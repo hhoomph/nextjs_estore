@@ -1,0 +1,74 @@
+﻿# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+.bun.*
+# Testing
+/coverage
+
+# Next.js
+/.next/
+/out/
+
+# Production
+/build
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Local env files (can opt-in for committing if needed)
+.env*
+!.env.example
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Generated files
+/generated/prisma
+
+# Project specific files
+/.clinerules
+.clineignore
+./memory-bank
+performance-report.json
+IMPLEMENTATION_PLAN_DETAILED.md
+IMPLEMENTATION_PLAN.md
+IMPLEMENTATION_PLAN_PHASE5-6.md
+mcp.json
+prompt.json
+AGENT.md
+fix_plan.md
+GOAL.md
+/.vscode/
+/vscode/
+/docs
+turbo.json
+/design-to-code-mcp
+/project-health-auditor
+/data
+# Test results and reports
+tests/
+test-results/
+playwright-report/
+bundle-analysis/
+reports/
+lighthouserc.json
+/script

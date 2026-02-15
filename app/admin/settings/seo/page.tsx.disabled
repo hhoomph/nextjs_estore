@@ -1,0 +1,331 @@
+/**
+ * Module for page
+ *
+ * @author hh.oomph@gmail.com
+ * @version 1.0.0
+ * @since 2025-01-01
+ */
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Search,
+  Save,
+  Loader2,
+  AlertTriangle,
+  CheckCircle,
+  BarChart3,
+  Globe,
+  Image,
+} from "lucide-react";
+import { useToast } from "@/lib/hooks/use-toast";
+import { updateSiteSettings, getSiteSettings } from "@/lib/actions/seo";
+
+const seoSchema = z.object({
+  default_seo_title: z.string().optional(),
+  default_seo_description: z.string().optional(),
+  default_og_image: z.string().url().optional().or(z.literal("")),
+  google_analytics_id: z.string().optional(),
+});
+
+type SEOFormData = z.infer<typeof seoSchema>;
+
+export default function AdminSEOSettingsPage() {
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const form = useForm<SEOFormData>({
+    resolver: zodResolver(seoSchema),
+    defaultValues: {
+      default_seo_title: "",
+      default_seo_description: "",
+      default_og_image: "",
+      google_analytics_id: "",
+    },
+  });
+
+  const fetchSettings = useCallback(async () => {
+    try {
+      const result = await getSiteSettings();
+      if (result.success && result.settings) {
+        form.reset({
+          default_seo_title: result.settings.default_seo_title || "",
+          default_seo_description: result.settings.default_seo_description || "",
+          default_og_image: result.settings.default_og_image || "",
+          google_analytics_id: result.settings.google_analytics_id || "",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to fetch SEO settings",
+          variant: "destructive",
+        });
+      }
+    } catch (err) {
+      console.error("Error fetching SEO settings:", err);
+      toast({
+        title: "Error",
+        description: "Failed to fetch SEO settings",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [form, toast]);
+
+  useEffect(() => {
+    fetchSettings();
+  }, [fetchSettings]);
+
+  const onSubmit = async (data: SEOFormData) => {
+    setSaving(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      // Fetch current settings to merge with SEO data
+      const currentResult = await getSiteSettings();
+      if (!currentResult.success || !currentResult.settings) {
+        throw new Error("Failed to fetch current settings");
+      }
+
+      // Merge current settings with new SEO data, providing defaults for required fields
+      const current = currentResult.settings;
+      const updatedData = {
+        site_title_en: current.site_title_en || "E-commerce Store",
+        site_title_fa: current.site_title_fa || "فروشگاه آنلاین",
+        phone_en: current.phone_en || "",
+        phone_fa: current.phone_fa || "",
+        description_en: current.description_en || "",
+        description_fa: current.description_fa || "",
+        // Language settings with defaults
+        language_mode: (current.language_mode as "multilingual" | "single_fa" | "single_en") || "multilingual",
+        default_language: (current.default_language as "en" | "fa") || "fa",
+        // Product suggestions with defaults
+        enable_product_suggestions: current.enable_product_suggestions ?? true,
+        suggestion_algorithm: (current.suggestion_algorithm as "popularity" | "similarity" | "recent" | "hybrid") || "hybrid",
+        max_suggestions: current.max_suggestions || 6,
+        // SEO settings
+        default_seo_title: data.default_seo_title,
+        default_seo_description: data.default_seo_description,
+        default_og_image: data.default_og_image,
+        google_analytics_id: data.google_analytics_id,
+        // Site configuration
+        maintenance_mode: current.maintenance_mode,
+        allow_registration: current.allow_registration,
+        default_currency: current.default_currency,
+        low_stock_threshold: current.low_stock_threshold,
+      };
+
+      const result = await updateSiteSettings(updatedData);
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: "SEO settings updated successfully",
+        });
+        setSuccess("SEO settings updated successfully!");
+      } else {
+        throw new Error(result.error || "Failed to update SEO settings");
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to update SEO settings";
+      setError(errorMessage);
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+          <p className="mt-2 text-muted-foreground">Loading SEO settings...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">SEO Settings</h1>
+          <p className="text-muted-foreground">Configure search engine optimization and analytics</p>
+        </div>
+      </div>
+
+      {/* Status Messages */}
+      {error && (
+        <div className="flex items-center gap-2 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+          <AlertTriangle className="h-5 w-5 text-destructive" />
+          <p className="text-destructive">{error}</p>
+        </div>
+      )}
+
+      {success && (
+        <div className="flex items-center gap-2 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <CheckCircle className="h-5 w-5 text-green-600" />
+          <p className="text-green-800">{success}</p>
+        </div>
+      )}
+
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* Default SEO Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Search className="h-5 w-5" />
+              Default SEO Settings
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="default_seo_title">Default Page Title</Label>
+              <Input
+                id="default_seo_title"
+                {...form.register("default_seo_title")}
+                placeholder="My E-commerce Store - Online Shopping"
+              />
+              <p className="text-xs text-muted-foreground">
+                This will be used as the default title for pages that don't have a custom SEO title
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="default_seo_description">Default Meta Description</Label>
+              <Textarea
+                id="default_seo_description"
+                {...form.register("default_seo_description")}
+                placeholder="Shop the best products online with fast shipping and great prices."
+                rows={3}
+              />
+              <p className="text-xs text-muted-foreground">
+                This will be used as the default meta description for pages that don't have a custom one (recommended: 150-160 characters)
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="default_og_image">Default OG Image URL</Label>
+              <Input
+                id="default_og_image"
+                {...form.register("default_og_image")}
+                placeholder="https://example.com/images/og-default.jpg"
+              />
+              <p className="text-xs text-muted-foreground">
+                This image will be used for social media sharing when no specific image is set (recommended: 1200x630px)
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Analytics Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5" />
+              Analytics & Tracking
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="google_analytics_id">Google Analytics ID</Label>
+              <Input
+                id="google_analytics_id"
+                {...form.register("google_analytics_id")}
+                placeholder="GA-XXXXXXXXXX or G-XXXXXXXXXX"
+              />
+              <p className="text-xs text-muted-foreground">
+                Enter your Google Analytics 4 measurement ID to enable tracking
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* SEO Tips */}
+        <Card className="bg-blue-50 border-blue-200">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-blue-900">
+              <Globe className="h-5 w-5" />
+              SEO Best Practices
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-800">
+              <div>
+                <h4 className="font-semibold mb-2">Page Titles</h4>
+                <ul className="space-y-1 text-xs">
+                  <li>• Keep under 60 characters</li>
+                  <li>• Include target keywords</li>
+                  <li>• Make them unique per page</li>
+                  <li>• Use your brand name when relevant</li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-2">Meta Descriptions</h4>
+                <ul className="space-y-1 text-xs">
+                  <li>• Keep under 160 characters</li>
+                  <li>• Include compelling call-to-action</li>
+                  <li>• Use target keywords naturally</li>
+                  <li>• Make them unique per page</li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-2">Images</h4>
+                <ul className="space-y-1 text-xs">
+                  <li>• Use descriptive filenames</li>
+                  <li>• Include alt text for accessibility</li>
+                  <li>• Optimize file sizes</li>
+                  <li>• Use proper dimensions</li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-2">Technical SEO</h4>
+                <ul className="space-y-1 text-xs">
+                  <li>• Use HTTPS protocol</li>
+                  <li>• Ensure mobile-friendliness</li>
+                  <li>• Improve page load speeds</li>
+                  <li>• Create XML sitemap</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Save Button */}
+        <div className="flex justify-end">
+          <Button type="submit" disabled={saving}>
+            {saving ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4 mr-2" />
+                Save SEO Settings
+              </>
+            )}
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
+}

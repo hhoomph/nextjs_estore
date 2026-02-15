@@ -1,0 +1,71 @@
+/**
+ * Module for route
+ *
+ * @author hh.oomph@gmail.com
+ * @version 1.0.0
+ * @since 2025-01-01
+ */
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+
+export async function GET(request: NextRequest) {
+  try {
+    const products = await prisma.product.findMany({
+      where: { status: 1 },
+      include: {
+        productPictures: {
+          take: 1,
+          orderBy: { displayOrder: "asc" },
+          include: {
+            picture: {
+              select: { url: true },
+            },
+          },
+        },
+      },
+      take: 12,
+      orderBy: { createdAt: "desc" },
+    });
+
+    const transformedProducts = products.map((product) => ({
+      id: product.id,
+      name: product.name,
+      desc: product.desc,
+      slug: product.slug,
+      price: Number(product.price),
+      discount_price: product.discountPrice ? Number(product.discountPrice) : null,
+      quantity: product.quantity,
+      images: product.productPictures.map((pp) => pp.picture.url),
+      inStock: product.quantity > 0,
+      createdAt: product.createdAt,
+    }));
+
+    return NextResponse.json({
+      success: true,
+      data: transformedProducts,
+      pagination: {
+        page: 1,
+        limit: 12,
+        total: products.length,
+        pages: 1,
+        hasNext: false,
+        hasPrev: false,
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    return NextResponse.json(
+      { error: "Failed to fetch products" },
+      { status: 500 }
+    );
+  }
+}
+
+// Temporarily disable POST for debugging
+// POST /api/products - Create new product (admin only)
+export async function POST(request: NextRequest) {
+  return NextResponse.json(
+    { error: "POST endpoint temporarily disabled for debugging" },
+    { status: 503 }
+  );
+}

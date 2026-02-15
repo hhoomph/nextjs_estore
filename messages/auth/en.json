@@ -1,0 +1,80 @@
+{
+  "signin": {
+    "title": "Sign in to your account",
+    "subtitle": "Enter your credentials to access your account",
+    "email": {
+      "label": "Email",
+      "placeholder": "Enter your email"
+    },
+    "password": {
+      "label": "Password",
+      "placeholder": "Enter your password"
+    },
+    "submit": "Sign in",
+    "loading": "Signing in...",
+    "forgotPassword": "Forgot your password?",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign up",
+    "social": {
+      "orContinueWith": "Or continue with",
+      "google": "Google",
+      "github": "GitHub"
+    },
+    "errors": {
+      "signInFailed": "Sign in failed",
+      "socialSignInFailed": "Social sign in failed",
+      "unexpectedError": "An unexpected error occurred"
+    }
+  },
+  "signup": {
+    "title": "Create your account",
+    "subtitle": "Enter your information to create your account",
+    "name": {
+      "label": "Full Name",
+      "placeholder": "Enter your full name"
+    },
+    "email": {
+      "label": "Email",
+      "placeholder": "Enter your email"
+    },
+    "password": {
+      "label": "Password",
+      "placeholder": "Enter your password"
+    },
+    "phone": {
+      "label": "Phone Number",
+      "placeholder": "Enter your phone number"
+    },
+    "confirmPassword": {
+      "label": "Confirm Password",
+      "placeholder": "Confirm your password"
+    },
+    "submit": "Create account",
+    "loading": "Creating account...",
+    "hasAccount": "Already have an account?",
+    "signIn": "Sign in",
+    "social": {
+      "orContinueWith": "Or continue with",
+      "google": "Google",
+      "github": "GitHub"
+    },
+    "errors": {
+      "signUpFailed": "Sign up failed",
+      "socialSignUpFailed": "Social sign up failed",
+      "unexpectedError": "An unexpected error occurred"
+    }
+  },
+  "verifyEmail": {
+    "title": "Verify your email",
+    "subtitle": "We've sent a verification code to your email",
+    "code": {
+      "label": "Verification Code",
+      "placeholder": "Enter verification code"
+    },
+    "submit": "Verify",
+    "loading": "Verifying...",
+    "resend": "Didn't receive the code?",
+    "resendButton": "Resend code",
+    "backToSignIn": "Back to sign in"
+  }
+}

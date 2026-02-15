@@ -1,0 +1,80 @@
+{
+  "signin": {
+    "title": "ورود به حساب کاربری",
+    "subtitle": "برای دسترسی به حساب خود اعتبارنامه خود را وارد کنید",
+    "email": {
+      "label": "ایمیل",
+      "placeholder": "ایمیل خود را وارد کنید"
+    },
+    "password": {
+      "label": "رمز عبور",
+      "placeholder": "رمز عبور خود را وارد کنید"
+    },
+    "submit": "ورود",
+    "loading": "در حال ورود...",
+    "forgotPassword": "رمز عبور خود را فراموش کرده‌اید؟",
+    "noAccount": "حساب کاربری ندارید؟",
+    "signUp": "ثبت نام",
+    "social": {
+      "orContinueWith": "یا ادامه با",
+      "google": "گوگل",
+      "github": "گیت هاب"
+    },
+    "errors": {
+      "signInFailed": "ورود ناموفق",
+      "socialSignInFailed": "ورود اجتماعی ناموفق",
+      "unexpectedError": "خطای غیرمنتظره رخ داد"
+    }
+  },
+  "signup": {
+    "title": "حساب کاربری خود را ایجاد کنید",
+    "subtitle": "برای ایجاد حساب کاربری اطلاعات خود را وارد کنید",
+    "name": {
+      "label": "نام کامل",
+      "placeholder": "نام کامل خود را وارد کنید"
+    },
+    "email": {
+      "label": "ایمیل",
+      "placeholder": "ایمیل خود را وارد کنید"
+    },
+    "password": {
+      "label": "رمز عبور",
+      "placeholder": "رمز عبور خود را وارد کنید"
+    },
+    "phone": {
+      "label": "شماره تلفن",
+      "placeholder": "شماره تلفن خود را وارد کنید"
+    },
+    "confirmPassword": {
+      "label": "تأیید رمز عبور",
+      "placeholder": "رمز عبور خود را تأیید کنید"
+    },
+    "submit": "ایجاد حساب",
+    "loading": "در حال ایجاد حساب...",
+    "hasAccount": "قبلاً حساب کاربری دارید؟",
+    "signIn": "ورود",
+    "social": {
+      "orContinueWith": "یا ادامه با",
+      "google": "گوگل",
+      "github": "گیت هاب"
+    },
+    "errors": {
+      "signUpFailed": "ثبت نام ناموفق",
+      "socialSignUpFailed": "ثبت نام اجتماعی ناموفق",
+      "unexpectedError": "خطای غیرمنتظره رخ داد"
+    }
+  },
+  "verifyEmail": {
+    "title": "ایمیل خود را تأیید کنید",
+    "subtitle": "کد تأیید را به ایمیل شما ارسال کردیم",
+    "code": {
+      "label": "کد تأیید",
+      "placeholder": "کد تأیید را وارد کنید"
+    },
+    "submit": "تأیید",
+    "loading": "در حال تأیید...",
+    "resend": "کد را دریافت نکردید؟",
+    "resendButton": "ارسال مجدد کد",
+    "backToSignIn": "بازگشت به ورود"
+  }
+}

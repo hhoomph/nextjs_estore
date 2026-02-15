@@ -1,0 +1,551 @@
+/**
+ * Unified Session & Cart Management Hook
+ *
+ * Provides seamless synchronization between guest and authenticated user sessions,
+ * automatic cart merging, and real-time badge count updates.
+ *
+ * Features:
+ * - Unified session state management
+ * - Automatic guest-to-user cart merging
+ * - Real-time badge count synchronization
+ * - Conflict resolution for cart items
+ * - Persistent state across sessions
+ *
+ * @author hh.oomph@gmail.com
+ * @version 1.0.0
+ * @since 2025-01-01
+ */
+
+"use client";
+
+import { useEffect, useCallback, useRef } from 'react';
+import { useSession } from '@/lib/auth-client';
+import { useRouter } from 'next/navigation';
+
+// Import stores
+import { useSessionSyncStore, type SessionUser } from '@/lib/stores/session-sync-store';
+import { useCartStore, type CartItem } from '@/lib/stores/cart-store';
+import { useGuestCartStore, type EnhancedCartItem } from '@/lib/stores/guest-cart-store';
+
+// Import utilities
+import { toast } from '@/lib/hooks/use-toast';
+
+/**
+ * Unified session and cart state interface
+ */
+export interface UnifiedSessionState {
+  // Session state
+  user: SessionUser | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  sessionSyncStatus: 'idle' | 'syncing' | 'synced' | 'error';
+
+  // Cart state
+  cartItems: CartItem[];
+  guestCartItems: EnhancedCartItem[];
+  cartItemCount: number;
+  cartTotal: number;
+  isCartOpen: boolean;
+
+  // Computed states
+  isGuest: boolean;
+  hasValidSession: boolean;
+  cartMergeInProgress: boolean;
+  lastActivity: Date | null;
+}
+
+/**
+ * Actions for unified session/cart management
+ */
+export interface UnifiedSessionActions {
+  // Session actions
+  signIn: (user: SessionUser) => Promise<void>;
+  signOut: () => Promise<void>;
+  refreshSession: () => Promise<void>;
+
+  // Cart actions
+  addToCart: (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => void;
+  removeFromCart: (id: string) => void;
+  updateCartQuantity: (id: string, quantity: number) => void;
+  clearCart: () => void;
+  toggleCart: () => void;
+
+  // Unified actions
+  mergeGuestCartOnLogin: () => Promise<void>;
+  syncCartWithServer: () => Promise<void>;
+  exportCartState: () => any;
+}
+
+/**
+ * Configuration for unified session management
+ */
+export interface UnifiedSessionConfig {
+  enableAutoMerge: boolean;
+  enableServerSync: boolean;
+  mergeStrategy: 'prefer-user' | 'prefer-guest' | 'combine';
+  syncInterval: number; // in milliseconds
+  enableRealTimeUpdates: boolean;
+}
+
+/**
+ * Default configuration
+ */
+const DEFAULT_CONFIG: UnifiedSessionConfig = {
+  enableAutoMerge: true,
+  enableServerSync: true,
+  mergeStrategy: 'combine',
+  syncInterval: 30000, // 30 seconds
+  enableRealTimeUpdates: true,
+};
+
+/**
+ * Cart merge conflict resolution
+ */
+export interface CartMergeConflict {
+  itemId: string;
+  guestItem: EnhancedCartItem;
+  userItem: CartItem;
+  resolution: 'keep-guest' | 'keep-user' | 'combine-quantities';
+}
+
+/**
+ * Unified Session & Cart Manager
+ */
+class UnifiedSessionManager {
+  private config: UnifiedSessionConfig;
+  private syncIntervalId: NodeJS.Timeout | null = null;
+  private isInitialized = false;
+
+  constructor(config: Partial<UnifiedSessionConfig> = {}) {
+    this.config = { ...DEFAULT_CONFIG, ...config };
+  }
+
+  /**
+   * Initialize the unified session manager
+   */
+  initialize(): void {
+    if (this.isInitialized) return;
+
+    // Setup real-time synchronization
+    if (this.config.enableRealTimeUpdates) {
+      this.setupRealTimeSync();
+    }
+
+    // Setup periodic sync
+    if (this.config.enableServerSync) {
+      this.setupPeriodicSync();
+    }
+
+    this.isInitialized = true;
+  }
+
+  /**
+   * Setup real-time synchronization
+   */
+  private setupRealTimeSync(): void {
+    // Listen to session changes
+    useSessionSyncStore.subscribe(
+      (state) => state.isAuthenticated,
+      (isAuthenticated, prevAuthenticated) => {
+        if (isAuthenticated && !prevAuthenticated) {
+          // User just logged in
+          if (this.config.enableAutoMerge) {
+            this.handleGuestToUserTransition();
+          }
+        } else if (!isAuthenticated && prevAuthenticated) {
+          // User just logged out
+          this.handleUserToGuestTransition();
+        }
+      }
+    );
+
+    // Listen to cart changes for badge updates
+    useCartStore.subscribe(
+      (state) => state.items,
+      (items) => {
+        this.updateBadgeCount(items);
+      }
+    );
+  }
+
+  /**
+   * Setup periodic synchronization
+   */
+  private setupPeriodicSync(): void {
+    this.syncIntervalId = setInterval(() => {
+      const sessionState = useSessionSyncStore.getState();
+      const cartState = useCartStore.getState();
+
+      // Sync if there are pending changes
+      if (sessionState.syncStatus === 'idle' && cartState.items.length > 0) {
+        this.syncWithServer();
+      }
+    }, this.config.syncInterval);
+  }
+
+  /**
+   * Handle guest to user transition
+   */
+  public async handleGuestToUserTransition(): Promise<void> {
+    const sessionState = useSessionSyncStore.getState();
+    const guestCartState = useGuestCartStore.getState();
+
+    if (!sessionState.user || guestCartState.items.length === 0) {
+      return;
+    }
+
+    try {
+      // Set cart merge in progress
+      useCartStore.setState({ cartMergeInProgress: true });
+
+      // Get user cart from server (this would be an API call)
+      const userCartItems = await this.fetchUserCart(sessionState.user.id);
+
+      // Merge guest cart with user cart
+      const mergedItems = await this.mergeCarts(guestCartState.items, userCartItems);
+
+      // Update cart store
+      useCartStore.setState({
+        items: mergedItems,
+        guestCart: [], // Clear guest cart
+        cartMergeInProgress: false,
+      });
+
+      // Clear guest cart store
+      useGuestCartStore.setState({
+        items: [],
+        pendingUpdates: [],
+      });
+
+      toast({
+        title: "Cart Merged",
+        description: "Your guest cart has been merged with your account",
+        variant: "success",
+      });
+
+    } catch (error) {
+      console.error('Failed to merge guest cart:', error);
+      useCartStore.setState({ cartMergeInProgress: false });
+
+      toast({
+        title: "Merge Failed",
+        description: "Could not merge your cart. Please try again.",
+        variant: "destructive",
+      });
+    }
+  }
+
+  /**
+   * Handle user to guest transition
+   */
+  public handleUserToGuestTransition(): void {
+    // Clear user-specific data, keep cart for guest session
+    useSessionSyncStore.getState().clearSession();
+  }
+
+  /**
+   * Merge guest cart with user cart
+   */
+  private async mergeCarts(guestItems: EnhancedCartItem[], userItems: CartItem[]): Promise<CartItem[]> {
+    const mergedItems = [...userItems];
+    const userItemMap = new Map(userItems.map(item => [item.product_id + (item.product_options_id || ''), item]));
+
+    for (const guestItem of guestItems) {
+      const key = guestItem.product_id + (guestItem.product_options_id || '');
+      const existingUserItem = userItemMap.get(key);
+
+      if (existingUserItem) {
+        // Item exists in both carts
+        if (this.config.mergeStrategy === 'prefer-user') {
+          // Keep user cart version
+          continue;
+        } else if (this.config.mergeStrategy === 'prefer-guest') {
+          // Replace with guest cart version
+          const index = mergedItems.findIndex(item => item.id === existingUserItem.id);
+          mergedItems[index] = this.convertToCartItem(guestItem);
+        } else {
+          // Combine quantities
+          const index = mergedItems.findIndex(item => item.id === existingUserItem.id);
+          mergedItems[index] = {
+            ...existingUserItem,
+            quantity: existingUserItem.quantity + guestItem.quantity,
+          };
+        }
+      } else {
+        // Item only exists in guest cart
+        mergedItems.push(this.convertToCartItem(guestItem));
+      }
+    }
+
+    return mergedItems;
+  }
+
+  /**
+   * Convert enhanced cart item to cart item (for compatibility)
+   */
+  private convertToCartItem(enhancedItem: EnhancedCartItem): CartItem {
+    // Since CartItem is now an alias for EnhancedCartItem, just return the item
+    return enhancedItem;
+  }
+
+  /**
+   * Fetch user cart from server
+   */
+  private async fetchUserCart(userId: string): Promise<CartItem[]> {
+    try {
+      const response = await fetch(`/api/cart?userId=${userId}`);
+      if (!response.ok) throw new Error('Failed to fetch user cart');
+      const data = await response.json();
+      return data.items || [];
+    } catch (error) {
+      console.error('Failed to fetch user cart:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Sync cart with server
+   */
+  public async syncWithServer(): Promise<void> {
+    const sessionState = useSessionSyncStore.getState();
+    const cartState = useCartStore.getState();
+
+    if (!sessionState.user) return;
+
+    try {
+      await fetch('/api/cart/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: sessionState.user.id,
+          items: cartState.items,
+        }),
+      });
+    } catch (error) {
+      console.error('Failed to sync cart with server:', error);
+    }
+  }
+
+  /**
+   * Update badge count across the application
+   */
+  private updateBadgeCount(items: CartItem[]): void {
+    const itemCount = items.reduce((count, item) => count + item.quantity, 0);
+
+    // Update navbar store
+    try {
+      const { updateRealTimeData } = require('@/lib/stores/navbar-store').useNavbarStore.getState();
+      updateRealTimeData({ cartCount: itemCount });
+    } catch (error) {
+      // Navbar store might not be available
+    }
+
+    // Dispatch custom event for other components
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('cart-count-updated', {
+        detail: { count: itemCount }
+      }));
+    }
+  }
+
+  /**
+   * Cleanup resources
+   */
+  destroy(): void {
+    if (this.syncIntervalId) {
+      clearInterval(this.syncIntervalId);
+      this.syncIntervalId = null;
+    }
+    this.isInitialized = false;
+  }
+}
+
+/**
+ * Singleton instance of the unified session manager
+ */
+let unifiedSessionManager: UnifiedSessionManager | null = null;
+
+/**
+ * Get or create the unified session manager instance
+ */
+function getUnifiedSessionManager(config?: Partial<UnifiedSessionConfig>): UnifiedSessionManager {
+  if (!unifiedSessionManager) {
+    unifiedSessionManager = new UnifiedSessionManager(config);
+    unifiedSessionManager.initialize();
+  }
+  return unifiedSessionManager;
+}
+
+/**
+ * Main hook for unified session and cart management
+ */
+export function useUnifiedSession(config?: Partial<UnifiedSessionConfig>) {
+  const router = useRouter();
+  const { data: session, isPending } = useSession();
+
+  // Get store states
+  const sessionState = useSessionSyncStore();
+  const cartState = useCartStore();
+  const guestCartState = useGuestCartStore();
+
+  // Initialize manager
+  const manager = getUnifiedSessionManager(config);
+
+  // Convert cart items to unified format
+  const cartItems = cartState.items;
+  const guestCartItems = guestCartState.items;
+  const cartItemCount = cartState.getItemCount();
+  const cartTotal = cartState.getTotal();
+
+  // Unified state
+  const unifiedState: UnifiedSessionState = {
+    user: sessionState.user,
+    isAuthenticated: sessionState.isAuthenticated,
+    isLoading: sessionState.isLoading || isPending,
+    sessionSyncStatus: sessionState.syncStatus,
+
+    cartItems,
+    guestCartItems,
+    cartItemCount,
+    cartTotal,
+    isCartOpen: cartState.isOpen,
+
+    isGuest: !sessionState.isAuthenticated,
+    hasValidSession: sessionState.isAuthenticated && !!sessionState.user,
+    cartMergeInProgress: cartState.cartMergeInProgress || false,
+    lastActivity: sessionState.lastSync,
+  };
+
+  // Actions
+  const signIn = useCallback(async (user: SessionUser) => {
+    await sessionState.syncSession(user);
+    await manager.handleGuestToUserTransition();
+  }, [sessionState, manager]);
+
+  const signOut = useCallback(async () => {
+    sessionState.clearSession();
+    manager.handleUserToGuestTransition();
+    router.push('/auth/signin');
+  }, [sessionState, manager, router]);
+
+  const refreshSession = useCallback(async () => {
+    await sessionState.refreshSession();
+  }, [sessionState]);
+
+  // Cart actions
+  const addToCart = useCallback((item: Omit<CartItem, 'quantity'> & { quantity?: number }) => {
+    cartState.addItem(item);
+  }, [cartState]);
+
+  const removeFromCart = useCallback((id: string) => {
+    cartState.removeItem(id);
+  }, [cartState]);
+
+  const updateCartQuantity = useCallback((id: string, quantity: number) => {
+    cartState.updateQuantity(id, quantity);
+  }, [cartState]);
+
+  const clearCart = useCallback(() => {
+    cartState.clearCart();
+  }, [cartState]);
+
+  const toggleCart = useCallback(() => {
+    cartState.toggleCart();
+  }, [cartState]);
+
+  // Unified actions
+  const mergeGuestCartOnLogin = useCallback(async () => {
+    await manager.handleGuestToUserTransition();
+  }, [manager]);
+
+  const syncCartWithServer = useCallback(async () => {
+    await manager.syncWithServer();
+  }, [manager]);
+
+  const exportCartState = useCallback(() => {
+    return {
+      session: unifiedState,
+      cart: cartState,
+      guestCart: guestCartState,
+    };
+  }, [unifiedState, cartState, guestCartState]);
+
+  const actions: UnifiedSessionActions = {
+    signIn,
+    signOut,
+    refreshSession,
+    addToCart,
+    removeFromCart,
+    updateCartQuantity,
+    clearCart,
+    toggleCart,
+    mergeGuestCartOnLogin,
+    syncCartWithServer,
+    exportCartState,
+  };
+
+  return {
+    ...unifiedState,
+    ...actions,
+  };
+}
+
+/**
+ * Hook for cart badge count with real-time updates
+ */
+export function useCartBadge() {
+  const { cartItemCount } = useUnifiedSession();
+
+  return {
+    count: cartItemCount,
+    hasItems: cartItemCount > 0,
+    displayCount: cartItemCount > 99 ? '99+' : cartItemCount.toString(),
+  };
+}
+
+/**
+ * Hook for session-dependent cart operations
+ */
+export function useSessionCart() {
+  const {
+    isAuthenticated,
+    user,
+    cartItems,
+    guestCartItems,
+    mergeGuestCartOnLogin,
+    addToCart,
+    removeFromCart,
+    updateCartQuantity,
+    clearCart,
+  } = useUnifiedSession();
+
+  const effectiveCartItems = isAuthenticated ? cartItems : guestCartItems;
+
+  return {
+    items: effectiveCartItems,
+    isAuthenticated,
+    user,
+    addToCart,
+    removeFromCart,
+    updateCartQuantity,
+    clearCart,
+    mergeGuestCartOnLogin,
+    canMerge: !isAuthenticated && guestCartItems.length > 0,
+  };
+}
+
+/**
+ * Hook for cart synchronization status
+ */
+export function useCartSyncStatus() {
+  const { sessionSyncStatus, cartMergeInProgress } = useUnifiedSession();
+
+  return {
+    isSyncing: sessionSyncStatus === 'syncing' || cartMergeInProgress,
+    hasError: sessionSyncStatus === 'error',
+    lastSync: null, // Cart store doesn't track last sync time
+    errorMessage: sessionSyncStatus === 'error' ? 'Sync failed' : null,
+  };
+}
+
+export default useUnifiedSession;

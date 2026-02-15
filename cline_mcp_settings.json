@@ -1,0 +1,204 @@
+﻿{
+  "mcpServers": {
+    "better-auth": {
+      "disabled": false,
+      "timeout": 60,
+      "type": "sse",
+      "url": "https://mcp.chonkie.ai/better-auth/better-auth-builder/mcp"
+    },
+    "filesystem": {
+      "autoApprove": [
+        "list_allowed_directories",
+        "list_directory",
+        "read_text_file"
+      ],
+      "disabled": false,
+      "timeout": 60,
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "C:\\Users\\oomph\\Documents\\Cline\\MCP\\filesystem-server\\src\\filesystem\\dist\\index.js",
+        "C:\\Users\\oomph",
+        "M:\\Programs Files\\GithubDesktop",
+        "M:\\Programs Files\\GithubDesktop\\nextjs_estore"
+      ]
+    },
+    "git": {
+      "disabled": false,
+      "timeout": 60,
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["mcp-server-git", "--repository", "."]
+    },
+    "fetch": {
+      "autoApprove": ["fetch"],
+      "timeout": 60,
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["mcp-server-fetch"],
+      "env": {
+        "PYTHONIOENCODING": "utf-8"
+      }
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": ["-y", "chrome-devtools-mcp@latest"]
+    },
+    "next-devtools": {
+      "autoApprove": [
+        "browser_eval",
+        "enable_cache_components",
+        "init",
+        "nextjs_docs",
+        "nextjs_index",
+        "nextjs_call",
+        "upgrade_nextjs_16"
+      ],
+      "timeout": 60,
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "next-devtools-mcp@latest"]
+    },
+    "shadcn": {
+      "timeout": 60,
+      "type": "stdio",
+      "command": "npx",
+      "args": ["shadcn@latest", "mcp"]
+    },
+    "magicuidesign": {
+      "timeout": 60,
+      "type": "stdio",
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@magicuidesign/mcp@latest"]
+    },
+    "vercel": {
+      "autoApprove": [
+        "search_vercel_documentation",
+        "list_projects",
+        "list_deployments",
+        "get_deployment_build_logs",
+        "get_access_to_vercel_url",
+        "check_domain_availability_and_price"
+      ],
+      "timeout": 60,
+      "type": "stdio",
+      "command": "npx",
+      "args": ["mcp-remote", "https://mcp.vercel.com"]
+    },
+    "github": {
+      "disabled": false,
+      "timeout": 60,
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "autoApprove": ["get_me"]
+    },
+    "agentdeskai-browser-tools": {
+      "disabled": false,
+      "timeout": 60,
+      "type": "stdio",
+      "command": "npx",
+      "args": ["@agentdeskai/browser-tools-mcp@latest"],
+      "autoApprove": ["runAccessibilityAudit"]
+    },
+    "sequential-thinking": {
+      "disabled": false,
+      "timeout": 60,
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "autoApprove": ["sequentialthinking"]
+    },
+    "nighttrek-software-planning": {
+      "command": "node",
+      "args": [
+        "C:\\Users\\oomph\\Documents\\Cline\\MCP\\software-planning-tool\\build\\index.js"
+      ],
+      "disabled": false,
+      "timeout": 60,
+      "type": "stdio",
+      "autoApprove": ["start_planning"]
+    },
+    "code-mode": {
+      "command": "npx",
+      "args": ["@utcp/code-mode-mcp"],
+      "disabled": false,
+      "timeout": 60,
+      "type": "stdio",
+      "autoApprove": ["call_tool_chain", "get_example"]
+    },
+    "docker": {
+      "command": "docker",
+      "args": ["mcp", "gateway", "run"],
+      "disabled": false,
+      "timeout": 60,
+      "type": "stdio",
+      "env": {
+        "LOCALAPPDATA": "C:\\Users\\oomph\\AppData\\Local",
+        "ProgramData": "C:\\ProgramData",
+        "ProgramFiles": "C:\\Program Files"
+      }
+    },
+    "campfirein-cipher": {
+      "disabled": false,
+      "timeout": 60,
+      "type": "stdio",
+      "command": "npx",
+      "args": ["tsx", "src/app/index.ts", "--mode", "mcp"],
+      "env": {
+        "CIPHER_LOG_LEVEL": "info",
+        "MCP_SERVER_MODE": "default"
+      }
+    },
+    "parallel-task-mcp": {
+      "disabled": false,
+      "timeout": 60,
+      "type": "http",
+      "url": "https://task-mcp.parallel.ai/mcp",
+      "autoApprove": ["list_tools"]
+    },
+    "MCP_DOCKER": {
+      "command": "docker",
+      "args": ["mcp", "gateway", "run"],
+      "disabled": true,
+      "timeout": 60,
+      "type": "stdio",
+      "env": {
+        "LOCALAPPDATA": "C:\\Users\\oomph\\AppData\\Local",
+        "ProgramData": "C:\\ProgramData",
+        "ProgramFiles": "C:\\Program Files"
+      }
+    },
+    "design-to-code": {
+      "command": "node",
+      "args": [
+        "M:\\Programs Files\\GithubDesktop\\nextjs_estore\\design-to-code-mcp\\dist\\servers\\design-converter.js"
+      ],
+      "disabled": false,
+      "timeout": 60,
+      "type": "stdio",
+      "autoApprove": []
+    },
+    "project-health-auditor": {
+      "command": "node",
+      "args": [
+        "C:\\Users\\oomph\\Documents\\Cline\\MCP\\project-health-auditor\\build\\index.js"
+      ],
+      "disabled": false,
+      "timeout": 60,
+      "type": "stdio",
+      "autoApprove": ["list_repo_files"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@executeautomation/playwright-mcp-server"],
+      "disabled": false,
+      "timeout": 60,
+      "type": "stdio",
+      "autoApprove": [
+        "browser_navigate",
+        "browser_snapshot",
+        "browser_take_screenshot"
+      ]
+    }
+  }
+}

@@ -1,0 +1,948 @@
+{
+  "loading": "Loading...",
+  "Navigation": {
+    "products": "Products",
+    "categories": "Categories",
+    "deals": "Deals",
+    "search": "Search",
+    "account": "Account",
+    "orders": "Orders",
+    "settings": "Settings",
+    "dashboard": "Dashboard",
+    "wishlist": "Wishlist",
+    "cart": "Cart",
+    "profile": "Profile",
+    "adminPanel": "Admin Panel",
+    "signOut": "Sign Out"
+  },
+  "Authentication": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "manageProducts": "Manage Products"
+  },
+  "Admin Panel": {
+    "admin": "Admin",
+    "adminPanel": "Admin Panel",
+    "analytics": "Analytics",
+    "users": "Users",
+    "sales": "Sales",
+    "revenue": "Revenue",
+    "customers": "Customers",
+    "totalRevenue": "Total Revenue",
+    "totalOrders": "Total Orders",
+    "totalCustomers": "Total Customers",
+    "averageOrderValue": "Average Order Value",
+    "salesTrend": "Sales Trend",
+    "userGrowth": "User Growth",
+    "topProducts": "Top Products",
+    "categoryPerformance": "Category Performance",
+    "lowStockAlert": "Low Stock Alert",
+    "quickActions": "Quick Actions",
+    "addNewProduct": "Add New Product",
+    "manageUsers": "Manage Users",
+    "viewAnalytics": "View Analytics"
+  },
+  "Settings": {
+    "generalSettings": "General Settings",
+    "storeSettings": "Store Settings",
+    "siteName": "Site Name",
+    "siteDescription": "Site Description",
+    "contactEmail": "Contact Email",
+    "defaultCurrency": "Default Currency",
+    "lowStockThreshold": "Low Stock Threshold",
+    "maintenanceMode": "Maintenance Mode",
+    "allowRegistration": "Allow User Registration",
+    "saveSettings": "Save Settings"
+  },
+  "API Messages": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "failedToFetch": "Failed to fetch data",
+    "failedToUpdate": "Failed to update",
+    "failedToCreate": "Failed to create",
+    "failedToDelete": "Failed to delete",
+    "failedToSave": "Failed to save",
+    "failedToLoad": "Failed to load",
+    "failedToUpload": "Failed to upload",
+    "failedToSend": "Failed to send",
+    "itemCreated": "Item created successfully",
+    "itemUpdated": "Item updated successfully",
+    "itemDeleted": "Item deleted successfully",
+    "settingsUpdated": "Settings updated successfully",
+    "orderStatusUpdated": "Order status updated successfully",
+    "profileUpdated": "Profile updated successfully",
+    "passwordUpdated": "Password updated successfully",
+    "unauthorized": "Unauthorized access",
+    "adminRequired": "Admin access required",
+    "pleaseTryAgain": "Please try again"
+  },
+  "Toast Messages": {
+    "welcomeBack": "Welcome back!",
+    "signedOut": "You have been signed out",
+    "cartUpdated": "Cart updated",
+    "itemAddedToCart": "Item added to cart",
+    "itemRemovedFromCart": "Item removed from cart",
+    "itemAddedToWishlist": "Item added to wishlist",
+    "itemRemovedFromWishlist": "Item removed from wishlist",
+    "productCreated": "Product created successfully",
+    "productUpdated": "Product updated successfully",
+    "userUpdated": "User updated successfully",
+    "categoryCreated": "Category created successfully",
+    "categoryUpdated": "Category updated successfully"
+  },
+  "Form Validation": {
+    "requiredField": "This field is required",
+    "invalidEmail": "Please enter a valid email address",
+    "invalidPassword": "Password must be at least 6 characters",
+    "passwordsNotMatch": "Passwords do not match",
+    "invalidPhone": "Please enter a valid phone number"
+  },
+  "Status Messages": {
+    "pending": "Pending",
+    "processing": "Processing",
+    "shipped": "Shipped",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled",
+    "active": "Active",
+    "inactive": "Inactive",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "lowStock": "Low Stock",
+    "available": "Available"
+  },
+  "Common Actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "remove": "Remove",
+    "view": "View",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit"
+  },
+  "Placeholders": {
+    "enterSiteName": "Enter site name",
+    "enterSiteDescription": "Enter site description",
+    "enterEmail": "Enter email address",
+    "enterName": "Enter name",
+    "enterDescription": "Enter description",
+    "searchProducts": "Search products...",
+    "enterQuantity": "Enter quantity"
+  },
+  "Currencies": {
+    "irr": "تومان (تومان)",
+    "toman": "تومان (تومان)",
+    "rial": "ریال (ریال)",
+    "usd": "US Dollar ($)",
+    "eur": "Euro (€)",
+    "gbp": "British Pound (£)",
+    "cad": "Canadian Dollar (CA$)",
+    "aud": "Australian Dollar (A$)"
+  },
+  "Time Periods": {
+    "last7Days": "Last 7 days",
+    "last30Days": "Last 30 days",
+    "last90Days": "Last 90 days",
+    "lastYear": "Last year",
+    "today": "Today",
+    "thisWeek": "This week",
+    "thisMonth": "This month",
+    "selectPeriod": "Select period"
+  },
+  "Error Messages": {
+    "networkError": "Network error occurred",
+    "serverError": "Server error occurred",
+    "validationError": "Validation error",
+    "permissionDenied": "Permission denied",
+    "notFound": "Item not found",
+    "alreadyExists": "Item already exists"
+  },
+  "Confirmations": {
+    "confirmDelete": "Are you sure you want to delete this item?",
+    "confirmSave": "Are you sure you want to save changes?",
+    "unsavedChanges": "You have unsaved changes. Are you sure you want to leave?"
+  },
+  "Analytics": {
+    "fromLastMonth": "from last month",
+    "sold": "sold",
+    "remaining": "remaining",
+    "newUsers": "New Users",
+    "revenueLabel": "Revenue",
+    "ordersLabel": "Orders",
+    "userLabel": "Users"
+  },
+  "auth": {
+    "signin": {
+      "title": "Sign in to your account",
+      "subtitle": "Enter your credentials to access your account",
+      "email": {
+        "label": "Email",
+        "placeholder": "Enter your email"
+      },
+      "password": {
+        "label": "Password",
+        "placeholder": "Enter your password"
+      },
+      "phone": {
+        "label": "Phone Number",
+        "placeholder": "Enter your phone number"
+      },
+      "submit": "Sign in",
+      "loading": "Signing in...",
+      "forgotPassword": "Forgot your password?",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "hasAccount": "Already have an account?",
+      "social": {
+        "orContinueWith": "Or continue with",
+        "google": "Google",
+        "github": "GitHub"
+      },
+      "errors": {
+        "signInFailed": "Sign in failed",
+        "socialSignInFailed": "Social sign in failed",
+        "unexpectedError": "An unexpected error occurred"
+      }
+    },
+    "signup": {
+      "title": "Create your account",
+      "subtitle": "Join us today and start shopping",
+      "name": {
+        "label": "Full Name",
+        "placeholder": "Enter your full name"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "Enter your email"
+      },
+      "phone": {
+        "label": "Phone Number",
+        "placeholder": "Enter your phone number"
+      },
+      "password": {
+        "label": "Password",
+        "placeholder": "Enter your password"
+      },
+      "confirmPassword": {
+        "label": "Confirm Password",
+        "placeholder": "Confirm your password"
+      },
+      "submit": "Create Account",
+      "loading": "Creating account...",
+      "hasAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "social": {
+        "orContinueWith": "Or continue with",
+        "google": "Google",
+        "github": "GitHub"
+      },
+      "errors": {
+        "signUpFailed": "Sign up failed",
+        "socialSignUpFailed": "Social sign up failed",
+        "unexpectedError": "An unexpected error occurred"
+      }
+    }
+  },
+  "Footer & Additional UI": {
+    "copyright": "© 2025 E-Store. All rights reserved.",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "contactUs": "Contact Us",
+    "aboutUs": "About Us",
+    "help": "Help",
+    "support": "Support",
+    "followUs": "Follow Us",
+    "newsletter": "Newsletter",
+    "subscribe": "Subscribe",
+    "emailAddress": "Email Address"
+  },
+  "Theme Colors": {
+    "themeColorCustomization": "Theme Color Customization",
+    "lightModeColors": "Light Mode Colors",
+    "darkModeColors": "Dark Mode Colors",
+    "primaryColor": "Primary Color",
+    "secondaryColor": "Secondary Color",
+    "accentColor": "Accent Color",
+    "backgroundColor": "Background Color",
+    "foregroundColor": "Foreground Color",
+    "themeColorNote": "Theme Color Changes",
+    "themeColorChanges": "Changes to theme colors will be applied immediately across all user and admin pages. Make sure to choose colors that maintain good contrast and readability.",
+    "saveThemeSettings": "Save Theme Settings",
+    "resetToDefaults": "Reset to Defaults",
+    "themePreview": "Theme Preview",
+    "applyTheme": "Apply Theme",
+    "colorValidationError": "Invalid color format. Please use hex format (e.g., #RRGGBB)",
+    "contrastWarning": "Warning: This color combination may have poor contrast for accessibility"
+  },
+  "Product Related": {
+    "price": "Price",
+    "quantity": "Quantity",
+    "specifications": "Specifications",
+    "relatedProducts": "Related Products",
+    "buyNow": "Buy Now",
+    "availability": "Availability",
+    "brand": "Brand",
+    "tags": "Tags",
+    "addToCart": "Add to Cart"
+  },
+  "Checkout & Cart": {
+    "checkout": "Checkout",
+    "proceedToCheckout": "Proceed to Checkout",
+    "continueShopping": "Continue Shopping"
+  },
+  "Cart Operations": {
+    "cart": "Cart",
+    "cartEmpty": "Your cart is empty",
+    "cartEmptyMessage": "Add some products to get started with your shopping",
+    "removeFromCart": "Remove from Cart",
+    "updateQuantity": "Update Quantity",
+    "clearCart": "Clear Cart",
+    "cartItemCount": "item(s) in cart",
+    "cartTotal": "Cart Total",
+    "cartSubtotal": "Subtotal",
+    "cartTax": "Tax",
+    "cartShipping": "Shipping",
+    "cartDiscount": "Discount",
+    "continueShopping": "Continue Shopping",
+    "orderSummary": "Order Summary",
+    "proceedToCheckout": "Proceed to Checkout"
+  },
+  "Cart Messages": {
+    "cartUpdated": "Cart updated successfully",
+    "cartCleared": "Cart cleared successfully",
+    "quantityUpdated": "Quantity updated",
+    "maxQuantityReached": "Maximum quantity reached"
+  },
+  "Checkout Steps": {
+    "checkoutStep1": "Cart Review",
+    "checkoutStep2": "Shipping Information",
+    "checkoutStep3": "Payment Information",
+    "checkoutStep4": "Order Review",
+    "checkoutStep5": "Order Confirmation"
+  },
+  "Guest Checkout": {
+    "guestCheckout": "Guest Checkout",
+    "guestCheckoutDescription": "Complete your order without creating an account",
+    "continueAsGuest": "Continue as Guest",
+    "signInForAccount": "Sign in to save your information for faster checkout",
+    "createAccountOption": "Create an account for faster checkout next time",
+    "guestOrderNote": "Your order will be processed as a guest purchase"
+  },
+  "Shipping Information": {
+    "shippingInformation": "Shipping Information",
+    "shippingAddress": "Shipping Address",
+    "billingAddress": "Billing Address",
+    "sameAsShipping": "Same as shipping address",
+    "shippingMethod": "Shipping Method",
+    "standardShipping": "Standard Shipping",
+    "expressShipping": "Express Shipping",
+    "freeShipping": "Free Shipping",
+    "shippingCost": "Shipping Cost",
+    "estimatedDelivery": "Estimated Delivery"
+  },
+  "Payment Information": {
+    "paymentInformation": "Payment Information",
+    "paymentMethod": "Payment Method",
+    "creditCard": "Credit Card",
+    "debitCard": "Debit Card",
+    "paypal": "PayPal",
+    "bankTransfer": "Bank Transfer",
+    "cardNumber": "Card Number",
+    "expiryDate": "Expiry Date",
+    "cvv": "CVV/Security Code",
+    "cardholderName": "Cardholder Name",
+    "paymentProcessing": "Processing payment...",
+    "paymentSuccessful": "Payment successful",
+    "paymentFailed": "Payment failed"
+  },
+  "Order Review": {
+    "orderReview": "Order Review",
+    "orderSummary": "Order Summary",
+    "orderItems": "Order Items",
+    "orderTotal": "Order Total",
+    "placeOrder": "Place Order",
+    "confirmOrder": "Confirm Order",
+    "orderConfirmation": "Order Confirmation",
+    "orderNumber": "Order Number",
+    "orderDate": "Order Date",
+    "orderStatus": "Order Status"
+  },
+  "Order Status": {
+    "orderPending": "Order Pending",
+    "orderProcessing": "Processing",
+    "orderConfirmed": "Confirmed",
+    "orderShipped": "Shipped",
+    "orderDelivered": "Delivered",
+    "orderCancelled": "Cancelled",
+    "orderRefunded": "Refunded"
+  },
+  "Form Validation - Cart & Checkout": {
+    "cartValidation": {
+      "emptyCart": "Your cart is empty",
+      "invalidQuantity": "Please enter a valid quantity",
+      "maxQuantityExceeded": "Maximum quantity exceeded",
+      "productUnavailable": "Product is currently unavailable",
+      "insufficientStock": "Insufficient stock available"
+    },
+    "checkoutValidation": {
+      "shippingRequired": "Shipping address is required",
+      "billingRequired": "Billing address is required",
+      "paymentRequired": "Payment method is required",
+      "invalidCard": "Please enter a valid card number",
+      "invalidExpiry": "Please enter a valid expiry date",
+      "invalidCvv": "Please enter a valid CVV",
+      "termsRequired": "Please accept the terms and conditions"
+    }
+  },
+  "Error Messages - Cart & Checkout": {
+    "cartErrors": {
+      "addToCartFailed": "Failed to add item to cart",
+      "removeFromCartFailed": "Failed to remove item from cart",
+      "updateCartFailed": "Failed to update cart",
+      "cartSyncFailed": "Failed to sync cart",
+      "cartLoadFailed": "Failed to load cart"
+    },
+    "checkoutErrors": {
+      "checkoutFailed": "Checkout failed",
+      "paymentFailed": "Payment processing failed",
+      "orderCreationFailed": "Failed to create order",
+      "shippingCalculationFailed": "Failed to calculate shipping",
+      "invalidOrder": "Invalid order data"
+    }
+  },
+  "Success Messages": {
+    "orderSuccess": "Order placed successfully!",
+    "orderConfirmationSent": "Order confirmation sent to your email",
+    "guestOrderSuccess": "Your guest order has been placed successfully"
+  },
+  "Terms and Conditions": {
+    "acceptTerms": "I accept the terms and conditions",
+    "termsAndConditions": "Terms and Conditions",
+    "refundPolicy": "Refund Policy"
+  },
+  "User Actions": {
+    "profile": "Profile",
+    "addresses": "Addresses",
+    "paymentMethods": "Payment Methods"
+  },
+  "Status and Messages": {
+    "noResults": "No results found",
+    "goBack": "Go Back",
+    "pageNotFound": "Page Not Found",
+    "somethingWentWrong": "Something went wrong"
+  },
+  "Admin Specific": {
+    "create": "Create",
+    "manage": "Manage",
+    "export": "Export",
+    "import": "Import",
+    "bulkActions": "Bulk Actions",
+    "selectAll": "Select All",
+    "checkingPermissions": "Checking Permissions",
+    "redirectingToAdmin": "Redirecting to admin panel..."
+  },
+  "Admin Dashboard": {
+    "loading": "Loading dashboard...",
+    "tryAgain": "Try Again",
+    "stats": {
+      "totalProducts": "Total Products",
+      "totalOrders": "Total Orders",
+      "totalUsers": "Total Users",
+      "totalRevenue": "Total Revenue",
+      "fromLastMonth": "from last month"
+    },
+    "recentOrders": "Recent Orders",
+    "noRecentOrders": "No recent orders",
+    "lowStockAlert": "Low Stock Alert",
+    "allProductsWellStocked": "All products are well stocked",
+    "remaining": "remaining",
+    "quickActions": "Quick Actions",
+    "addNewProduct": "Add New Product",
+    "createNewProductListing": "Create a new product listing",
+    "manageUsers": "Manage Users",
+    "viewManageUserAccounts": "View and manage user accounts",
+    "viewAnalytics": "View Analytics",
+    "checkSalesPerformance": "Check sales and performance data"
+  },
+  "Language Settings": {
+    "languageSettings": "Language Settings",
+    "languageMode": "Language Mode",
+    "multilingual": "Multilingual (Persian & English)",
+    "singleFa": "Single Language - Persian Only",
+    "singleEn": "Single Language - English Only",
+    "defaultLanguage": "Default Language",
+    "persianFarsi": "Persian (Farsi)",
+    "english": "English"
+  },
+  "Product Suggestions": {
+    "productSuggestions": "Product Suggestions",
+    "enableProductSuggestions": "Enable Product Suggestions",
+    "suggestionAlgorithm": "Suggestion Algorithm",
+    "popularityBased": "Popularity Based",
+    "similarityBased": "Similarity Based",
+    "recentlyViewed": "Recently Viewed",
+    "hybrid": "Hybrid (Recommended)",
+    "maximumSuggestions": "Maximum Suggestions"
+  },
+  "Site Settings": {
+    "siteSettings": "Site Settings",
+    "siteTitles": "Site Titles",
+    "siteTitleEn": "Site Title (English)",
+    "siteTitleFa": "Site Title (Persian)",
+    "contactInformation": "Contact Information",
+    "phoneNumberEn": "Phone Number (English)",
+    "phoneNumberFa": "Phone Number (Persian)",
+    "siteDescriptions": "Site Descriptions",
+    "siteDescriptionEn": "Site Description (English)",
+    "siteDescriptionFa": "Site Description (Persian)"
+  },
+  "Multilingual Tips": {
+    "multilingualSupport": "Multilingual Support",
+    "siteTitlesDisplayed": "Site Titles are displayed in the navigation bar and browser tab",
+    "contactInfoFooter": "Contact Information appears in the footer and contact pages",
+    "descriptionsForSEO": "Descriptions are used for SEO and social media sharing",
+    "changesReflected": "Changes are reflected immediately across the site based on user language preference",
+    "provideBothVersions": "Both English and Persian versions should be provided for full multilingual support"
+  },
+  "Product Comparison": {
+    "productComparison": "Product Comparison",
+    "comparingProducts": "Comparing {count} selected products",
+    "clearAll": "Clear All",
+    "addProduct": "Add Product",
+    "overview": "Overview",
+    "reviews": "Reviews",
+    "addAnotherProduct": "Add another product",
+    "selectProduct": "Select Product",
+    "productDetails": "Product Details",
+    "technicalSpecs": "Technical Specifications",
+    "stockStatus": "Stock Status",
+    "available": "Available",
+    "notAvailable": "Not Available",
+    "productRating": "Product Rating",
+    "outOf": "out of"
+  },
+  "Recently Viewed": {
+    "recentlyViewedProducts": "Recently Viewed Products",
+    "noRecentlyViewed": "No recently viewed products",
+    "viewAllRecentlyViewed": "View all recently viewed products"
+  },
+  "Social Sharing": {
+    "share": "Share",
+    "shareOnSocial": "Share on Social Media",
+    "shareProduct": "Share Product",
+    "copyLink": "Copy Link",
+    "linkCopied": "Link copied to clipboard!"
+  },
+  "Home": {
+    "hero": {
+      "badge": "New Collection Available",
+      "title": "Discover Amazing Products",
+      "subtitle": "Shop the latest trends with fast, secure delivery and exceptional customer service. Find everything you need in one place.",
+      "shopNow": "Shop Now",
+      "browseCategories": "Browse Categories"
+    },
+    "featuredProducts": {
+      "title": "Featured Products",
+      "subtitle": "Discover our handpicked selection of premium products",
+      "viewAll": "View All Products"
+    },
+    "product": {
+      "sale": "Sale",
+      "viewDetails": "View Details"
+    },
+    "features": {
+      "title": "Why Choose E-Store?",
+      "subtitle": "Experience shopping like never before with our premium features and services.",
+      "freeShipping": {
+        "title": "Free Shipping",
+        "description": "Free shipping on all orders over $50. Fast and reliable delivery worldwide."
+      },
+      "securePayment": {
+        "title": "Secure Payment",
+        "description": "Your payment information is always safe with our advanced security measures."
+      },
+      "qualityProducts": {
+        "title": "Quality Products",
+        "description": "Carefully curated products from trusted brands with quality assurance."
+      },
+      "support247": {
+        "title": "24/7 Support",
+        "description": "Our customer support team is always here to help you with any questions."
+      }
+    },
+    "categories": {
+      "title": "Shop by Category",
+      "subtitle": "Explore our wide range of product categories",
+      "electronics": {
+        "title": "Electronics",
+        "description": "Latest gadgets, smartphones, laptops, and more tech essentials.",
+        "shopButton": "Shop Electronics"
+      },
+      "fashion": {
+        "title": "Fashion",
+        "description": "Trendy clothing, shoes, accessories, and fashion essentials.",
+        "shopButton": "Shop Fashion"
+      },
+      "homeGarden": {
+        "title": "Home & Garden",
+        "description": "Furniture, decor, appliances, and everything for your home.",
+        "shopButton": "Shop Home"
+      }
+    },
+    "cta": {
+      "title": "Ready to start shopping?",
+      "subtitle": "Join thousands of satisfied customers who trust E-Store for their shopping needs.",
+      "createAccount": "Create Account",
+      "browseProducts": "Browse Products"
+    }
+  },
+  "products": {
+    "title": "Products",
+    "subtitle": "Discover our amazing collection",
+    "noProducts": "No products found",
+    "loading": "Loading products...",
+    "filterBy": "Filter by",
+    "sortBy": "Sort by",
+    "priceRange": "Price Range",
+    "category": "Category",
+    "allCategories": "All Categories",
+    "search": "Search products...",
+    "clearFilters": "Clear Filters",
+    "addToCart": "Add to Cart",
+    "viewDetails": "View Details",
+    "outOfStock": "Out of Stock",
+    "inStock": "In Stock",
+    "price": "Price",
+    "rating": "Rating",
+    "reviews": "Reviews",
+    "showMore": "Show More",
+    "showLess": "Show Less",
+    "itemsFound": "items found",
+    "breadcrumb": {
+      "home": "Home",
+      "products": "Products"
+    },
+    "sortOptions": {
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "priceLowHigh": "Price: Low to High",
+      "priceHighLow": "Price: High to Low",
+      "rating": "Highest Rated",
+      "popularity": "Most Popular",
+      "name": "Name"
+    },
+    "categories": {
+      "All": "All",
+      "Electronics": "Electronics",
+      "Fashion": "Fashion",
+      "Home & Garden": "Home & Garden",
+      "Sports": "Sports",
+      "Books": "Books"
+    },
+    "filters": {
+      "search": "Search",
+      "categories": "Categories",
+      "priceRange": "Price Range",
+      "rating": "Rating",
+      "availability": "Availability",
+      "inStockOnly": "In Stock Only",
+      "onSale": "On Sale",
+      "andUp": "& up"
+    },
+    "showing": "Showing",
+    "of": "of",
+    "products": "products",
+    "filtersText": "Filters",
+    "previous": "Previous",
+    "next": "Next",
+    "somethingWentWrong": "Something went wrong",
+    "tryAgain": "Try Again",
+    "uncategorized": "Uncategorized",
+    "sale": "Sale",
+    "unknownProduct": "Unknown Product"
+  },
+  "categories": {
+    "title": "Categories",
+    "subtitle": "Browse our product categories",
+    "allCategories": "All Categories",
+    "noCategories": "No categories found",
+    "loading": "Loading categories...",
+    "viewProducts": "View Products",
+    "subcategories": "Subcategories",
+    "productsCount": "products",
+    "filterCategories": "Filter categories...",
+    "clearFilter": "Clear Filter",
+    "breadcrumb": {
+      "home": "Home",
+      "categories": "Categories"
+    },
+    "header": {
+      "title": "Shop by Category",
+      "subtitle": "Explore our wide range of product categories"
+    },
+    "search": {
+      "placeholder": "Search categories..."
+    },
+    "stats": {
+      "categories": "categories",
+      "products": "products"
+    },
+    "empty": {
+      "title": "No Categories Found",
+      "noCategories": "We don't have any categories available right now.",
+      "searchMessage": "No categories match your search criteria.",
+      "clearSearch": "Clear Search"
+    },
+    "error": {
+      "title": "Error Loading Categories",
+      "fetchFailed": "Failed to load categories. Please try again.",
+      "tryAgain": "Try Again"
+    },
+    "product": {
+      "singular": "product",
+      "plural": "products"
+    },
+    "category": {
+      "browse": "Browse Products"
+    },
+    "cta": {
+      "title": "Explore All Products",
+      "subtitle": "Browse our complete collection of amazing products",
+      "browseAll": "Browse All Products"
+    }
+  },
+  "SEO": {
+    "defaultTitle": "E-Store - Your Premier Online Shopping Destination",
+    "defaultDescription": "Discover amazing products at great prices with fast, secure delivery and exceptional customer service. Shop the latest trends and find everything you need in one place.",
+    "siteName": "E-Store",
+    "twitterHandle": "@estore",
+    "home": {
+      "title": "Welcome to E-Store - Amazing Products & Great Deals",
+      "description": "Discover our amazing collection of products with fast shipping and secure checkout. Shop electronics, fashion, home goods and more at E-Store."
+    },
+    "category": {
+      "title": "Shop by Category - Find What You Need",
+      "description": "Browse our wide range of product categories. Find electronics, fashion, home & garden items, and everything you need for your lifestyle."
+    },
+    "search": {
+      "title": "Search Products - Find Exactly What You're Looking For",
+      "description": "Search our extensive product catalog. Find the perfect product for you with our advanced search and filtering options."
+    },
+    "cart": {
+      "title": "Shopping Cart - Review Your Items & Checkout",
+      "description": "Review your shopping cart items and proceed to secure checkout. Complete your purchase with fast, reliable delivery."
+    },
+    "checkout": {
+      "title": "Secure Checkout - Complete Your Purchase",
+      "description": "Complete your order with our secure checkout process. Fast payment processing and reliable delivery worldwide."
+    },
+    "account": {
+      "title": "My Account - Manage Your Profile & Orders",
+      "description": "Manage your account, view order history, update your profile, and track your purchases on E-Store."
+    }
+  },
+  "Cart Sidebar": {
+    "title": "Shopping Cart",
+    "closeButton": "Close cart sidebar",
+    "itemsCount": "items",
+    "guestLabel": "Guest",
+    "syncing": "Syncing cart",
+    "authenticatedDescription": "Your shopping cart items and checkout options",
+    "guestDescription": "Guest shopping cart - sign in to save your items",
+    "errorMessage": "Error",
+    "cartStatus": "Cart has {count} items totaling {total}",
+    "emptyTitle": "Your cart is empty",
+    "emptyMessage": "Add some products to get started with your shopping",
+    "continueShopping": "Continue Shopping",
+    "totalLabel": "Total amount",
+    "totalText": "Total",
+    "currency": "تومان",
+    "totalAmount": "Total amount: {amount}",
+    "guestCheckoutTitle": "Guest Checkout",
+    "guestCheckoutMessage": "Sign in to save your cart and access order history.",
+    "checkoutActions": "Checkout actions",
+    "proceedToCheckout": "Proceed to checkout",
+    "checkoutButton": "Checkout",
+    "viewFullCart": "View full cart",
+    "viewCartButton": "View Full Cart"
+  },
+  "Contact": {
+    "title": "Contact Us",
+    "subtitle": "Get in touch with our team",
+    "form": {
+      "title": "Send us a message",
+      "name": "Full Name",
+      "namePlaceholder": "Enter your full name",
+      "email": "Email Address",
+      "emailPlaceholder": "Enter your email address",
+      "subject": "Subject",
+      "subjectPlaceholder": "What's this about?",
+      "message": "Message",
+      "messagePlaceholder": "Tell us how we can help you...",
+      "submit": "Send Message"
+    },
+    "info": {
+      "title": "Contact Information",
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
+      "hours": "Business Hours"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": "How can I track my order?",
+      "a1": "You can track your order using the tracking number provided in your confirmation email.",
+      "q2": "What is your return policy?",
+      "a2": "We accept returns within 30 days of purchase. Items must be in original condition.",
+      "q3": "Do you offer international shipping?",
+      "a3": "Yes, we ship to most countries worldwide. Shipping costs vary by location."
+    }
+  },
+  "Help": {
+    "title": "Help & Support",
+    "subtitle": "Find answers and get support",
+    "search": {
+      "placeholder": "Search for help..."
+    },
+    "categories": {
+      "gettingStarted": {
+        "title": "Getting Started",
+        "description": "Learn the basics and get started with our platform"
+      },
+      "account": {
+        "title": "Account & Profile",
+        "description": "Manage your account settings and profile information"
+      },
+      "shopping": {
+        "title": "Shopping Guide",
+        "description": "Learn how to browse, search, and purchase products"
+      },
+      "orders": {
+        "title": "Orders & Tracking",
+        "description": "Track orders, manage deliveries, and handle returns"
+      },
+      "payment": {
+        "title": "Payment & Billing",
+        "description": "Payment methods, billing questions, and refunds"
+      },
+      "viewGuides": "View Guides"
+    },
+    "faqs": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Quick answers to common questions",
+      "shipping": {
+        "question": "How long does shipping take?",
+        "answer": "Standard shipping takes 3-5 business days. Express shipping is available for 1-2 business days."
+      },
+      "returns": {
+        "question": "What is your return policy?",
+        "answer": "We offer a 30-day return policy on most items. Returns are free for defective items."
+      },
+      "payment": {
+        "question": "What payment methods do you accept?",
+        "answer": "We accept credit cards, debit cards, PayPal, and bank transfers."
+      },
+      "account": {
+        "question": "How do I reset my password?",
+        "answer": "Click 'Forgot Password' on the sign-in page and follow the instructions sent to your email."
+      },
+      "tracking": {
+        "question": "How can I track my order?",
+        "answer": "Use the tracking number from your confirmation email on our tracking page."
+      }
+    },
+    "contact": {
+      "title": "Still need help?",
+      "description": "Can't find what you're looking for? Our support team is here to help.",
+      "email": "Contact via Email",
+      "phone": "Call Us"
+    }
+  },
+
+  "Blog": {
+    "title": "Blog",
+    "readMore": "Read More",
+    "description": "Latest news and articles from our team",
+    "keywords": "blog, news, articles",
+    "category": "Category",
+    "search": "Search",
+    "error": {
+      "title": "Error",
+      "description": "Something went wrong"
+    },
+    "categories": {
+      "title": "Categories",
+      "all": "All Categories"
+    },
+    "search": {
+      "title": "Search",
+      "placeholder": "Search articles...",
+      "button": "Search",
+      "clear": "Clear",
+      "tips": {
+        "title": "Search Tips",
+        "excerpt": "Search by article excerpt",
+        "content": "Search by article content",
+        "tags": "Search by tags"
+      }
+    },
+    "showingResults": "Showing {count} of {total} results",
+    "noPosts": {
+      "title": "No Posts Found",
+      "description": "We couldn't find any posts matching your criteria."
+    },
+    "noSearchResults": {
+      "title": "No Search Results",
+      "description": "No articles found for your search. Try different keywords."
+    },
+    "noCategoryPosts": {
+      "title": "No Posts in This Category",
+      "description": "There are no posts in this category yet."
+    },
+    "anonymous": "Anonymous",
+    "unpublished": "Unpublished",
+    "post": {
+      "backToBlog": "Back to Blog",
+      "tags": "Tags",
+      "notFound": "Post not found",
+      "error": "Error loading post",
+      "errorDescription": "There was an error loading this blog post."
+    },
+    "comments": {
+      "title": "Comments",
+      "addComment": "Add a Comment",
+      "placeholder": "Share your thoughts...",
+      "submit": "Submit Comment",
+      "submitting": "Submitting...",
+      "reply": "Reply",
+      "replyPlaceholder": "Write a reply...",
+      "submitReply": "Submit Reply",
+      "cancel": "Cancel",
+      "noComments": "No comments yet",
+      "beFirst": "Be the first to comment!"
+    },
+    "relatedPosts": {
+      "title": "Related Posts",
+      "viewAll": "View All Posts"
+    }
+  },
+  "Order Review": {
+    "orderReview": "Order Review",
+    "orderConfirmation": "Order Confirmed",
+    "orderConfirmationSent": "Your order confirmation has been sent",
+    "orderSummary": "Order Summary",
+    "orderNumber": "Order Number",
+    "orderDate": "Order Date",
+    "orderStatus": "Order Status",
+    "orderItems": "Order Items",
+    "orderTotal": "Order Total",
+    "placeOrder": "Place Order",
+    "confirmOrder": "Confirm Order"
+  },
+  "blog": "Blog"
+}

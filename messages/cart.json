@@ -1,0 +1,32 @@
+{
+  "Cart Operations": {
+    "cartEmpty": "Your cart is empty",
+    "cartEmptyMessage": "Add some products to get started with your shopping",
+    "removeFromCart": "Remove from Cart",
+    "updateQuantity": "Update Quantity",
+    "clearCart": "Clear Cart",
+    "cartItemCount": "item(s) in cart",
+    "cartTotal": "Cart Total",
+    "cartSubtotal": "Subtotal",
+    "cartTax": "Tax",
+    "cartShipping": "Shipping",
+    "cartDiscount": "Discount",
+    "proceedToCheckout": "Proceed to Checkout",
+    "continueShopping": "Continue Shopping"
+  },
+  "Cart Messages": {
+    "cartUpdated": "Cart updated successfully",
+    "cartCleared": "Cart cleared successfully",
+    "quantityUpdated": "Quantity updated",
+    "maxQuantityReached": "Maximum quantity reached"
+  },
+  "Error Messages": {
+    "cartErrors": {
+      "addToCartFailed": "Failed to add item to cart",
+      "removeFromCartFailed": "Failed to remove item from cart",
+      "updateCartFailed": "Failed to update cart",
+      "cartSyncFailed": "Failed to sync cart",
+      "cartLoadFailed": "Failed to load cart"
+    }
+  }
+}

@@ -1,0 +1,935 @@
+{
+  "loading": "در حال بارگذاری...",
+  "Navigation": {
+    "products": "محصولات",
+    "categories": "دسته‌بندی‌ها",
+    "deals": "تخفیف‌ها",
+    "search": "جستجو",
+    "account": "حساب کاربری",
+    "orders": "سفارشات",
+    "settings": "تنظیمات",
+    "dashboard": "داشبورد",
+    "wishlist": "لیست علاقه‌مندی‌ها",
+    "cart": "سبد خرید",
+    "profile": "پروفایل",
+    "adminPanel": "پنل مدیریت",
+    "signOut": "خروج"
+  },
+  "Authentication": {
+    "signIn": "ورود",
+    "signUp": "ثبت نام",
+    "signOut": "خروج",
+    "manageProducts": "مدیریت محصولات"
+  },
+  "Admin Panel": {
+    "admin": "مدیریت",
+    "adminPanel": "پنل مدیریت",
+    "analytics": "آمار",
+    "users": "کاربران",
+    "sales": "فروش",
+    "revenue": "درآمد",
+    "customers": "مشتریان",
+    "totalRevenue": "کل درآمد",
+    "totalOrders": "کل سفارشات",
+    "totalCustomers": "کل مشتریان",
+    "averageOrderValue": "میانگین ارزش سفارش",
+    "salesTrend": "روند فروش",
+    "userGrowth": "رشد کاربران",
+    "topProducts": "محصولات برتر",
+    "categoryPerformance": "عملکرد دسته‌بندی‌ها",
+    "lowStockAlert": "هشدار موجودی کم",
+    "quickActions": "اقدامات سریع",
+    "addNewProduct": "افزودن محصول جدید",
+    "manageUsers": "مدیریت کاربران",
+    "viewAnalytics": "مشاهده آمار"
+  },
+  "Settings": {
+    "generalSettings": "تنظیمات عمومی",
+    "storeSettings": "تنظیمات فروشگاه",
+    "siteName": "نام سایت",
+    "siteDescription": "توضیحات سایت",
+    "contactEmail": "ایمیل تماس",
+    "defaultCurrency": "واحد پول پیش‌فرض",
+    "lowStockThreshold": "آستانه موجودی کم",
+    "maintenanceMode": "حالت تعمیر و نگهداری",
+    "allowRegistration": "اجازه ثبت نام کاربران",
+    "saveSettings": "ذخیره تنظیمات"
+  },
+  "API Messages": {
+    "loading": "در حال بارگذاری...",
+    "error": "خطا",
+    "success": "موفقیت",
+    "failedToFetch": "خطا در دریافت داده‌ها",
+    "failedToUpdate": "خطا در بروزرسانی",
+    "failedToCreate": "خطا در ایجاد",
+    "failedToDelete": "خطا در حذف",
+    "failedToSave": "خطا در ذخیره",
+    "failedToLoad": "خطا در بارگذاری",
+    "failedToUpload": "خطا در آپلود",
+    "failedToSend": "خطا در ارسال",
+    "itemCreated": "آیتم با موفقیت ایجاد شد",
+    "itemUpdated": "آیتم با موفقیت بروزرسانی شد",
+    "itemDeleted": "آیتم با موفقیت حذف شد",
+    "settingsUpdated": "تنظیمات با موفقیت بروزرسانی شد",
+    "orderStatusUpdated": "وضعیت سفارش بروزرسانی شد",
+    "profileUpdated": "پروفایل با موفقیت بروزرسانی شد",
+    "passwordUpdated": "رمز عبور با موفقیت بروزرسانی شد",
+    "unauthorized": "دسترسی غیرمجاز",
+    "adminRequired": "نیاز به دسترسی مدیریت",
+    "pleaseTryAgain": "لطفا دوباره امتحان کنید"
+  },
+  "Toast Messages": {
+    "welcomeBack": "خوش آمدید!",
+    "signedOut": "از سیستم خارج شدید",
+    "cartUpdated": "سبد خرید بروزرسانی شد",
+    "itemAddedToCart": "محصول به سبد خرید اضافه شد",
+    "itemRemovedFromCart": "محصول از سبد خرید حذف شد",
+    "itemAddedToWishlist": "محصول به لیست علاقه‌مندی‌ها اضافه شد",
+    "itemRemovedFromWishlist": "محصول از لیست علاقه‌مندی‌ها حذف شد",
+    "productCreated": "محصول با موفقیت ایجاد شد",
+    "productUpdated": "محصول با موفقیت بروزرسانی شد",
+    "userUpdated": "کاربر با موفقیت بروزرسانی شد",
+    "categoryCreated": "دسته‌بندی با موفقیت ایجاد شد",
+    "categoryUpdated": "دسته‌بندی با موفقیت بروزرسانی شد"
+  },
+  "Form Validation": {
+    "requiredField": "این فیلد اجباری است",
+    "invalidEmail": "لطفا یک ایمیل معتبر وارد کنید",
+    "invalidPassword": "رمز عبور باید حداقل ۶ کاراکتر باشد",
+    "passwordsNotMatch": "رمزهای عبور مطابقت ندارند",
+    "invalidPhone": "لطفا یک شماره تلفن معتبر وارد کنید"
+  },
+  "Status Messages": {
+    "pending": "در انتظار",
+    "processing": "در حال پردازش",
+    "shipped": "ارسال شده",
+    "delivered": "تحویل داده شده",
+    "cancelled": "لغو شده",
+    "active": "فعال",
+    "inactive": "غیرفعال",
+    "inStock": "موجود",
+    "outOfStock": "ناموجود",
+    "lowStock": "موجودی کم",
+    "available": "موجود"
+  },
+  "Common Actions": {
+    "save": "ذخیره",
+    "cancel": "لغو",
+    "delete": "حذف",
+    "edit": "ویرایش",
+    "add": "افزودن",
+    "remove": "حذف",
+    "view": "مشاهده",
+    "back": "بازگشت",
+    "next": "بعدی",
+    "previous": "قبلی",
+    "submit": "ارسال"
+  },
+  "Placeholders": {
+    "enterSiteName": "نام سایت را وارد کنید",
+    "enterSiteDescription": "توضیحات سایت را وارد کنید",
+    "enterEmail": "ایمیل را وارد کنید",
+    "enterName": "نام را وارد کنید",
+    "enterDescription": "توضیحات را وارد کنید",
+    "searchProducts": "جستجوی محصولات...",
+    "enterQuantity": "مقدار را وارد کنید"
+  },
+  "Currencies": {
+    "irr": "تومان (تومان)",
+    "toman": "تومان (تومان)",
+    "rial": "ریال (ریال)",
+    "usd": "دلار آمریکا ($)",
+    "eur": "یورو (€)",
+    "gbp": "پوند انگلیس (£)",
+    "cad": "دلار کانادا (CA$)",
+    "aud": "دلار استرالیا (A$)"
+  },
+  "Time Periods": {
+    "last7Days": "۷ روز گذشته",
+    "last30Days": "۳۰ روز گذشته",
+    "last90Days": "۹۰ روز گذشته",
+    "lastYear": "یک سال گذشته",
+    "today": "امروز",
+    "thisWeek": "این هفته",
+    "thisMonth": "این ماه",
+    "selectPeriod": "انتخاب دوره زمانی"
+  },
+  "Error Messages": {
+    "networkError": "خطای شبکه رخ داد",
+    "serverError": "خطای سرور رخ داد",
+    "validationError": "خطای اعتبارسنجی",
+    "permissionDenied": "دسترسی رد شد",
+    "notFound": "آیتم یافت نشد",
+    "alreadyExists": "آیتم از قبل وجود دارد"
+  },
+  "Confirmations": {
+    "confirmDelete": "آیا مطمئن هستید که می‌خواهید این آیتم را حذف کنید؟",
+    "confirmSave": "آیا مطمئن هستید که می‌خواهید تغییرات را ذخیره کنید؟",
+    "unsavedChanges": "شما تغییرات ذخیره نشده دارید. آیا مطمئن هستید که می‌خواهید خارج شوید؟"
+  },
+  "Analytics": {
+    "fromLastMonth": "از ماه گذشته",
+    "sold": "فروخته شده",
+    "remaining": "باقی مانده",
+    "newUsers": "کاربران جدید",
+    "revenueLabel": "درآمد",
+    "ordersLabel": "سفارشات",
+    "userLabel": "کاربران"
+  },
+  "Footer & Additional UI": {
+    "copyright": "© ۲۰۲۵ فروشگاه آنلاین. تمامی حقوق محفوظ است.",
+    "privacyPolicy": "سیاست حفظ حریم خصوصی",
+    "termsOfService": "شرایط استفاده از خدمات",
+    "contactUs": "تماس با ما",
+    "aboutUs": "درباره ما",
+    "help": "راهنما",
+    "support": "پشتیبانی",
+    "followUs": "ما را دنبال کنید",
+    "newsletter": "خبرنامه",
+    "subscribe": "اشتراک",
+    "emailAddress": "آدرس ایمیل"
+  },
+  "Product Related": {
+    "price": "قیمت",
+    "quantity": "تعداد",
+    "specifications": "مشخصات",
+    "relatedProducts": "محصولات مرتبط",
+    "buyNow": "هم اکنون خریداری کنید",
+    "availability": "دسترسی",
+    "brand": "برند",
+    "tags": "برچسب‌ها",
+    "addToCart": "افزودن به سبد خرید"
+  },
+  "products": {
+    "title": "محصولات",
+    "subtitle": "مجموعه شگفت‌انگیز ما را کشف کنید",
+    "noProducts": "هیچ محصولی یافت نشد",
+    "loading": "در حال بارگذاری محصولات...",
+    "filterBy": "فیلتر بر اساس",
+    "sortBy": "مرتب‌سازی بر اساس",
+    "priceRange": "محدوده قیمت",
+    "category": "دسته‌بندی",
+    "allCategories": "همه دسته‌بندی‌ها",
+    "search": "جستجوی محصولات...",
+    "clearFilters": "پاک کردن فیلترها",
+    "addToCart": "افزودن به سبد خرید",
+    "viewDetails": "مشاهده جزئیات",
+    "outOfStock": "ناموجود",
+    "inStock": "موجود",
+    "price": "قیمت",
+    "rating": "امتیاز",
+    "reviews": "نظرات",
+    "showMore": "نمایش بیشتر",
+    "showLess": "نمایش کمتر",
+    "itemsFound": "مورد یافت شد",
+    "breadcrumb": {
+      "home": "خانه",
+      "products": "محصولات"
+    },
+    "sortOptions": {
+      "newest": "جدیدترین",
+      "oldest": "قدیمی‌ترین",
+      "priceLowHigh": "قیمت: کم به زیاد",
+      "priceHighLow": "قیمت: زیاد به کم",
+      "rating": "بالاترین امتیاز",
+      "popularity": "محبوب‌ترین",
+      "name": "نام"
+    },
+    "categories": {
+      "All": "همه",
+      "Electronics": "الکترونیک",
+      "Fashion": "مد",
+      "Home & Garden": "خانه و باغ",
+      "Sports": "ورزشی",
+      "Books": "کتاب‌ها"
+    },
+    "filters": {
+      "search": "جستجو",
+      "categories": "دسته‌بندی‌ها",
+      "priceRange": "محدوده قیمت",
+      "rating": "امتیاز",
+      "availability": "دسترسی",
+      "inStockOnly": "فقط موجود",
+      "onSale": "در فروش ویژه",
+      "andUp": "و بالاتر"
+    },
+    "showing": "نمایش",
+    "of": "از",
+    "products": "محصول",
+    "filtersText": "فیلترها",
+    "previous": "قبلی",
+    "next": "بعدی",
+    "somethingWentWrong": "مشکلی پیش آمده",
+    "tryAgain": "دوباره امتحان کنید",
+    "uncategorized": "دسته‌بندی نشده",
+    "sale": "فروش ویژه",
+    "unknownProduct": "محصول نامشخص"
+  },
+  "Checkout & Cart": {
+    "checkout": "تسویه حساب",
+    "proceedToCheckout": "ادامه به تسویه حساب",
+    "continueShopping": "ادامه خرید"
+  },
+  "Cart Operations": {
+    "cart": "سبد خرید",
+    "cartEmpty": "سبد خرید شما خالی است",
+    "cartEmptyMessage": "برای شروع خرید، محصولاتی را به سبد خرید اضافه کنید",
+    "removeFromCart": "حذف از سبد خرید",
+    "updateQuantity": "بروزرسانی تعداد",
+    "clearCart": "پاک کردن سبد خرید",
+    "cartItemCount": "مورد در سبد خرید",
+    "cartTotal": "مجموع سبد خرید",
+    "cartSubtotal": "جمع جزء",
+    "cartTax": "مالیات",
+    "cartShipping": "ارسال",
+    "cartDiscount": "تخفیف",
+    "continueShopping": "ادامه خرید",
+    "orderSummary": "خلاصه سفارش",
+    "proceedToCheckout": "ادامه به تسویه حساب"
+  },
+  "Cart Messages": {
+    "cartUpdated": "سبد خرید بروزرسانی شد",
+    "cartCleared": "سبد خرید پاک شد",
+    "quantityUpdated": "تعداد بروزرسانی شد",
+    "maxQuantityReached": "حداکثر تعداد رسیده"
+  },
+  "Checkout Steps": {
+    "checkoutStep1": "بررسی سبد خرید",
+    "checkoutStep2": "اطلاعات ارسال",
+    "checkoutStep3": "اطلاعات پرداخت",
+    "checkoutStep4": "بررسی سفارش",
+    "checkoutStep5": "تایید سفارش"
+  },
+  "Guest Checkout": {
+    "guestCheckout": "خرید مهمان",
+    "guestCheckoutDescription": "سفارش خود را بدون ایجاد حساب کاربری تکمیل کنید",
+    "continueAsGuest": "ادامه به عنوان مهمان",
+    "signInForAccount": "برای تسویه حساب سریع‌تر وارد شوید",
+    "createAccountOption": "برای تسویه حساب سریع‌تر در آینده حسابی ایجاد کنید",
+    "guestOrderNote": "سفارش شما به عنوان خرید مهمان پردازش خواهد شد"
+  },
+  "Shipping Information": {
+    "shippingInformation": "اطلاعات ارسال",
+    "shippingAddress": "آدرس ارسال",
+    "billingAddress": "آدرس صورتحساب",
+    "sameAsShipping": "همانند آدرس ارسال",
+    "shippingMethod": "روش ارسال",
+    "standardShipping": "ارسال استاندارد",
+    "expressShipping": "ارسال سریع",
+    "freeShipping": "ارسال رایگان",
+    "shippingCost": "هزینه ارسال",
+    "estimatedDelivery": "تحویل تخمینی"
+  },
+  "Payment Information": {
+    "paymentInformation": "اطلاعات پرداخت",
+    "paymentMethod": "روش پرداخت",
+    "creditCard": "کارت اعتباری",
+    "debitCard": "کارت بدهی",
+    "paypal": "پی‌پال",
+    "bankTransfer": "انتقال بانکی",
+    "cardNumber": "شماره کارت",
+    "expiryDate": "تاریخ انقضا",
+    "cvv": "CVV/کد امنیتی",
+    "cardholderName": "نام دارنده کارت",
+    "paymentProcessing": "در حال پردازش پرداخت...",
+    "paymentSuccessful": "پرداخت موفق",
+    "paymentFailed": "پرداخت ناموفق"
+  },
+  "Order Review": {
+    "orderReview": "بررسی سفارش",
+    "orderSummary": "خلاصه سفارش",
+    "orderItems": "موارد سفارش",
+    "orderTotal": "مجموع سفارش",
+    "placeOrder": "ثبت سفارش",
+    "confirmOrder": "تایید سفارش",
+    "orderConfirmation": "تایید سفارش",
+    "orderNumber": "شماره سفارش",
+    "orderDate": "تاریخ سفارش",
+    "orderStatus": "وضعیت سفارش",
+    "orderConfirmationSent": "تایید سفارش به ایمیل شما ارسال شد"
+  },
+  "Order Status": {
+    "orderPending": "سفارش در انتظار",
+    "orderProcessing": "در حال پردازش",
+    "orderConfirmed": "تایید شده",
+    "orderShipped": "ارسال شده",
+    "orderDelivered": "تحویل داده شده",
+    "orderCancelled": "لغو شده",
+    "orderRefunded": "بازپرداخت شده"
+  },
+  "Form Validation - Cart & Checkout": {
+    "cartValidation": {
+      "emptyCart": "سبد خرید خالی است",
+      "invalidQuantity": "لطفا تعداد معتبر وارد کنید",
+      "maxQuantityExceeded": "حداکثر تعداد بیش از حد است",
+      "productUnavailable": "محصول در حال حاضر موجود نیست",
+      "insufficientStock": "موجودی کافی نیست"
+    },
+    "checkoutValidation": {
+      "shippingRequired": "آدرس ارسال ضروری است",
+      "billingRequired": "آدرس صورتحساب ضروری است",
+      "paymentRequired": "روش پرداخت ضروری است",
+      "invalidCard": "لطفا شماره کارت معتبر وارد کنید",
+      "invalidExpiry": "لطفا تاریخ انقضا معتبر وارد کنید",
+      "invalidCvv": "لطفا CVV معتبر وارد کنید",
+      "termsRequired": "لطفا شرایط و ضوابط را بپذیرید"
+    }
+  },
+  "Error Messages - Cart & Checkout": {
+    "cartErrors": {
+      "addToCartFailed": "افزودن به سبد خرید ناموفق بود",
+      "removeFromCartFailed": "حذف از سبد خرید ناموفق بود",
+      "updateCartFailed": "بروزرسانی سبد خرید ناموفق بود",
+      "cartSyncFailed": "همگام‌سازی سبد خرید ناموفق بود",
+      "cartLoadFailed": "بارگذاری سبد خرید ناموفق بود"
+    },
+    "checkoutErrors": {
+      "checkoutFailed": "تسویه حساب ناموفق بود",
+      "paymentFailed": "پردازش پرداخت ناموفق بود",
+      "orderCreationFailed": "ایجاد سفارش ناموفق بود",
+      "shippingCalculationFailed": "محاسبه هزینه ارسال ناموفق بود",
+      "invalidOrder": "داده‌های سفارش نامعتبر"
+    }
+  },
+  "Success Messages": {
+    "orderSuccess": "سفارش با موفقیت ثبت شد!",
+    "orderConfirmationSent": "تایید سفارش به ایمیل شما ارسال شد",
+    "guestOrderSuccess": "سفارش مهمان شما با موفقیت ثبت شد"
+  },
+  "Terms and Conditions": {
+    "acceptTerms": "شرایط و ضوابط را می‌پذیرم",
+    "termsAndConditions": "شرایط و ضوابط",
+    "refundPolicy": "سیاست بازپرداخت"
+  },
+  "User Actions": {
+    "profile": "پروفایل",
+    "addresses": "آدرس‌ها",
+    "paymentMethods": "روش‌های پرداخت"
+  },
+  "Status and Messages": {
+    "noResults": "نتیجه‌ای یافت نشد",
+    "goBack": "بازگشت",
+    "pageNotFound": "صفحه یافت نشد",
+    "somethingWentWrong": "مشکلی پیش آمده"
+  },
+  "Admin Specific": {
+    "create": "ایجاد",
+    "manage": "مدیریت",
+    "export": "خروجی",
+    "import": "ورودی",
+    "bulkActions": "اعمال گروهی",
+    "selectAll": "انتخاب همه",
+    "checkingPermissions": "بررسی مجوزها",
+    "redirectingToAdmin": "در حال انتقال به پنل مدیریت..."
+  },
+  "Language Settings": {
+    "languageSettings": "تنظیمات زبان",
+    "languageMode": "حالت زبان",
+    "multilingual": "چندزبانه (فارسی و انگلیسی)",
+    "singleFa": "زبان واحد - فقط فارسی",
+    "singleEn": "زبان واحد - فقط انگلیسی",
+    "defaultLanguage": "زبان پیش‌فرض",
+    "persianFarsi": "فارسی",
+    "english": "انگلیسی"
+  },
+  "Product Suggestions": {
+    "productSuggestions": "پیشنهادات محصول",
+    "enableProductSuggestions": "فعال کردن پیشنهادات محصول",
+    "suggestionAlgorithm": "الگوریتم پیشنهاد",
+    "popularityBased": "بر اساس محبوبیت",
+    "similarityBased": "بر اساس شباهت",
+    "recentlyViewed": "اخیراً مشاهده شده",
+    "hybrid": "ترکیبی (توصیه شده)",
+    "maximumSuggestions": "حداکثر پیشنهادات"
+  },
+  "Site Settings": {
+    "siteSettings": "تنظیمات سایت",
+    "siteTitles": "عناوین سایت",
+    "siteTitleEn": "عنوان سایت (انگلیسی)",
+    "siteTitleFa": "عنوان سایت (فارسی)",
+    "contactInformation": "اطلاعات تماس",
+    "phoneNumberEn": "شماره تلفن (انگلیسی)",
+    "phoneNumberFa": "شماره تلفن (فارسی)",
+    "siteDescriptions": "توضیحات سایت",
+    "siteDescriptionEn": "توضیحات سایت (انگلیسی)",
+    "siteDescriptionFa": "توضیحات سایت (فارسی)"
+  },
+  "Multilingual Tips": {
+    "multilingualSupport": "پشتیبانی چندزبانه",
+    "siteTitlesDisplayed": "عناوین سایت در نوار ناوبری و تب مرورگر نمایش داده می‌شوند",
+    "contactInfoFooter": "اطلاعات تماس در فوتر و صفحات تماس نمایش داده می‌شود",
+    "descriptionsForSEO": "توضیحات برای سئو و اشتراک‌گذاری در شبکه‌های اجتماعی استفاده می‌شوند",
+    "changesReflected": "تغییرات بر اساس ترجیح زبان کاربر بلافاصله در سراسر سایت منعکس می‌شوند",
+    "provideBothVersions": "برای پشتیبانی کامل چندزبانه باید هر دو نسخه انگلیسی و فارسی ارائه شوند"
+  },
+  "Product Comparison": {
+    "productComparison": "مقایسه محصولات",
+    "comparingProducts": "مقایسه {count} محصول انتخاب شده",
+    "clearAll": "پاک کردن همه",
+    "addProduct": "افزودن محصول",
+    "overview": "نمای کلی",
+    "reviews": "نظرات",
+    "addAnotherProduct": "محصول دیگری اضافه کنید",
+    "selectProduct": "انتخاب محصول",
+    "productDetails": "جزئیات محصول",
+    "technicalSpecs": "مشخصات فنی",
+    "stockStatus": "وضعیت موجودی",
+    "available": "موجود",
+    "notAvailable": "ناموجود",
+    "productRating": "امتیاز محصول",
+    "outOf": "از"
+  },
+  "Recently Viewed": {
+    "recentlyViewedProducts": "محصولات اخیراً مشاهده شده",
+    "noRecentlyViewed": "هیچ محصول اخیراً مشاهده شده‌ای وجود ندارد",
+    "viewAllRecentlyViewed": "مشاهده همه محصولات اخیراً مشاهده شده"
+  },
+  "auth": {
+    "signin": {
+      "title": "ورود به حساب کاربری",
+      "subtitle": "برای دسترسی به حساب خود اعتبارنامه‌های خود را وارد کنید",
+      "email": {
+        "label": "ایمیل",
+        "placeholder": "ایمیل خود را وارد کنید"
+      },
+      "password": {
+        "label": "رمز عبور",
+        "placeholder": "رمز عبور خود را وارد کنید"
+      },
+      "submit": "ورود",
+      "loading": "در حال ورود...",
+      "forgotPassword": "رمز عبور خود را فراموش کرده‌اید؟",
+      "noAccount": "حساب کاربری ندارید؟",
+      "signUp": "ثبت نام",
+      "social": {
+        "orContinueWith": "یا ادامه با",
+        "google": "گوگل",
+        "github": "گیت‌هاب"
+      },
+      "errors": {
+        "signInFailed": "ورود ناموفق بود",
+        "socialSignInFailed": "ورود از طریق شبکه اجتماعی ناموفق بود",
+        "unexpectedError": "خطای غیرمنتظره‌ای رخ داد"
+      },
+      "phone": {
+        "label": "شماره تلفن",
+        "placeholder": "شماره تلفن خود را وارد کنید"
+      },
+      "hasAccount": "حساب کاربری دارید؟"
+    },
+    "signup": {
+      "title": "ایجاد حساب کاربری",
+      "subtitle": "اطلاعات خود را وارد کنید تا حساب کاربری جدیدی ایجاد کنید",
+      "name": {
+        "label": "نام",
+        "placeholder": "نام خود را وارد کنید"
+      },
+      "email": {
+        "label": "ایمیل",
+        "placeholder": "ایمیل خود را وارد کنید"
+      },
+      "phone": {
+        "label": "شماره تلفن",
+        "placeholder": "شماره تلفن خود را وارد کنید"
+      },
+      "password": {
+        "label": "رمز عبور",
+        "placeholder": "رمز عبور خود را وارد کنید"
+      },
+      "confirmPassword": {
+        "label": "تایید رمز عبور",
+        "placeholder": "رمز عبور خود را دوباره وارد کنید"
+      },
+      "submit": "ثبت نام",
+      "loading": "در حال ثبت نام...",
+      "hasAccount": "حساب کاربری دارید؟",
+      "signIn": "ورود",
+      "social": {
+        "orContinueWith": "یا ادامه با",
+        "google": "گوگل",
+        "github": "گیت‌هاب"
+      },
+      "errors": {
+        "signUpFailed": "ثبت نام ناموفق بود",
+        "socialSignUpFailed": "ثبت نام از طریق شبکه اجتماعی ناموفق بود",
+        "unexpectedError": "خطای غیرمنتظره‌ای رخ داد"
+      }
+    }
+  },
+  "Social Sharing": {
+    "share": "اشتراک‌گذاری",
+    "shareOnSocial": "اشتراک‌گذاری در شبکه‌های اجتماعی",
+    "shareProduct": "اشتراک‌گذاری محصول",
+    "copyLink": "کپی لینک",
+    "linkCopied": "لینک در کلیپ‌بورد کپی شد!"
+  },
+  "Theme Colors": {
+    "themeColorCustomization": "سفارشی‌سازی رنگ تم",
+    "lightModeColors": "رنگ‌های حالت روشن",
+    "darkModeColors": "رنگ‌های حالت تاریک",
+    "primaryColor": "رنگ اصلی",
+    "secondaryColor": "رنگ ثانویه",
+    "accentColor": "رنگ برجسته",
+    "backgroundColor": "رنگ پس‌زمینه",
+    "foregroundColor": "رنگ پیش‌زمینه",
+    "themeColorNote": "تغییرات رنگ تم",
+    "themeColorChanges": "تغییرات رنگ تم بلافاصله در تمام صفحات کاربر و مدیریت اعمال خواهد شد. اطمینان حاصل کنید که رنگ‌هایی انتخاب کنید که کنتراست خوب و خوانایی را حفظ کنند.",
+    "saveThemeSettings": "ذخیره تنظیمات تم",
+    "resetToDefaults": "بازنشانی به پیش‌فرض",
+    "themePreview": "پیش‌نمایش تم",
+    "applyTheme": "اعمال تم",
+    "colorValidationError": "فرمت رنگ نامعتبر. لطفا از فرمت هگز استفاده کنید (مثال: #RRGGBB)",
+    "contrastWarning": "هشدار: این ترکیب رنگ ممکن است کنتراست ضعیفی برای دسترسی‌پذیری داشته باشد"
+  },
+  "Admin Dashboard": {
+    "loading": "در حال بارگذاری داشبورد...",
+    "tryAgain": "دوباره امتحان کنید",
+    "stats": {
+      "totalProducts": "کل محصولات",
+      "totalOrders": "کل سفارشات",
+      "totalUsers": "کل کاربران",
+      "totalRevenue": "کل درآمد",
+      "fromLastMonth": "از ماه گذشته"
+    },
+    "recentOrders": "سفارشات اخیر",
+    "noRecentOrders": "هیچ سفارش جدیدی وجود ندارد",
+    "lowStockAlert": "هشدار موجودی کم",
+    "allProductsWellStocked": "همه محصولات خوب موجود هستند",
+    "remaining": "باقی مانده",
+    "quickActions": "اقدامات سریع",
+    "addNewProduct": "افزودن محصول جدید",
+    "createNewProductListing": "ایجاد لیست محصول جدید",
+    "manageUsers": "مدیریت کاربران",
+    "viewManageUserAccounts": "مشاهده و مدیریت حساب‌های کاربری",
+    "viewAnalytics": "مشاهده آمار",
+    "checkSalesPerformance": "بررسی فروش و عملکرد"
+  },
+  "categories": {
+    "title": "دسته‌بندی‌ها",
+    "subtitle": "دسته‌بندی محصولات ما را مرور کنید",
+    "allCategories": "همه دسته‌بندی‌ها",
+    "noCategories": "هیچ دسته‌بندی‌ای یافت نشد",
+    "loading": "در حال بارگذاری دسته‌بندی‌ها...",
+    "viewProducts": "مشاهده محصولات",
+    "subcategories": "زیردسته‌بندی‌ها",
+    "productsCount": "محصولات",
+    "filterCategories": "فیلتر دسته‌بندی‌ها...",
+    "clearFilter": "پاک کردن فیلتر",
+    "breadcrumb": {
+      "home": "خانه",
+      "categories": "دسته‌بندی‌ها"
+    },
+    "header": {
+      "title": "بر اساس دسته‌بندی خرید کنید",
+      "subtitle": "طیف گسترده‌ای از دسته‌بندی‌های محصولات ما را کاوش کنید"
+    },
+    "search": {
+      "placeholder": "جستجوی دسته‌بندی‌ها..."
+    },
+    "stats": {
+      "categories": "دسته‌بندی‌ها",
+      "products": "محصولات"
+    },
+    "empty": {
+      "title": "هیچ دسته‌بندی‌ای یافت نشد",
+      "noCategories": "در حال حاضر هیچ دسته‌بندی‌ای موجود نیست.",
+      "searchMessage": "هیچ دسته‌بندی‌ای با معیارهای جستجوی شما مطابقت ندارد.",
+      "clearSearch": "پاک کردن جستجو"
+    },
+    "error": {
+      "title": "خطا در بارگذاری دسته‌بندی‌ها",
+      "fetchFailed": "بارگذاری دسته‌بندی‌ها ناموفق بود. لطفا دوباره امتحان کنید.",
+      "tryAgain": "دوباره امتحان کنید"
+    },
+    "product": {
+      "singular": "محصول",
+      "plural": "محصولات"
+    },
+    "category": {
+      "browse": "مرور محصولات"
+    },
+    "cta": {
+      "title": "همه محصولات را کاوش کنید",
+      "subtitle": "کل مجموعه شگفت‌انگیز محصولات ما را مرور کنید",
+      "browseAll": "مرور همه محصولات"
+    }
+  },
+  "Home": {
+    "hero": {
+      "badge": "مجموعه جدید موجود است",
+      "title": "محصولات شگفت‌انگیز را کشف کنید",
+      "subtitle": "آخرین روندها را با تحویل سریع و امن و خدمات مشتری عالی خریداری کنید. همه چیز مورد نیاز خود را در یک مکان پیدا کنید.",
+      "shopNow": "هم اکنون خرید کنید",
+      "browseCategories": "مرور دسته‌بندی‌ها"
+    },
+    "featuredProducts": {
+      "title": "محصولات ویژه",
+      "subtitle": "انتخاب دستچین شده ما از محصولات برتر را کشف کنید",
+      "viewAll": "مشاهده همه محصولات"
+    },
+    "product": {
+      "sale": "فروش",
+      "viewDetails": "مشاهده جزئیات"
+    },
+    "features": {
+      "title": "چرا فروشگاه آنلاین را انتخاب کنید؟",
+      "subtitle": "تجربه خریدی را که هرگز فراموش نخواهید کرد با ویژگی‌ها و خدمات برتر ما داشته باشید.",
+      "freeShipping": {
+        "title": "ارسال رایگان",
+        "description": "ارسال رایگان برای همه سفارشات بیش از ۵۰ دلار. تحویل سریع و قابل اعتماد در سراسر جهان."
+      },
+      "securePayment": {
+        "title": "پرداخت امن",
+        "description": "اطلاعات پرداخت شما همیشه با اقدامات امنیتی پیشرفته ما ایمن است."
+      },
+      "qualityProducts": {
+        "title": "محصولات با کیفیت",
+        "description": "محصولات با دقت انتخاب شده از برندهای معتبر با تضمین کیفیت."
+      },
+      "support247": {
+        "title": "پشتیبانی ۲۴/۷",
+        "description": "تیم پشتیبانی مشتری ما همیشه در اینجا هستند تا به شما کمک کنند."
+      }
+    },
+    "categories": {
+      "title": "بر اساس دسته‌بندی خرید کنید",
+      "subtitle": "طیف گسترده‌ای از دسته‌بندی‌های محصولات ما را کاوش کنید",
+      "electronics": {
+        "title": "الکترونیک",
+        "description": "گجت‌های آخرین مدل، گوشی‌های هوشمند، لپ‌تاپ‌ها و سایر ضروریات فناوری.",
+        "shopButton": "خرید الکترونیک"
+      },
+      "fashion": {
+        "title": "مد",
+        "description": "لباس‌های مد روز، کفش‌ها، اکسسوری‌ها و ضروریات مد.",
+        "shopButton": "خرید مد"
+      },
+      "homeGarden": {
+        "title": "خانه و باغ",
+        "description": "مبلمان، دکور، لوازم خانگی و همه چیز برای خانه شما.",
+        "shopButton": "خرید خانه"
+      }
+    },
+    "cta": {
+      "title": "آماده شروع خرید هستید؟",
+      "subtitle": "به هزاران مشتری راضی که به فروشگاه آنلاین اعتماد دارند بپیوندید.",
+      "createAccount": "ایجاد حساب",
+      "browseProducts": "مرور محصولات"
+    }
+  },
+  "SEO": {
+    "defaultTitle": "فروشگاه آنلاین - بهترین مقصد خرید آنلاین شما",
+    "defaultDescription": "محصولات شگفت‌انگیز را با قیمت مناسب با تحویل سریع و امن و خدمات مشتری عالی کشف کنید. آخرین روندها را خریداری کنید و همه چیز مورد نیاز خود را در یک مکان پیدا کنید.",
+    "siteName": "فروشگاه آنلاین",
+    "twitterHandle": "@estore",
+    "home": {
+      "title": "خوش آمدید به فروشگاه آنلاین - محصولات شگفت‌انگیز و تخفیف‌های عالی",
+      "description": "مجموعه شگفت‌انگیز محصولات ما را با ارسال سریع و تسویه حساب امن کشف کنید. الکترونیک، مد، کالاهای خانگی و موارد دیگر را در فروشگاه آنلاین خریداری کنید."
+    },
+    "category": {
+      "title": "بر اساس دسته‌بندی خرید کنید - آنچه نیاز دارید پیدا کنید",
+      "description": "طیف گسترده‌ای از دسته‌بندی‌های محصولات را مرور کنید. الکترونیک، مد، خانه و باغ را پیدا کنید و همه چیز مورد نیاز سبک زندگی خود را بیابید."
+    },
+    "search": {
+      "title": "جستجوی محصولات - دقیقاً آنچه را که به دنبالش هستید پیدا کنید",
+      "description": "کاتالوگ گسترده محصولات ما را جستجو کنید. محصول完美的 را با گزینه‌های جستجوی پیشرفته و فیلترینگ ما پیدا کنید."
+    },
+    "cart": {
+      "title": "سبد خرید - موارد خود را بررسی کنید و تسویه حساب کنید",
+      "description": "موارد سبد خرید خود را بررسی کنید و به تسویه حساب امن ادامه دهید. خرید خود را با تحویل سریع و قابل اعتماد تکمیل کنید."
+    },
+    "checkout": {
+      "title": "تسویه حساب امن - خرید خود را تکمیل کنید",
+      "description": "سفارش خود را با فرآیند تسویه حساب امن ما تکمیل کنید. پردازش پرداخت سریع و تحویل قابل اعتماد در سراسر جهان."
+    },
+    "account": {
+      "title": "حساب من - پروفایل و سفارشات خود را مدیریت کنید",
+      "description": "حساب خود را مدیریت کنید، تاریخچه سفارشات را مشاهده کنید، پروفایل خود را بروزرسانی کنید و خریدهای خود را در فروشگاه آنلاین پیگیری کنید."
+    }
+  },
+  "Cart Sidebar": {
+    "title": "سبد خرید",
+    "closeButton": "بستن نوار کناری سبد خرید",
+    "itemsCount": "مورد",
+    "guestLabel": "مهمان",
+    "syncing": "همگام‌سازی سبد خرید",
+    "authenticatedDescription": "موارد سبد خرید و گزینه‌های تسویه حساب شما",
+    "guestDescription": "سبد خرید مهمان - برای ذخیره موارد خود وارد شوید",
+    "errorMessage": "خطا",
+    "cartStatus": "سبد خرید دارای {count} مورد مجموعاً {total} است",
+    "emptyTitle": "سبد خرید شما خالی است",
+    "emptyMessage": "برای شروع خرید، محصولاتی را به سبد خرید اضافه کنید",
+    "continueShopping": "ادامه خرید",
+    "totalLabel": "مبلغ کل",
+    "totalText": "مجموع",
+    "currency": "تومان",
+    "totalAmount": "مبلغ کل: {amount}",
+    "guestCheckoutTitle": "تسویه حساب مهمان",
+    "guestCheckoutMessage": "برای ذخیره سبد خرید و دسترسی به تاریخچه سفارشات وارد شوید.",
+    "checkoutActions": "اقدامات تسویه حساب",
+    "proceedToCheckout": "ادامه به تسویه حساب",
+    "checkoutButton": "تسویه حساب",
+    "viewFullCart": "مشاهده سبد خرید کامل",
+    "viewCartButton": "مشاهده سبد خرید کامل"
+  },
+  "Contact": {
+    "title": "تماس با ما",
+    "subtitle": "با تیم ما در تماس باشید",
+    "form": {
+      "title": "پیام خود را ارسال کنید",
+      "name": "نام کامل",
+      "namePlaceholder": "نام کامل خود را وارد کنید",
+      "email": "آدرس ایمیل",
+      "emailPlaceholder": "آدرس ایمیل خود را وارد کنید",
+      "subject": "موضوع",
+      "subjectPlaceholder": "در مورد چیست؟",
+      "message": "پیام",
+      "messagePlaceholder": "بگویید چگونه می‌توانیم به شما کمک کنیم...",
+      "submit": "ارسال پیام"
+    },
+    "info": {
+      "title": "اطلاعات تماس",
+      "address": "آدرس",
+      "phone": "تلفن",
+      "email": "ایمیل",
+      "hours": "ساعات کاری"
+    },
+    "faq": {
+      "title": "سوالات متداول",
+      "q1": "چگونه می‌توانم سفارش خود را پیگیری کنم؟",
+      "a1": "می‌توانید سفارش خود را با استفاده از شماره پیگیری موجود در ایمیل تاییدیه پیگیری کنید.",
+      "q2": "سیاست بازگشت شما چیست؟",
+      "a2": "بازگشت‌ها را ظرف ۳۰ روز پس از خرید می‌پذیریم. اقلام باید در شرایط اصلی باشند.",
+      "q3": "ارسال بین‌المللی ارائه می‌دهید؟",
+      "a3": "بله، به اکثر کشورها در سراسر جهان ارسال می‌کنیم. هزینه‌های ارسال بسته به مکان متفاوت است."
+    }
+  },
+  "Help": {
+    "title": "راهنما و پشتیبانی",
+    "subtitle": "پاسخ‌ها را پیدا کنید و پشتیبانی دریافت کنید",
+    "search": {
+      "placeholder": "جستجو برای راهنما..."
+    },
+    "categories": {
+      "gettingStarted": {
+        "title": "شروع کار",
+        "description": "اصول را یاد بگیرید و با پلتفرم ما شروع کنید"
+      },
+      "account": {
+        "title": "حساب و پروفایل",
+        "description": "تنظیمات حساب و اطلاعات پروفایل خود را مدیریت کنید"
+      },
+      "shopping": {
+        "title": "راهنمای خرید",
+        "description": "یاد بگیرید چگونه مرور کنید، جستجو کنید و محصولات را خریداری کنید"
+      },
+      "orders": {
+        "title": "سفارشات و پیگیری",
+        "description": "سفارشات را پیگیری کنید، تحویل‌ها را مدیریت کنید و بازگشت‌ها را رسیدگی کنید"
+      },
+      "payment": {
+        "title": "پرداخت و صورتحساب",
+        "description": "روش‌های پرداخت، سوالات صورتحساب و بازپرداخت‌ها"
+      },
+      "viewGuides": "مشاهده راهنماها"
+    },
+    "faqs": {
+      "title": "سوالات متداول",
+      "subtitle": "پاسخ‌های سریع به سوالات رایج",
+      "shipping": {
+        "question": "ارسال چقدر طول می‌کشد؟",
+        "answer": "ارسال استاندارد ۳-۵ روز کاری طول می‌کشد. ارسال سریع برای ۱-۲ روز کاری موجود است."
+      },
+      "returns": {
+        "question": "سیاست بازگشت شما چیست؟",
+        "answer": "سیاست بازگشت ۳۰ روزه برای اکثر اقلام ارائه می‌دهیم. بازگشت اقلام معیوب رایگان است."
+      },
+      "payment": {
+        "question": "چه روش‌های پرداختی را می‌پذیرید؟",
+        "answer": "کارت‌های اعتباری، کارت‌های بدهی، پی‌پال و انتقال بانکی را می‌پذیریم."
+      },
+      "account": {
+        "question": "چگونه رمز عبور خود را بازنشانی کنم؟",
+        "answer": "روی 'رمز عبور فراموش شده' در صفحه ورود کلیک کنید و دستورالعمل‌های ارسال شده به ایمیل خود را دنبال کنید."
+      },
+      "tracking": {
+        "question": "چگونه می‌توانم سفارش خود را پیگیری کنم؟",
+        "answer": "از شماره پیگیری موجود در ایمیل تاییدیه خود در صفحه پیگیری ما استفاده کنید."
+      }
+    },
+    "contact": {
+      "title": "هنوز نیاز به کمک دارید؟",
+      "description": "چیزی را که به دنبالش هستید پیدا نکردید؟ تیم پشتیبانی ما اینجا هستند تا کمک کنند.",
+      "email": "تماس از طریق ایمیل",
+      "phone": "با ما تماس بگیرید"
+    }
+  },
+  "blog": "بلاگ",
+  "Blog": {
+    "title": "بلاگ",
+    "readMore": "بیشتر بخوانید",
+    "description": "آخرین اخبار و مقالات از تیم ما",
+    "keywords": "بلاگ، اخبار، مقالات",
+    "category": "دسته‌بندی",
+    "search": "جستجو",
+    "error": {
+      "title": "خطا",
+      "description": "مشکلی پیش آمده"
+    },
+    "categories": {
+      "title": "دسته‌بندی‌ها",
+      "all": "همه دسته‌بندی‌ها"
+    },
+    "search": {
+      "title": "جستجو",
+      "placeholder": "جستجوی مقالات...",
+      "button": "جستجو",
+      "clear": "پاک کردن",
+      "tips": {
+        "title": "نکات جستجو",
+        "excerpt": "جستجو در خلاصه مقالات",
+        "content": "جستجو در محتوای مقالات",
+        "tags": "جستجو در برچسب‌ها"
+      }
+    },
+    "showingResults": "نمایش {count} از {total} نتیجه",
+    "noPosts": {
+      "title": "پستی یافت نشد",
+      "description": "هیچ پستی مطابق معیارهای شما یافت نشد."
+    },
+    "noSearchResults": {
+      "title": "نتیجه جستجویی یافت نشد",
+      "description": "هیچ مقاله‌ای برای جستجوی شما یافت نشد. از کلمات کلیدی دیگری استفاده کنید."
+    },
+    "noCategoryPosts": {
+      "title": "پستی در این دسته‌بندی وجود ندارد",
+      "description": "هنوز هیچ پستی در این دسته‌بندی وجود ندارد."
+    },
+    "anonymous": "ناشناس",
+    "unpublished": "منتشر نشده",
+    "post": {
+      "backToBlog": "بازگشت به بلاگ",
+      "tags": "برچسب‌ها",
+      "notFound": "پست یافت نشد",
+      "error": "خطا در بارگذاری پست",
+      "errorDescription": "مشکلی در بارگذاری این پست بلاگ رخ داد."
+    },
+    "comments": {
+      "title": "نظرات",
+      "addComment": "افزودن نظر",
+      "placeholder": "افکار خود را بیان کنید...",
+      "submit": "ارسال نظر",
+      "submitting": "در حال ارسال...",
+      "reply": "پاسخ",
+      "replyPlaceholder": "نوشتن پاسخ...",
+      "submitReply": "ارسال پاسخ",
+      "cancel": "لغو",
+      "noComments": "هنوز نظری وجود ندارد",
+      "beFirst": "اولین نفری باشید که نظر می‌دهد!"
+    },
+    "relatedPosts": {
+      "title": "پست‌های مرتبط",
+      "viewAll": "مشاهده همه پست‌ها"
+    }
+  }
+}

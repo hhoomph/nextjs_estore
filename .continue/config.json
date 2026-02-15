@@ -1,0 +1,18 @@
+{
+  "models": [
+    {
+      "title": "LM Studio",
+      "provider": "lmstudio",
+      "model": "qwen-coder2.5-7b",
+      "apiBase": "http://localhost:1234",
+      "apiKey": "sk-lm-iwHFr0Xk:nEghLayTOWBJpO5YmxpF"
+    }
+  ],
+  "tabAutocompleteModel": {
+    "title": "LM Studio",
+    "provider": "lmstudio",
+    "model": "qwen-coder2.5-7b",
+    "apiBase": "http://localhost:1234",
+    "apiKey": "sk-lm-iwHFr0Xk:nEghLayTOWBJpO5YmxpF"
+  }
+}
