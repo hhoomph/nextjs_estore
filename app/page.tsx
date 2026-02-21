@@ -150,15 +150,19 @@ async function FeaturedProducts() {
       sortOrder: "desc",
     });
 
-    if (result.data && result.data.length > 0) {
+    if (result?.data && result.data.length > 0) {
       products = result.data.slice(0, 8);
+    } else {
+      // Return null gracefully if no products found
+      return null;
     }
   } catch (error) {
-    console.warn("Failed to load featured products:", error);
+    console.warn("[v0] Failed to load featured products:", error);
+    // Return null instead of throwing to allow page to load
     return null;
   }
 
-  if (products.length === 0) {
+  if (!products || products.length === 0) {
     return null;
   }
 
