@@ -22,7 +22,7 @@ import {
   createSecureResponse,
   createSecurityMiddleware,
 } from "@/app/api/middleware/security";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/database";
 
 // Validation schemas
 const getProductsQuerySchema = z.object({

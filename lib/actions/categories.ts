@@ -10,7 +10,7 @@
 
 import { revalidateTag } from "next/cache";
 import { cache } from "react";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/database";
 
 /**
  * Category with product count

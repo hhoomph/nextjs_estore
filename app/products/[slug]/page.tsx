@@ -7,7 +7,7 @@
  */
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/database";
 import { LoadingPage } from "@/components/ui/loading";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

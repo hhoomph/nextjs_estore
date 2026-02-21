@@ -7,7 +7,7 @@
  * @since 2025-01-01
  */
 import { type NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/database";
 
 export async function POST(request: NextRequest) {
   try {
