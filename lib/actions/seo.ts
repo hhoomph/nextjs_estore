@@ -43,68 +43,61 @@ export async function updateProductSEO(productId: string, data: SEOData) {
   }
 }
 
+// Default settings object for fallback
+const DEFAULT_SETTINGS = {
+  id: "default-settings",
+  siteTitleEn: "E-commerce Store",
+  siteTitleFa: "فروشگاه آنلاین",
+  phoneEn: undefined,
+  phoneFa: undefined,
+  descriptionEn: undefined,
+  descriptionFa: undefined,
+  languageMode: "multilingual",
+  defaultLanguage: "fa",
+  enableProductSuggestions: true,
+  suggestionAlgorithm: "hybrid",
+  maxSuggestions: 6,
+  primaryColorLight: "#0ea5e9",
+  secondaryColorLight: "#a8a29e",
+  accentColorLight: "#0d9488",
+  backgroundColorLight: "#ffffff",
+  foregroundColorLight: "#171717",
+  primaryColorDark: "#0284c7",
+  secondaryColorDark: "#a8a29e",
+  accentColorDark: "#0d9488",
+  backgroundColorDark: "#0a0a0a",
+  foregroundColorDark: "#fafafa",
+  defaultSeoTitle: undefined,
+  defaultSeoDescription: undefined,
+  defaultOgImage: undefined,
+  googleAnalyticsId: undefined,
+  maintenanceMode: false,
+  allowRegistration: true,
+  defaultCurrency: "USD",
+  lowStockThreshold: 10,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
 export async function getSiteSettings() {
   try {
-    // Try to fetch from Prisma model with fallback error handling
-    let settings: any = null;
+    // Query directly from database to bypass Prisma schema issues
+    const result = await (prisma as any).$queryRaw`
+      SELECT * FROM site_settings LIMIT 1
+    `;
     
-    try {
-      settings = await (prisma as any).siteSettings?.findFirst?.();
-    } catch (schemaError) {
-      console.warn("[v0] Prisma schema mismatch, using default settings:", schemaError);
+    if (result && Array.isArray(result) && result.length > 0) {
+      return { success: true, settings: result[0] };
     }
 
-    if (!settings) {
-      // Return default settings if database query fails
-      return {
-        success: true,
-        settings: {
-          id: "default-settings",
-          siteTitleEn: "E-commerce Store",
-          siteTitleFa: "فروشگاه آنلاین",
-          maintenanceMode: false,
-          allowRegistration: true,
-          defaultCurrency: "USD",
-          lowStockThreshold: 10,
-          primaryColorLight: "#3b82f6",
-          secondaryColorLight: "#78716c",
-          accentColorLight: "#10b981",
-          backgroundColorLight: "#ffffff",
-          foregroundColorLight: "#171717",
-          primaryColorDark: "#60a5fa",
-          secondaryColorDark: "#a8a29e",
-          accentColorDark: "#10b981",
-          backgroundColorDark: "#0a0a0a",
-          foregroundColorDark: "#fafafa",
-        },
-      };
-    }
-
-    return { success: true, settings };
+    // If no settings in database, return defaults
+    return { success: true, settings: DEFAULT_SETTINGS };
   } catch (error) {
-    console.error("[v0] Error fetching site settings:", error);
+    console.warn("[v0] Could not fetch site settings from DB, using defaults:", error);
     // Return sensible defaults instead of crashing
     return {
       success: true,
-      settings: {
-        id: "default-settings",
-        siteTitleEn: "E-commerce Store",
-        siteTitleFa: "فروشگاه آنلاین",
-        maintenanceMode: false,
-        allowRegistration: true,
-        defaultCurrency: "USD",
-        lowStockThreshold: 10,
-        primaryColorLight: "#3b82f6",
-        secondaryColorLight: "#78716c",
-        accentColorLight: "#10b981",
-        backgroundColorLight: "#ffffff",
-        foregroundColorLight: "#171717",
-        primaryColorDark: "#60a5fa",
-        secondaryColorDark: "#a8a29e",
-        accentColorDark: "#10b981",
-        backgroundColorDark: "#0a0a0a",
-        foregroundColorDark: "#fafafa",
-      },
+      settings: DEFAULT_SETTINGS,
     };
   }
 }
