@@ -174,10 +174,11 @@ export const iranSansFontUtils = {
 
   /**
    * Preload IranSans fonts for better performance - Disabled due to unavailable CDN
+   * No warning is logged as this is expected behavior in development environments
    */
   preloadFonts: (weights: string[] = ["400", "500", "600", "700"]): void => {
     // IranSans fonts are not available from the CDN, so we skip preloading
-    console.warn("IranSans font preloading skipped - CDN not available");
+    // Silently skip - this is expected and not an error condition
   },
 };
 

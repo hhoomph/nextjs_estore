@@ -106,8 +106,8 @@ export async function updateSiteSettings(data: SiteSettingsData) {
   try {
     const validatedData = siteSettingsSchema.parse(data);
 
-    // Transform snake_case to camelCase for Prisma
-    const prismaData = {
+    // Transform snake_case to camelCase for database update
+    const updateData = {
       siteTitleEn: validatedData.site_title_en,
       siteTitleFa: validatedData.site_title_fa,
       descriptionEn: validatedData.description_en,
@@ -117,14 +117,31 @@ export async function updateSiteSettings(data: SiteSettingsData) {
       defaultCurrency: validatedData.default_currency,
       lowStockThreshold: validatedData.low_stock_threshold,
       defaultOgImage: validatedData.default_og_image,
+      updatedAt: new Date(),
     };
 
-    // Update or create settings (ensure only one record exists)
-    const settings = await prisma.siteSettings.upsert({
-      where: { id: "default" }, // Using a fixed ID since we want only one record
-      update: prismaData,
-      create: { ...prismaData, id: "default" },
-    });
+    // Update using raw SQL to bypass Prisma model issues
+    await (prisma as any).$executeRaw`
+      UPDATE site_settings 
+      SET "siteTitleEn" = ${updateData.siteTitleEn},
+          "siteTitleFa" = ${updateData.siteTitleFa},
+          "descriptionEn" = ${updateData.descriptionEn},
+          "descriptionFa" = ${updateData.descriptionFa},
+          "maintenanceMode" = ${updateData.maintenanceMode},
+          "allowRegistration" = ${updateData.allowRegistration},
+          "defaultCurrency" = ${updateData.defaultCurrency},
+          "lowStockThreshold" = ${updateData.lowStockThreshold},
+          "defaultOgImage" = ${updateData.defaultOgImage},
+          "updatedAt" = ${updateData.updatedAt}
+      WHERE id = 'default-settings'
+    `;
+
+    // Fetch updated settings
+    const result = await (prisma as any).$queryRaw`
+      SELECT * FROM site_settings WHERE id = 'default-settings' LIMIT 1
+    `;
+
+    const settings = result && Array.isArray(result) ? result[0] : DEFAULT_SETTINGS;
 
     // Revalidate all pages that might use site settings
     revalidatePath("/");
