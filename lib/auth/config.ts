@@ -10,9 +10,26 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { sendEmail } from "@/lib/email";
 import { prisma } from "@/lib/database";
 
+// Suppress warnings about missing OAuth providers in development
+const originalWarn = console.warn;
+const suppressedWarnings = ["[better-auth]", "Social provider"];
+const filteredWarn = (...args: any[]) => {
+  const message = String(args[0]);
+  if (!suppressedWarnings.some(warning => message.includes(warning))) {
+    originalWarn(...args);
+  }
+};
+
+// Only suppress in development
+if (process.env.NODE_ENV === "development") {
+  console.warn = filteredWarn;
+}
+
 // Better Auth configuration with database integration
 export const auth = betterAuth({
-  secret: process.env.BETTER_AUTH_SECRET,
+  secret: process.env.BETTER_AUTH_SECRET || "development-secret-key",
+  baseURL: process.env.BETTER_AUTH_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+  trustHost: true,
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
@@ -52,11 +69,15 @@ export const auth = betterAuth({
       user: { email: string; name?: string };
       url: string;
     }) => {
-      await sendEmail({
-        to: user.email,
-        subject: "Verify your email address",
-        html: `Welcome, ${user.name}! Please click the link to verify your email: <a href="${url}">${url}</a>`,
-      });
+      try {
+        await sendEmail({
+          to: user.email,
+          subject: "Verify your email address",
+          html: `Welcome, ${user.name}! Please click the link to verify your email: <a href="${url}">${url}</a>`,
+        });
+      } catch (error) {
+        console.warn("[v0] Email sending not configured, skipping verification email");
+      }
     },
     sendResetPassword: async ({
       user,
@@ -65,22 +86,35 @@ export const auth = betterAuth({
       user: { email: string; name?: string };
       url: string;
     }) => {
-      await sendEmail({
-        to: user.email,
-        subject: "Reset your password",
-        html: `Hi, ${user.name}. Please click the link to reset your password: <a href="${url}">${url}</a>`,
-      });
+      try {
+        await sendEmail({
+          to: user.email,
+          subject: "Reset your password",
+          html: `Hi, ${user.name}. Please click the link to reset your password: <a href="${url}">${url}</a>`,
+        });
+      } catch (error) {
+        console.warn("[v0] Email sending not configured, skipping password reset email");
+      }
     },
   },
   socialProviders: {
-    github: {
-      clientId: process.env.GITHUB_CLIENT_ID as string,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
-    },
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    },
+    // Only include providers that have credentials configured
+    ...(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
+      ? {
+          github: {
+            clientId: process.env.GITHUB_CLIENT_ID,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET,
+          },
+        }
+      : {}),
+    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+      ? {
+          google: {
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+          },
+        }
+      : {}),
   },
   advanced: {
     cookiePrefix: "estore",
