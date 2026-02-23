@@ -6,7 +6,7 @@
  * @since 2025-01-01
  */
 import { unstable_cache as cache } from "next/cache";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/database";
 
 interface GetProductsParams {
   page?: number;

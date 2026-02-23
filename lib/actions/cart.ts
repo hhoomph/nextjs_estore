@@ -12,7 +12,7 @@
 import { revalidateTag } from "next/cache";
 import { cache } from "react";
 import { createErrorResponse, createSuccessResponse } from "@/lib/api/helpers";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/database";
 import type { CartSyncResponse, EnhancedCartItem } from "@/types/cart";
 
 interface CartItem {

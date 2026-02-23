@@ -7,7 +7,7 @@
  */
 import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/config";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/database";
 
 // PATCH /api/admin/orders/[id] - Update order status
 export async function PATCH(

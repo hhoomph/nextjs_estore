@@ -9,7 +9,7 @@
 import { randomBytes } from "crypto";
 import { type NextRequest, NextResponse } from "next/server";
 import { sendEmail } from "@/lib/email";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/database";
 
 export async function POST(request: NextRequest) {
   try {

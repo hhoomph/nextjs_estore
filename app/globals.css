@@ -61,18 +61,18 @@
 
 /* Modern Design System Variables */
 :root {
-  /* Core Brand Colors - Professional Blue Palette */
-  --color-primary-50: #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #3b82f6;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a8a;
-  --color-primary-950: #172554;
+  /* Core Brand Colors - Modern Vibrant Blue Palette */
+  --color-primary-50: #f0f9ff;
+  --color-primary-100: #e0f2fe;
+  --color-primary-200: #bae6fd;
+  --color-primary-300: #7dd3fc;
+  --color-primary-400: #38bdf8;
+  --color-primary-500: #0ea5e9;
+  --color-primary-600: #0284c7;
+  --color-primary-700: #0369a1;
+  --color-primary-800: #075985;
+  --color-primary-900: #0c3d66;
+  --color-primary-950: #051d2e;
 
   /* Secondary Colors - Sophisticated Warm Grays */
   --color-secondary-50: #fafaf9;
@@ -87,13 +87,15 @@
   --color-secondary-900: #1c1917;
   --color-secondary-950: #0c0a09;
 
-  /* Accent Colors - Vibrant and Modern */
-  --color-accent-emerald: #10b981;
-  --color-accent-amber: #f59e0b;
-  --color-accent-rose: #f43f5e;
-  --color-accent-violet: #8b5cf6;
-  --color-accent-cyan: #06b6d4;
-  --color-accent-lime: #84cc16;
+  /* Accent Colors - Vibrant, Modern & Accessible */
+  --color-accent-emerald: #059669;
+  --color-accent-amber: #d97706;
+  --color-accent-rose: #e11d48;
+  --color-accent-violet: #7c3aed;
+  --color-accent-cyan: #0891b2;
+  --color-accent-lime: #65a30d;
+  --color-accent-teal: #0d9488;
+  --color-accent-fuchsia: #d946ef;
 
   /* Status Colors - Accessible and Clear */
   --color-success-50: #f0fdf4;
@@ -131,24 +133,25 @@
   --popover-foreground: var(--color-neutral-900);
 
   --primary: var(--color-primary-600);
-  --primary-foreground: var(--color-primary-50);
+  --primary-foreground: #ffffff;
   --primary-hover: var(--color-primary-700);
   --primary-active: var(--color-primary-800);
+  --primary-subtle: var(--color-primary-50);
 
-  --secondary: var(--color-secondary-100);
+  --secondary: var(--color-secondary-200);
   --secondary-foreground: var(--color-secondary-900);
-  --secondary-hover: var(--color-secondary-200);
-  --secondary-active: var(--color-secondary-300);
+  --secondary-hover: var(--color-secondary-300);
+  --secondary-active: var(--color-secondary-400);
 
-  --muted: var(--color-secondary-100);
-  --muted-foreground: var(--color-secondary-600);
-  --muted-hover: var(--color-secondary-200);
-  --muted-active: var(--color-secondary-300);
+  --muted: var(--color-neutral-200);
+  --muted-foreground: var(--color-neutral-600);
+  --muted-hover: var(--color-neutral-300);
+  --muted-active: var(--color-neutral-400);
 
-  --accent: var(--color-secondary-100);
-  --accent-foreground: var(--color-secondary-900);
-  --accent-hover: var(--color-secondary-200);
-  --accent-active: var(--color-secondary-300);
+  --accent: var(--color-accent-teal);
+  --accent-foreground: #ffffff;
+  --accent-hover: #0f766e;
+  --accent-active: #134e4a;
 
   --destructive: var(--color-error-500);
   --destructive-foreground: var(--color-error-50);
@@ -383,30 +386,40 @@
 
 /* Dark mode variables */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.205 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.205 0 0);
-  --muted-foreground: oklch(0.705 0 0);
-  --accent: oklch(0.205 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.985 0 0);
-  --destructive-foreground: oklch(0.205 0 0);
-  --border: oklch(0.205 0 0);
-  --input: oklch(0.205 0 0);
-  --ring: oklch(0.985 0 0);
-  --chart-1: oklch(0.985 0 0);
-  --chart-2: oklch(0.985 0 0);
-  --chart-3: oklch(0.985 0 0);
-  --chart-4: oklch(0.985 0 0);
-  --chart-5: oklch(0.985 0 0);
+  --background: var(--color-neutral-900);
+  --foreground: var(--color-neutral-50);
+  --card: var(--color-neutral-800);
+  --card-foreground: var(--color-neutral-50);
+  --popover: var(--color-neutral-800);
+  --popover-foreground: var(--color-neutral-50);
+  --primary: var(--color-primary-400);
+  --primary-foreground: var(--color-primary-900);
+  --secondary: var(--color-secondary-800);
+  --secondary-foreground: var(--color-secondary-50);
+  --muted: var(--color-neutral-700);
+  --muted-foreground: var(--color-neutral-400);
+  --accent: var(--color-accent-teal);
+  --accent-foreground: var(--color-neutral-50);
+  --destructive: var(--color-error-400);
+  --destructive-foreground: var(--color-neutral-900);
+  --border: var(--color-neutral-700);
+  --input: var(--color-neutral-700);
+  --ring: var(--color-primary-400);
+  --chart-1: var(--color-primary-400);
+  --chart-2: var(--color-accent-cyan);
+  --chart-3: var(--color-accent-emerald);
+  --chart-4: var(--color-accent-amber);
+  --chart-5: var(--color-accent-violet);
+  
+  /* Dark mode sidebar */
+  --sidebar: var(--color-neutral-900);
+  --sidebar-foreground: var(--color-neutral-50);
+  --sidebar-primary: var(--color-primary-400);
+  --sidebar-primary-foreground: var(--color-primary-900);
+  --sidebar-accent: var(--color-secondary-800);
+  --sidebar-accent-foreground: var(--color-secondary-50);
+  --sidebar-border: var(--color-neutral-700);
+  --sidebar-ring: var(--color-primary-400);
 }
 
 /* Base styles */
@@ -435,9 +448,33 @@ body {
   text-align: left;
 }
 
+/* Animations */
+@keyframes blob {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(20px, -50px) scale(1.1);
+  }
+  50% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  75% {
+    transform: translate(50px, 50px) scale(1.05);
+  }
+}
+
 /* Utility classes */
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+  
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+  
+  .animation-delay-2000 {
+    animation-delay: 2s;
   }
 }

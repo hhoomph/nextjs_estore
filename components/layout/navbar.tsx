@@ -203,11 +203,19 @@ export function Navbar() {
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-                  className="relative border-2 hover:border-blue-600 transition-all duration-300 bg-background hover:bg-accent"
+                  onClick={() => {
+                    try {
+                      setTheme(theme === "light" ? "dark" : "light");
+                    } catch (error) {
+                      console.error("[v0] Failed to change theme:", error);
+                    }
+                  }}
+                  className="relative border-2 hover:border-primary transition-all duration-300 bg-background hover:bg-accent focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  title={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
+                  aria-label={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
                 >
-                  <Sun className="h-4 w-4 rotate-0 scale-100 transition-all duration-300 dark:-rotate-90 dark:scale-0 text-yellow-500" />
-                  <Moon className="absolute inset-0 h-4 w-4 rotate-90 scale-0 transition-all duration-300 dark:rotate-0 dark:scale-100 text-blue-400" />
+                  <Sun className="h-5 w-5 rotate-0 scale-100 transition-all duration-300 dark:-rotate-90 dark:scale-0 text-yellow-500" />
+                  <Moon className="absolute inset-0 h-5 w-5 rotate-90 scale-0 transition-all duration-300 dark:rotate-0 dark:scale-100 text-blue-400 m-auto" />
                   <span className="sr-only">Toggle theme</span>
                 </Button>
               )}

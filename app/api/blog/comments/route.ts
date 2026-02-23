@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { authClient } from "@/lib/auth-client";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/database";
 
 // Validation schema for creating comments
 const createCommentSchema = z.object({

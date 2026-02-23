@@ -13,7 +13,7 @@ import { getTranslations } from "next-intl/server";
 import { BlogCategories } from "@/components/blog/blog-categories";
 import { BlogPostList } from "@/components/blog/blog-post-list";
 import { BlogSearch } from "@/components/blog/blog-search";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/database";
 
 export async function generateMetadata({
   searchParams,
