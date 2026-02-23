@@ -386,30 +386,40 @@
 
 /* Dark mode variables */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.205 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.205 0 0);
-  --muted-foreground: oklch(0.705 0 0);
-  --accent: oklch(0.205 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.985 0 0);
-  --destructive-foreground: oklch(0.205 0 0);
-  --border: oklch(0.205 0 0);
-  --input: oklch(0.205 0 0);
-  --ring: oklch(0.985 0 0);
-  --chart-1: oklch(0.985 0 0);
-  --chart-2: oklch(0.985 0 0);
-  --chart-3: oklch(0.985 0 0);
-  --chart-4: oklch(0.985 0 0);
-  --chart-5: oklch(0.985 0 0);
+  --background: var(--color-neutral-900);
+  --foreground: var(--color-neutral-50);
+  --card: var(--color-neutral-800);
+  --card-foreground: var(--color-neutral-50);
+  --popover: var(--color-neutral-800);
+  --popover-foreground: var(--color-neutral-50);
+  --primary: var(--color-primary-400);
+  --primary-foreground: var(--color-primary-900);
+  --secondary: var(--color-secondary-800);
+  --secondary-foreground: var(--color-secondary-50);
+  --muted: var(--color-neutral-700);
+  --muted-foreground: var(--color-neutral-400);
+  --accent: var(--color-accent-teal);
+  --accent-foreground: var(--color-neutral-50);
+  --destructive: var(--color-error-400);
+  --destructive-foreground: var(--color-neutral-900);
+  --border: var(--color-neutral-700);
+  --input: var(--color-neutral-700);
+  --ring: var(--color-primary-400);
+  --chart-1: var(--color-primary-400);
+  --chart-2: var(--color-accent-cyan);
+  --chart-3: var(--color-accent-emerald);
+  --chart-4: var(--color-accent-amber);
+  --chart-5: var(--color-accent-violet);
+  
+  /* Dark mode sidebar */
+  --sidebar: var(--color-neutral-900);
+  --sidebar-foreground: var(--color-neutral-50);
+  --sidebar-primary: var(--color-primary-400);
+  --sidebar-primary-foreground: var(--color-primary-900);
+  --sidebar-accent: var(--color-secondary-800);
+  --sidebar-accent-foreground: var(--color-secondary-50);
+  --sidebar-border: var(--color-neutral-700);
+  --sidebar-ring: var(--color-primary-400);
 }
 
 /* Base styles */
