@@ -26,7 +26,7 @@ interface ProductPageProps {
 // Fetch product by slug
 async function getProduct(slug: string) {
   try {
-    const product = await prisma.product.findUnique({
+    const product = await (prisma as any).product.findUnique({
       where: { slug },
       include: {
         category: true,
@@ -38,29 +38,13 @@ async function getProduct(slug: string) {
             displayOrder: "asc",
           },
         },
-        reviews: {
-          where: {
-            status: "APPROVED",
-          },
-          take: 10,
-          orderBy: {
-            createdAt: "desc",
-          },
-          include: {
-            user: {
-              select: {
-                name: true,
-                image: true,
-              },
-            },
-          },
-        },
       },
     });
 
     return product;
   } catch (error) {
-    console.error("Error fetching product:", error);
+    console.error("[v0] Error fetching product:", error);
+    // Return null and let notFound() handle it
     return null;
   }
 }
