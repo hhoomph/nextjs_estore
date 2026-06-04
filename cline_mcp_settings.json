@@ -1,4 +1,4 @@
-﻿{
+{
   "mcpServers": {
     "better-auth": {
       "disabled": false,
@@ -41,6 +41,9 @@
       }
     },
     "chrome-devtools": {
+      "disabled": false,
+      "timeout": 60,
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "chrome-devtools-mcp@latest"]
     },
@@ -60,12 +63,14 @@
       "args": ["-y", "next-devtools-mcp@latest"]
     },
     "shadcn": {
+      "disabled": false,
       "timeout": 60,
       "type": "stdio",
       "command": "npx",
       "args": ["shadcn@latest", "mcp"]
     },
     "magicuidesign": {
+      "disabled": false,
       "timeout": 60,
       "type": "stdio",
       "command": "cmd",
@@ -199,6 +204,95 @@
         "browser_snapshot",
         "browser_take_screenshot"
       ]
+    },
+    "prisma": {
+      "description": "Direct Prisma schema inspection, data queries, and migrations",
+      "disabled": false,
+      "timeout": 60,
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@prisma/mcp"],
+      "env": {
+        "PRISMA_CONFIG_PATH": "prisma.config.ts"
+      },
+      "autoApprove": []
+    },
+    "context7": {
+      "description": "Live docs for Next.js, Prisma, Better Auth, shadcn",
+      "disabled": false,
+      "timeout": 60,
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"],
+      "autoApprove": ["resolve-library-id", "get-library-docs"]
+    },
+    "sentry": {
+      "description": "Sentry error monitoring (requires token)",
+      "disabled": true,
+      "timeout": 60,
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@sentry/mcp-server@latest"],
+      "env": {
+        "SENTRY_AUTH_TOKEN": "${env:SENTRY_AUTH_TOKEN}",
+        "SENTRY_ORG": "${env:SENTRY_ORG}",
+        "SENTRY_PROJECT": "${env:SENTRY_PROJECT}"
+      },
+      "autoApprove": [],
+      "_instructions": "Set SENTRY_AUTH_TOKEN, SENTRY_ORG, SENTRY_PROJECT and set disabled to false to enable."
+    },
+    "stripe": {
+      "description": "Stripe payments (requires key)",
+      "disabled": true,
+      "timeout": 60,
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@stripe/mcp@latest"],
+      "env": {
+        "STRIPE_SECRET_KEY": "${env:STRIPE_SECRET_KEY}"
+      },
+      "autoApprove": [],
+      "_instructions": "Set STRIPE_SECRET_KEY and set disabled to false to enable."
+    },
+    "resend": {
+      "description": "Resend email (requires key)",
+      "disabled": true,
+      "timeout": 60,
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "resend-mcp"],
+      "env": {
+        "RESEND_API_KEY": "${env:RESEND_API_KEY}"
+      },
+      "autoApprove": [],
+      "_instructions": "Set RESEND_API_KEY and set disabled to false to enable."
+    },
+    "upstash-redis": {
+      "description": "Upstash Redis caching (requires account)",
+      "disabled": true,
+      "timeout": 60,
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@upstash/mcp-server"],
+      "env": {
+        "UPSTASH_REDIS_REST_URL": "${env:UPSTASH_REDIS_REST_URL}",
+        "UPSTASH_REDIS_REST_TOKEN": "${env:UPSTASH_REDIS_REST_TOKEN}"
+      },
+      "autoApprove": [],
+      "_instructions": "Set UPSTASH vars and set disabled to false to enable."
+    },
+    "tavily": {
+      "description": "Tavily web search (requires key)",
+      "disabled": true,
+      "timeout": 60,
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "tavily-mcp"],
+      "env": {
+        "TAVILY_API_KEY": "${env:TAVILY_API_KEY}"
+      },
+      "autoApprove": [],
+      "_instructions": "Set TAVILY_API_KEY and set disabled to false to enable."
     }
   }
 }
