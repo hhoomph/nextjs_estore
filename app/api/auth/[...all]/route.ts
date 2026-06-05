@@ -28,7 +28,7 @@ const applySecurityMiddleware = createSecurityMiddleware({
   rateLimitType: "auth",
   sanitization: true,
   securityHeaders: true,
-  csrf: true, // Enable CSRF for sensitive auth operations
+  csrf: false, // Disabled - better-auth handles its own CSRF protection internally
 });
 
 // Enhanced POST handler with security
@@ -40,18 +40,9 @@ export async function POST(request: NextRequest) {
       return securityResult;
     }
 
-    // Proceed with original auth handler
-    const response = await originalPOST(request);
-
-    // The response from Better Auth is already properly formatted
-    // We need to preserve the original response but add security headers
-    const responseData = response.clone();
-    const data = await responseData.json().catch(() => null);
-
-    return createSecureResponse(data, {
-      status: response.status,
-      securityHeaders: true,
-    });
+    // Proceed with original auth handler — preserve response as-is
+    // to keep Set-Cookie headers (session cookies) from better-auth
+    return await originalPOST(request);
   } catch (error) {
     console.error("Auth POST error:", error);
     return createSecureResponse(
@@ -70,18 +61,9 @@ export async function GET(request: NextRequest) {
       return securityResult;
     }
 
-    // Proceed with original auth handler
-    const response = await originalGET(request);
-
-    // The response from Better Auth is already properly formatted
-    // We need to preserve the original response but add security headers
-    const responseData = response.clone();
-    const data = await responseData.json().catch(() => null);
-
-    return createSecureResponse(data, {
-      status: response.status,
-      securityHeaders: true,
-    });
+    // Proceed with original auth handler — preserve response as-is
+    // to keep Set-Cookie headers (session cookies) from better-auth
+    return await originalGET(request);
   } catch (error) {
     console.error("Auth GET error:", error);
     return createSecureResponse(

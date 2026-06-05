@@ -8,27 +8,38 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useSession } from "@/lib/auth-client";
 
 export function AdminRedirect() {
   const router = useRouter();
   const { data: session, isPending } = useSession();
+  const hasFetched = useRef(false);
 
-  // Handle redirects when authentication state changes
+  // Track when session has actually been fetched at least once
   useEffect(() => {
-    if (!isPending) {
-      // If user is not signed in, redirect to admin signin
-      if (!session) {
-        router.push("/admin/signin");
-        return;
-      }
+    if (!isPending && !hasFetched.current) {
+      hasFetched.current = true;
+    }
+  }, [isPending]);
 
-      // If user is signed in but not admin, redirect to home
-      if (session.user.role !== "ADMIN") {
-        router.push("/");
-        return;
-      }
+  // Only redirect AFTER the session has been fully fetched (not just initial render)
+  useEffect(() => {
+    if (!hasFetched.current) return;
+    if (isPending) return;
+
+    // Check both possible session data structures
+    const userObj = (session?.user as any) || (session?.session as any)?.user;
+
+    // Session was fetched and user is not signed in or not admin
+    if (!userObj) {
+      router.push("/admin/signin");
+      return;
+    }
+
+    if (userObj.role !== "ADMIN") {
+      router.push("/");
+      return;
     }
   }, [session, isPending, router]);
 

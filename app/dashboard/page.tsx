@@ -7,50 +7,14 @@
  */
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 // Force dynamic rendering to avoid prerendering issues
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-import {
-  Activity,
-  AlertCircle,
-  BarChart3,
-  DollarSign,
-  Edit,
-  Eye,
-  MoreHorizontal,
-  Package,
-  PieChart,
-  Search,
-  ShoppingCart,
-  Trash2,
-  TrendingUp,
-  Users,
-} from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSession } from "@/lib/auth-client";
 
 interface DashboardStats {
@@ -80,12 +44,7 @@ interface Product {
   category: { name: string };
 }
 
-export default function DashboardPage() {
-  // Prevent prerendering during build time - return early
-  if (typeof window === "undefined") {
-    return null;
-  }
-
+function DashboardContent() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("overview");
@@ -160,8 +119,20 @@ export default function DashboardPage() {
     );
   }
 
-  // This should not be reached for admin users (they get redirected)
-  // or non-logged-in users (they get redirected to home)
-  // But just in case, return null
   return null;
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex justify-center items-center py-20">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <span className="ml-2">Loading dashboard...</span>
+        </div>
+      }
+    >
+      <DashboardContent />
+    </Suspense>
+  );
 }

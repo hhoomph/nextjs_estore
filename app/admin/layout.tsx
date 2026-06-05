@@ -25,6 +25,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useEffect, useRef } from "react";
 import { signOut, useSession } from "@/lib/auth-client";
 import { useAdminTheme } from "@/lib/utils/theme-admin-overrides";
 
@@ -46,7 +47,60 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   // Skip auth check on sign-in page
   const isSignInPage = pathname === "/admin/signin";
 
-  // Show loading state while checking authentication
+  // Track whether session has been fetched at least once
+  const hasFetchedSession = useRef(false);
+
+  useEffect(() => {
+    if (!isPending && !hasFetchedSession.current) {
+      hasFetchedSession.current = true;
+    }
+  }, [isPending]);
+
+  // Handle redirects via useEffect — only AFTER session has been fetched
+  useEffect(() => {
+    if (!hasFetchedSession.current || isPending || isSignInPage) return;
+
+    const userObj = (session?.user as any) || (session?.session as any)?.user;
+    const userRole = userObj?.role;
+
+    if (!userObj) {
+      router.push("/admin/signin");
+      return;
+    }
+
+    if (userRole !== "ADMIN") {
+      router.push("/");
+      return;
+    }
+  }, [session, isPending, router, isSignInPage]);
+
+  // Allow access to sign-in page without authentication
+  if (isSignInPage) {
+    if (isPending) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              Loading...
+            </h2>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <AdvancedErrorBoundary
+        showErrorDetails={process.env.NODE_ENV === "development"}
+        enableReporting={true}
+      >
+        <div className="min-h-screen bg-background">
+          <main className={`p-6 ${contentClasses.card}`}>{children}</main>
+        </div>
+      </AdvancedErrorBoundary>
+    );
+  }
+
+  // While session is loading, show a spinner (do NOT redirect yet)
   if (isPending) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -61,27 +115,26 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Allow access to sign-in page without authentication
-  if (isSignInPage) {
-    return (
-      <AdvancedErrorBoundary
-        showErrorDetails={process.env.NODE_ENV === "development"}
-        enableReporting={true}
-      >
-        <div className="min-h-screen bg-background">
-          <main className={`p-6 ${contentClasses.card}`}>{children}</main>
-        </div>
-      </AdvancedErrorBoundary>
-    );
-  }
-
-  // Check if user is admin - handle role property properly
-  const userRole = (session?.user as any)?.role;
+  // Extract user from session — better-auth may return { user, session } or { session: { user } }
+  const userObj = (session?.user as any) || (session?.session as any)?.user;
+  const userRole = userObj?.role;
   const isAdmin = userRole === "ADMIN";
 
-  // Show redirect component if not signed in or not admin
-  if (!session || !isAdmin) {
-    return <AdminRedirect />;
+  // Helper to get user property safely
+  const getUser = (key: string) => userObj?.[key] ?? "";
+
+  // Show loading while redirect is in progress
+  if (!userObj || !isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Redirecting...
+          </h2>
+        </div>
+      </div>
+    );
   }
 
   const handleSignOut = async () => {
@@ -171,14 +224,14 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                     >
                       <Avatar className="h-8 w-8">
                         <AvatarImage
-                          src={session?.user.image || ""}
-                          alt={session?.user.name || ""}
+                          src={(session?.session as any)?.user?.image || (session?.user as any)?.image || ""}
+                          alt={(session?.session as any)?.user?.name || (session?.user as any)?.name || ""}
                           loading="lazy"
                         />
                         <AvatarFallback
                           className={`${navbarClasses.avatar.text} font-medium`}
                         >
-                          {session?.user.name?.charAt(0).toUpperCase() || "A"}
+                          {((session?.session as any)?.user?.name || (session?.user as any)?.name || "A").charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
@@ -191,16 +244,16 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none text-slate-100">
-                          {session?.user.name}
+                          {(session?.session as any)?.user?.name || (session?.user as any)?.name || ""}
                         </p>
                         <p className="text-xs leading-none text-slate-400">
-                          {session?.user.email}
+                          {(session?.session as any)?.user?.email || (session?.user as any)?.email || ""}
                         </p>
                         <Badge
                           variant="secondary"
                           className="w-fit text-xs bg-slate-700 text-slate-300"
                         >
-                          {session?.user.role}
+                          {(session?.session as any)?.user?.role || (session?.user as any)?.role || ""}
                         </Badge>
                       </div>
                     </DropdownMenuLabel>
