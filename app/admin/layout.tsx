@@ -2,12 +2,25 @@
  * Module for layout
  *
  * @author hh.oomph@gmail.com
- * @version 1.0.0
+ * @version 2.0.0
  * @since 2025-01-01
  */
 "use client";
 
-import { LayoutDashboard, LogOut, Package, User } from "lucide-react";
+import {
+  LayoutDashboard,
+  LogOut,
+  Package,
+  User,
+  ShoppingCart,
+  Users,
+  BarChart3,
+  FolderTree,
+  Settings,
+  Palette,
+  Search,
+  Globe,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -17,6 +30,7 @@ import { ApiErrorBoundary } from "@/components/errors/api-error-boundary";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,20 +43,59 @@ import { useEffect, useRef } from "react";
 import { signOut, useSession } from "@/lib/auth-client";
 import { useAdminTheme } from "@/lib/utils/theme-admin-overrides";
 
+// Admin sidebar navigation item definition
+interface AdminNavItem {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  group: "dashboard" | "commerce" | "content" | "users" | "settings";
+}
+
+// All admin sidebar navigation items organized by group
+const adminNavItems: AdminNavItem[] = [
+  // Dashboard
+  { href: "/admin", label: "Dashboard", icon: LayoutDashboard, group: "dashboard" },
+
+  // Commerce
+  { href: "/admin/products", label: "Products", icon: Package, group: "commerce" },
+  { href: "/admin/categories", label: "Categories", icon: FolderTree, group: "commerce" },
+  { href: "/admin/collections", label: "Collections", icon: Package, group: "commerce" },
+  { href: "/admin/orders", label: "Orders", icon: ShoppingCart, group: "commerce" },
+
+  // Content
+  { href: "/admin/analytics", label: "Analytics", icon: BarChart3, group: "content" },
+
+  // Users
+  { href: "/admin/users", label: "Users", icon: Users, group: "users" },
+
+  // Settings
+  { href: "/admin/settings", label: "Settings", icon: Settings, group: "settings" },
+  { href: "/admin/settings/seo", label: "SEO", icon: Search, group: "settings" },
+  { href: "/admin/settings/site", label: "Site", icon: Globe, group: "settings" },
+  { href: "/admin/settings/theme", label: "Theme", icon: Palette, group: "settings" },
+];
+
+// Group metadata for sidebar section headers
+const navGroups: Record<string, { label: string }> = {
+  dashboard: { label: "Overview" },
+  commerce: { label: "Commerce" },
+  content: { label: "Content" },
+  users: { label: "Users" },
+  settings: { label: "Settings" },
+};
+
+const groupOrder = ["dashboard", "commerce", "content", "users", "settings"];
+
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const { data: session, isPending } = useSession();
   const router = useRouter();
   const pathname = usePathname();
   const t = useTranslations("Navigation");
-  const {
-    getAdminNavbarClasses,
-    getAdminSidebarClasses,
-    getAdminContentClasses,
-  } = useAdminTheme();
+  const sidebarTheme = useAdminTheme();
 
-  const navbarClasses = getAdminNavbarClasses();
-  const sidebarClasses = getAdminSidebarClasses();
-  const contentClasses = getAdminContentClasses();
+  const navbarClasses = sidebarTheme.getAdminNavbarClasses();
+  const sidebarClasses = sidebarTheme.getAdminSidebarClasses();
+  const contentClasses = sidebarTheme.getAdminContentClasses();
 
   // Skip auth check on sign-in page
   const isSignInPage = pathname === "/admin/signin";
@@ -147,6 +200,14 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     });
   };
 
+  // Check if a nav item is active (matches current pathname)
+  const isActive = (href: string) => {
+    if (href === "/admin") {
+      return pathname === "/admin" || pathname === "/admin/";
+    }
+    return pathname.startsWith(href);
+  };
+
   return (
     <AdvancedErrorBoundary
       showErrorDetails={process.env.NODE_ENV === "development"}
@@ -155,13 +216,18 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
       <div className={`min-h-screen ${contentClasses.background}`}>
         {/* Sidebar */}
         <div
-          className={`fixed inset-y-0 left-0 z-50 w-64 ${sidebarClasses.background} shadow-lg border-r border-slate-700`}
+          className={cn(
+            "fixed inset-y-0 left-0 z-50 w-64",
+            sidebarClasses.background,
+            "shadow-lg",
+          )}
         >
-          <div className="flex h-16 items-center border-b border-slate-700 px-6">
+          {/* Logo area */}
+          <div className={cn("flex h-16 items-center px-6", sidebarClasses.background, "border-b")}>
             <Link href="/admin" className="flex items-center space-x-2">
-              <Package className={`h-6 w-6 ${sidebarClasses.text}`} />
+              <LayoutDashboard className={cn("h-6 w-6", sidebarClasses.text)} />
               <span
-                className="font-bold text-xl text-slate-200"
+                className={cn("font-bold text-xl", sidebarClasses.text)}
                 suppressHydrationWarning={true}
               >
                 {t("adminPanel")}
@@ -169,34 +235,64 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
 
-          <nav className="mt-6 px-3">
-            <div className="space-y-1">
-              {/* Dashboard */}
-              <Link
-                href="/admin"
-                className="flex items-center px-3 py-2 text-sm font-medium text-slate-400 hover:bg-slate-700 hover:text-slate-100 rounded-md transition-colors duration-200"
-              >
-                <LayoutDashboard className="mr-3 h-5 w-5" />
-                <span suppressHydrationWarning={true}>{t("dashboard")}</span>
-              </Link>
+          {/* Navigation */}
+          <nav className="mt-6 px-3 overflow-y-auto h-[calc(100vh-4rem)]">
+            {groupOrder.map((groupKey) => {
+              const groupItems = adminNavItems.filter((item) => item.group === groupKey);
+              if (groupItems.length === 0) return null;
 
-              {/* Collections */}
-              <Link
-                href="/admin/collections"
-                className="flex items-center px-3 py-2 text-sm font-medium text-slate-400 hover:bg-slate-700 hover:text-slate-100 rounded-md transition-colors duration-200"
-              >
-                <Package className="mr-3 h-5 w-5" />
-                <span suppressHydrationWarning={true}>Collections</span>
-              </Link>
-            </div>
+              return (
+                <div key={groupKey} className="mb-6">
+                  {/* Group section title */}
+                  <p
+                    className={cn(
+                      "px-3 mb-2 text-xs font-semibold uppercase tracking-wider",
+                      sidebarClasses.section.title,
+                    )}
+                  >
+                    {navGroups[groupKey].label}
+                  </p>
 
-            <div className="mt-8 pt-4 border-t border-slate-700">
+                  {/* Group items */}
+                  <div className="space-y-1">
+                    {groupItems.map((item) => {
+                      const active = isActive(item.href);
+                      const Icon = item.icon;
+
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={cn(
+                            "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200",
+                            active
+                              ? sidebarClasses.menu.active
+                              : sidebarClasses.menu.item,
+                          )}
+                        >
+                          <Icon className="mr-3 h-5 w-5 shrink-0" />
+                          <span suppressHydrationWarning={true}>
+                            {item.label}
+                          </span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Sign Out at bottom */}
+            <div className="mt-8 pt-4 border-t">
               <Button
                 onClick={() => handleSignOut()}
                 variant="ghost"
-                className="w-full justify-start text-slate-400 hover:bg-slate-700 hover:text-slate-100"
+                className={cn(
+                  "w-full justify-start",
+                  sidebarClasses.menu.item,
+                )}
               >
-                <LogOut className="mr-3 h-5 w-5 text-slate-400" />
+                <LogOut className="mr-3 h-5 w-5 shrink-0" />
                 <span suppressHydrationWarning={true}>{t("signOut")}</span>
               </Button>
             </div>
@@ -206,10 +302,10 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
         {/* Main Content */}
         <div className="pl-64">
           {/* Top Bar */}
-          <div className={`${navbarClasses.background} px-6 py-4`}>
-            <div className="flex items-center justify-between">
+          <div className={navbarClasses.background}>
+            <div className="flex items-center justify-between px-6 py-4">
               <h1
-                className={`text-2xl font-semibold ${navbarClasses.text}`}
+                className={cn("text-2xl font-semibold", navbarClasses.text)}
                 suppressHydrationWarning={true}
               >
                 {t("adminPanel")}
@@ -220,7 +316,11 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                   <DropdownMenuTrigger asChild={true}>
                     <Button
                       variant="ghost"
-                      className={`relative h-8 w-8 rounded-full ${navbarClasses.avatar.background} transition-colors`}
+                      className={cn(
+                        "relative h-8 w-8 rounded-full",
+                        navbarClasses.avatar.background,
+                        "transition-colors",
+                      )}
                     >
                       <Avatar className="h-8 w-8">
                         <AvatarImage
@@ -229,7 +329,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                           loading="lazy"
                         />
                         <AvatarFallback
-                          className={`${navbarClasses.avatar.text} font-medium`}
+                          className={cn(navbarClasses.avatar.text, "font-medium")}
                         >
                           {((session?.session as any)?.user?.name || (session?.user as any)?.name || "A").charAt(0).toUpperCase()}
                         </AvatarFallback>
