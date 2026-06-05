@@ -27,8 +27,8 @@ import {
 
 // Rate limiters for different API endpoints
 const authRateLimiter = createRateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  maxRequests: 5, // 5 attempts per 15 minutes
+  windowMs: 60 * 1000, // 1 minute
+  maxRequests: 50, // 50 attempts per minute for development
   message: "Too many authentication attempts. Please try again later.",
 });
 

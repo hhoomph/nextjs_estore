@@ -47,7 +47,16 @@ next-env.d.ts
 # Project specific files
 /.clinerules
 .clineignore
-./memory-bank
+/memory-bank
+./memory-bank/*
+/memory-bank*
+/.claude
+/.codebase
+/.codebase-viz
+/.continue
+/.cortex
+/.github
+/.specsmd
 performance-report.json
 IMPLEMENTATION_PLAN_DETAILED.md
 IMPLEMENTATION_PLAN.md
@@ -72,3 +81,21 @@ bundle-analysis/
 reports/
 lighthouserc.json
 /script
+
+# Continuity
+SESSION_HANDOFF.md
+.continuity/
+.cursorrules
+AGENTS.md
+CLAUDE.md
+.gitignore
+GEMINI.md
+
+/memory-bank*
+memory-bank/consolidated_learnings.md
+memory-bank/raw_reflection_log.md
+nul
+cline_mcp_settings.json
+memory-bank/consolidated_learnings.md
+memory-bank/raw_reflection_log.md
+cline_mcp_settings.json.bak

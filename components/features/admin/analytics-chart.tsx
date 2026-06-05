@@ -40,8 +40,8 @@ interface AnalyticsChartProps {
   showTooltip?: boolean;
   title?: string;
   formatter?: (
-    value: number | string | undefined,
-    name?: string,
+    value: string | number | readonly (string | number)[] | undefined,
+    name?: string | number,
   ) => [string, string];
 }
 
@@ -86,7 +86,6 @@ export function AnalyticsChart({
               dataKey={xAxisKey}
               tick={{ fontSize: 12 }}
               tickFormatter={(value) => {
-                // Format date values
                 if (
                   typeof value === "string" &&
                   value.match(/^\d{4}-\d{2}-\d{2}$/)
@@ -111,7 +110,7 @@ export function AnalyticsChart({
                   }
                   return value;
                 }}
-                formatter={formatter}
+                formatter={formatter as any}
               />
             )}
             <Line
@@ -156,7 +155,7 @@ export function AnalyticsChart({
                   }
                   return value;
                 }}
-                formatter={formatter}
+                formatter={formatter as any}
               />
             )}
             <Bar dataKey={dataKey} fill={colors[0]} radius={[4, 4, 0, 0]} />
@@ -195,7 +194,7 @@ export function AnalyticsChart({
                   }
                   return value;
                 }}
-                formatter={formatter}
+                formatter={formatter as any}
               />
             )}
             <Area
@@ -230,7 +229,7 @@ export function AnalyticsChart({
                 />
               ))}
             </Pie>
-            {showTooltip && <Tooltip formatter={formatter} />}
+            {showTooltip && <Tooltip formatter={formatter as any} />}
           </PieChart>
         );
 

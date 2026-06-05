@@ -485,9 +485,12 @@ class GlobalErrorBoundary extends React.Component<
       errorBoundaryStack: new Error().stack || undefined,
     };
 
-    this.setState({
-      errorInfo: errorBoundaryInfo,
-    });
+    // Avoid infinite loop: only setState if errorInfo is not already set
+    if (!this.state.errorInfo) {
+      this.setState({
+        errorInfo: errorBoundaryInfo,
+      });
+    }
 
     // Log error to console in development
     if (process.env.NODE_ENV === "development") {

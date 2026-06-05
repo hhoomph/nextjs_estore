@@ -98,6 +98,10 @@ export const auth = betterAuth({
       updateAge: 60 * 60, // Update session every hour
     },
   },
+  rateLimit: {
+    window: 60,
+    max: 100,
+  },
   trustedOrigins: [
     "http://localhost:3000",
     // Add your production URL here
