@@ -92,15 +92,17 @@ export default function AdminProductsPage() {
   });
 
   useEffect(() => {
-    if (!isPending && (!session || session.user.role !== "ADMIN")) {
+    if (isPending) return;
+
+    // session may have nested structure: { user: {...} } or { session: { user: {...} } }
+    const userObj = (session?.user as any) || (session?.session as any)?.user;
+    if (!userObj || userObj.role !== "ADMIN") {
       router.push("/");
       return;
     }
 
-    if (session?.user.role === "ADMIN") {
-      fetchProducts();
-      fetchCategories();
-    }
+    fetchProducts();
+    fetchCategories();
   }, [session, isPending, router]);
 
   const fetchProducts = async () => {
@@ -268,6 +270,10 @@ export default function AdminProductsPage() {
     setProductImages((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // Extract user from session — safe access
+  const userObj = (session?.user as any) || (session?.session as any)?.user;
+  const isAdmin = userObj?.role === "ADMIN";
+
   if (isPending || loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -279,7 +285,7 @@ export default function AdminProductsPage() {
     );
   }
 
-  if (!session || session.user.role !== "ADMIN") {
+  if (!isAdmin) {
     return null;
   }
 
