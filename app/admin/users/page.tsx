@@ -1,17 +1,9 @@
-/**
- * Module for page
- *
- * @author hh.oomph@gmail.com
- * @version 1.0.0
- * @since 2025-01-01
- */
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
-// Force dynamic rendering to avoid prerendering issues
-export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,15 +19,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, Eye, UserCheck, UserX, Crown, Plus, Edit, Loader2, Trash2 } from "lucide-react";
+import { Search, Eye, UserCheck, UserX, Plus, Edit, Loader2, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { toast } from "sonner";
 
 const userSchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
-  phone_number: z.string().optional(),
+  phoneNumber: z.string().optional(),
   role: z.enum(["USER", "ADMIN"]),
   active: z.boolean(),
 });
@@ -46,13 +39,13 @@ interface User {
   id: string;
   name: string | null;
   email: string;
-  phone_number: string | null;
+  phoneNumber: string | null;
   role: "USER" | "ADMIN";
-  created_at: string;
+  createdAt: string;
   active: boolean | null;
   _count?: {
-    order: number;
-    review: number;
+    orders: number;
+    reviews: number;
   };
 }
 
@@ -74,7 +67,7 @@ export default function AdminUsersPage() {
     defaultValues: {
       name: "",
       email: "",
-      phone_number: "",
+      phoneNumber: "",
       role: "USER",
       active: true,
     },
@@ -101,7 +94,7 @@ export default function AdminUsersPage() {
         throw new Error(data.error || "Failed to fetch users");
       }
 
-      setUsers(data.users);
+      setUsers(data.users || []);
       setTotalPages(data.pagination?.pages || 1);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch users");
@@ -125,17 +118,21 @@ export default function AdminUsersPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update user role");
+        const data = await response.json();
+        throw new Error(data.error || "Failed to update user role");
       }
 
-      // Refresh users
+      toast.success("User role updated");
       fetchUsers();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update user");
+      toast.error(err instanceof Error ? err.message : "Failed to update user");
     }
   };
 
-  const toggleUserStatus = async (userId: string, currentStatus: boolean | null) => {
+  const toggleUserStatus = async (
+    userId: string,
+    currentStatus: boolean | null,
+  ) => {
     try {
       const response = await fetch(`/api/admin/users/${userId}`, {
         method: "PATCH",
@@ -146,13 +143,14 @@ export default function AdminUsersPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update user status");
+        const data = await response.json();
+        throw new Error(data.error || "Failed to update user status");
       }
 
-      // Refresh users
+      toast.success("User status updated");
       fetchUsers();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update user");
+      toast.error(err instanceof Error ? err.message : "Failed to update user");
     }
   };
 
@@ -171,17 +169,18 @@ export default function AdminUsersPage() {
       });
 
       if (response.ok) {
+        toast.success(editingUser ? "User updated" : "User created");
         setDialogOpen(false);
         form.reset();
         setEditingUser(null);
         fetchUsers();
       } else {
         const errorData = await response.json();
-        alert(errorData.error || "Failed to save user");
+        toast.error(errorData.error || "Failed to save user");
       }
     } catch (error) {
       console.error("Failed to save user:", error);
-      alert("Failed to save user. Please try again.");
+      toast.error("Failed to save user. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -192,7 +191,7 @@ export default function AdminUsersPage() {
     form.reset({
       name: user.name || "",
       email: user.email,
-      phone_number: user.phone_number || "",
+      phoneNumber: user.phoneNumber || "",
       role: user.role,
       active: user.active ?? true,
     });
@@ -200,7 +199,10 @@ export default function AdminUsersPage() {
   };
 
   const handleDelete = async (userId: string) => {
-    if (!confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
+    if (
+      !confirm("Are you sure you want to delete this user? This action cannot be undone.")
+    )
+      return;
 
     try {
       const response = await fetch(`/api/admin/users/${userId}`, {
@@ -208,14 +210,15 @@ export default function AdminUsersPage() {
       });
 
       if (response.ok) {
+        toast.success("User deleted");
         fetchUsers();
       } else {
         const errorData = await response.json();
-        alert(errorData.error || "Failed to delete user");
+        toast.error(errorData.error || "Failed to delete user");
       }
     } catch (error) {
       console.error("Failed to delete user:", error);
-      alert("Failed to delete user. Please try again.");
+      toast.error("Failed to delete user. Please try again.");
     }
   };
 
@@ -231,7 +234,7 @@ export default function AdminUsersPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 style={{ borderBottomColor: 'rgb(59, 130, 246)' }} mx-auto"></div>
+          <Loader2 className="h-8 w-8 animate-spin mx-auto" />
           <p className="mt-2 text-muted-foreground">Loading users...</p>
         </div>
       </div>
@@ -240,7 +243,6 @@ export default function AdminUsersPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Users</h1>
@@ -249,16 +251,18 @@ export default function AdminUsersPage() {
 
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => {
-              setEditingUser(null);
-              form.reset({
-                name: "",
-                email: "",
-                phone_number: "",
-                role: "USER",
-                active: true,
-              });
-            }}>
+            <Button
+              onClick={() => {
+                setEditingUser(null);
+                form.reset({
+                  name: "",
+                  email: "",
+                  phoneNumber: "",
+                  role: "USER",
+                  active: true,
+                });
+              }}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Add User
             </Button>
@@ -271,7 +275,10 @@ export default function AdminUsersPage() {
             </DialogHeader>
 
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+              <form
+                onSubmit={form.handleSubmit(handleSubmit)}
+                className="space-y-4"
+              >
                 <FormField
                   control={form.control}
                   name="name"
@@ -302,12 +309,12 @@ export default function AdminUsersPage() {
 
                 <FormField
                   control={form.control}
-                  name="phone_number"
+                  name="phoneNumber"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Phone Number (Optional)</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input {...field} value={field.value ?? ""} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -320,7 +327,10 @@ export default function AdminUsersPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Role</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select role" />
@@ -342,7 +352,10 @@ export default function AdminUsersPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Status</FormLabel>
-                      <Select onValueChange={(value) => field.onChange(value === "true")} value={field.value.toString()}>
+                      <Select
+                        onValueChange={(value) => field.onChange(value === "true")}
+                        value={field.value ? "true" : "false"}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue />
@@ -365,8 +378,10 @@ export default function AdminUsersPage() {
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                         Saving...
                       </>
+                    ) : editingUser ? (
+                      "Update User"
                     ) : (
-                      editingUser ? "Update User" : "Create User"
+                      "Create User"
                     )}
                   </Button>
                   <Button
@@ -383,7 +398,6 @@ export default function AdminUsersPage() {
         </Dialog>
       </div>
 
-      {/* Filters */}
       <Card>
         <CardContent className="pt-6">
           <div className="flex gap-4">
@@ -422,7 +436,6 @@ export default function AdminUsersPage() {
         </CardContent>
       </Card>
 
-      {/* Users Table */}
       <Card>
         <CardHeader>
           <CardTitle>Users ({users.length})</CardTitle>
@@ -458,7 +471,7 @@ export default function AdminUsersPage() {
                     <TableRow key={user.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-full style={{ backgroundColor: 'rgb(59, 130, 246)' }}/10 flex items-center justify-center">
+                          <div className="h-8 w-8 rounded-full bg-blue-500/10 flex items-center justify-center">
                             <span className="text-sm font-medium">
                               {(user.name || user.email).charAt(0).toUpperCase()}
                             </span>
@@ -491,9 +504,9 @@ export default function AdminUsersPage() {
                           {user.active ? "Active" : "Inactive"}
                         </Badge>
                       </TableCell>
-                      <TableCell>{user._count?.order || 0}</TableCell>
+                      <TableCell>{user._count?.orders || 0}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">
-                        {formatDate(user.created_at)}
+                        {formatDate(user.createdAt)}
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
@@ -537,7 +550,6 @@ export default function AdminUsersPage() {
         </CardContent>
       </Card>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center">
           <div className="flex gap-2">

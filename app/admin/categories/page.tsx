@@ -1,17 +1,9 @@
-/**
- * Module for page
- *
- * @author hh.oomph@gmail.com
- * @version 1.0.0
- * @since 2025-01-01
- */
 "use client";
 
-import { useState, useEffect } from "react";
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
-// Force dynamic rendering to avoid prerendering issues
-export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,10 +25,11 @@ import {
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { toast } from "sonner";
 
 const categorySchema = z.object({
   name: z.string().min(1, "Name is required"),
-  parent_id: z.string().optional(),
+  parentId: z.string().optional(),
 });
 
 type CategoryFormData = z.infer<typeof categorySchema>;
@@ -44,10 +37,10 @@ type CategoryFormData = z.infer<typeof categorySchema>;
 interface Category {
   id: string;
   name: string | null;
-  parent_id: string | null;
+  parentId: string | null;
   level: number | null;
-  created_at: string;
-  modified_at: string;
+  createdAt: string;
+  modifiedAt: string;
   _count?: {
     products: number;
   };
@@ -66,7 +59,7 @@ export default function AdminCategoriesPage() {
     resolver: zodResolver(categorySchema),
     defaultValues: {
       name: "",
-      parent_id: "",
+      parentId: "",
     },
   });
 
@@ -78,7 +71,7 @@ export default function AdminCategoriesPage() {
     try {
       const response = await fetch("/api/admin/categories");
       const data = await response.json();
-      setCategories(data.categories);
+      setCategories(data.categories || []);
     } catch (error) {
       console.error("Failed to fetch categories:", error);
     } finally {
@@ -86,27 +79,24 @@ export default function AdminCategoriesPage() {
     }
   };
 
-  const filteredCategories = categories.filter(category =>
-    category.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredCategories = categories.filter((category) =>
+    (category.name ?? "").toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  // Build hierarchical structure
-  const buildCategoryTree = (categories: Category[]): Category[] => {
+  const buildCategoryTree = (cats: Category[]): Category[] => {
     const categoryMap = new Map<string, Category & { children: Category[] }>();
     const rootCategories: (Category & { children: Category[] })[] = [];
 
-    // Initialize all categories with children array
-    categories.forEach(cat => {
+    cats.forEach((cat) => {
       categoryMap.set(cat.id, { ...cat, children: [] });
     });
 
-    // Build the tree
-    categories.forEach(cat => {
+    cats.forEach((cat) => {
       const categoryWithChildren = categoryMap.get(cat.id)!;
-      if (cat.parent_id) {
-        const parent = categoryMap.get(cat.parent_id);
+      if (cat.parentId) {
+        const parent = categoryMap.get(cat.parentId);
         if (parent) {
-          parent.children.push(categoryWithChildren);
+          parent.children!.push(categoryWithChildren);
         }
       } else {
         rootCategories.push(categoryWithChildren);
@@ -116,18 +106,20 @@ export default function AdminCategoriesPage() {
     return rootCategories;
   };
 
-  const flattenCategories = (categories: Category[], level = 0): Category[] => {
+  const flattenCategories = (cats: Category[], level = 0): Category[] => {
     const result: Category[] = [];
-    categories.forEach(cat => {
+    cats.forEach((cat) => {
       result.push({ ...cat, level });
-      if (cat.children) {
+      if (cat.children && cat.children.length > 0) {
         result.push(...flattenCategories(cat.children, level + 1));
       }
     });
     return result;
   };
 
-  const hierarchicalCategories = flattenCategories(buildCategoryTree(filteredCategories));
+  const hierarchicalCategories = flattenCategories(
+    buildCategoryTree(filteredCategories),
+  );
 
   const handleSubmit = async (data: CategoryFormData) => {
     setSubmitting(true);
@@ -137,26 +129,34 @@ export default function AdminCategoriesPage() {
         ? `/api/admin/categories/${editingCategory.id}`
         : "/api/admin/categories";
 
+      const payload = {
+        name: data.name,
+        parentId: data.parentId && data.parentId !== "" ? data.parentId : null,
+      };
+
       const response = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
+        toast.success(
+          editingCategory ? "Category updated" : "Category created",
+        );
         setDialogOpen(false);
         form.reset();
         setEditingCategory(null);
         fetchCategories();
       } else {
         const errorData = await response.json();
-        alert(errorData.error || "Failed to save category");
+        toast.error(errorData.error || "Failed to save category");
       }
     } catch (error) {
       console.error("Failed to save category:", error);
-      alert("Failed to save category. Please try again.");
+      toast.error("Failed to save category. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -166,7 +166,7 @@ export default function AdminCategoriesPage() {
     setEditingCategory(category);
     form.reset({
       name: category.name || "",
-      parent_id: category.parent_id || "",
+      parentId: category.parentId ?? "",
     });
     setDialogOpen(true);
   };
@@ -180,13 +180,15 @@ export default function AdminCategoriesPage() {
       });
 
       if (response.ok) {
+        toast.success("Category deleted");
         fetchCategories();
       } else {
         const errorData = await response.json();
-        alert(errorData.error || "Failed to delete category");
+        toast.error(errorData.error || "Failed to delete category");
       }
     } catch (error) {
       console.error("Failed to delete category:", error);
+      toast.error("Failed to delete category. Please try again.");
     }
   };
 
@@ -206,18 +208,22 @@ export default function AdminCategoriesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Category Management</h1>
-          <p className="text-muted-foreground">Manage your store's product categories</p>
+          <p className="text-muted-foreground">
+            Manage your store's product categories
+          </p>
         </div>
 
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => {
-              setEditingCategory(null);
-              form.reset({
-                name: "",
-                parent_id: "",
-              });
-            }}>
+            <Button
+              onClick={() => {
+                setEditingCategory(null);
+                form.reset({
+                  name: "",
+                  parentId: "",
+                });
+              }}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Add Category
             </Button>
@@ -230,7 +236,10 @@ export default function AdminCategoriesPage() {
             </DialogHeader>
 
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+              <form
+                onSubmit={form.handleSubmit(handleSubmit)}
+                className="space-y-4"
+              >
                 <FormField
                   control={form.control}
                   name="name"
@@ -247,23 +256,32 @@ export default function AdminCategoriesPage() {
 
                 <FormField
                   control={form.control}
-                  name="parent_id"
+                  name="parentId"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Parent Category (Optional)</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value ?? ""}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select parent category" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">None (Top Level)</SelectItem>
+                          <SelectItem value="none">
+                            None (Top Level)
+                          </SelectItem>
                           {categories
-                            .filter(cat => cat.id !== editingCategory?.id)
+                            .filter((cat) => cat.id !== editingCategory?.id)
                             .map((category) => (
-                              <SelectItem key={category.id} value={category.id}>
-                                {"  ".repeat(category.level || 0)}{category.name}
+                              <SelectItem
+                                key={category.id}
+                                value={category.id}
+                              >
+                                {"  ".repeat(category.level || 0)}
+                                {category.name}
                               </SelectItem>
                             ))}
                         </SelectContent>
@@ -280,8 +298,10 @@ export default function AdminCategoriesPage() {
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                         Saving...
                       </>
+                    ) : editingCategory ? (
+                      "Update Category"
                     ) : (
-                      editingCategory ? "Update Category" : "Create Category"
+                      "Create Category"
                     )}
                   </Button>
                   <Button
@@ -298,7 +318,6 @@ export default function AdminCategoriesPage() {
         </Dialog>
       </div>
 
-      {/* Search */}
       <Card className="mb-6">
         <CardContent className="pt-6">
           <div className="flex gap-4">
@@ -317,7 +336,6 @@ export default function AdminCategoriesPage() {
         </CardContent>
       </Card>
 
-      {/* Categories Table */}
       <Card>
         <CardHeader>
           <CardTitle>Categories ({filteredCategories.length})</CardTitle>
@@ -338,7 +356,11 @@ export default function AdminCategoriesPage() {
                 <TableRow key={category.id}>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <div style={{ marginLeft: `${(category.level || 0) * 20}px` }}>
+                      <div
+                        style={{
+                          marginLeft: `${(category.level || 0) * 20}px`,
+                        }}
+                      >
                         {category.level === 0 ? (
                           <Folder className="h-4 w-4 text-blue-500" />
                         ) : (
@@ -360,11 +382,15 @@ export default function AdminCategoriesPage() {
                     </div>
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
-                    {new Date(category.created_at).toLocaleDateString()}
+                    {new Date(category.createdAt).toLocaleDateString()}
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline" onClick={() => handleEdit(category)}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEdit(category)}
+                      >
                         <Edit className="h-3 w-3" />
                       </Button>
                       <Button
@@ -389,8 +415,7 @@ export default function AdminCategoriesPage() {
               <p className="text-muted-foreground">
                 {searchQuery
                   ? "Try adjusting your search."
-                  : "Get started by adding your first category."
-                }
+                  : "Get started by adding your first category."}
               </p>
             </div>
           )}

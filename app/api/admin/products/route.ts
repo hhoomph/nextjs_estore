@@ -59,9 +59,16 @@ export async function GET(request: NextRequest) {
       where.status = parseInt(status);
     }
 
-    // Build order by
+    // Build order by - map snake_case to camelCase Prisma fields
+    const sortFieldMap: Record<string, string> = {
+      created_at: "createdAt",
+      modified_at: "modifiedAt",
+      category_id: "categoryId",
+      discount_price: "discountPrice",
+    };
+    const prismaSortBy = sortFieldMap[sortBy] ?? sortBy;
     const orderBy: Record<string, "asc" | "desc"> = {};
-    orderBy[sortBy] = sortOrder as "asc" | "desc";
+    orderBy[prismaSortBy] = sortOrder as "asc" | "desc";
 
     const [products, total] = await Promise.all([
       prisma.product.findMany({
@@ -125,15 +132,26 @@ export async function POST(request: NextRequest) {
       name,
       desc,
       categoryId,
+      category_id,
       quantity,
       price,
       discountPrice,
+      discount_price,
       status,
       images,
     } = body;
 
+    // Accept both camel and snake
+    const finalCategoryId = categoryId ?? category_id;
+    const finalDiscountPrice =
+      discountPrice !== undefined
+        ? discountPrice
+        : discount_price !== undefined
+          ? discount_price
+          : null;
+
     // Validation
-    if (!name || !desc || !categoryId) {
+    if (!name || !desc || !finalCategoryId) {
       return NextResponse.json(
         { error: "Name, description, and category are required" },
         { status: 400 },
@@ -147,10 +165,10 @@ export async function POST(request: NextRequest) {
         name,
         desc,
         slug: name.toLowerCase().replace(/\s+/g, "-"),
-        categoryId,
+        categoryId: finalCategoryId,
         quantity: quantity || 0,
         price: parseFloat(price),
-        discountPrice: discountPrice ? parseFloat(discountPrice) : null,
+        discountPrice: finalDiscountPrice ? parseFloat(finalDiscountPrice) : null,
         status: status !== undefined ? parseInt(status) : 1,
         createdAt: new Date(),
         modifiedAt: new Date(),

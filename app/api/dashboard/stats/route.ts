@@ -85,7 +85,12 @@ export async function GET(request: NextRequest) {
       totalOrders,
       totalRevenue: Number(totalRevenue._sum.total || 0),
       totalProducts,
-      recentOrders,
+      recentOrders: recentOrders.map((o) => ({
+        id: o.id,
+        total: Number(o.total),
+        createdAt: o.createdAt.toISOString(),
+        user: { name: o.user?.name ?? null },
+      })),
       lowStockProducts,
     };
 

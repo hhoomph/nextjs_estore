@@ -7,12 +7,11 @@
  */
 "use client";
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-
-// Force dynamic rendering to avoid prerendering issues
-export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

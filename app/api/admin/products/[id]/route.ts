@@ -98,15 +98,25 @@ export async function PUT(
       name,
       desc,
       categoryId,
+      category_id,
       quantity,
       price,
       discountPrice,
+      discount_price,
       status,
       images,
     } = body;
 
+    const finalCategoryId = categoryId ?? category_id;
+    const finalDiscountPrice =
+      discountPrice !== undefined
+        ? discountPrice
+        : discount_price !== undefined
+          ? discount_price
+          : null;
+
     // Validation
-    if (!name || !desc || !categoryId) {
+    if (!name || !desc || !finalCategoryId) {
       return NextResponse.json(
         { error: "Name, description, and category are required" },
         { status: 400 },
@@ -120,10 +130,10 @@ export async function PUT(
         name,
         desc,
         slug: name.toLowerCase().replace(/\s+/g, "-"),
-        categoryId,
+        categoryId: finalCategoryId,
         quantity: quantity || 0,
         price: parseFloat(price),
-        discountPrice: discountPrice ? parseFloat(discountPrice) : null,
+        discountPrice: finalDiscountPrice ? parseFloat(finalDiscountPrice) : null,
         status: status !== undefined ? parseInt(status) : 1,
         modifiedAt: new Date(),
       },

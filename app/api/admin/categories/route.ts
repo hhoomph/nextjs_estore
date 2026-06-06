@@ -53,7 +53,10 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { name, parentId } = body;
+    const { name, parentId, parent_id } = body;
+
+    // Accept both camel and snake
+    const finalParentId = parentId ?? parent_id ?? null;
 
     if (!name || name.trim().length === 0) {
       return NextResponse.json(
@@ -76,9 +79,9 @@ export async function POST(request: NextRequest) {
 
     // Determine level based on parent
     let level = 0;
-    if (parentId) {
+    if (finalParentId) {
       const parent = await prisma.category.findUnique({
-        where: { id: parentId },
+        where: { id: finalParentId },
       });
       if (!parent) {
         return NextResponse.json(
@@ -93,7 +96,7 @@ export async function POST(request: NextRequest) {
       data: {
         id: crypto.randomUUID(),
         name: name.trim(),
-        parentId,
+        parentId: finalParentId,
         level,
         modifiedAt: new Date(),
       },

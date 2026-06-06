@@ -84,12 +84,12 @@ async function getSalesData(startDate: Date, endDate: Date) {
     Array<{ date: string; revenue: number; orders: number }>
   >`
     SELECT
-      DATE(o.created_at) as date,
-      COALESCE(SUM(o.total), 0) as revenue,
+      DATE(o."createdAt") as date,
+      COALESCE(SUM(o."total"), 0) as revenue,
       COUNT(o.id) as orders
     FROM "order" o
-    WHERE o.created_at >= ${startDate} AND o.created_at <= ${endDate}
-    GROUP BY DATE(o.created_at)
+    WHERE o."createdAt" >= ${startDate} AND o."createdAt" <= ${endDate}
+    GROUP BY DATE(o."createdAt")
     ORDER BY date
   `;
 
@@ -141,12 +141,12 @@ async function getTopProducts() {
   >`
     SELECT
       p.name,
-      COALESCE(SUM(oi.quantity), 0) as sales,
-      COALESCE(SUM(oi.quantity * p.price), 0) as revenue
+      COALESCE(SUM(oi."quantity"), 0) as sales,
+      COALESCE(SUM(oi."quantity" * p."price"), 0) as revenue
     FROM product p
-    LEFT JOIN order_items oi ON p.id = oi.product_id
-    LEFT JOIN "order" o ON oi.order_id = o.id
-    WHERE p.status = 1
+    LEFT JOIN order_items oi ON p.id = oi."productId"
+    LEFT JOIN "order" o ON oi."orderId" = o.id
+    WHERE p."status" = 1
     GROUP BY p.id, p.name
     ORDER BY revenue DESC
     LIMIT 10
@@ -165,12 +165,12 @@ async function getCategoryPerformance() {
   >`
     SELECT
       c.name,
-      COALESCE(SUM(oi.quantity), 0) as sales,
-      COALESCE(SUM(oi.quantity * p.price), 0) as revenue
+      COALESCE(SUM(oi."quantity"), 0) as sales,
+      COALESCE(SUM(oi."quantity" * p."price"), 0) as revenue
     FROM category c
-    LEFT JOIN product p ON c.id = p.category_id
-    LEFT JOIN order_items oi ON p.id = oi.product_id
-    LEFT JOIN "order" o ON oi.order_id = o.id
+    LEFT JOIN product p ON c.id = p."categoryId"
+    LEFT JOIN order_items oi ON p.id = oi."productId"
+    LEFT JOIN "order" o ON oi."orderId" = o.id
     GROUP BY c.id, c.name
     ORDER BY revenue DESC
   `;

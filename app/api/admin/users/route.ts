@@ -114,7 +114,10 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, email, phoneNumber, role, active } = body;
+    const { name, email, phoneNumber, phone_number, role, active } = body;
+
+    // Accept both camel and snake
+    const finalPhoneNumber = phoneNumber ?? phone_number ?? null;
 
     // Validation
     if (!name || !email) {
@@ -142,7 +145,7 @@ export async function POST(request: NextRequest) {
         id: crypto.randomUUID(),
         name,
         email,
-        phoneNumber: phoneNumber || null,
+        phoneNumber: finalPhoneNumber,
         role: role || "USER",
         active: active !== undefined ? active : true,
       },

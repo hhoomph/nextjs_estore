@@ -1,18 +1,10 @@
-/**
- * Module for page
- *
- * @author hh.oomph@gmail.com
- * @version 1.0.0
- * @since 2025-01-01
- */
 "use client";
+
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-
-// Force dynamic rendering to avoid prerendering issues
-export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
 import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -34,19 +26,20 @@ import {
   AlertTriangle,
   Loader2,
   Upload,
-  X
+  X,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { toast } from "sonner";
 
 const productSchema = z.object({
   name: z.string().min(1, "Name is required"),
   desc: z.string().min(1, "Description is required"),
-  category_id: z.string().min(1, "Category is required"),
+  categoryId: z.string().min(1, "Category is required"),
   quantity: z.number().min(0, "Quantity must be 0 or more"),
   price: z.number().min(0.01, "Price must be greater than 0"),
-  discount_price: z.number().optional(),
+  discountPrice: z.number().optional(),
   status: z.number().min(0).max(1),
 });
 
@@ -57,12 +50,12 @@ interface Product {
   name: string;
   desc: string;
   slug: string;
-  category_id: string;
+  categoryId: string;
   quantity: number;
   price: number;
-  discount_price: number | null;
+  discountPrice: number | null;
   status: number;
-  category: { name: string };
+  category?: { id?: string; name: string } | null;
 }
 
 interface Category {
@@ -90,10 +83,10 @@ export default function AdminProductsPage() {
     defaultValues: {
       name: "",
       desc: "",
-      category_id: "",
+      categoryId: "",
       quantity: 0,
       price: 0,
-      discount_price: undefined,
+      discountPrice: undefined,
       status: 1,
     },
   });
@@ -112,9 +105,9 @@ export default function AdminProductsPage() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch("/api/products?limit=100");
+      const response = await fetch("/api/admin/products?limit=100");
       const data = await response.json();
-      setProducts(data.products);
+      setProducts(data.products || []);
     } catch (error) {
       console.error("Failed to fetch products:", error);
     } finally {
@@ -126,16 +119,18 @@ export default function AdminProductsPage() {
     try {
       const response = await fetch("/api/categories");
       const data = await response.json();
-      setCategories(data.categories);
+      setCategories(data.categories || []);
     } catch (error) {
       console.error("Failed to fetch categories:", error);
     }
   };
 
-  const filteredProducts = (products || []).filter(product => {
-    const matchesSearch = (product.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         (product.desc || "").toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === "all" || (product.status ?? 1).toString() === statusFilter;
+  const filteredProducts = (products || []).filter((product) => {
+    const matchesSearch =
+      (product.name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (product.desc || "").toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" || (product.status ?? 1).toString() === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -143,7 +138,9 @@ export default function AdminProductsPage() {
     setSubmitting(true);
     try {
       const method = editingProduct ? "PUT" : "POST";
-      const url = editingProduct ? `/api/admin/products/${editingProduct.id}` : "/api/admin/products";
+      const url = editingProduct
+        ? `/api/admin/products/${editingProduct.id}`
+        : "/api/admin/products";
 
       const response = await fetch(url, {
         method,
@@ -152,12 +149,12 @@ export default function AdminProductsPage() {
         },
         body: JSON.stringify({
           ...data,
-          slug: data.name.toLowerCase().replace(/\s+/g, "-"),
           images: productImages,
         }),
       });
 
       if (response.ok) {
+        toast.success(editingProduct ? "Product updated" : "Product created");
         setDialogOpen(false);
         form.reset();
         setEditingProduct(null);
@@ -165,11 +162,11 @@ export default function AdminProductsPage() {
         fetchProducts();
       } else {
         const errorData = await response.json();
-        alert(errorData.error || "Failed to save product");
+        toast.error(errorData.error || "Failed to save product");
       }
     } catch (error) {
       console.error("Failed to save product:", error);
-      alert("Failed to save product. Please try again.");
+      toast.error("Failed to save product. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -180,21 +177,23 @@ export default function AdminProductsPage() {
     form.reset({
       name: product.name || "",
       desc: product.desc || "",
-      category_id: product.category_id,
+      categoryId: product.categoryId,
       quantity: product.quantity,
       price: product.price,
-      discount_price: product.discount_price || undefined,
+      discountPrice: product.discountPrice || undefined,
       status: product.status ?? 1,
     });
 
-    // Load existing images
     try {
       const response = await fetch(`/api/admin/products/${product.id}`);
       const data = await response.json();
-      if (data.product && data.product.product_pictures) {
-        const images = data.product.product_pictures
-          .sort((a: any, b: any) => a.display_order - b.display_order)
-          .map((pp: any) => pp.picture.url);
+      if (data.product && data.product.productPictures) {
+        const images = data.product.productPictures
+          .sort(
+            (a: { displayOrder: number }, b: { displayOrder: number }) =>
+              a.displayOrder - b.displayOrder,
+          )
+          .map((pp: { picture: { url: string } }) => pp.picture.url);
         setProductImages(images);
       } else {
         setProductImages([]);
@@ -211,15 +210,20 @@ export default function AdminProductsPage() {
     if (!confirm("Are you sure you want to delete this product?")) return;
 
     try {
-      const response = await fetch(`/api/products/${productId}`, {
+      const response = await fetch(`/api/admin/products/${productId}`, {
         method: "DELETE",
       });
 
       if (response.ok) {
+        toast.success("Product deleted");
         fetchProducts();
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || "Failed to delete product");
       }
     } catch (error) {
       console.error("Failed to delete product:", error);
+      toast.error("Failed to delete product. Please try again.");
     }
   };
 
@@ -244,14 +248,14 @@ export default function AdminProductsPage() {
           throw new Error(data.error || "Upload failed");
         }
 
-        return data.url;
+        return data.url as string;
       });
 
       const uploadedUrls = await Promise.all(uploadPromises);
-      setProductImages(prev => [...prev, ...uploadedUrls]);
+      setProductImages((prev) => [...prev, ...uploadedUrls]);
     } catch (error) {
       console.error("Failed to upload images:", error);
-      alert("Failed to upload images. Please try again.");
+      toast.error("Failed to upload images. Please try again.");
     } finally {
       setUploadingImage(false);
       if (fileInputRef.current) {
@@ -261,7 +265,7 @@ export default function AdminProductsPage() {
   };
 
   const removeImage = (index: number) => {
-    setProductImages(prev => prev.filter((_, i) => i !== index));
+    setProductImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   if (isPending || loading) {
@@ -289,18 +293,21 @@ export default function AdminProductsPage() {
 
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => {
-              setEditingProduct(null);
-              form.reset({
-                name: "",
-                desc: "",
-                category_id: "",
-                quantity: 0,
-                price: 0,
-                discount_price: undefined,
-                status: 1,
-              });
-            }}>
+            <Button
+              onClick={() => {
+                setEditingProduct(null);
+                form.reset({
+                  name: "",
+                  desc: "",
+                  categoryId: "",
+                  quantity: 0,
+                  price: 0,
+                  discountPrice: undefined,
+                  status: 1,
+                });
+                setProductImages([]);
+              }}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Add Product
             </Button>
@@ -313,7 +320,10 @@ export default function AdminProductsPage() {
             </DialogHeader>
 
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+              <form
+                onSubmit={form.handleSubmit(handleSubmit)}
+                className="space-y-4"
+              >
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -331,11 +341,14 @@ export default function AdminProductsPage() {
 
                   <FormField
                     control={form.control}
-                    name="category_id"
+                    name="categoryId"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Category</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select category" />
@@ -379,8 +392,10 @@ export default function AdminProductsPage() {
                         <FormControl>
                           <Input
                             type="number"
-                            {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                            value={field.value ?? 0}
+                            onChange={(e) =>
+                              field.onChange(parseInt(e.target.value) || 0)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -398,8 +413,10 @@ export default function AdminProductsPage() {
                           <Input
                             type="number"
                             step="0.01"
-                            {...field}
-                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                            value={field.value ?? 0}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value) || 0)
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -409,7 +426,7 @@ export default function AdminProductsPage() {
 
                   <FormField
                     control={form.control}
-                    name="discount_price"
+                    name="discountPrice"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Discount Price ($)</FormLabel>
@@ -417,8 +434,14 @@ export default function AdminProductsPage() {
                           <Input
                             type="number"
                             step="0.01"
-                            {...field}
-                            onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                            value={(field.value ?? "") as number | string}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value
+                                  ? parseFloat(e.target.value)
+                                  : undefined,
+                              )
+                            }
                           />
                         </FormControl>
                         <FormMessage />
@@ -433,7 +456,10 @@ export default function AdminProductsPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Status</FormLabel>
-                      <Select onValueChange={(value) => field.onChange(parseInt(value))} value={(field.value ?? 1).toString()}>
+                      <Select
+                        onValueChange={(value) => field.onChange(parseInt(value))}
+                        value={(field.value ?? 1).toString()}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue />
@@ -449,7 +475,6 @@ export default function AdminProductsPage() {
                   )}
                 />
 
-                {/* Image Upload Section */}
                 <div>
                   <FormLabel>Product Images</FormLabel>
                   <div className="mt-2">
@@ -486,7 +511,6 @@ export default function AdminProductsPage() {
                     </p>
                   </div>
 
-                  {/* Image Preview */}
                   {productImages.length > 0 && (
                     <div className="mt-4 grid grid-cols-3 gap-4">
                       {productImages.map((imageUrl, index) => (
@@ -521,8 +545,10 @@ export default function AdminProductsPage() {
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                         Saving...
                       </>
+                    ) : editingProduct ? (
+                      "Update Product"
                     ) : (
-                      editingProduct ? "Update Product" : "Create Product"
+                      "Create Product"
                     )}
                   </Button>
                   <Button
@@ -539,125 +565,132 @@ export default function AdminProductsPage() {
         </Dialog>
       </div>
 
-        {/* Filters */}
-        <Card className="mb-6">
-          <CardContent className="pt-6">
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search products..."
-                    className="pl-8"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
+      <Card className="mb-6">
+        <CardContent className="pt-6">
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search products..."
+                  className="pl-8"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="1">Active</SelectItem>
-                  <SelectItem value="0">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
-          </CardContent>
-        </Card>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="1">Active</SelectItem>
+                <SelectItem value="0">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Products Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Products ({filteredProducts.length})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Product</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Stock</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
+      <Card>
+        <CardHeader>
+          <CardTitle>Products ({filteredProducts.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Product</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Stock</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredProducts.map((product) => (
+                <TableRow key={product.id}>
+                  <TableCell>
+                    <div>
+                      <p className="font-medium">{product.name}</p>
+                      <p className="text-sm text-muted-foreground line-clamp-1">
+                        {product.desc}
+                      </p>
+                    </div>
+                  </TableCell>
+                  <TableCell>{product.category?.name ?? "-"}</TableCell>
+                  <TableCell>
+                    <div>
+                      <span>${Number(product.price).toFixed(2)}</span>
+                      {product.discountPrice && (
+                        <span className="text-sm text-muted-foreground line-through ml-2">
+                          ${Number(product.discountPrice).toFixed(2)}
+                        </span>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Package className="h-4 w-4" />
+                      <span>{product.quantity}</span>
+                      {product.quantity < 10 && (
+                        <AlertTriangle className="h-4 w-4 text-orange-500" />
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        (product.status ?? 1) === 1 ? "default" : "destructive"
+                      }
+                    >
+                      {(product.status ?? 1) === 1 ? "Active" : "Inactive"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEdit(product)}
+                      >
+                        <Edit className="h-3 w-3" />
+                      </Button>
+                      <Button size="sm" variant="outline">
+                        <Eye className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDelete(product.id)}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredProducts.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{product.name}</p>
-                        <p className="text-sm text-muted-foreground line-clamp-1">
-                          {product.desc}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell>{product.category?.name}</TableCell>
-                    <TableCell>
-                      <div>
-                        <span>${product.price.toFixed(2)}</span>
-                        {product.discount_price && (
-                          <span className="text-sm text-muted-foreground line-through ml-2">
-                            ${product.discount_price.toFixed(2)}
-                          </span>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Package className="h-4 w-4" />
-                        <span>{product.quantity}</span>
-                        {product.quantity < 10 && (
-                          <AlertTriangle className="h-4 w-4 text-orange-500" />
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={(product.status ?? 1) === 1 ? "default" : "destructive"}>
-                        {(product.status ?? 1) === 1 ? "Active" : "Inactive"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline" onClick={() => handleEdit(product)}>
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          <Eye className="h-3 w-3" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleDelete(product.id)}
-                          className="text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+              ))}
+            </TableBody>
+          </Table>
 
-            {filteredProducts.length === 0 && (
-              <div className="text-center py-12">
-                <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No products found</h3>
-                <p className="text-muted-foreground">
-                  {searchQuery || statusFilter !== "all"
-                    ? "Try adjusting your filters."
-                  : "Get started by adding your first product."
-                  }
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          {filteredProducts.length === 0 && (
+            <div className="text-center py-12">
+              <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No products found</h3>
+              <p className="text-muted-foreground">
+                {searchQuery || statusFilter !== "all"
+                  ? "Try adjusting your filters."
+                  : "Get started by adding your first product."}
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
+
+     

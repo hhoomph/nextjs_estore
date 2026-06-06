@@ -146,7 +146,9 @@ export async function PUT(
 
     const { id } = await params;
     const body = await request.json();
-    const { name, email, phoneNumber, role, active } = body;
+    const { name, email, phoneNumber, phone_number, role, active } = body;
+
+    const finalPhoneNumber = phoneNumber ?? phone_number ?? null;
 
     // Validation
     if (!name || !email) {
@@ -177,7 +179,7 @@ export async function PUT(
       data: {
         name,
         email,
-        phoneNumber: phoneNumber || null,
+        phoneNumber: finalPhoneNumber,
         role: role || "USER",
         active: active !== undefined ? active : true,
       },

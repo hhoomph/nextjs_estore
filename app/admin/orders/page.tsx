@@ -1,17 +1,9 @@
-/**
- * Module for page
- *
- * @author hh.oomph@gmail.com
- * @version 1.0.0
- * @since 2025-01-01
- */
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
-// Force dynamic rendering to avoid prerendering issues
-export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,19 +16,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, Eye, Package } from "lucide-react";
+import { Search, Eye, Package, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface Order {
   id: string;
-  user_id: string;
+  userId: string;
   total: number;
   status: string;
-  created_at: string;
+  createdAt: string;
   user: {
     name: string;
     email: string;
   };
-  order_items: Array<{
+  orderItems: Array<{
     quantity: number;
     product: {
       name: string;
@@ -44,8 +37,6 @@ interface Order {
     };
   }>;
 }
-
-
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -76,7 +67,7 @@ export default function AdminOrdersPage() {
         throw new Error(data.error || "Failed to fetch orders");
       }
 
-      setOrders(data.orders);
+      setOrders(data.orders || []);
       setTotalPages(data.pagination?.pages || 1);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch orders");
@@ -100,13 +91,16 @@ export default function AdminOrdersPage() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update order status");
+        const data = await response.json();
+        throw new Error(data.error || "Failed to update order status");
       }
 
-      // Refresh orders
+      toast.success("Order status updated");
       fetchOrders();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update order");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to update order",
+      );
     }
   };
 
@@ -124,7 +118,7 @@ export default function AdminOrdersPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 style={{ borderBottomColor: 'rgb(59, 130, 246)' }} mx-auto"></div>
+          <Loader2 className="h-8 w-8 animate-spin mx-auto" />
           <p className="mt-2 text-muted-foreground">Loading orders...</p>
         </div>
       </div>
@@ -133,7 +127,6 @@ export default function AdminOrdersPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Orders</h1>
@@ -141,7 +134,6 @@ export default function AdminOrdersPage() {
         </div>
       </div>
 
-      {/* Filters */}
       <Card>
         <CardContent className="pt-6">
           <div className="flex gap-4">
@@ -173,7 +165,6 @@ export default function AdminOrdersPage() {
         </CardContent>
       </Card>
 
-      {/* Orders Table */}
       <Card>
         <CardHeader>
           <CardTitle>Orders ({orders.length})</CardTitle>
@@ -212,22 +203,25 @@ export default function AdminOrdersPage() {
                       </TableCell>
                       <TableCell>
                         <div>
-                          <p className="font-medium">{order.user.name}</p>
+                          <p className="font-medium">{order.user?.name ?? "Guest"}</p>
                           <p className="text-sm text-muted-foreground">
-                            {order.user.email}
+                            {order.user?.email ?? "-"}
                           </p>
                         </div>
                       </TableCell>
                       <TableCell>
-                        {order.order_items.length} item{order.order_items.length !== 1 ? "s" : ""}
+                        {order.orderItems?.length ?? 0} item
+                        {(order.orderItems?.length ?? 0) !== 1 ? "s" : ""}
                       </TableCell>
                       <TableCell className="font-medium">
-                        ${order.total.toFixed(2)}
+                        ${Number(order.total).toFixed(2)}
                       </TableCell>
                       <TableCell>
                         <Select
                           value={order.status}
-                          onValueChange={(value) => updateOrderStatus(order.id, value)}
+                          onValueChange={(value) =>
+                            updateOrderStatus(order.id, value)
+                          }
                         >
                           <SelectTrigger className="w-32">
                             <SelectValue />
@@ -242,7 +236,7 @@ export default function AdminOrdersPage() {
                         </Select>
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
-                        {formatDate(order.created_at)}
+                        {formatDate(order.createdAt)}
                       </TableCell>
                       <TableCell>
                         <Button variant="ghost" size="sm">
@@ -258,7 +252,6 @@ export default function AdminOrdersPage() {
         </CardContent>
       </Card>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center">
           <div className="flex gap-2">
