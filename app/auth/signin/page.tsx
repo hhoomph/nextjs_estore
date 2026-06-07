@@ -54,9 +54,26 @@ export default function SignInPage() {
       if (result.error) {
         setError(result.error.message || "Sign in failed. Please check your credentials.");
       } else {
-        // Redirect to account page on success
-        router.push("/account");
-        router.refresh();
+        // Check if the user has ADMIN role — redirect to admin dashboard
+        const user = result.data?.user as any;
+        if (user?.role === "ADMIN") {
+          router.push("/admin");
+          router.refresh();
+          return;
+        }
+
+        // Fallback: fetch session to check role if not immediately available
+        const checkAndRedirect = async () => {
+          const sessionResult = await authClient.getSession();
+          const sessionUser = sessionResult.data?.user as any;
+          if (sessionUser?.role === "ADMIN") {
+            router.push("/admin");
+          } else {
+            router.push("/account");
+          }
+          router.refresh();
+        };
+        checkAndRedirect();
       }
     } catch {
       setError("An unexpected error occurred. Please try again.");
