@@ -374,6 +374,166 @@ async function createProducts(
       discountPrice: 24.99,
       categoryIndex: 2,
     },
+
+    // Sports & Outdoors
+    {
+      name: "Yoga Mat Premium",
+      price: 39.99,
+      discountPrice: 29.99,
+      categoryIndex: 3,
+    },
+    {
+      name: "Adjustable Dumbbell Set",
+      price: 199.99,
+      discountPrice: 149.99,
+      categoryIndex: 3,
+    },
+    {
+      name: "Mountain Bike Helmet",
+      price: 89.99,
+      discountPrice: 69.99,
+      categoryIndex: 3,
+    },
+    {
+      name: "Camping Tent 4-Person",
+      price: 249.99,
+      discountPrice: 199.99,
+      categoryIndex: 3,
+    },
+    {
+      name: "Resistance Bands Kit",
+      price: 29.99,
+      discountPrice: 19.99,
+      categoryIndex: 3,
+    },
+
+    // Books
+    {
+      name: "The Art of Programming",
+      price: 49.99,
+      discountPrice: 39.99,
+      categoryIndex: 4,
+    },
+    {
+      name: "JavaScript: The Good Parts",
+      price: 34.99,
+      discountPrice: 24.99,
+      categoryIndex: 4,
+    },
+    {
+      name: "Clean Code Handbook",
+      price: 44.99,
+      discountPrice: 34.99,
+      categoryIndex: 4,
+    },
+    {
+      name: "System Design Interview",
+      price: 39.99,
+      discountPrice: 29.99,
+      categoryIndex: 4,
+    },
+    {
+      name: "Data Structures & Algorithms",
+      price: 54.99,
+      discountPrice: 44.99,
+      categoryIndex: 4,
+    },
+
+    // Beauty & Personal Care
+    {
+      name: "Organic Face Serum",
+      price: 34.99,
+      discountPrice: 24.99,
+      categoryIndex: 5,
+    },
+    {
+      name: "Professional Hair Dryer",
+      price: 79.99,
+      discountPrice: 59.99,
+      categoryIndex: 5,
+    },
+    {
+      name: "Essential Oils Collection",
+      price: 44.99,
+      discountPrice: 34.99,
+      categoryIndex: 5,
+    },
+    {
+      name: "Electric Toothbrush",
+      price: 69.99,
+      discountPrice: 49.99,
+      categoryIndex: 5,
+    },
+    {
+      name: "Moisturizing Cream Set",
+      price: 29.99,
+      discountPrice: 19.99,
+      categoryIndex: 5,
+    },
+
+    // Automotive
+    {
+      name: "Dash Cam 4K",
+      price: 129.99,
+      discountPrice: 99.99,
+      categoryIndex: 6,
+    },
+    {
+      name: "Car Vacuum Cleaner",
+      price: 59.99,
+      discountPrice: 44.99,
+      categoryIndex: 6,
+    },
+    {
+      name: "LED Interior Lights Kit",
+      price: 24.99,
+      discountPrice: 19.99,
+      categoryIndex: 6,
+    },
+    {
+      name: "Portable Jump Starter",
+      price: 89.99,
+      discountPrice: 69.99,
+      categoryIndex: 6,
+    },
+    {
+      name: "Car Phone Mount",
+      price: 19.99,
+      discountPrice: 14.99,
+      categoryIndex: 6,
+    },
+
+    // Toys & Games
+    {
+      name: "Building Blocks Set 1000pc",
+      price: 49.99,
+      discountPrice: 39.99,
+      categoryIndex: 7,
+    },
+    {
+      name: "Remote Control Car",
+      price: 59.99,
+      discountPrice: 44.99,
+      categoryIndex: 7,
+    },
+    {
+      name: "Board Game Collection",
+      price: 34.99,
+      discountPrice: 24.99,
+      categoryIndex: 7,
+    },
+    {
+      name: "Stuffed Animal Bear",
+      price: 24.99,
+      discountPrice: 19.99,
+      categoryIndex: 7,
+    },
+    {
+      name: "Science Experiment Kit",
+      price: 39.99,
+      discountPrice: 29.99,
+      categoryIndex: 7,
+    },
   ];
 
   for (const category of categories) {

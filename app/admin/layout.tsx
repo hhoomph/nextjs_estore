@@ -6,7 +6,6 @@
  * @since 2025-01-01
  */
 "use client";
-
 import {
   LayoutDashboard,
   LogOut,
@@ -42,7 +41,6 @@ import {
 import { useEffect, useRef } from "react";
 import { signOut, useSession } from "@/lib/auth-client";
 import { useAdminTheme } from "@/lib/utils/theme-admin-overrides";
-
 // Admin sidebar navigation item definition
 interface AdminNavItem {
   href: string;
@@ -50,31 +48,25 @@ interface AdminNavItem {
   icon: React.ComponentType<{ className?: string }>;
   group: "dashboard" | "commerce" | "content" | "users" | "settings";
 }
-
 // All admin sidebar navigation items organized by group
 const adminNavItems: AdminNavItem[] = [
-  // Dashboard
+  { href: "/", label: "Main Page", icon: Globe, group: "dashboard" },
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, group: "dashboard" },
-
   // Commerce
   { href: "/admin/products", label: "Products", icon: Package, group: "commerce" },
   { href: "/admin/categories", label: "Categories", icon: FolderTree, group: "commerce" },
   { href: "/admin/collections", label: "Collections", icon: Package, group: "commerce" },
   { href: "/admin/orders", label: "Orders", icon: ShoppingCart, group: "commerce" },
-
   // Content
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3, group: "content" },
-
   // Users
   { href: "/admin/users", label: "Users", icon: Users, group: "users" },
-
   // Settings
   { href: "/admin/settings", label: "Settings", icon: Settings, group: "settings" },
   { href: "/admin/settings/seo", label: "SEO", icon: Search, group: "settings" },
   { href: "/admin/settings/site", label: "Site", icon: Globe, group: "settings" },
   { href: "/admin/settings/theme", label: "Theme", icon: Palette, group: "settings" },
 ];
-
 // Group metadata for sidebar section headers
 const navGroups: Record<string, { label: string }> = {
   dashboard: { label: "Overview" },
@@ -83,50 +75,39 @@ const navGroups: Record<string, { label: string }> = {
   users: { label: "Users" },
   settings: { label: "Settings" },
 };
-
 const groupOrder = ["dashboard", "commerce", "content", "users", "settings"];
-
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const { data: session, isPending } = useSession();
   const router = useRouter();
   const pathname = usePathname();
   const t = useTranslations("Navigation");
   const sidebarTheme = useAdminTheme();
-
   const navbarClasses = sidebarTheme.getAdminNavbarClasses();
   const sidebarClasses = sidebarTheme.getAdminSidebarClasses();
   const contentClasses = sidebarTheme.getAdminContentClasses();
-
   // Skip auth check on sign-in page
   const isSignInPage = pathname === "/admin/signin";
-
   // Track whether session has been fetched at least once
   const hasFetchedSession = useRef(false);
-
   useEffect(() => {
     if (!isPending && !hasFetchedSession.current) {
       hasFetchedSession.current = true;
     }
   }, [isPending]);
-
   // Handle redirects via useEffect — only AFTER session has been fetched
   useEffect(() => {
     if (!hasFetchedSession.current || isPending || isSignInPage) return;
-
     const userObj = (session?.user as any) || (session?.session as any)?.user;
     const userRole = userObj?.role;
-
     if (!userObj) {
       router.push("/admin/signin");
       return;
     }
-
     if (userRole !== "ADMIN") {
       router.push("/");
       return;
     }
   }, [session, isPending, router, isSignInPage]);
-
   // Allow access to sign-in page without authentication
   if (isSignInPage) {
     if (isPending) {
@@ -152,7 +133,6 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
       </AdvancedErrorBoundary>
     );
   }
-
   // While session is loading, show a spinner (do NOT redirect yet)
   if (isPending) {
     return (
@@ -167,15 +147,12 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-
   // Extract user from session — better-auth may return { user, session } or { session: { user } }
   const userObj = (session?.user as any) || (session?.session as any)?.user;
   const userRole = userObj?.role;
   const isAdmin = userRole === "ADMIN";
-
   // Helper to get user property safely
   const getUser = (key: string) => userObj?.[key] ?? "";
-
   // Show loading while redirect is in progress
   if (!userObj || !isAdmin) {
     return (
@@ -189,7 +166,6 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-
   const handleSignOut = async () => {
     await signOut({
       fetchOptions: {
@@ -199,7 +175,6 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
       },
     });
   };
-
   // Check if a nav item is active (matches current pathname)
   const isActive = (href: string) => {
     if (href === "/admin") {
@@ -207,7 +182,6 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     }
     return pathname.startsWith(href);
   };
-
   return (
     <AdvancedErrorBoundary
       showErrorDetails={process.env.NODE_ENV === "development"}
@@ -234,13 +208,11 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
               </span>
             </Link>
           </div>
-
           {/* Navigation */}
           <nav className="mt-6 px-3 overflow-y-auto h-[calc(100vh-4rem)]">
             {groupOrder.map((groupKey) => {
               const groupItems = adminNavItems.filter((item) => item.group === groupKey);
               if (groupItems.length === 0) return null;
-
               return (
                 <div key={groupKey} className="mb-6">
                   {/* Group section title */}
@@ -252,13 +224,11 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                   >
                     {navGroups[groupKey].label}
                   </p>
-
                   {/* Group items */}
                   <div className="space-y-1">
                     {groupItems.map((item) => {
                       const active = isActive(item.href);
                       const Icon = item.icon;
-
                       return (
                         <Link
                           key={item.href}
@@ -281,7 +251,6 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                 </div>
               );
             })}
-
             {/* Sign Out at bottom */}
             <div className="mt-8 pt-4 border-t">
               <Button
@@ -298,7 +267,6 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
             </div>
           </nav>
         </div>
-
         {/* Main Content */}
         <div className="pl-64">
           {/* Top Bar */}
@@ -310,7 +278,6 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
               >
                 {t("adminPanel")}
               </h1>
-
               <div className="flex items-center space-x-4">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild={true}>
@@ -337,7 +304,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
-                    className="w-56 bg-slate-800/95 backdrop-blur-sm border border-slate-700 shadow-lg"
+                    className="w-56 bg-slate-800/95 backdrop-blur-sm border border-slate-700 shadow-lg z-50"
                     align="end"
                     forceMount={true}
                   >
@@ -401,7 +368,6 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
               </div>
             </div>
           </div>
-
           {/* Page Content */}
           <ApiErrorBoundary showNetworkStatus={true}>
             <main className={`p-6 ${contentClasses.card}`}>{children}</main>
@@ -411,7 +377,6 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     </AdvancedErrorBoundary>
   );
 }
-
 export default function AdminLayout({
   children,
 }: {

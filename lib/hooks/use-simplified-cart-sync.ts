@@ -103,56 +103,59 @@ export function useSimplifiedCartSync() {
 }
 
 /**
- * Hook for cart actions with simplified error handling
+ * Hook for cart actions with simplified error handling.
+ *
+ * Uses store getState() directly inside callbacks to avoid
+ * stale closure issues and unnecessary re-renders caused by
+ * changing store object references.
  */
 export function useCartActions() {
   const { isAuthenticated } = useSimplifiedCartSync();
-  const userCart = useCartStore();
-  const guestCart = useGuestCartStore();
-
-  // Get the appropriate cart store based on authentication
-  const currentCart = isAuthenticated ? userCart : guestCart;
 
   const addToCart = useCallback(
     async (item: any) => {
       try {
-        currentCart.addItem(item);
+        const cart = isAuthenticated ? useCartStore.getState() : useGuestCartStore.getState();
+        cart.addItem(item);
       } catch (error) {
         console.error("Failed to add item to cart:", error);
       }
     },
-    [currentCart],
+    [isAuthenticated],
   );
 
   const removeFromCart = useCallback(
     async (itemId: string) => {
       try {
-        currentCart.removeItem(itemId);
+        const cart = isAuthenticated ? useCartStore.getState() : useGuestCartStore.getState();
+        cart.removeItem(itemId);
       } catch (error) {
         console.error("Failed to remove item from cart:", error);
       }
     },
-    [currentCart],
+    [isAuthenticated],
   );
 
   const updateQuantity = useCallback(
     async (itemId: string, quantity: number) => {
       try {
-        currentCart.updateQuantity(itemId, quantity);
+        const cart = isAuthenticated ? useCartStore.getState() : useGuestCartStore.getState();
+        cart.updateQuantity(itemId, quantity);
       } catch (error) {
         console.error("Failed to update item quantity:", error);
       }
     },
-    [currentCart],
+    [isAuthenticated],
   );
 
   const clearCart = useCallback(async () => {
     try {
-      currentCart.clearCart();
+      const cart = isAuthenticated ? useCartStore.getState() : useGuestCartStore.getState();
+      cart.clearCart();
     } catch (error) {
       console.error("Failed to clear cart:", error);
     }
-  }, [currentCart]);
+  }, [isAuthenticated]);
 
   return {
     addToCart,

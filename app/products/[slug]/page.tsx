@@ -9,13 +9,13 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { LoadingPage } from "@/components/ui/loading";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { AddToCartSection } from "@/components/features/add-to-cart-section";
 import Image from "next/image";
 import Link from "next/link";
-import { Star, ShoppingCart, Heart, ChevronLeft } from "lucide-react";
+import { Star, ChevronLeft } from "lucide-react";
 
 interface ProductPageProps {
   params: Promise<{
@@ -215,16 +215,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <Separator />
 
               {/* Actions */}
-              <div className="flex gap-4">
-                <Button className="flex-1" size="lg" disabled={product.quantity <= 0}>
-                  <ShoppingCart className="mr-2 h-5 w-5" />
-                  Add to Cart
-                </Button>
-                <Button variant="outline" size="lg">
-                  <Heart className="mr-2 h-5 w-5" />
-                  Wishlist
-                </Button>
-              </div>
+              <AddToCartSection
+                productId={product.id}
+                productName={product.name || ""}
+                productPrice={Number(product.price)}
+                productDiscountPrice={product.discountPrice ? Number(product.discountPrice) : null}
+                productSlug={product.slug || ""}
+                quantity={1}
+                isOutOfStock={product.quantity <= 0}
+              />
 
               {/* Back to Products */}
               <div className="pt-4">
