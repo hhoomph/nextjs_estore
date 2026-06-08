@@ -54,6 +54,7 @@ export function NavbarFallback() {
   const [searchQuery, setSearchQuery] = useState("");
   const [siteTitle, setSiteTitle] = useState("E-Store");
   const [mounted, setMounted] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
 
   // ALWAYS call hooks at top level - never conditionally
   const { user, isAuthenticated, isLoading } = useSimplifiedSessionSync();
@@ -66,6 +67,12 @@ export function NavbarFallback() {
   // Effects - must be called after all state hooks
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  // Track hydration so the cart badge (which depends on persisted
+  // localStorage state) does not flash on the first client paint.
+  useEffect(() => {
+    setHydrated(true);
   }, []);
 
   useEffect(() => {
@@ -214,10 +221,14 @@ export function NavbarFallback() {
           <Link
             href="/wishlist"
             className="relative p-2 hover:bg-accent rounded-md transition-colors"
+            suppressHydrationWarning={true}
           >
             <Heart className="h-4 w-4" />
-            {wishlistCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+            {hydrated && wishlistCount > 0 && (
+              <span
+                className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                suppressHydrationWarning={true}
+              >
                 {wishlistCount > 99 ? "99+" : wishlistCount}
               </span>
             )}
@@ -227,10 +238,14 @@ export function NavbarFallback() {
           <button
             onClick={() => router.push("/cart")}
             className="relative p-2 hover:bg-accent rounded-md transition-colors"
+            suppressHydrationWarning={true}
           >
             <ShoppingCart className="h-4 w-4" />
-            {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+            {hydrated && cartCount > 0 && (
+              <span
+                className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                suppressHydrationWarning={true}
+              >
                 {cartCount > 99 ? "99+" : cartCount}
               </span>
             )}

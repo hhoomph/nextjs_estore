@@ -20,15 +20,14 @@ import { useGuestCartStore } from "@/lib/stores/guest-cart-store";
 export function useSimplifiedCartSync() {
   const { data: session } = useSession();
 
-  // Use selectors to get specific state values instead of entire store objects
-  const userCartItems = useCartStore((state) => state.items);
-  const userCartItemCount = useCartStore((state) => state.getItemCount());
-  const guestCartItems = useGuestCartStore((state) => state.items);
-  const guestCartItemCount = useGuestCartStore((state) => state.getItemCount());
+  // Use stable, primitive selectors so the hook only re-renders
+  // when the actual data changes (not when the store object reference changes).
+  const userCartItems = useCartStore((state) => state.items ?? []);
+  const guestCartItems = useGuestCartStore((state) => state.items ?? []);
 
-  // Full store references (needed for performing actions)
-  const userCart = useCartStore();
-  const guestCart = useGuestCartStore();
+  // Read counts via getState() inside a memo so the value is always derived
+  // from the latest store snapshot without subscribing to a function reference.
+  // We import the stores at module top, so calling getState() is safe.
 
   // Simple state computation without complex dependencies
   const cartState = useMemo(() => {
@@ -37,36 +36,33 @@ export function useSimplifiedCartSync() {
 
     // Choose cart data based on authentication status
     const items = isAuthenticated ? userCartItems : guestCartItems;
-    const itemCount = isAuthenticated ? userCartItemCount : guestCartItemCount;
+    const itemCount = (items ?? []).reduce(
+      (count: number, item: { quantity: number }) =>
+        count + (item.quantity || 0),
+      0,
+    );
 
     return {
       isAuthenticated,
       userId,
-      items,
+      items: items ?? [],
       itemCount,
       isUsingUserCart: isAuthenticated,
       isUsingGuestCart: !isAuthenticated,
     };
-  }, [
-    session?.user?.id,
-    userCartItems,
-    userCartItemCount,
-    guestCartItems,
-    guestCartItemCount,
-  ]);
+  }, [session?.user?.id, userCartItems, guestCartItems]);
 
   // Simple merge function without circular dependencies
   const mergeGuestToUser = useCallback(async () => {
-    const userCart = useCartStore();
-    const guestCart = useGuestCartStore();
-
     if (!cartState.isAuthenticated || !cartState.userId) return;
 
-    const guestItems = guestCart.items;
+    const guestItems = useGuestCartStore.getState().items ?? [];
     if (guestItems.length === 0) return;
 
     // Simple merge logic
     try {
+      const userCart = useCartStore.getState();
+
       for (const item of guestItems) {
         // Convert guest cart item to user cart format
         userCart.addItem({
@@ -79,7 +75,7 @@ export function useSimplifiedCartSync() {
       }
 
       // Clear guest cart after successful merge
-      guestCart.clearCart();
+      useGuestCartStore.getState().clearCart();
 
       console.log(`Merged ${guestItems.length} guest cart items to user cart`);
     } catch (error) {
@@ -89,16 +85,20 @@ export function useSimplifiedCartSync() {
 
   // Trigger merge when user logs in
   useEffect(() => {
-    const guestCart = useGuestCartStore.getState();
-    if (cartState.isAuthenticated && guestCart.items.length > 0) {
-      mergeGuestToUser();
+    if (cartState.isAuthenticated) {
+      const guestItems = useGuestCartStore.getState().items ?? [];
+      if (guestItems.length > 0) {
+        mergeGuestToUser();
+      }
     }
   }, [cartState.isAuthenticated, mergeGuestToUser]);
 
   return {
     ...cartState,
     mergeGuestToUser,
-    currentCart: cartState.isAuthenticated ? userCart : guestCart,
+    currentCart: cartState.isAuthenticated
+      ? useCartStore.getState()
+      : useGuestCartStore.getState(),
   };
 }
 

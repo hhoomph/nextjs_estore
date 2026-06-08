@@ -72,22 +72,44 @@ export function CartSidebar({
   const { data: session } = useSession();
   const { isSyncing, error } = useCartSync();
 
-  // Always call hooks at the top level - never conditionally
-  const authenticatedCart = useCartStore();
-  const guestCart = useGuestCartStore();
+  // Use explicit per-field selectors with safe defaults so the component
+  // is resilient to partial store rehydration during SSR.
+  const userItems = useCartStore((s) => s.items ?? []);
+  const userIsOpen = useCartStore((s) => s.isOpen);
+  const userSetCartOpen = useCartStore((s) => s.setCartOpen);
+  const userRemoveItem = useCartStore((s) => s.removeItem);
+  const userUpdateQuantity = useCartStore((s) => s.updateQuantity);
+
+  const guestItems = useGuestCartStore((s) => s.items ?? []);
+  const guestIsOpen = useGuestCartStore((s) => s.isOpen);
+  const guestSetCartOpen = useGuestCartStore((s) => s.setCartOpen);
+  const guestRemoveItem = useGuestCartStore((s) => s.removeItem);
+  const guestUpdateQuantity = useGuestCartStore((s) => s.updateQuantity);
+  const guestIsLoading = useGuestCartStore((s) => s.isLoading);
 
   const isGuest = !session?.user;
-  const cartData = isGuest ? guestCart : authenticatedCart;
-  const { isOpen, setCartOpen } = cartData; // Use the same cart store for both items and open state
-
-  const { items, removeItem, updateQuantity, getTotal, getItemCount } =
-    cartData;
+  const items = isGuest ? guestItems : userItems;
+  const isOpen = isGuest ? guestIsOpen : userIsOpen;
+  const setCartOpen = isGuest ? guestSetCartOpen : userSetCartOpen;
+  const removeItem = isGuest ? guestRemoveItem : userRemoveItem;
+  const updateQuantity = isGuest
+    ? guestUpdateQuantity
+    : userUpdateQuantity;
 
   // Only guest cart has isLoading
-  const isLoading = isGuest ? guestCart.isLoading : false;
+  const isLoading = isGuest ? guestIsLoading : false;
 
-  const total = getTotal();
-  const itemCount = getItemCount();
+  // Compute totals defensively from the items array we already have
+  const total = (items ?? []).reduce((sum, item) => {
+    const price = item.product.discount_price || item.product.price;
+    const optionPrice = item.options?.price_increment || 0;
+    return sum + (price + optionPrice) * item.quantity;
+  }, 0);
+  const itemCount = (items ?? []).reduce(
+    (count, item) => count + (item.quantity || 0),
+    0,
+  );
+  const safeItems = items ?? [];
 
   // Get theme-aware classes
   const bgClasses = getThemeAwareBackgroundClasses();

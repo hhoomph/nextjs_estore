@@ -109,15 +109,17 @@ class CartStorage {
     if (typeof window === "undefined") return;
 
     try {
+      const safeItems = state.items ?? [];
+      const safePendingUpdates = state.pendingUpdates ?? [];
       const dataToStore = {
-        items: state.items.map((item) => ({
+        items: safeItems.map((item) => ({
           ...item,
           addedAt: item.addedAt.toISOString(),
           updatedAt: item.updatedAt.toISOString(),
         })),
         guestId: state.guestId,
         lastSync: state.lastSync.toISOString(),
-        pendingUpdates: state.pendingUpdates.map((update) => ({
+        pendingUpdates: safePendingUpdates.map((update) => ({
           ...update,
           timestamp: update.timestamp.toISOString(),
         })),
@@ -547,12 +549,14 @@ export const useGuestCartStore = create<GuestCartStore>()(
         // Utility operations
         getItemCount: () => {
           const { items } = get();
-          return items.reduce((count, item) => count + item.quantity, 0);
+          const safeItems = items ?? [];
+          return safeItems.reduce((count, item) => count + item.quantity, 0);
         },
 
         getTotal: () => {
           const { items } = get();
-          return items.reduce((total, item) => {
+          const safeItems = items ?? [];
+          return safeItems.reduce((total, item) => {
             const price = item.product.discount_price || item.product.price;
             const optionPrice = item.options?.price_increment || 0;
             return total + (price + optionPrice) * item.quantity;
@@ -620,11 +624,11 @@ export const useGuestCartStore = create<GuestCartStore>()(
             if (stored) {
               return {
                 state: {
-                  items: stored.items || [],
+                  items: stored.items ?? [],
                   guestId: stored.guestId || CartStorage.getGuestId(),
                   isGuest: true,
                   lastSync: stored.lastSync || new Date(),
-                  pendingUpdates: stored.pendingUpdates || [],
+                  pendingUpdates: stored.pendingUpdates ?? [],
                   isLoading: false,
                   error: undefined,
                 },

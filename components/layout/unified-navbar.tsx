@@ -75,6 +75,7 @@ export function UnifiedNavbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [siteTitle, setSiteTitle] = useState("E-Store");
   const [mounted, setMounted] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
   const [messagesOpen, setMessagesOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [categories, setCategories] = useState<CategoryItem[]>([]);
@@ -110,6 +111,14 @@ export function UnifiedNavbar() {
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  // Track hydration so badges that depend on persisted (localStorage) state
+  // do not flash on the first client paint, eliminating the SSR/CSR
+  // hydration mismatch where the server renders no badge but the client
+  // renders the badge immediately after hydration.
+  useEffect(() => {
+    setHydrated(true);
   }, []);
 
   useEffect(() => {
@@ -267,10 +276,14 @@ export function UnifiedNavbar() {
           <Link
             href="/wishlist"
             className="relative p-2 hover:bg-accent rounded-md transition-colors"
+            suppressHydrationWarning={true}
           >
             <Heart className="h-4 w-4" />
-            {wishlistCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+            {hydrated && wishlistCount > 0 && (
+              <span
+                className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                suppressHydrationWarning={true}
+              >
                 {wishlistCount > 99 ? "99+" : wishlistCount}
               </span>
             )}
@@ -280,10 +293,14 @@ export function UnifiedNavbar() {
           <Link
             href="/cart"
             className="relative p-2 hover:bg-accent rounded-md transition-colors"
+            suppressHydrationWarning={true}
           >
             <ShoppingCart className="h-4 w-4" />
-            {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+            {hydrated && cartCount > 0 && (
+              <span
+                className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                suppressHydrationWarning={true}
+              >
                 {cartCount > 99 ? "99+" : cartCount}
               </span>
             )}

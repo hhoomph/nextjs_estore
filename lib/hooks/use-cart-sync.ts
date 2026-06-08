@@ -21,8 +21,21 @@ import type { EnhancedCartItem, UseCartSyncReturn } from "@/types/cart";
 
 export function useCartSync(): UseCartSyncReturn {
   const { data: session, isPending } = useSession();
-  const guestCart = useGuestCartStore();
-  const userCart = useCartStore();
+
+  // Use explicit per-field selectors instead of bare `useStore()` so the
+  // hook stays resilient when the store is partially hydrated (e.g. items
+  // is `undefined` on the very first render during SSR/rehydration).
+  const guestItems = useGuestCartStore((s) => s.items ?? []);
+  const guestIsOpen = useGuestCartStore((s) => s.isOpen);
+  const guestIsLoading = useGuestCartStore((s) => s.isLoading);
+  const guestError = useGuestCartStore((s) => s.error);
+  const guestPendingUpdates = useGuestCartStore((s) => s.pendingUpdates ?? []);
+  const guestId = useGuestCartStore((s) => s.guestId);
+  const guestIsGuest = useGuestCartStore((s) => s.isGuest);
+
+  const userItems = useCartStore((s) => s.items ?? []);
+  const userIsOpen = useCartStore((s) => s.isOpen);
+  const userIsLoading = false; // user cart has no loading flag
 
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSync, setLastSync] = useState<Date | null>(null);
@@ -34,8 +47,7 @@ export function useCartSync(): UseCartSyncReturn {
 
   // Memoized user and guest state to prevent unnecessary re-computations
   const userId = session?.user?.id || null;
-  const guestId = guestCart.guestId;
-  const hasGuestItems = guestCart.items.length > 0;
+  const hasGuestItems = guestItems.length > 0;
 
   // Simple sync function without complex dependencies
   const syncCart = useCallback(async () => {
@@ -46,7 +58,7 @@ export function useCartSync(): UseCartSyncReturn {
     setError(null);
 
     try {
-      await guestCart.syncWithServer();
+      await useGuestCartStore.getState().syncWithServer();
       setLastSync(new Date());
     } catch (err) {
       const errorMessage =
@@ -61,7 +73,7 @@ export function useCartSync(): UseCartSyncReturn {
       setIsSyncing(false);
       syncInProgressRef.current = false;
     }
-  }, [guestCart]); // Only depends on guestCart, not other state
+  }, [isSyncing]); // Only depends on isSyncing flag
 
   // Simplified merge function - moved outside useEffect
   const mergeGuestCartToUserCart = useCallback(async () => {
@@ -74,15 +86,15 @@ export function useCartSync(): UseCartSyncReturn {
       setIsSyncing(true);
       setError(null);
 
-      // Get current items at merge time
-      const currentGuestItems = [...guestCart.items];
-      const currentUserItems = userCart.items as EnhancedCartItem[];
-
+      // Get current items at merge time (always read fresh, never cached)
+      const currentGuestItems = useGuestCartStore.getState().items ?? [];
       if (currentGuestItems.length === 0) return;
+
+      const userCartApi = useCartStore.getState();
 
       // Simple merge: add guest items to user cart
       for (const item of currentGuestItems) {
-        userCart.addItem({
+        userCartApi.addItem({
           product_id: item.product_id,
           product_options_id: item.product_options_id,
           product: item.product,
@@ -92,7 +104,7 @@ export function useCartSync(): UseCartSyncReturn {
       }
 
       // Clear guest cart
-      guestCart.clearCart();
+      useGuestCartStore.getState().clearCart();
 
       toast({
         title: "Cart Merged",
@@ -112,7 +124,7 @@ export function useCartSync(): UseCartSyncReturn {
       setIsSyncing(false);
       syncInProgressRef.current = false;
     }
-  }, [userId, guestId, hasGuestItems, guestCart, userCart]); // Simplified dependencies
+  }, [userId, guestId, hasGuestItems]); // Simplified dependencies
 
   // Handle authentication changes - single, focused effect
   useEffect(() => {
@@ -122,13 +134,16 @@ export function useCartSync(): UseCartSyncReturn {
     if (userId && guestId && hasGuestItems && !syncInProgressRef.current) {
       mergeGuestCartToUserCart();
     }
-  }, [userId, isPending]); // Only check auth state changes
+  }, [userId, isPending, guestId, hasGuestItems, mergeGuestCartToUserCart]); // Only check auth state changes
 
   // Auto-sync on visibility change - simplified
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (!document.hidden && guestCart.pendingUpdates.length > 0) {
-        syncCart();
+      if (!document.hidden) {
+        const pending = useGuestCartStore.getState().pendingUpdates ?? [];
+        if (pending.length > 0) {
+          syncCart();
+        }
       }
     };
 
@@ -139,26 +154,29 @@ export function useCartSync(): UseCartSyncReturn {
 
   // Periodic sync - simplified
   useEffect(() => {
-    if (!guestCart.isGuest || guestCart.pendingUpdates.length === 0) return;
+    if (!guestIsGuest) return;
+    const pending = useGuestCartStore.getState().pendingUpdates ?? [];
+    if (pending.length === 0) return;
 
     const interval = setInterval(() => {
       syncCart();
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [syncCart, guestCart.isGuest, guestCart.pendingUpdates.length]);
+  }, [syncCart, guestIsGuest, guestPendingUpdates.length]);
 
   // Online/offline handling - simplified
   useEffect(() => {
     const handleOnline = () => {
-      if (guestCart.pendingUpdates.length > 0) {
+      const pending = useGuestCartStore.getState().pendingUpdates ?? [];
+      if (pending.length > 0) {
         syncCart();
       }
     };
 
     window.addEventListener("online", handleOnline);
     return () => window.removeEventListener("online", handleOnline);
-  }, [syncCart, guestCart.pendingUpdates.length]);
+  }, [syncCart, guestPendingUpdates.length]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -168,6 +186,16 @@ export function useCartSync(): UseCartSyncReturn {
       }
     };
   }, []);
+
+  // Suppress unused-variable warnings by reading these values so the
+  // selector subscriptions stay active and the re-render triggers fire.
+  void guestIsOpen;
+  void userIsOpen;
+  void guestIsLoading;
+  void userIsLoading;
+  void userItems;
+  void guestError;
+  void guestPendingUpdates;
 
   return {
     syncCart,

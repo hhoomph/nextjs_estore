@@ -61,8 +61,8 @@ export const useCartStore = create<CartStore>()(
         cartMergeInProgress: false, // Initialize merge progress flag
 
         addItem: (newItem) => {
-          const { items } = get();
-          const existingItemIndex = items.findIndex(
+          const safeItems = get().items ?? [];
+          const existingItemIndex = safeItems.findIndex(
             (item) =>
               item.product_id === newItem.product_id &&
               item.product_options_id === newItem.product_options_id,
@@ -70,7 +70,7 @@ export const useCartStore = create<CartStore>()(
 
           if (existingItemIndex >= 0) {
             // Update quantity of existing item
-            const updatedItems = [...items];
+            const updatedItems = [...safeItems];
             updatedItems[existingItemIndex].quantity += newItem.quantity || 1;
             updatedItems[existingItemIndex].updatedAt = new Date();
             set({ items: updatedItems }); // Removed auto-opening of cart sidebar
@@ -90,7 +90,7 @@ export const useCartStore = create<CartStore>()(
               isPersisted: false,
             };
             set({
-              items: [...items, cartItem],
+              items: [...safeItems, cartItem],
               // Removed isOpen: true to prevent auto-opening of cart sidebar
             });
             toast({
@@ -103,7 +103,7 @@ export const useCartStore = create<CartStore>()(
 
         removeItem: (id) => {
           set((state) => ({
-            items: state.items.filter((item) => item.id !== id),
+            items: (state.items ?? []).filter((item) => item.id !== id),
           }));
         },
 
@@ -114,7 +114,7 @@ export const useCartStore = create<CartStore>()(
           }
 
           set((state) => ({
-            items: state.items.map((item) =>
+            items: (state.items ?? []).map((item) =>
               item.id === id ? { ...item, quantity } : item,
             ),
           }));
@@ -136,7 +136,7 @@ export const useCartStore = create<CartStore>()(
           set({ billingSameAsShipping: same }),
 
         getTotal: () => {
-          const { items } = get();
+          const items = get().items ?? [];
           return items.reduce((total, item) => {
             const price = item.product.discount_price || item.product.price;
             const optionPrice = item.options?.price_increment || 0;
@@ -145,20 +145,22 @@ export const useCartStore = create<CartStore>()(
         },
 
         getItemCount: () => {
-          const { items } = get();
+          const items = get().items ?? [];
           return items.reduce((count, item) => count + item.quantity, 0);
         },
 
         mergeGuestCartWithUser: async (userId) => {
-          const { guestCart, items } = get();
+          const { guestCart } = get();
+          const items = get().items ?? [];
+          const safeGuestCart = guestCart ?? [];
 
-          if (guestCart.length === 0) return;
+          if (safeGuestCart.length === 0) return;
 
           try {
             // Merge guest cart with user cart
             const mergedItems = [...items];
 
-            guestCart.forEach((guestItem) => {
+            safeGuestCart.forEach((guestItem) => {
               const existingIndex = mergedItems.findIndex(
                 (item) =>
                   item.product_id === guestItem.product_id &&
@@ -197,7 +199,7 @@ export const useCartStore = create<CartStore>()(
 
         syncWithDatabase: async (userId) => {
           try {
-            const { items } = get();
+            const items = get().items ?? [];
 
             // Get current session
             const sessionResponse = await fetch("/api/auth/session");
@@ -239,7 +241,7 @@ export const useCartStore = create<CartStore>()(
 
             // Mark items as persisted
             set((state) => ({
-              items: state.items.map((item) => ({
+              items: (state.items ?? []).map((item) => ({
                 ...item,
                 isPersisted: true,
                 userId: userId,
@@ -254,7 +256,7 @@ export const useCartStore = create<CartStore>()(
       }),
       {
         name: "cart-storage",
-        partialize: (state) => ({ items: state.items }),
+        partialize: (state) => ({ items: state.items ?? [] }),
         // Skip hydration on server side
         skipHydration: typeof window === "undefined",
       },
