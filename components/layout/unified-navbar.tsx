@@ -31,9 +31,18 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { CategoryDropdown } from "@/components/navbar/category-dropdown";
 import { MessageSidebar } from "@/components/features/messages/message-sidebar";
 import { NotificationSidebar } from "@/components/features/notifications/notification-sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+// Mobile category list item interface
+interface CategoryItem {
+  id: string;
+  name: string;
+  productCount: number;
+}
+
 // Use client fetch to avoid importing server actions into client bundle
 import { Button } from "@/components/ui/button";
 import {
@@ -68,6 +77,7 @@ export function UnifiedNavbar() {
   const [mounted, setMounted] = useState(false);
   const [messagesOpen, setMessagesOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
 
   // ALWAYS call hooks at top level - never conditionally
   const { user, isAuthenticated } = useSimplifiedSessionSync();
@@ -81,6 +91,23 @@ export function UnifiedNavbar() {
   // No need to extract locale from pathname for URL generation
 
   // Effects - must be called after all state hooks
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("/api/categories");
+        if (!res.ok) return;
+        const data = await res.json();
+        const activeCategories = (data.categories || []).filter(
+          (cat: CategoryItem) => cat.productCount > 0,
+        );
+        setCategories(activeCategories);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -172,19 +199,14 @@ export function UnifiedNavbar() {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex space-x-6">
+        <nav className="hidden md:flex items-center space-x-6">
           <Link
             href="/products"
             className="text-sm font-medium hover:text-blue-600 transition-colors"
           >
             {t("products")}
           </Link>
-          <Link
-            href="/categories"
-            className="text-sm font-medium hover:text-blue-600 transition-colors"
-          >
-            {t("categories")}
-          </Link>
+          <CategoryDropdown />
           <Link
             href="/deals"
             className="text-sm font-medium hover:text-blue-600 transition-colors"
@@ -373,6 +395,22 @@ export function UnifiedNavbar() {
                   </div>
                 </form>
 
+                {/* Mobile User Info */}
+                {isAuthenticated && (
+                  <div className="flex items-center space-x-3 px-4 py-3 bg-accent/50 rounded-lg">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
+                      <AvatarFallback className="bg-blue-600/10 text-blue-600">
+                        {user?.name?.charAt(0).toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{user?.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Mobile Navigation */}
                 <nav className="flex flex-col space-y-2">
                   <Link
@@ -381,12 +419,23 @@ export function UnifiedNavbar() {
                   >
                     Products
                   </Link>
-                  <Link
-                    href="/categories"
-                    className="flex items-center py-2 px-4 text-sm font-medium hover:bg-accent rounded-md"
-                  >
-                    Categories
-                  </Link>
+                  <div className="flex flex-col space-y-1">
+                    <Link
+                      href="/categories"
+                      className="flex items-center py-2 px-4 text-sm font-medium hover:bg-accent rounded-md"
+                    >
+                      All Categories
+                    </Link>
+                    {categories.map((cat: CategoryItem) => (
+                      <Link
+                        key={cat.id}
+                        href={`/categories/${cat.id}`}
+                        className="flex items-center py-1.5 px-8 text-sm text-muted-foreground hover:text-foreground hover:bg-accent rounded-md"
+                      >
+                        {cat.name} ({cat.productCount})
+                      </Link>
+                    ))}
+                  </div>
                   <Link
                     href="/deals"
                     className="flex items-center py-2 px-4 text-sm font-medium hover:bg-accent rounded-md"
@@ -400,13 +449,55 @@ export function UnifiedNavbar() {
                     <Heart className="mr-2 h-4 w-4" />
                     Wishlist
                   </Link>
-                  <Link
-                    href="/account"
-                    className="flex items-center py-2 px-4 text-sm font-medium hover:bg-accent rounded-md"
-                  >
-                    <User className="mr-2 h-4 w-4" />
-                    Account
-                  </Link>
+                  {isAuthenticated ? (
+                    <>
+                      <Link
+                        href="/account"
+                        className="flex items-center py-2 px-4 text-sm font-medium hover:bg-accent rounded-md"
+                      >
+                        <User className="mr-2 h-4 w-4" />
+                        Profile
+                      </Link>
+                      <Link
+                        href="/orders"
+                        className="flex items-center py-2 px-4 text-sm font-medium hover:bg-accent rounded-md"
+                      >
+                        <Package className="mr-2 h-4 w-4" />
+                        Orders
+                      </Link>
+                      <Link
+                        href="/settings"
+                        className="flex items-center py-2 px-4 text-sm font-medium hover:bg-accent rounded-md"
+                      >
+                        <Settings className="mr-2 h-4 w-4" />
+                        Settings
+                      </Link>
+                      {user?.role === "ADMIN" && (
+                        <Link
+                          href="/admin"
+                          className="flex items-center py-2 px-4 text-sm font-medium text-blue-600 hover:bg-accent rounded-md"
+                        >
+                          <Package className="mr-2 h-4 w-4" />
+                          Admin Panel
+                        </Link>
+                      )}
+                      <button
+                        onClick={handleSignOut}
+                        className="flex items-center py-2 px-4 text-sm font-medium text-destructive hover:bg-accent rounded-md text-left"
+                      >
+                        <LogOut className="mr-2 h-4 w-4" />
+                        {t("signOut")}
+                      </button>
+                    </>
+                  ) : (
+                    <Link
+                      href="/account"
+                      className="flex items-center py-2 px-4 text-sm font-medium hover:bg-accent rounded-md"
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      Account
+                    </Link>
+                  )}
                 </nav>
               </div>
             </SheetContent>

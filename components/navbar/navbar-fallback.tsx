@@ -342,6 +342,22 @@ export function NavbarFallback() {
                   </div>
                 </form>
 
+                {/* Mobile User Info */}
+                {isAuthenticated && (
+                  <div className="flex items-center space-x-3 px-4 py-3 bg-accent/50 rounded-lg">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
+                      <AvatarFallback className="bg-blue-600/10 text-blue-600">
+                        {user?.name?.charAt(0).toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{user?.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Mobile Navigation */}
                 <nav className="flex flex-col space-y-2">
                   <Link
@@ -369,13 +385,55 @@ export function NavbarFallback() {
                     <Heart className="mr-2 h-4 w-4" />
                     {translations.wishlist}
                   </Link>
-                  <Link
-                    href="/account"
-                    className="flex items-center py-2 px-4 text-sm font-medium hover:bg-accent rounded-md"
-                  >
-                    <User className="mr-2 h-4 w-4" />
-                    {translations.account}
-                  </Link>
+                  {isAuthenticated ? (
+                    <>
+                      <Link
+                        href="/account"
+                        className="flex items-center py-2 px-4 text-sm font-medium hover:bg-accent rounded-md"
+                      >
+                        <User className="mr-2 h-4 w-4" />
+                        Profile
+                      </Link>
+                      <Link
+                        href="/orders"
+                        className="flex items-center py-2 px-4 text-sm font-medium hover:bg-accent rounded-md"
+                      >
+                        <Package className="mr-2 h-4 w-4" />
+                        Orders
+                      </Link>
+                      <Link
+                        href="/settings"
+                        className="flex items-center py-2 px-4 text-sm font-medium hover:bg-accent rounded-md"
+                      >
+                        <Settings className="mr-2 h-4 w-4" />
+                        Settings
+                      </Link>
+                      {user?.role === "ADMIN" && (
+                        <Link
+                          href="/admin"
+                          className="flex items-center py-2 px-4 text-sm font-medium text-blue-600 hover:bg-accent rounded-md"
+                        >
+                          <Package className="mr-2 h-4 w-4" />
+                          {translations.adminPanel}
+                        </Link>
+                      )}
+                      <button
+                        onClick={handleSignOut}
+                        className="flex items-center py-2 px-4 text-sm font-medium text-destructive hover:bg-accent rounded-md text-left"
+                      >
+                        <LogOut className="mr-2 h-4 w-4" />
+                        {translations.signOut}
+                      </button>
+                    </>
+                  ) : (
+                    <Link
+                      href="/account"
+                      className="flex items-center py-2 px-4 text-sm font-medium hover:bg-accent rounded-md"
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      {translations.account}
+                    </Link>
+                  )}
                 </nav>
               </div>
             </SheetContent>

@@ -7,13 +7,16 @@
  */
 "use client";
 
-import { Mail, Package, Phone } from "lucide-react";
+import { LayoutDashboard, Package, User } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 // Use client-side API route to fetch settings to avoid importing server actions
 import { IranSansLoader } from "@/components/features/persian-font-loader";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useSimplifiedSessionSync } from "@/lib/hooks/use-simplified-session-sync";
 
 export function Footer() {
+  const { user, isAuthenticated } = useSimplifiedSessionSync();
   const [siteTitle, setSiteTitle] = useState("E-Store");
   const [contactInfo, setContactInfo] = useState({
     phone: "",
@@ -110,40 +113,91 @@ export function Footer() {
             </div>
             <div>
               <h3 className="font-semibold mb-4 font-persian">Account</h3>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link
-                    href="/auth/signin"
-                    className="text-muted-foreground hover:text-foreground font-persian"
-                  >
-                    Sign In
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/auth/signup"
-                    className="text-muted-foreground hover:text-foreground font-persian"
-                  >
-                    Sign Up
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/orders"
-                    className="text-muted-foreground hover:text-foreground font-persian"
-                  >
-                    Orders
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/wishlist"
-                    className="text-muted-foreground hover:text-foreground font-persian"
-                  >
-                    Wishlist
-                  </Link>
-                </li>
-              </ul>
+              {isAuthenticated ? (
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center space-x-2 mb-3">
+                    <Avatar className="h-6 w-6">
+                      <AvatarFallback className="bg-blue-600/10 text-blue-600 text-xs">
+                        {user?.name?.charAt(0).toUpperCase() || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="font-medium text-foreground font-persian">
+                      {user?.name || "User"}
+                    </span>
+                  </li>
+                  <li>
+                    <Link
+                      href="/account"
+                      className="text-muted-foreground hover:text-foreground font-persian"
+                    >
+                      <User className="inline-block h-3 w-3 mr-1" />
+                      Profile
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/orders"
+                      className="text-muted-foreground hover:text-foreground font-persian"
+                    >
+                      Orders
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/wishlist"
+                      className="text-muted-foreground hover:text-foreground font-persian"
+                    >
+                      Wishlist
+                    </Link>
+                  </li>
+                  {user?.role === "ADMIN" && (
+                    <li>
+                      <Link
+                        href="/admin"
+                        className="text-blue-600 hover:text-blue-700 font-persian font-medium"
+                      >
+                        <LayoutDashboard className="inline-block h-3 w-3 mr-1" />
+                        Dashboard
+                      </Link>
+                    </li>
+                  )}
+                </ul>
+              ) : (
+                <ul className="space-y-2 text-sm">
+                  <li>
+                    <Link
+                      href="/auth/signin"
+                      className="text-muted-foreground hover:text-foreground font-persian"
+                    >
+                      Sign In
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/auth/signup"
+                      className="text-muted-foreground hover:text-foreground font-persian"
+                    >
+                      Sign Up
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/orders"
+                      className="text-muted-foreground hover:text-foreground font-persian"
+                    >
+                      Orders
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/wishlist"
+                      className="text-muted-foreground hover:text-foreground font-persian"
+                    >
+                      Wishlist
+                    </Link>
+                  </li>
+                </ul>
+              )}
             </div>
           </div>
           <div className="mt-12 border-t pt-8">
