@@ -93,9 +93,10 @@ export function UnifiedNavbar() {
 
   // Effects - must be called after all state hooks
   useEffect(() => {
+    const controller = new AbortController();
     const fetchCategories = async () => {
       try {
-        const res = await fetch("/api/categories");
+        const res = await fetch("/api/categories", { signal: controller.signal });
         if (!res.ok) return;
         const data = await res.json();
         const activeCategories = (data.categories || []).filter(
@@ -103,10 +104,12 @@ export function UnifiedNavbar() {
         );
         setCategories(activeCategories);
       } catch (error) {
+        if (error instanceof Error && (error.name === "AbortError" || error.message === "Failed to fetch")) return;
         console.error("Failed to fetch categories:", error);
       }
     };
-    fetchCategories();
+    void fetchCategories();
+    return () => controller.abort();
   }, []);
 
   useEffect(() => {
@@ -122,19 +125,22 @@ export function UnifiedNavbar() {
   }, []);
 
   useEffect(() => {
+    const controller = new AbortController();
     const fetchSiteSettings = async () => {
       try {
-        const res = await fetch("/api/admin/settings");
+        const res = await fetch("/api/admin/settings", { signal: controller.signal });
         if (!res.ok) return;
         const result = await res.json();
         if (result?.settings)
           setSiteTitle(result.settings.siteTitleEn || "E-Store");
       } catch (error) {
+        if (error instanceof Error && (error.name === "AbortError" || error.message === "Failed to fetch")) return;
         console.error("Failed to fetch site settings:", error);
       }
     };
 
-    fetchSiteSettings();
+    void fetchSiteSettings();
+    return () => controller.abort();
   }, []);
 
   // Computed values - no hooks here

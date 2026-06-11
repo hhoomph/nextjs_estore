@@ -46,6 +46,24 @@ const SheetOverlay = React.forwardRef<
 });
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
 
+function containsSheetTitle(children: React.ReactNode): boolean {
+  return React.Children.toArray(children).some((child) => {
+    if (!React.isValidElement(child)) return false;
+
+    const typeWithDisplayName = child.type as {
+      displayName?: string;
+    };
+
+    if (typeWithDisplayName.displayName === "DialogTitle") {
+      return true;
+    }
+
+    return containsSheetTitle(
+      (child.props as { children?: React.ReactNode }).children,
+    );
+  });
+}
+
 const sheetVariants = cva(
   "fixed z-50 gap-4 bg-background p-6 shadow-lg border transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
   {
@@ -72,22 +90,39 @@ interface SheetContentProps
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   SheetContentProps
->(({ side = "right", className, children, ...props }, ref) => (
-  <SheetPortal>
-    <SheetOverlay />
-    <SheetPrimitive.Content
-      ref={ref}
-      className={cn(sheetVariants({ side }), className)}
-      {...props}
-    >
-      {children}
-      <SheetPrimitive.Close className="absolute right-3 top-3 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary hover:bg-accent hover:text-accent-foreground z-10">
-        <X className="h-5 w-5 text-muted-foreground hover:text-foreground" />
-        <span className="sr-only">Close</span>
-      </SheetPrimitive.Close>
-    </SheetPrimitive.Content>
-  </SheetPortal>
-));
+>(
+  (
+    {
+      side = "right",
+      className,
+      children,
+      ...props
+    },
+    ref,
+  ) => {
+    const shouldRenderFallbackTitle = !containsSheetTitle(children);
+
+    return (
+      <SheetPortal>
+        <SheetOverlay />
+        <SheetPrimitive.Content
+          ref={ref}
+          className={cn(sheetVariants({ side }), className)}
+          {...props}
+        >
+          {shouldRenderFallbackTitle && (
+            <SheetPrimitive.Title className="sr-only">Sheet</SheetPrimitive.Title>
+          )}
+          {children}
+          <SheetPrimitive.Close className="absolute right-3 top-3 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary hover:bg-accent hover:text-accent-foreground z-10">
+            <X className="h-5 w-5 text-muted-foreground hover:text-foreground" />
+            <span className="sr-only">Close</span>
+          </SheetPrimitive.Close>
+        </SheetPrimitive.Content>
+      </SheetPortal>
+    );
+  },
+);
 SheetContent.displayName = SheetPrimitive.Content.displayName;
 
 const SheetHeader = ({

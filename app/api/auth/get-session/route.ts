@@ -16,23 +16,18 @@ export async function GET(request: NextRequest) {
     });
 
     if (!session) {
-      return NextResponse.json(
-        { error: "No session found" },
-        { status: 401 },
-      );
+      return NextResponse.json({ error: "No session found" }, { status: 401 });
     }
+
+    const user = {
+      ...session.user,
+      role: (session.user as any).role || "USER",
+    };
 
     return NextResponse.json({
       success: true,
-      session: {
-        user: {
-          id: session.user.id,
-          email: session.user.email,
-          name: session.user.name,
-          role: (session.user as any).role || "USER",
-        },
-        expiresAt: session.session.expiresAt,
-      },
+      session: session.session,
+      user,
     });
   } catch (error) {
     console.error("Get session error:", error);

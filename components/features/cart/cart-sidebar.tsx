@@ -7,18 +7,15 @@
  */
 "use client";
 
-import { Minus, Plus, RefreshCw, ShoppingBag, User, X } from "lucide-react";
+import { RefreshCw, ShoppingBag, User, X } from "lucide-react";
 // Lazy load cart item component for bundle optimization
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useTheme } from "next-themes";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FocusTrap, LiveRegion } from "@/components/ui/enhanced-accessibility";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import {
   Sheet,
   SheetContent,
@@ -32,17 +29,10 @@ import { useCartSync } from "@/lib/hooks/use-cart-sync";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { useGuestCartStore } from "@/lib/stores/guest-cart-store";
 import {
-  getEnhancedBackdropClasses,
-  getEnhancedOverlayClasses,
-  getOverlayTextClasses,
-  isDarkTheme,
-} from "@/lib/utils/overlay-utils";
-import {
-  getThemeAwareBackgroundClasses,
   getThemeAwareBorderClasses,
   getThemeAwareTextClasses,
 } from "@/lib/utils/theme-utils";
-import { type CartSidebarProps, EnhancedCartItem } from "@/types/cart";
+import { type CartSidebarProps } from "@/types/cart";
 
 const CartItem = dynamic(
   () => import("./cart-item").then((mod) => ({ default: mod.CartItem })),
@@ -64,10 +54,7 @@ const CartItem = dynamic(
   },
 );
 
-export function CartSidebar({
-  theme,
-  animations = true,
-}: CartSidebarProps = {}) {
+export function CartSidebar({}: CartSidebarProps = {}) {
   const t = useTranslations("Cart Sidebar");
   const { data: session } = useSession();
   const { isSyncing, error } = useCartSync();
@@ -109,10 +96,7 @@ export function CartSidebar({
     (count, item) => count + (item.quantity || 0),
     0,
   );
-  const safeItems = items ?? [];
-
   // Get theme-aware classes
-  const bgClasses = getThemeAwareBackgroundClasses();
   const textClasses = getThemeAwareTextClasses();
   const borderClasses = getThemeAwareBorderClasses();
 
@@ -122,8 +106,6 @@ export function CartSidebar({
         side="right"
         className={`w-full sm:max-w-lg flex flex-col bg-background text-foreground border-border`}
         data-testid="cart-sidebar"
-        aria-labelledby="cart-sidebar-title"
-        aria-describedby="cart-sidebar-description"
       >
         <FocusTrap onEscape={() => setCartOpen(false)}>
           <SheetHeader
@@ -141,10 +123,7 @@ export function CartSidebar({
                 <span className="sr-only">{t("closeButton")}</span>
               </Button>
             </div>
-            <SheetTitle
-              id="cart-sidebar-title"
-              className="flex items-center justify-center pt-2"
-            >
+            <SheetTitle className="flex items-center justify-center pt-2">
               <div className="flex items-center gap-2">
                 <ShoppingBag
                   className="h-5 w-5 text-primary"
@@ -183,7 +162,7 @@ export function CartSidebar({
                 </div>
               )}
             </SheetTitle>
-            <SheetDescription id="cart-sidebar-description" className="sr-only">
+            <SheetDescription className="sr-only">
               {isGuest ? t("guestDescription") : t("authenticatedDescription")}
             </SheetDescription>
             {error && (

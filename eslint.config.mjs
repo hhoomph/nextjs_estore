@@ -20,7 +20,20 @@ const eslintConfig = defineConfig([
       "out/**",
       "build/**",
       "next-env.d.ts",
+      ".kilo/**",
+      ".github/**",
+      ".specsmd/**",
+      "test-results/**",
+      "playwright-report/**",
+      "playwright-smoke-report/**",
     ],
+  },
+  {
+    settings: {
+      react: {
+        version: "19.2",
+      },
+    },
   },
 ]);
 

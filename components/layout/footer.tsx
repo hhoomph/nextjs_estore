@@ -25,9 +25,10 @@ export function Footer() {
 
   // Fetch site settings for dynamic title
   useEffect(() => {
+    const controller = new AbortController();
     const fetchSiteSettings = async () => {
       try {
-        const res = await fetch("/api/admin/settings");
+        const res = await fetch("/api/admin/settings", { signal: controller.signal });
         if (!res.ok) return;
         const result = await res.json();
         if (result?.settings) {
@@ -38,11 +39,13 @@ export function Footer() {
           });
         }
       } catch (error) {
+        if (error instanceof Error && (error.name === "AbortError" || error.message === "Failed to fetch")) return;
         console.error("Failed to fetch site settings for footer:", error);
       }
     };
 
-    fetchSiteSettings();
+    void fetchSiteSettings();
+    return () => controller.abort();
   }, []);
 
   return (

@@ -76,6 +76,30 @@ const navGroups: Record<string, { label: string }> = {
   settings: { label: "Settings" },
 };
 const groupOrder = ["dashboard", "commerce", "content", "users", "settings"];
+
+/**
+ * Normalize the Better Auth session shape into a single user record.
+ *
+ * Better Auth's client returns a flat `{ user, session }` shape, but
+ * older SSR helpers can still wrap it as `{ session: { user } }`. This
+ * helper accepts either and always returns a flat object so the rest of
+ * the admin layout can read `user.name`, `user.email`, `user.role`, etc.
+ * without re-implementing the fallback chain at every call site.
+ */
+function getSessionUser(
+  session: any,
+): { name: string; email: string; image: string; role: string } | null {
+  if (!session) return null;
+  const user = session.user ?? session.session?.user ?? null;
+  if (!user) return null;
+  return {
+    name: user.name ?? "",
+    email: user.email ?? "",
+    image: user.image ?? "",
+    role: user.role ?? "",
+  };
+}
+
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const { data: session, isPending } = useSession();
   const router = useRouter();
@@ -97,13 +121,12 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   // Handle redirects via useEffect — only AFTER session has been fetched
   useEffect(() => {
     if (!hasFetchedSession.current || isPending || isSignInPage) return;
-    const userObj = (session?.user as any) || (session?.session as any)?.user;
-    const userRole = userObj?.role;
+    const userObj = getSessionUser(session);
     if (!userObj) {
       router.push("/admin/signin");
       return;
     }
-    if (userRole !== "ADMIN") {
+    if (userObj.role !== "ADMIN") {
       router.push("/");
       return;
     }
@@ -147,12 +170,14 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-  // Extract user from session — better-auth may return { user, session } or { session: { user } }
-  const userObj = (session?.user as any) || (session?.session as any)?.user;
-  const userRole = userObj?.role;
-  const isAdmin = userRole === "ADMIN";
-  // Helper to get user property safely
-  const getUser = (key: string) => userObj?.[key] ?? "";
+  // Extract user from session — uses the helper above so the
+  // `user` / `session.user` / `session.session.user` fallback chain
+  // lives in exactly one place.
+  const userObj = getSessionUser(session);
+  const isAdmin = userObj?.role === "ADMIN";
+  // `getUser` is retained for any future use; `userObj` is a
+  // guaranteed-shape object now, so direct property access is safe.
+  void userObj;
   // Show loading while redirect is in progress
   if (!userObj || !isAdmin) {
     return (
@@ -291,14 +316,14 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                     >
                       <Avatar className="h-8 w-8">
                         <AvatarImage
-                          src={(session?.session as any)?.user?.image || (session?.user as any)?.image || ""}
-                          alt={(session?.session as any)?.user?.name || (session?.user as any)?.name || ""}
+                          src={userObj.image}
+                          alt={userObj.name}
                           loading="lazy"
                         />
                         <AvatarFallback
                           className={cn(navbarClasses.avatar.text, "font-medium")}
                         >
-                          {((session?.session as any)?.user?.name || (session?.user as any)?.name || "A").charAt(0).toUpperCase()}
+                          {(userObj.name || "A").charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
@@ -311,16 +336,16 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none text-slate-100">
-                          {(session?.session as any)?.user?.name || (session?.user as any)?.name || ""}
+                          {userObj.name}
                         </p>
                         <p className="text-xs leading-none text-slate-400">
-                          {(session?.session as any)?.user?.email || (session?.user as any)?.email || ""}
+                          {userObj.email}
                         </p>
                         <Badge
                           variant="secondary"
                           className="w-fit text-xs bg-slate-700 text-slate-300"
                         >
-                          {(session?.session as any)?.user?.role || (session?.user as any)?.role || ""}
+                          {userObj.role}
                         </Badge>
                       </div>
                     </DropdownMenuLabel>

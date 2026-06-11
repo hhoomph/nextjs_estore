@@ -35,10 +35,11 @@ export function CategoryDropdown() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const controller = new AbortController();
     const fetchCategories = async () => {
       try {
-        const res = await fetch("/api/categories");
-        if (!res.ok) throw new Error("Failed to fetch categories");
+        const res = await fetch("/api/categories", { signal: controller.signal });
+        if (!res.ok) return;
         const data = await res.json();
         // Filter to only categories that have active products
         const activeCategories = (data.categories || []).filter(
@@ -46,12 +47,14 @@ export function CategoryDropdown() {
         );
         setCategories(activeCategories);
       } catch (error) {
+        if (error instanceof Error && (error.name === "AbortError" || error.message === "Failed to fetch")) return;
         console.error("Failed to fetch categories:", error);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchCategories();
+    void fetchCategories();
+    return () => controller.abort();
   }, []);
 
   return (

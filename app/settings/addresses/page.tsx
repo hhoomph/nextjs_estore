@@ -39,13 +39,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSession } from "@/lib/auth-client";
 
 export default function AddressesPage() {
-  // Prevent prerendering during build time - return early
-  if (typeof window === "undefined") {
-    return null;
-  }
-
   const { data: session, isPending } = useSession();
   const [activeTab, setActiveTab] = useState("list");
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState<any>(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -71,6 +71,10 @@ export default function AddressesPage() {
     setEditingAddress(null);
     setRefreshKey((prev) => prev + 1); // Trigger refresh
   };
+
+  if (!isClient) {
+    return null;
+  }
 
   if (isPending) {
     return (

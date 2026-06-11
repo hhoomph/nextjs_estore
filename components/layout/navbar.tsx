@@ -63,9 +63,14 @@ export function Navbar() {
   const [mounted, setMounted] = useState(false); // Track hydration state
   const [siteTitle, setSiteTitle] = useState("E-Store");
   const router = useRouter();
-  const { getItemCount, toggleCart } = useCartStore();
-  const { getItemCount: getWishlistCount } = useWishlistStore();
-  const { getItemCount: getGuestCartCount } = useGuestCartStore();
+  const getItemCount = useCartStore((state) => state.getItemCount ?? (() => 0));
+  const toggleCart = useCartStore((state) => state.toggleCart ?? (() => {}));
+  const getWishlistCount = useWishlistStore(
+    (state) => state.getItemCount ?? (() => 0),
+  );
+  const getGuestCartCount = useGuestCartStore(
+    (state) => state.getItemCount ?? (() => 0),
+  );
   const { theme, setTheme } = useTheme();
 
   // Locale is handled via cookies in this project (localePrefix: "never")

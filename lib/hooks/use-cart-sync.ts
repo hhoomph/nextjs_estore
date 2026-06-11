@@ -207,16 +207,24 @@ export function useCartSync(): UseCartSyncReturn {
 
 /**
  * Simplified checkout session management
+ *
+ * Uses an explicit per-field selector for `guestId` instead of a bare
+ * `useGuestCartStore()` call, so the hook stays resilient when the store
+ * is partially hydrated (e.g. during SSR/rehydration `items` may briefly
+ * be `undefined`).
  */
 export function useCheckoutSession() {
   const { data: session } = useSession();
-  const guestCart = useGuestCartStore();
+  // Per-field selector — subscribe only to the slice we actually use so
+  // re-renders stay narrow and the component does not depend on the
+  // entire store reference.
+  const guestId = useGuestCartStore((s) => s.guestId);
 
   const createCheckoutSession = useCallback(
     (cartItems: EnhancedCartItem[]) => {
       const checkoutSession = {
         id: `checkout_${Date.now()}`,
-        guestId: guestCart.guestId,
+        guestId,
         userId: session?.user?.id,
         items: cartItems,
         expiresAt: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes
@@ -230,7 +238,7 @@ export function useCheckoutSession() {
       );
       return checkoutSession;
     },
-    [guestCart.guestId, session?.user?.id],
+    [guestId, session?.user?.id],
   );
 
   const getCheckoutSession = useCallback(() => {
@@ -284,14 +292,21 @@ export function useCheckoutSession() {
 
 /**
  * Simple conflict resolution
+ *
+ * Uses a single per-field selector for `resolveConflicts` and reads the
+ * latest function reference from `useGuestCartStore.getState()` inside
+ * the callback. This avoids the bare-`useGuestCartStore()` hydration
+ * hazard and keeps the dependency array stable.
  */
 export function useCartConflicts() {
-  const guestCart = useGuestCartStore();
+  const resolveConflicts = useGuestCartStore((s) => s.resolveConflicts);
 
-  const resolveConflicts = useCallback(
+  const handleResolveConflicts = useCallback(
     async (conflicts: any[]) => {
       try {
-        await guestCart.resolveConflicts(conflicts);
+        // Always read the latest action from the store so we never close
+        // over a stale reference if the store was swapped during HMR.
+        await useGuestCartStore.getState().resolveConflicts(conflicts);
         toast({
           title: "Conflicts Resolved",
           description: "Cart conflicts have been resolved",
@@ -305,23 +320,25 @@ export function useCartConflicts() {
         });
       }
     },
-    [guestCart],
+    [resolveConflicts],
   );
 
   return {
-    resolveConflicts,
+    resolveConflicts: handleResolveConflicts,
   };
 }
 
 /**
  * Simple cart validation
+ *
+ * Same per-field-selector + getState() pattern as `useCartConflicts`.
  */
 export function useCartValidation() {
-  const guestCart = useGuestCartStore();
+  const validateCartFn = useGuestCartStore((s) => s.validateCart);
 
   const validateCart = useCallback(async () => {
     try {
-      const result = await guestCart.validateCart();
+      const result = await useGuestCartStore.getState().validateCart();
 
       if (!result.isValid) {
         toast({
@@ -340,7 +357,7 @@ export function useCartValidation() {
       });
       return { isValid: false, errors: ["Validation failed"] };
     }
-  }, [guestCart]);
+  }, [validateCartFn]);
 
   return {
     validateCart,

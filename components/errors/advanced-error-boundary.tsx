@@ -117,16 +117,16 @@ export class AdvancedErrorBoundary extends Component<
 
   private reportError = async (error: Error, errorInfo: ErrorInfo) => {
     try {
-      // Prepare error report
+      // Prepare error report matching API schema
       const errorReport = {
-        errorId: this.state.errorId,
         message: error.message,
         stack: error.stack,
         componentStack: errorInfo.componentStack,
         timestamp: new Date().toISOString(),
         userAgent: navigator.userAgent,
         url: window.location.href,
-        userId: "anonymous", // Could be replaced with actual user ID
+        retryCount: this.state.retryCount,
+        userId: "anonymous",
       };
 
       // Send to error reporting service (implement based on your service)
@@ -227,6 +227,11 @@ export class AdvancedErrorBoundary extends Component<
                 We encountered an unexpected error. Please try again or contact
                 support if the problem persists.
               </CardDescription>
+              {error?.message && (
+                <pre className="max-h-32 overflow-auto rounded-md bg-muted p-3 text-left text-xs text-destructive">
+                  {error.message}
+                </pre>
+              )}
             </CardHeader>
 
             <CardContent className="space-y-4">

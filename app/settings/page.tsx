@@ -7,7 +7,7 @@
  */
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // Force dynamic rendering to avoid prerendering issues
 export const dynamic = "force-dynamic";
@@ -22,6 +22,7 @@ import {
   Globe,
   Save,
   Shield,
+  LogOut,
   User,
 } from "lucide-react";
 import Link from "next/link";
@@ -37,7 +38,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useSession } from "@/lib/auth-client";
+import { signOut, useSession } from "@/lib/auth-client";
 
 const profileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -59,23 +60,63 @@ type ProfileForm = z.infer<typeof profileSchema>;
 type PasswordForm = z.infer<typeof passwordSchema>;
 
 export default function SettingsPage() {
-  // Prevent prerendering during build time - return early
-  if (typeof window === "undefined") {
-    return null;
-  }
-
   const { data: session } = useSession();
+  const [browserSession, setBrowserSession] = useState<any>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
   const { theme, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState("profile");
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  useEffect(() => {
+    if (session?.user || browserSession?.user) {
+      setBrowserSession(null);
+      return;
+    }
+
+    let cancelled = false;
+    const loadBrowserSession = async () => {
+      try {
+        const response = await fetch("/api/auth/get-session", {
+          credentials: "include",
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        const browserSession = data?.session?.user
+          ? data.session
+          : data?.session && data?.user
+            ? { ...data.session, user: data.user }
+            : null;
+
+        if (!cancelled && browserSession?.user) {
+          setBrowserSession(browserSession);
+        }
+      } catch {
+        // Keep the existing guard UI if the manual session fetch fails.
+      }
+    };
+
+    void loadBrowserSession();
+    const timeoutId = window.setTimeout(loadBrowserSession, 500);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+    };
+  }, [session?.user?.id, browserSession?.user?.id]);
+
+  const effectiveSession = isClient && (session?.user ? session : browserSession);
+
   const profileForm = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: session?.user?.name || "",
-      email: session?.user?.email || "",
+      name: effectiveSession?.user?.name || "",
+      email: effectiveSession?.user?.email || "",
     },
   });
 
@@ -96,7 +137,7 @@ export default function SettingsPage() {
     pushPromotions: false,
   });
 
-  if (!session?.user) {
+  if (!effectiveSession?.user) {
     return (
       <div className="container px-4 py-16 text-center">
         <div className="max-w-md mx-auto">
@@ -118,10 +159,20 @@ export default function SettingsPage() {
     );
   }
 
+  const handleSignOut = async () => {
+    await signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          window.location.href = "/";
+        },
+      },
+    });
+  };
+
   const onProfileSubmit = async (data: ProfileForm) => {
-    if (!session?.user?.id) return;
+    if (!effectiveSession?.user?.id) return;
     try {
-      const response = await fetch(`/api/users/${session.user.id}`, {
+      const response = await fetch(`/api/users/${effectiveSession.user.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -187,6 +238,10 @@ export default function SettingsPage() {
                 Back to Account
               </Link>
             </Button>
+            <Button variant="outline" size="sm" onClick={() => handleSignOut()}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
             <div>
               <h1 className="text-3xl font-bold">Settings</h1>
               <p className="text-muted-foreground">
@@ -219,11 +274,13 @@ export default function SettingsPage() {
                     <div className="flex flex-col items-center">
                       <Avatar className="h-24 w-24">
                         <AvatarImage
-                          src={session.user.image || ""}
-                          alt={session.user.name || ""}
+                          src={effectiveSession.user.image || ""}
+                          alt={effectiveSession.user.name || ""}
                         />
                         <AvatarFallback className="text-2xl">
-                          {session.user.name?.charAt(0).toUpperCase() || "U"}
+                          {effectiveSession.user.name
+                            ?.charAt(0)
+                            .toUpperCase() || "U"}
                         </AvatarFallback>
                       </Avatar>
                       <Button variant="outline" size="sm" className="mt-4">
@@ -276,7 +333,7 @@ export default function SettingsPage() {
 
                       <div className="flex items-center gap-2 pt-4">
                         <Badge variant="secondary">
-                          {session.user.role === "ADMIN"
+                          {effectiveSession.user.role === "ADMIN"
                             ? "Administrator"
                             : "Customer"}
                         </Badge>

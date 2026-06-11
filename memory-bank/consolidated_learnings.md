@@ -89,3 +89,33 @@ When a build fails after package updates, stash changes and build with original 
 
 ### Pattern: @better-auth/kysely-adapter Turbopack build error
 `@better-auth/kysely-adapter` imports `DEFAULT_MIGRATION_LOCK_TABLE`/`DEFAULT_MIGRATION_TABLE` from `kysely@0.29.2` which no longer exports them. Turbopack's static ESM analysis catches this at build time. This is a known compatibility issue between better-auth and kysely versions, not related to package updates.
+
+---
+
+## Cline MCP Server Management
+
+### Pattern: Bypass npx + shebang for stdio MCP servers (Universal Fix)
+If a stdio MCP server fails with `Bun failed to remap this bin` or any shebang-resolution error:
+1. `npm install -g <pkg>@latest`
+2. Read `<pkg>/package.json` → `"bin"` field to find the real entry `.js` path
+3. Configure Cline: `command: "node"`, `args: ["<absolute-path-to-entry.js>"]`
+
+**Verified for**: `next-devtools-mcp`, `@magicuidesign/mcp`, `@agentdeskai/browser-tools-mcp`, `byterover-cli`
+
+### Pattern: MCP config source of truth
+`C:\Users\oomph\AppData\Roaming\Code\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json` — not `.vscode/mcp.json`. Cline re-reads it on every server start.
+
+### Pattern: `disabled: true` may not be durable
+Cline resets `disabled` fields back to `false` on reload. The only reliable fix for a server the user wants active is to make it work. Disabling is only appropriate for servers the user does NOT need.
+
+### Pattern: Detecting GitHub repo renames
+If `github.com/org/repo` 404s or the MCP source isn't where the config says, use GitHub's `search_repositories` API to find the current name. Example: `campfirein/cipher` → `campfirein/byterover-cli`.
+
+### Pattern: Streamable-HTTP vs SSE for MCP
+A Cline MCP `type: "sse"` server that returns 405 on GET is Streamable HTTP. Verify with `curl -X POST` + an `initialize` JSON-RPC body. Fix: disable, switch transport, or run `mcp-remote` as stdio→http bridge.
+
+### Pattern: MCP validation via temp file, not `node -e`
+`node -e "..."` with Windows paths + quoting deadlocks in Git Bash MINGW. Persist the script to a file under `scripts/`, run it once.
+
+### Pattern: Rollback backups for Cline MCP config
+Keep three layers: `.pre-mcp-fix.bak`, `.pre-mcp-fix2.bak`, `.pre-mcp-fix3.bak`. Roll back by copying the chosen `.bak` over `cline_mcp_settings.json` and reloading Cline.

@@ -87,7 +87,8 @@ export const useWishlistStore = create<WishlistStore>()(
 
         getItemCount: () => {
           const { items } = get();
-          return items.length;
+          const safeItems = items ?? [];
+          return Math.max(0, safeItems.length);
         },
 
         clearWishlist: () => {
@@ -96,6 +97,7 @@ export const useWishlistStore = create<WishlistStore>()(
       }),
       {
         name: "wishlist-storage",
+        skipHydration: typeof window === "undefined",
       },
     ),
   ),

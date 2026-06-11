@@ -75,19 +75,29 @@ type PaymentFormData = z.infer<typeof paymentSchema>;
 export default function CheckoutPage() {
   const router = useRouter();
   const { data: session, isPending } = useSession();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Determine if user is guest or authenticated
-  const isGuest = !session?.user;
+  const isGuest = !isClient || !session?.user;
   const cartStore = isGuest ? useGuestCartStore() : useCartStore();
-
-  // Prevent prerendering during build time - return early
-  if (typeof window === "undefined") {
-    return null;
-  }
 
   const { items: cartItems, getTotal, clearCart } = cartStore;
 
   const cartTotal = getTotal();
+
+  // Keep the initial client render aligned with the server render.
+  if (!isClient) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <span className="ml-2">Loading...</span>
+      </div>
+    );
+  }
 
   // Loading state while checking authentication
   if (isPending) {

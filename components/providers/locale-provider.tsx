@@ -47,9 +47,10 @@ export function LocaleProvider({
 
   // Sync locale with cookie on mount
   useEffect(() => {
+    const controller = new AbortController();
     const syncLocale = async () => {
       try {
-        const response = await fetch("/api/locale");
+        const response = await fetch("/api/locale", { signal: controller.signal });
         if (response.ok) {
           const data = await response.json();
           if (data.locale && data.locale !== locale) {
@@ -58,11 +59,13 @@ export function LocaleProvider({
         }
       } catch (error) {
         // Silently fail - use initial locale
+        if (error instanceof Error && (error.name === "AbortError" || error.message === "Failed to fetch")) return;
         console.error("Failed to sync locale:", error);
       }
     };
 
-    syncLocale();
+    void syncLocale();
+    return () => controller.abort();
   }, [locale]);
 
   /**

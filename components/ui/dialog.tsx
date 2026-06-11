@@ -55,10 +55,19 @@ const DialogContent = React.forwardRef<
       showCloseButton = true,
       enableFocusTrap = true,
       closeButtonLabel = "Close dialog",
+      ["aria-label"]: ariaLabel,
+      ["aria-labelledby"]: ariaLabelledBy,
       ...props
     },
     ref,
   ) => {
+    const generatedTitleId = React.useId();
+    const hasAriaLabel = typeof ariaLabel === "string" && ariaLabel.trim().length > 0;
+    const hasAriaLabelledBy =
+      typeof ariaLabelledBy === "string" && ariaLabelledBy.trim().length > 0;
+    const hasAccessibleName = hasAriaLabel || hasAriaLabelledBy;
+    const shouldRenderFallbackTitle = !hasAccessibleName;
+
     const content = (
       <DialogPortal>
         <DialogOverlay />
@@ -70,9 +79,22 @@ const DialogContent = React.forwardRef<
           )}
           aria-modal="true"
           role="dialog"
-          aria-describedby={undefined} // Explicitly set to avoid test warnings
+          aria-label={ariaLabel || undefined}
+          aria-labelledby={
+            hasAriaLabelledBy
+              ? ariaLabelledBy
+              : shouldRenderFallbackTitle
+                ? generatedTitleId
+                : undefined
+          }
+          aria-describedby={undefined}
           {...props}
         >
+          {shouldRenderFallbackTitle && (
+            <DialogPrimitive.Title id={generatedTitleId} className="sr-only">
+              {ariaLabel ?? "Dialog"}
+            </DialogPrimitive.Title>
+          )}
           {showCloseButton && (
             <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground z-10">
               <X className="h-4 w-4" />
@@ -140,7 +162,7 @@ const DialogTitle = React.forwardRef<
     {...props}
   />
 ));
-DialogTitle.displayName = DialogPrimitive.Title.displayName;
+DialogTitle.displayName = "DialogTitle";
 
 const DialogDescription = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Description>,

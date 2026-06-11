@@ -208,10 +208,9 @@ export function AdvancedSearch({
         setSuggestions(suggestions);
       }
     } catch (error) {
-      if (error instanceof Error && error.name !== "AbortError") {
-        console.error("Failed to fetch search suggestions:", error);
-        setSuggestions([]);
-      }
+      if (error instanceof Error && (error.name === "AbortError" || error.message === "Failed to fetch")) return;
+      console.error("Failed to fetch search suggestions:", error);
+      setSuggestions([]);
     }
   }, []);
 
@@ -226,19 +225,22 @@ export function AdvancedSearch({
 
   // Fetch trending searches
   useEffect(() => {
+    const controller = new AbortController();
     const fetchTrending = async () => {
       try {
-        const response = await fetch("/api/search/trending");
+        const response = await fetch("/api/search/trending", { signal: controller.signal });
         if (response.ok) {
           const data = await response.json();
           setTrendingSearches(data.trending || []);
         }
       } catch (error) {
+        if (error instanceof Error && (error.name === "AbortError" || error.message === "Failed to fetch")) return;
         console.error("Failed to fetch trending searches:", error);
       }
     };
 
-    fetchTrending();
+    void fetchTrending();
+    return () => controller.abort();
   }, []);
 
   // Handle search submission

@@ -2,26 +2,30 @@
  * Module for route
  *
  * @author hh.oomph@gmail.com
- * @version 1.0.0
+ * @version 1.1.0
  * @since 2025-01-01
  */
 import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/config";
 import { prisma } from "@/lib/database";
 
-// GET /api/dashboard/stats - Get dashboard statistics for admin
+// GET /api/dashboard/stats - Get dashboard statistics for the current user
 export async function GET(request: NextRequest) {
   try {
     const session = await auth.api.getSession({ headers: request.headers });
 
-    if (!session?.user?.id || session.user.role !== "ADMIN") {
+    if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "Unauthorized - Admin access required" },
-        { status: 403 },
+        { error: "Unauthorized - Please sign in" },
+        { status: 401 },
       );
     }
 
-    // Get all statistics in parallel
+    const isAdmin = session.user.role === "ADMIN";
+    const userWhere = isAdmin ? undefined : { userId: session.user.id };
+
+    // Get all statistics in parallel. Non-admin users only receive their own
+    // scoped order data, while admins receive platform-wide analytics.
     const [
       totalUsers,
       totalOrders,
@@ -30,31 +34,42 @@ export async function GET(request: NextRequest) {
       recentOrders,
       lowStockProducts,
     ] = await Promise.all([
-      // Total users
-      prisma.user.count(),
+      // Total users is admin-only data.
+      isAdmin ? prisma.user.count() : Promise.resolve(0),
 
-      // Total orders
-      prisma.order.count(),
+      // Total orders is scoped to the signed-in customer for non-admins.
+      prisma.order.count({ where: userWhere }),
 
-      // Total revenue
+      // Total revenue is scoped to the signed-in customer for non-admins.
       prisma.order.aggregate({
         _sum: {
           total: true,
         },
+        where: userWhere,
       }),
 
-      // Total products
+      // Active products are safe to expose as catalog context for customers.
       prisma.product.count({
         where: { status: 1 },
       }),
 
-      // Recent orders (last 30 days) with details
+      // Recent orders (last 5) with details.
       prisma.order.findMany({
         take: 5,
+        where: userWhere,
         include: {
-          user: {
+          ...(isAdmin
+            ? {
+                user: {
+                  select: {
+                    name: true,
+                  },
+                },
+              }
+            : {}),
+          orderItems: {
             select: {
-              name: true,
+              id: true,
             },
           },
         },
@@ -63,21 +78,23 @@ export async function GET(request: NextRequest) {
         },
       }),
 
-      // Low stock products (less than 10 items) with details
-      prisma.product.findMany({
-        where: {
-          status: 1,
-          quantity: {
-            lt: 10,
-          },
-        },
-        select: {
-          id: true,
-          name: true,
-          quantity: true,
-        },
-        take: 10,
-      }),
+      // Low stock products are admin-only operational data.
+      isAdmin
+        ? prisma.product.findMany({
+            where: {
+              status: 1,
+              quantity: {
+                lt: 10,
+              },
+            },
+            select: {
+              id: true,
+              name: true,
+              quantity: true,
+            },
+            take: 10,
+          })
+        : Promise.resolve([]),
     ]);
 
     const stats = {
@@ -85,11 +102,12 @@ export async function GET(request: NextRequest) {
       totalOrders,
       totalRevenue: Number(totalRevenue._sum.total || 0),
       totalProducts,
-      recentOrders: recentOrders.map((o) => ({
-        id: o.id,
-        total: Number(o.total),
-        createdAt: o.createdAt.toISOString(),
-        user: { name: o.user?.name ?? null },
+      recentOrders: recentOrders.map((order) => ({
+        id: order.id,
+        total: Number(order.total),
+        createdAt: order.createdAt.toISOString(),
+        items: order.orderItems.length,
+        user: isAdmin ? { name: order.user?.name ?? null } : undefined,
       })),
       lowStockProducts,
     };

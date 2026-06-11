@@ -47,7 +47,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
-import { useCartStore } from "@/lib/stores/cart-store";
+import { useCartActions } from "@/lib/hooks/use-simplified-cart-sync";
 
 interface Product {
   id: string;
@@ -320,7 +320,7 @@ export function ProductsPageClient({ initialData }: ProductsPageClientProps) {
     initialData.pagination.total,
   );
 
-  const { addItem } = useCartStore();
+  const { addToCart } = useCartActions();
 
   // Debounce search query to avoid too many API calls
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
@@ -385,8 +385,7 @@ export function ProductsPageClient({ initialData }: ProductsPageClientProps) {
 
   const handleAddToCart = async (product: Product) => {
     try {
-      // Add item to cart store (client-side cart management)
-      addItem({
+      await addToCart({
         product_id: product.id,
         product: {
           id: product.id,

@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * User sign-in page
  *
@@ -5,13 +7,11 @@
  * @version 1.0.0
  * @since 2025-01-01
  */
-"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import type { FormEvent } from "react";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,47 +31,50 @@ type SignInForm = z.infer<typeof signInSchema>;
 export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const router = useRouter();
 
-  const form = useForm<SignInForm>({
-    resolver: zodResolver(signInSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
-
-  const handleSignIn = async (data: SignInForm) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setIsLoading(true);
     setError("");
 
+    const parsed = signInSchema.safeParse({ email, password });
+    if (!parsed.success) {
+      setError(parsed.error.issues[0]?.message || "Please enter a valid email and password.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const result = await authClient.signIn.email({
-        email: data.email,
-        password: data.password,
+      const response = await fetch("/api/auth/sign-in/email", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(parsed.data),
+        signal: AbortSignal.timeout(15_000),
       });
+      const result = (await response.json()) as {
+        error?: { message?: string } | null;
+        user?: { role?: string } | null;
+      } | null;
 
-      if (result.error) {
-        setError(result.error.message || "Sign in failed. Please check your credentials.");
+      if (!response.ok) {
+        setError(result?.error?.message || "Sign in failed. Please check your credentials.");
+        return;
+      }
+
+      // Refresh the Better Auth session atom after the HttpOnly cookie is written.
+      authClient.$store.notify("$sessionSignal");
+
+      // Check if the user has ADMIN role — redirect to admin dashboard
+      if (result?.user?.role === "ADMIN") {
+        router.push("/admin");
       } else {
-        // Refresh session cache so Better Auth's useSession() hook picks up changes immediately
-        await authClient.getSession();
-
-        // Check if the user has ADMIN role — redirect to admin dashboard
-        const user = result.data?.user as any;
-        if (user?.role === "ADMIN") {
-          router.push("/admin");
-          return;
-        }
-
-        // Fallback: fetch session to check role if not immediately available
-        const sessionResult = await authClient.getSession();
-        const sessionUser = sessionResult.data?.user as any;
-        if (sessionUser?.role === "ADMIN") {
-          router.push("/admin");
-        } else {
-          router.push("/account");
-        }
+        router.push("/account");
       }
     } catch {
       setError("An unexpected error occurred. Please try again.");
@@ -104,7 +107,7 @@ export default function SignInPage() {
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={form.handleSubmit(handleSignIn)} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
               <div className="flex items-center space-x-2 p-3 text-sm text-destructive bg-destructive/10 rounded-md">
                 <AlertCircle className="h-4 w-4" />
@@ -118,12 +121,13 @@ export default function SignInPage() {
                 id="email"
                 type="email"
                 placeholder="your@email.com"
-                {...form.register("email")}
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
                 className="focus:ring-primary"
               />
-              {form.formState.errors.email && (
+              {error.includes("email") && (
                 <p className="text-sm text-destructive">
-                  {form.formState.errors.email.message}
+                  Email is required.
                 </p>
               )}
             </div>
@@ -142,19 +146,24 @@ export default function SignInPage() {
                 id="password"
                 type="password"
                 placeholder="Enter your password"
-                {...form.register("password")}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
                 className="focus:ring-primary"
               />
-              {form.formState.errors.password && (
+              {error.includes("Password") && (
                 <p className="text-sm text-destructive">
-                  {form.formState.errors.password.message}
+                  Password must be at least 6 characters.
                 </p>
               )}
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="inline-flex h-10 w-full items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
+            >
               {isLoading ? "Signing in..." : "Sign In"}
-            </Button>
+            </button>
           </form>
 
           <div className="mt-6 text-center text-sm text-muted-foreground">

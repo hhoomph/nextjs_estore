@@ -479,7 +479,7 @@ export const useGuestCartStore = create<GuestCartStore>()(
 
             // Update local state with server response
             set({
-              items: result.items,
+              items: result.syncedItems ?? result.items ?? state.items,
               pendingUpdates: [],
               lastSync: new Date(),
               isLoading: false,
@@ -565,9 +565,10 @@ export const useGuestCartStore = create<GuestCartStore>()(
 
         validateCart: async () => {
           const { items } = get();
+          const safeItems = items ?? [];
           const errors: string[] = [];
 
-          for (const item of items) {
+          for (const item of safeItems) {
             // Basic validation
             if (!CartValidator.validateQuantity(item.quantity)) {
               errors.push(`${item.product.name}: Invalid quantity`);

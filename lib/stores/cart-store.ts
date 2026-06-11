@@ -137,16 +137,22 @@ export const useCartStore = create<CartStore>()(
 
         getTotal: () => {
           const items = get().items ?? [];
-          return items.reduce((total, item) => {
-            const price = item.product.discount_price || item.product.price;
-            const optionPrice = item.options?.price_increment || 0;
-            return total + (price + optionPrice) * item.quantity;
-          }, 0);
+          return Math.max(
+            0,
+            items.reduce((total, item) => {
+              const price = item.product.discount_price || item.product.price;
+              const optionPrice = item.options?.price_increment || 0;
+              return total + (price + optionPrice) * item.quantity;
+            }, 0),
+          );
         },
 
         getItemCount: () => {
           const items = get().items ?? [];
-          return items.reduce((count, item) => count + item.quantity, 0);
+          return Math.max(
+            0,
+            items.reduce((count, item) => count + item.quantity, 0),
+          );
         },
 
         mergeGuestCartWithUser: async (userId) => {
@@ -212,11 +218,26 @@ export const useCartStore = create<CartStore>()(
             const sessionId = session.session.id;
 
             // Clear existing cart items for this user/session
-            await fetch("/api/cart/clear", {
+            const clearResponse = await fetch("/api/cart/clear", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ userId, sessionId }),
             });
+            if (!clearResponse.ok) {
+              // Surface the failure instead of silently swallowing it: the
+              // local cart is about to be re-synced from scratch, so an
+              // unsuccessful clear will leave the user with duplicated
+              // server-side items. Warn loudly but do not abort the merge
+              // — the subsequent /api/cart/sync will still write the
+              // intended set, and the user is told their cart may be out
+              // of sync so they can re-trigger sync manually.
+              console.warn(
+                "[cart] /api/cart/clear returned",
+                clearResponse.status,
+                clearResponse.statusText,
+                "— server-side cart may have stale items after sync.",
+              );
+            }
 
             // Add current items to database
             if (items.length > 0) {

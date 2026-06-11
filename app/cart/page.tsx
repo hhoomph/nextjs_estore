@@ -67,9 +67,11 @@ export default function CartPage() {
     isUsingUserCart,
   } = useCartActions();
 
-  // 4. State hooks - all defined together at the top
+  // 4. State hooks - all defined together at the top.
+  // `mounted` is the only local UI state; `isLoading` was previously
+  // declared but never flipped back to `true` after the initial mount,
+  // so the dead `if (isLoading) return …` branch has been removed.
   const [siteSettings, setSiteSettings] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   // 5. Effect hooks - all defined together at the top
@@ -135,23 +137,6 @@ export default function CartPage() {
     }, 0);
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-muted rounded w-1/4 mb-8"></div>
-            <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-32 bg-muted rounded"></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   const cartItems = items || [];
   const total = calculateTotal();
 
@@ -175,7 +160,11 @@ export default function CartPage() {
                 <ShoppingCart className="h-6 w-6" />
                 <h1 className="text-3xl font-bold">{tNavigation("cart")}</h1>
                 {cartItems.length > 0 && (
-                  <Badge variant="secondary" className="ml-2">
+                  <Badge
+                    variant="secondary"
+                    className="ml-2"
+                    data-testid="cart-item-count"
+                  >
                     {cartItems.length} {tCart("cartItemCount")}
                   </Badge>
                 )}
@@ -187,6 +176,7 @@ export default function CartPage() {
                 variant="outline"
                 onClick={handleClearCart}
                 className="text-destructive hover:text-destructive"
+                data-testid="cart-clear"
               >
                 <Trash2 className="h-4 w-4 mr-2" />
                 {tCart("clearCart")}
@@ -196,7 +186,7 @@ export default function CartPage() {
 
           {/* Cart Content */}
           {cartItems.length === 0 ? (
-            <Card className="text-center py-16">
+            <Card className="text-center py-16" data-testid="cart-empty">
               <CardContent>
                 <ShoppingCart className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
                 <h2 className="text-2xl font-semibold mb-2">
@@ -205,7 +195,10 @@ export default function CartPage() {
                 <p className="text-muted-foreground mb-6">
                   {tCart("cartEmptyMessage")}
                 </p>
-                <Button asChild={true}>
+                <Button
+                  asChild={true}
+                  data-testid="cart-empty-continue-shopping"
+                >
                   <Link href="/products">{tCheckout("continueShopping")}</Link>
                 </Button>
               </CardContent>
@@ -213,7 +206,7 @@ export default function CartPage() {
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Cart Items */}
-              <div className="lg:col-span-2 space-y-4">
+              <div className="lg:col-span-2 space-y-4" data-testid="cart-items">
                 {cartItems.map((item) => {
                   const product = item.product;
                   if (!product) return null;
@@ -222,7 +215,7 @@ export default function CartPage() {
                   const subtotal = price * item.quantity;
 
                   return (
-                    <Card key={item.id}>
+                    <Card key={item.id} data-testid={"cart-item-" + product.id}>
                       <CardContent className="p-6">
                         <div className="flex space-x-4">
                           {/* Product Image */}
@@ -254,10 +247,20 @@ export default function CartPage() {
                                     )
                                   }
                                   disabled={item.quantity <= 1}
+                                  data-testid={
+                                    "cart-item-" +
+                                    product.id +
+                                    "-quantity-decrease"
+                                  }
                                 >
                                   <Minus className="h-3 w-3" />
                                 </Button>
-                                <span className="w-12 text-center">
+                                <span
+                                  className="w-12 text-center"
+                                  data-testid={
+                                    "cart-item-" + product.id + "-quantity"
+                                  }
+                                >
                                   {item.quantity}
                                 </span>
                                 <Button
@@ -268,6 +271,11 @@ export default function CartPage() {
                                       item.id,
                                       item.quantity + 1,
                                     )
+                                  }
+                                  data-testid={
+                                    "cart-item-" +
+                                    product.id +
+                                    "-quantity-increase"
                                   }
                                 >
                                   <Plus className="h-3 w-3" />
@@ -295,6 +303,7 @@ export default function CartPage() {
                             size="sm"
                             onClick={() => handleRemoveItem(item.id)}
                             className="text-destructive hover:text-destructive"
+                            data-testid={"cart-item-" + product.id + "-remove"}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -308,11 +317,14 @@ export default function CartPage() {
               {/* Order Summary */}
               <div className="lg:col-span-1">
                 <Card className="sticky top-24">
-                  <CardHeader>
+                  <CardHeader data-testid="cart-summary-header">
                     <CardTitle>{tOrder("orderSummary")}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="flex justify-between">
+                    <div
+                      className="flex justify-between"
+                      data-testid="cart-subtotal"
+                    >
                       <span>{tCart("cartSubtotal")}</span>
                       <span>
                         {currencySymbol}
@@ -320,14 +332,20 @@ export default function CartPage() {
                       </span>
                     </div>
 
-                    <div className="flex justify-between">
+                    <div
+                      className="flex justify-between"
+                      data-testid="cart-shipping"
+                    >
                       <span>{tCart("cartShipping")}</span>
                       <span className="text-green-600">Free</span>
                     </div>
 
                     <Separator />
 
-                    <div className="flex justify-between font-semibold text-lg">
+                    <div
+                      className="flex justify-between font-semibold text-lg"
+                      data-testid="cart-total"
+                    >
                       <span>{tCart("cartTotal")}</span>
                       <span>
                         {currencySymbol}
@@ -335,13 +353,23 @@ export default function CartPage() {
                       </span>
                     </div>
 
-                    <Button className="w-full" size="lg" asChild={true}>
+                    <Button
+                      className="w-full"
+                      size="lg"
+                      asChild={true}
+                      data-testid="checkout-button"
+                    >
                       <Link href="/checkout">
                         {tCheckout("proceedToCheckout")}
                       </Link>
                     </Button>
 
-                    <Button variant="outline" className="w-full" asChild={true}>
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      asChild={true}
+                      data-testid="cart-continue-shopping"
+                    >
                       <Link href="/products">
                         {tCheckout("continueShopping")}
                       </Link>

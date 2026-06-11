@@ -112,50 +112,71 @@ export function useSimplifiedCartSync() {
 export function useCartActions() {
   const { isAuthenticated } = useSimplifiedCartSync();
 
+  const ensureCartHydrated = useCallback(async () => {
+    if (isAuthenticated) {
+      await useCartStore.persist.hasHydrated();
+      return;
+    }
+
+    await useGuestCartStore.persist.hasHydrated();
+  }, [isAuthenticated]);
+
   const addToCart = useCallback(
     async (item: any) => {
       try {
-        const cart = isAuthenticated ? useCartStore.getState() : useGuestCartStore.getState();
+        await ensureCartHydrated();
+        const cart = isAuthenticated
+          ? useCartStore.getState()
+          : useGuestCartStore.getState();
         cart.addItem(item);
       } catch (error) {
         console.error("Failed to add item to cart:", error);
       }
     },
-    [isAuthenticated],
+    [isAuthenticated, ensureCartHydrated],
   );
 
   const removeFromCart = useCallback(
     async (itemId: string) => {
       try {
-        const cart = isAuthenticated ? useCartStore.getState() : useGuestCartStore.getState();
+        await ensureCartHydrated();
+        const cart = isAuthenticated
+          ? useCartStore.getState()
+          : useGuestCartStore.getState();
         cart.removeItem(itemId);
       } catch (error) {
         console.error("Failed to remove item from cart:", error);
       }
     },
-    [isAuthenticated],
+    [isAuthenticated, ensureCartHydrated],
   );
 
   const updateQuantity = useCallback(
     async (itemId: string, quantity: number) => {
       try {
-        const cart = isAuthenticated ? useCartStore.getState() : useGuestCartStore.getState();
+        await ensureCartHydrated();
+        const cart = isAuthenticated
+          ? useCartStore.getState()
+          : useGuestCartStore.getState();
         cart.updateQuantity(itemId, quantity);
       } catch (error) {
         console.error("Failed to update item quantity:", error);
       }
     },
-    [isAuthenticated],
+    [isAuthenticated, ensureCartHydrated],
   );
 
   const clearCart = useCallback(async () => {
     try {
-      const cart = isAuthenticated ? useCartStore.getState() : useGuestCartStore.getState();
+      await ensureCartHydrated();
+      const cart = isAuthenticated
+        ? useCartStore.getState()
+        : useGuestCartStore.getState();
       cart.clearCart();
     } catch (error) {
       console.error("Failed to clear cart:", error);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, ensureCartHydrated]);
 
   return {
     addToCart,

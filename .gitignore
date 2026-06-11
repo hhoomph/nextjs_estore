@@ -92,6 +92,7 @@ CLAUDE.md
 GEMINI.md
 
 /memory-bank*
+memory-bank/*
 memory-bank/consolidated_learnings.md
 memory-bank/raw_reflection_log.md
 nul
@@ -99,3 +100,12 @@ cline_mcp_settings.json
 memory-bank/consolidated_learnings.md
 memory-bank/raw_reflection_log.md
 cline_mcp_settings.json.bak
+.tmp-cart-debug.js
+bun.lock
+dev-server.log
+/.kilo*
+.kilo/*
+.kilo/agent-manager.json.9580.1781057729360.tmp
+memory-bank/raw_reflection_log.md
+memory-bank/raw_reflection_log.md
+memory-bank/consolidated_learnings.md

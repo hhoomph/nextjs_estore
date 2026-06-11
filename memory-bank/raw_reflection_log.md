@@ -219,3 +219,45 @@
 - **Pattern: Distinguishing "broken" from "incompatible"** — a 401 on POST (with no JSON-RPC body) means the server is reachable but expects auth. A 405 on GET alone (with 200 on POST) means the server uses Streamable HTTP, not SSE. A `MODULE_NOT_FOUND` from a `node` MCP means a missing build artifact. Each of these is a different class of fix.
 - **Pattern: MCP validation via temp file, not `node -e`** — `node -e "..."` with Windows paths + quoting is unreliable in Git Bash MINGW. Use a small JS file under `scripts/`, run it once.
 - **Cline config hygiene**: keep three layers of `.bak` files (`pre-mcp-fix.bak`, `pre-mcp-fix2.bak`, `pre-mcp-fix3.bak`) so a partial-bad fix can be rolled back to the most recent good state.
+
+---
+
+## Entry: Fix campfirein-cipher MCP — Cipher Renamed to ByteRover CLI
+
+**Date:** 2026-06-09
+**TaskRef:** "fix all MCP Servers errors that installed in cline" (Round 3 — final)
+
+### Learnings
+
+1. **`campfirein/cipher` was renamed to `campfirein/byterover-cli`**: The GitHub repository `campfirein/cipher` no longer exists — it redirects or has been moved to `campfirein/byterover-cli` (ByteRover CLI, v3.16.1). The npm package is `byterover-cli`, the binary name is `brv`, and the MCP command is `brv mcp` (not `tsx src/app/index.ts --mode mcp` as the old config had).
+
+2. **`disabled: true` kept reverting to `false`**: Cline resets `disabled` fields back to `false` on reload in some conditions. The only reliable fix is to actually make the server work — disabling is not a durable solution for servers the user wants active.
+
+3. **Global npm install + absolute node path is the universal fix**: Same pattern as all previous rounds:
+   - `npm install -g byterover-cli@latest` (653 packages added)
+   - Entry point: `M:/vm4w/nodejs/node_modules/byterover-cli/bin/run.js`
+   - Config: `command: "node"`, `args: ["M:/vm4w/nodejs/node_modules/byterover-cli/bin/run.js", "mcp"]`
+   - Smoke test: `node M:/vm4w/nodejs/node_modules/byterover-cli/bin/run.js mcp` → valid JSON-RPC initialize response from `server: "byterover"`, version `"3.16.1"`, exit 0.
+
+4. **GitHub MCP was also corrupted**: Between rounds, the `github` MCP entry had been changed from `type: "sse"` to `type: "stdio", command: "node"` — which broke it. Restored to `type: "sse"` with `disabled: true` (auth not configured).
+
+5. **Full config path**: `C:\Users\oomph\AppData\Roaming\Code\User\globalStorage\saoudrizwan.claude-dev\settings\cline_mcp_settings.json`. This is the single source of truth for all Cline MCP servers.
+
+### Difficulties
+
+- The `disabled: true` approach from Round 2 was not durable — Cline kept reverting it. This forced a proper install rather than just disabling.
+- Finding the cipher source required searching GitHub (`search_repositories` with `campfirein/cipher` → found renamed repo `campfirein/byterover-cli`), then searching npm (`byterover-cli` exists, confirmed by `npm view`).
+- The old config's `args: ["tsx", "src/app/index.ts", "--mode", "mcp", "--experimental", "--transport", "stdio"]` was a completely wrong invocation — the package's `bin` field maps to `bin/run.js` and the correct subcommand is `mcp`.
+
+### Successes
+
+- Full config now has 9 active stdio MCP servers, all using absolute `node` paths with zero errors:
+  - filesystem, fetch, next-devtools, magicuidesign, agentdeskai-browser-tools, sequential-thinking, campfirein-cipher, nighttrek-software-planning, docker/MCP_DOCKER
+- 1 disabled server (github) — auth not configured, `gh` CLI covers the same ground.
+- All MCP servers verified working in Cline's live MCP panel (as of 2026-06-09 13:35).
+
+### Improvements_Identified_For_Consolidation
+
+- **Pattern: When a disabled MCP server keeps reverting, investigate whether the package exists and can be properly installed** — disabling is a temporary measure, not a fix. A renamed or moved package can be found via GitHub API search and npm registry.
+- **Pattern: GitHub repo rename detection** — If `github.com/org/repo` 404s or the source isn't where the config says, use GitHub's `search_repositories` API to find the current repo name. Repos can be renamed, archived, or transferred.
+- **Pattern: `brv mcp` as MCP subcommand convention** — Some CLI tools use a subcommand to enter MCP mode (e.g., `brv mcp`). Check the package's `README` or `--help` output for the correct invocation.

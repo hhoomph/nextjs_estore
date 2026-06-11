@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * Module for page
  *
@@ -5,9 +7,8 @@
  * @version 1.0.0
  * @since 2025-01-01
  */
-"use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // Force Node.js runtime for account features
 export const runtime = "nodejs";
@@ -35,10 +36,69 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { signOut, useSession } from "@/lib/auth-client";
 
 export default function AccountPage() {
-  const { data: session } = useSession();
+  const { data: session, isPending, refetch } = useSession();
   const [activeTab, setActiveTab] = useState("overview");
+  const [browserSession, setBrowserSession] = useState<any>(null);
+  const [isClient, setIsClient] = useState(false);
 
-  if (!session?.user) {
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+  const didRefetchSession = useRef(false);
+
+  useEffect(() => {
+    if (isPending || session?.user || didRefetchSession.current) return;
+
+    didRefetchSession.current = true;
+    void refetch();
+
+    const timeoutId = window.setTimeout(() => {
+      void refetch();
+    }, 500);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [session, isPending, refetch]);
+
+  useEffect(() => {
+    if (session?.user) {
+      setBrowserSession(null);
+      return;
+    }
+
+    let cancelled = false;
+    const loadBrowserSession = async () => {
+      try {
+        const response = await fetch("/api/auth/get-session", {
+          credentials: "include",
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        const browserSession = data?.session?.user
+          ? data.session
+          : data?.session && data?.user
+            ? { ...data.session, user: data.user }
+            : null;
+
+        if (!cancelled && browserSession?.user) {
+          setBrowserSession(browserSession);
+        }
+      } catch {
+        // Keep the existing guard UI if the manual session fetch fails.
+      }
+    };
+
+    void loadBrowserSession();
+    const timeoutId = window.setTimeout(loadBrowserSession, 500);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+    };
+  }, [session?.user?.id]);
+
+  const effectiveSession = isClient && (session?.user ? session : browserSession);
+
+  if (!effectiveSession?.user) {
     return (
       <div className="container px-4 py-16 text-center">
         <div className="max-w-md mx-auto">
@@ -91,11 +151,11 @@ export default function AccountPage() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-8">
             <Avatar className="h-20 w-20">
               <AvatarImage
-                src={session.user.image || ""}
-                alt={session.user.name || ""}
+                src={effectiveSession.user.image || ""}
+                alt={effectiveSession.user.name || ""}
               />
               <AvatarFallback className="text-xl">
-                {session.user.name?.charAt(0).toUpperCase() || "U"}
+                {effectiveSession.user.name?.charAt(0).toUpperCase() || "U"}
               </AvatarFallback>
             </Avatar>
 
@@ -103,12 +163,14 @@ export default function AccountPage() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                   <h1 className="text-3xl font-bold">
-                    {session.user.name || "User"}
+                    {effectiveSession.user.name || "User"}
                   </h1>
-                  <p className="text-muted-foreground">{session.user.email}</p>
+                  <p className="text-muted-foreground">
+                    {effectiveSession.user.email}
+                  </p>
                   <div className="flex items-center gap-2 mt-2">
                     <Badge variant="secondary">
-                      {session.user.role === "ADMIN"
+                      {effectiveSession.user.role === "ADMIN"
                         ? "Administrator"
                         : "Customer"}
                     </Badge>
