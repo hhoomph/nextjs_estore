@@ -6,8 +6,122 @@
  * @since 2025-01-01
  */
 import { type NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { auth } from "@/lib/auth/config";
 import { prisma } from "@/lib/database";
+
+const imageUrlSchema = z
+  .string()
+  .trim()
+  .min(1, "Image URL is required")
+  .refine(
+    (value) => value.startsWith("/") || /^https?:\/\//.test(value),
+    "Image URL must be an absolute URL or local path",
+  );
+
+const adminProductInputSchema = z.preprocess(
+  (body) => {
+    if (!body || typeof body !== "object") return body;
+
+    const input = body as Record<string, unknown>;
+    return {
+      name: input.name,
+      desc: input.desc,
+      categoryId: input.categoryId ?? input.category_id,
+      quantity: input.quantity,
+      price: input.price,
+      discountPrice: input.discountPrice ?? input.discount_price,
+      status: input.status,
+      images: input.images,
+    };
+  },
+  z
+    .object({
+      name: z.string().trim().min(1, "Name is required").max(255),
+      desc: z.string().trim().min(1, "Description is required").max(5000),
+      categoryId: z.string().trim().min(1, "Category is required"),
+      quantity: z.coerce.number().int().min(0).max(999999),
+      price: z.coerce.number().min(0.01).max(999999.99),
+      discountPrice: z
+        .preprocess(
+          (value) => (value === "" || value === null ? undefined : value),
+          z.coerce.number().min(0.01).max(999999.99).optional(),
+        )
+        .optional(),
+      status: z.coerce.number().int().min(0).max(1).default(1),
+      images: z
+      .array(imageUrlSchema)
+      .min(1, "At least one product image is required")
+      .transform((urls) => Array.from(new Set(urls))),
+    })
+    .refine(
+      (data) => data.discountPrice === undefined || data.discountPrice < data.price,
+      {
+        message: "Discount price must be less than the regular price",
+        path: ["discountPrice"],
+      },
+    ),
+);
+
+class ProductNotFoundError extends Error {}
+class CategoryNotFoundError extends Error {}
+
+type ProductSlugQueryClient = {
+  product: {
+    findFirst: (args: {
+      where: { slug: string; id?: { not: string } };
+      select: { slug: true };
+    }) => Promise<{ slug: string | null } | null>;
+  };
+};
+
+function buildProductSlug(name: string) {
+  return (
+    name
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "") || crypto.randomUUID()
+  );
+}
+
+const MAX_SLUG_SUFFIX = 1000;
+
+async function getUniqueProductSlug(
+  tx: ProductSlugQueryClient,
+  baseSlug: string,
+  productId?: string,
+) {
+  let slug = baseSlug;
+  let suffix = 2;
+
+  while (suffix <= MAX_SLUG_SUFFIX) {
+    const where: { slug: string; id?: { not: string } } = { slug };
+    if (productId) where.id = { not: productId };
+
+    const existing = await tx.product.findFirst({
+      where,
+      select: { slug: true },
+    });
+
+    if (!existing || !existing.slug) return slug;
+    slug = `${baseSlug}-${suffix++}`;
+  }
+
+  // Fallback: append a short UUID fragment to guarantee uniqueness
+  return `${baseSlug}-${crypto.randomUUID().slice(0, 8)}`;
+}
+
+function badRequest(error: z.ZodError) {
+  return NextResponse.json(
+    {
+      error: "Invalid product data",
+      details: error.flatten(),
+    },
+    { status: 400 },
+  );
+}
 
 // GET /api/admin/products/[id] - Get single product for admin
 export async function GET(
@@ -93,160 +207,194 @@ export async function PUT(
     }
 
     const { id } = await params;
-    const body = await request.json();
-    const {
-      name,
-      desc,
-      categoryId,
-      category_id,
-      quantity,
-      price,
-      discountPrice,
-      discount_price,
-      status,
-      images,
-    } = body;
+    const result = adminProductInputSchema.safeParse(await request.json());
+    if (!result.success) return badRequest(result.error);
 
-    const finalCategoryId = categoryId ?? category_id;
-    const finalDiscountPrice =
-      discountPrice !== undefined
-        ? discountPrice
-        : discount_price !== undefined
-          ? discount_price
-          : null;
+    const data = result.data;
 
-    // Validation
-    if (!name || !desc || !finalCategoryId) {
-      return NextResponse.json(
-        { error: "Name, description, and category are required" },
-        { status: 400 },
-      );
-    }
-
-    // Update product
-    const product = await prisma.product.update({
-      where: { id },
-      data: {
-        name,
-        desc,
-        slug: name.toLowerCase().replace(/\s+/g, "-"),
-        categoryId: finalCategoryId,
-        quantity: quantity || 0,
-        price: parseFloat(price),
-        discountPrice: finalDiscountPrice ? parseFloat(finalDiscountPrice) : null,
-        status: status !== undefined ? parseInt(status) : 1,
-        modifiedAt: new Date(),
-      },
-      include: {
-        category: {
-          select: {
-            id: true,
-            name: true,
+    const product = await prisma.$transaction(async (tx) => {
+      const existingProduct = await tx.product.findUnique({
+        where: { id },
+        include: {
+          productPictures: {
+            include: {
+              picture: true,
+            },
+            orderBy: {
+              displayOrder: "asc",
+            },
           },
         },
-        productPictures: {
-          include: {
-            picture: true,
-          },
-        },
-      },
-    });
+      });
 
-    // Handle images if provided
-    if (images && Array.isArray(images)) {
-      // Get current images
-      const currentImages = product.productPictures.map((pp) => pp.picture.url);
+      if (!existingProduct) throw new ProductNotFoundError();
 
-      // Find images to add
-      const imagesToAdd = images.filter((img) => !currentImages.includes(img));
+      const category = await tx.category.findUnique({
+        where: { id: data.categoryId },
+        select: { id: true },
+      });
 
-      // Find images to remove
-      const imagesToRemove = currentImages.filter(
-        (img) => !images.includes(img),
+      if (!category) throw new CategoryNotFoundError();
+
+      const slug = await getUniqueProductSlug(
+        tx,
+        buildProductSlug(data.name),
+        id,
       );
 
-      // Remove old images
+      const updatedProduct = await tx.product.update({
+        where: { id },
+        data: {
+          name: data.name,
+          desc: data.desc,
+          slug,
+          categoryId: data.categoryId,
+          quantity: data.quantity,
+          price: data.price,
+          discountPrice: data.discountPrice ?? null,
+          status: data.status,
+          ogImage: data.images[0],
+        },
+        include: {
+          category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          productPictures: {
+            include: {
+              picture: true,
+            },
+            orderBy: {
+              displayOrder: "asc",
+            },
+          },
+        },
+      });
+
+      const currentProductPictures = updatedProduct.productPictures;
+      const currentImages = new Set(data.images);
+      const imagesToRemove = currentProductPictures.filter(
+        (productPicture) => !currentImages.has(productPicture.picture.url),
+      );
+
       if (imagesToRemove.length > 0) {
-        for (const imageUrl of imagesToRemove) {
-          const productPicture = product.productPictures.find(
-            (pp) => pp.picture.url === imageUrl,
-          );
-          if (productPicture) {
-            // Remove productPictures record
-            await prisma.productPicture.delete({
-              where: { id: productPicture.id },
-            });
+        await tx.productPicture.deleteMany({
+          where: {
+            productId: id,
+            id: { in: imagesToRemove.map((productPicture) => productPicture.id) },
+          },
+        });
 
-            // Check if picture is used by other products
-            const otherUsages = await prisma.productPicture.count({
-              where: { pictureId: productPicture.pictureId },
-            });
+        for (const productPicture of imagesToRemove) {
+          const remainingUsages = await tx.productPicture.count({
+            where: { pictureId: productPicture.pictureId },
+          });
 
-            // If not used elsewhere, delete the picture record
-            if (otherUsages === 0) {
-              await prisma.picture.delete({
-                where: { id: productPicture.pictureId },
-              });
-            }
+          if (remainingUsages === 0) {
+            await tx.picture.delete({
+              where: { id: productPicture.pictureId },
+            });
           }
         }
       }
 
-      // Add new images
-      if (imagesToAdd.length > 0) {
-        for (let i = 0; i < imagesToAdd.length; i++) {
-          const imageUrl = imagesToAdd[i];
-          const displayOrder = images.findIndex((img) => img === imageUrl);
-          const pictureId = crypto.randomUUID();
+      const existingProductPictureByImage = new Map(
+        currentProductPictures.map((productPicture) => [
+          productPicture.picture.url,
+          productPicture,
+        ]),
+      );
 
-          // Create picture record
-          await prisma.picture.create({
-            data: {
-              id: pictureId,
-              url: imageUrl,
-              type: "product",
-              modifiedAt: new Date(),
-            },
-          });
+      for (const [index, imageUrl] of data.images.entries()) {
+        const productPicture = existingProductPictureByImage.get(imageUrl);
 
-          // Associate with product
-          await prisma.productPicture.create({
-            data: {
-              id: crypto.randomUUID(),
-              pictureId: pictureId,
-              productId: product.id,
-              displayOrder: displayOrder,
-            },
-          });
+        if (productPicture) {
+          if (productPicture.displayOrder !== index) {
+            await tx.productPicture.update({
+              where: { id: productPicture.id },
+              data: { displayOrder: index },
+            });
+          }
+          continue;
         }
+
+        const pictureId = crypto.randomUUID();
+        await tx.picture.create({
+          data: {
+            id: pictureId,
+            url: imageUrl,
+            type: "product",
+            modifiedAt: new Date(),
+          },
+        });
+        await tx.productPicture.create({
+          data: {
+            id: crypto.randomUUID(),
+            pictureId,
+            productId: id,
+            displayOrder: index,
+          },
+        });
       }
 
-      // Update display order for all images
-      for (let i = 0; i < images.length; i++) {
-        const imageUrl = images[i];
-        const productPicture = product.productPictures.find(
-          (pp) => pp.picture.url === imageUrl,
-        );
-        if (productPicture && productPicture.displayOrder !== i) {
-          await prisma.productPicture.update({
-            where: { id: productPicture.id },
-            data: { displayOrder: i },
-          });
-        }
-      }
+      return tx.product.findUnique({
+        where: { id },
+        include: {
+          category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          productPictures: {
+            include: {
+              picture: true,
+            },
+            orderBy: {
+              displayOrder: "asc",
+            },
+          },
+          productOptions: {
+            include: {
+              options: {
+                include: {
+                  optionGroup: true,
+                },
+              },
+            },
+          },
+          _count: {
+            select: {
+              orderItems: true,
+              reviews: true,
+              wishlists: true,
+              cartItems: true,
+            },
+          },
+        },
+      });
+    });
+
+    if (!product) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
     return NextResponse.json({ product });
   } catch (error) {
-    console.error("Error updating product:", error);
-
-    if (
-      error instanceof Error &&
-      error.message.includes("Record to update not found")
-    ) {
+    if (error instanceof z.ZodError) return badRequest(error);
+    if (error instanceof ProductNotFoundError) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
+    if (error instanceof CategoryNotFoundError) {
+      return NextResponse.json(
+        { error: "Category not found" },
+        { status: 400 },
+      );
+    }
 
+    console.error("Error updating product:", error);
     return NextResponse.json(
       { error: "Failed to update product" },
       { status: 500 },
@@ -271,15 +419,15 @@ export async function DELETE(
 
     const { id } = await params;
 
-    // Check if product exists and get related counts
     const product = await prisma.product.findUnique({
       where: { id },
       select: {
+        name: true,
         _count: {
           select: {
             orderItems: true,
             cartItems: true,
-            wishlists: true,
+            reviews: true,
           },
         },
       },
@@ -289,21 +437,50 @@ export async function DELETE(
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    // Check if product is in active orders
-    if (product._count.orderItems > 0) {
+    if (
+      product._count.orderItems > 0 ||
+      product._count.cartItems > 0 ||
+      product._count.reviews > 0
+    ) {
       return NextResponse.json(
         {
           error:
-            "Cannot delete product that has been ordered. Consider deactivating it instead.",
-          orderCount: product._count.orderItems,
+            "Cannot delete product that has orders, active cart items, or reviews. Deactivate it instead.",
+          counts: product._count,
         },
-        { status: 400 },
+        { status: 409 },
       );
     }
 
-    // Delete product (this will cascade delete related records)
-    await prisma.product.delete({
-      where: { id },
+    await prisma.$transaction(async (tx) => {
+      const productPictures = await tx.productPicture.findMany({
+        where: { productId: id },
+        include: { picture: true },
+      });
+
+      await tx.productPicture.deleteMany({
+        where: { productId: id },
+      });
+
+      for (const productPicture of productPictures) {
+        const remainingUsages = await tx.productPicture.count({
+          where: { pictureId: productPicture.pictureId },
+        });
+
+        if (remainingUsages === 0) {
+          await tx.picture.delete({
+            where: { id: productPicture.pictureId },
+          });
+        }
+      }
+
+      await tx.productOption.deleteMany({
+        where: { productId: id },
+      });
+
+      await tx.product.delete({
+        where: { id },
+      });
     });
 
     return NextResponse.json({

@@ -1,21 +1,46 @@
 "use client";
 
 export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
 
-import { useState, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState, type ChangeEvent } from "react";
 import Image from "next/image";
-import { useSession } from "@/lib/auth-client";
+import { useSession, type Session } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Plus,
   Search,
@@ -41,6 +66,9 @@ const productSchema = z.object({
   price: z.number().min(0.01, "Price must be greater than 0"),
   discountPrice: z.number().optional(),
   status: z.number().min(0).max(1),
+  seoTitle: z.string().optional(),
+  seoDescription: z.string().optional(),
+  seoKeywords: z.string().optional(),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -55,12 +83,75 @@ interface Product {
   price: number;
   discountPrice: number | null;
   status: number;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  seoKeywords?: string | null;
   category?: { id?: string; name: string } | null;
 }
 
 interface Category {
   id: string;
   name: string;
+}
+
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const MAX_IMAGES = 5;
+const ALLOWED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+];
+
+function isAdminSession(session: Session | null | undefined) {
+  return session?.user?.role === "ADMIN";
+}
+
+async function readErrorMessage(response: Response, fallback: string) {
+  try {
+    const data = await response.json();
+    return data?.error || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function extractProductImages(product: {
+  productPictures?: Array<{
+    displayOrder?: number;
+    picture: { url: string };
+  }>;
+  ogImage?: string | null;
+}) {
+  const images = (product.productPictures || [])
+    .slice()
+    .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
+    .map((productPicture) => productPicture.picture.url);
+
+  if (images.length > 0) return images;
+  return product.ogImage ? [product.ogImage] : [];
+}
+
+async function uploadImageFile(file: File) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch("/api/upload", {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data?.error || "Upload failed");
+  }
+
+  if (typeof data?.url !== "string") {
+    throw new Error("Upload did not return an image URL");
+  }
+
+  return data.url;
 }
 
 export default function AdminProductsPage() {
@@ -75,6 +166,7 @@ export default function AdminProductsPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [productImages, setProductImages] = useState<string[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -91,41 +183,53 @@ export default function AdminProductsPage() {
     },
   });
 
+  const fetchProducts = useCallback(async () => {
+    try {
+      const response = await fetch("/api/admin/products?limit=100");
+      if (!response.ok) {
+        throw new Error(await readErrorMessage(response, "Failed to fetch products"));
+      }
+
+      const data = await response.json();
+      setProducts(data.products || []);
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+      toast.error("Failed to fetch products");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchCategories = useCallback(async () => {
+    setCategoriesLoading(true);
+    try {
+      const response = await fetch("/api/categories");
+      if (!response.ok) {
+        throw new Error(await readErrorMessage(response, "Failed to fetch categories"));
+      }
+
+      const data = await response.json();
+      setCategories(data.categories || []);
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+      setCategories([]);
+      toast.error("Failed to fetch categories");
+    } finally {
+      setCategoriesLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (isPending) return;
 
-    // session may have nested structure: { user: {...} } or { session: { user: {...} } }
-    const userObj = (session?.user as any) || (session?.session as any)?.user;
-    if (!userObj || userObj.role !== "ADMIN") {
+    if (!isAdminSession(session)) {
       router.push("/");
       return;
     }
 
     fetchProducts();
     fetchCategories();
-  }, [session, isPending, router]);
-
-  const fetchProducts = async () => {
-    try {
-      const response = await fetch("/api/admin/products?limit=100");
-      const data = await response.json();
-      setProducts(data.products || []);
-    } catch (error) {
-      console.error("Failed to fetch products:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch("/api/categories");
-      const data = await response.json();
-      setCategories(data.categories || []);
-    } catch (error) {
-      console.error("Failed to fetch categories:", error);
-    }
-  };
+  }, [fetchCategories, fetchProducts, isPending, router, session]);
 
   const filteredProducts = (products || []).filter((product) => {
     const matchesSearch =
@@ -137,6 +241,11 @@ export default function AdminProductsPage() {
   });
 
   const handleSubmit = async (data: ProductFormData) => {
+    if (productImages.length === 0) {
+      toast.error("At least one product image is required");
+      return;
+    }
+
     setSubmitting(true);
     try {
       const method = editingProduct ? "PUT" : "POST";
@@ -161,10 +270,10 @@ export default function AdminProductsPage() {
         form.reset();
         setEditingProduct(null);
         setProductImages([]);
-        fetchProducts();
+        await fetchProducts();
       } else {
-        const errorData = await response.json();
-        toast.error(errorData.error || "Failed to save product");
+        const errorData = await response.json().catch(() => ({}));
+        toast.error(errorData?.error || "Failed to save product");
       }
     } catch (error) {
       console.error("Failed to save product:", error);
@@ -175,37 +284,36 @@ export default function AdminProductsPage() {
   };
 
   const handleEdit = async (product: Product) => {
-    setEditingProduct(product);
-    form.reset({
-      name: product.name || "",
-      desc: product.desc || "",
-      categoryId: product.categoryId,
-      quantity: product.quantity,
-      price: product.price,
-      discountPrice: product.discountPrice || undefined,
-      status: product.status ?? 1,
-    });
-
     try {
       const response = await fetch(`/api/admin/products/${product.id}`);
-      const data = await response.json();
-      if (data.product && data.product.productPictures) {
-        const images = data.product.productPictures
-          .sort(
-            (a: { displayOrder: number }, b: { displayOrder: number }) =>
-              a.displayOrder - b.displayOrder,
-          )
-          .map((pp: { picture: { url: string } }) => pp.picture.url);
-        setProductImages(images);
-      } else {
-        setProductImages([]);
+      if (!response.ok) {
+        throw new Error(await readErrorMessage(response, "Failed to load product"));
       }
-    } catch (error) {
-      console.error("Failed to load product images:", error);
-      setProductImages([]);
-    }
 
-    setDialogOpen(true);
+      const data = await response.json();
+      if (!data.product) {
+        throw new Error("Product not found");
+      }
+
+      setEditingProduct(product);
+      form.reset({
+        name: data.product.name || "",
+        desc: data.product.desc || "",
+        categoryId: data.product.categoryId,
+        quantity: data.product.quantity,
+        price: data.product.price,
+        discountPrice: data.product.discountPrice || undefined,
+        status: data.product.status ?? 1,
+        seoTitle: data.product.seoTitle || "",
+        seoDescription: data.product.seoDescription || "",
+        seoKeywords: data.product.seoKeywords || "",
+      });
+      setProductImages(extractProductImages(data.product));
+      setDialogOpen(true);
+    } catch (error) {
+      console.error("Failed to load product:", error);
+      toast.error("Failed to load product details");
+    }
   };
 
   const handleDelete = async (productId: string) => {
@@ -218,10 +326,10 @@ export default function AdminProductsPage() {
 
       if (response.ok) {
         toast.success("Product deleted");
-        fetchProducts();
+        await fetchProducts();
       } else {
-        const errorData = await response.json();
-        toast.error(errorData.error || "Failed to delete product");
+        const errorData = await response.json().catch(() => ({}));
+        toast.error(errorData?.error || "Failed to delete product");
       }
     } catch (error) {
       console.error("Failed to delete product:", error);
@@ -229,40 +337,66 @@ export default function AdminProductsPage() {
     }
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
+    const selectedFiles = Array.from(files);
+    const totalAfterUpload = productImages.length + selectedFiles.length;
+    if (totalAfterUpload > MAX_IMAGES) {
+      const canAdd = MAX_IMAGES - productImages.length;
+      toast.error(
+        canAdd <= 0
+          ? `Maximum ${MAX_IMAGES} images allowed. Remove some before adding more.`
+          : `Maximum ${MAX_IMAGES} images allowed. You can only add ${canAdd} more.`,
+      );
+      event.target.value = "";
+      return;
+    }
+
+    const invalidFiles = selectedFiles.filter(
+      (file) =>
+        !ALLOWED_IMAGE_TYPES.includes(file.type) || file.size > MAX_IMAGE_BYTES,
+    );
+
+    if (invalidFiles.length > 0) {
+      toast.error("Use JPEG, PNG, or WebP images under 5MB each");
+      event.target.value = "";
+      return;
+    }
+
     setUploadingImage(true);
     try {
-      const uploadPromises = Array.from(files).map(async (file) => {
-        const formData = new FormData();
-        formData.append("file", file);
+      const uploadResults = await Promise.allSettled(
+        selectedFiles.map((file) => uploadImageFile(file)),
+      );
 
-        const response = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
+      const uploadedUrls = uploadResults
+        .filter(
+          (result): result is PromiseFulfilledResult<string> =>
+            result.status === "fulfilled",
+        )
+        .map((result) => result.value);
 
-        const data = await response.json();
+      const failedUploads = uploadResults.filter(
+        (result) => result.status === "rejected",
+      );
 
-        if (!response.ok) {
-          throw new Error(data.error || "Upload failed");
-        }
+      if (uploadedUrls.length > 0) {
+        setProductImages((prev) =>
+          Array.from(new Set([...prev, ...uploadedUrls])),
+        );
+      }
 
-        return data.url as string;
-      });
-
-      const uploadedUrls = await Promise.all(uploadPromises);
-      setProductImages((prev) => [...prev, ...uploadedUrls]);
+      if (failedUploads.length > 0) {
+        toast.error(`${failedUploads.length} image upload failed`);
+      }
     } catch (error) {
       console.error("Failed to upload images:", error);
       toast.error("Failed to upload images. Please try again.");
     } finally {
       setUploadingImage(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      event.target.value = "";
     }
   };
 
@@ -270,35 +404,39 @@ export default function AdminProductsPage() {
     setProductImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Extract user from session — safe access
-  const userObj = (session?.user as any) || (session?.session as any)?.user;
-  const isAdmin = userObj?.role === "ADMIN";
-
   if (isPending || loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex h-64 items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto" />
-          <p className="mt-2 text-muted-foreground">Loading products...</p>
+          <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
+          <p className="mt-2 text-sm text-muted-foreground">Loading products...</p>
         </div>
       </div>
     );
   }
 
-  if (!isAdmin) {
+  if (!isAdminSession(session)) {
     return null;
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Product Management</h1>
-          <p className="text-muted-foreground">Manage your store's products</p>
-        </div>
+      <section className="overflow-hidden rounded-[2rem] border border-border bg-card p-6 shadow-xl">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+              Commerce workspace
+            </p>
+            <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground">
+              Product Management
+            </h1>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Manage your store&apos;s products with Apex-style cards and tables.
+            </p>
+          </div>
 
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
             <Button
               onClick={() => {
                 setEditingProduct(null);
@@ -317,8 +455,8 @@ export default function AdminProductsPage() {
               <Plus className="h-4 w-4 mr-2" />
               Add Product
             </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>
                 {editingProduct ? "Edit Product" : "Add New Product"}
@@ -481,8 +619,55 @@ export default function AdminProductsPage() {
                   )}
                 />
 
+                <details className="rounded-2xl border border-border p-4">
+                  <summary className="cursor-pointer text-sm font-semibold text-muted-foreground hover:text-foreground">
+                    SEO Settings
+                  </summary>
+                  <div className="mt-4 space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="seoTitle"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>SEO Title</FormLabel>
+                          <FormControl>
+                            <Input {...field} value={field.value ?? ""} placeholder="Leave blank to use product name" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="seoDescription"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>SEO Description</FormLabel>
+                          <FormControl>
+                            <Textarea rows={2} {...field} value={field.value ?? ""} placeholder="Meta description for search engines" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="seoKeywords"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>SEO Keywords</FormLabel>
+                          <FormControl>
+                            <Input {...field} value={field.value ?? ""} placeholder="Comma-separated keywords" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </details>
+
                 <div>
-                  <FormLabel>Product Images</FormLabel>
+                  <FormLabel>Product Images ({productImages.length}/{MAX_IMAGES})</FormLabel>
                   <div className="mt-2">
                     <input
                       ref={fileInputRef}
@@ -512,7 +697,7 @@ export default function AdminProductsPage() {
                         </>
                       )}
                     </Button>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="mt-1 text-sm text-muted-foreground line-clamp-1">
                       You can upload multiple images (JPEG, PNG, WebP, max 5MB each)
                     </p>
                   </div>
@@ -520,8 +705,8 @@ export default function AdminProductsPage() {
                   {productImages.length > 0 && (
                     <div className="mt-4 grid grid-cols-3 gap-4">
                       {productImages.map((imageUrl, index) => (
-                        <div key={index} className="relative group">
-                          <div className="aspect-square rounded-lg overflow-hidden bg-muted">
+                        <div key={`${imageUrl}-${index}`} className="relative group">
+                            <div className="aspect-square overflow-hidden rounded-2xl bg-muted">
                             <Image
                               src={imageUrl}
                               alt={`Product image ${index + 1}`}
@@ -533,7 +718,7 @@ export default function AdminProductsPage() {
                             type="button"
                             size="sm"
                             variant="destructive"
-                            className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                            className="absolute top-2 right-2 h-6 w-6 p-0 opacity-100 bg-destructive/90 shadow-sm transition-opacity hover:bg-destructive focus-visible:ring-2 focus-visible:ring-offset-2"
                             onClick={() => removeImage(index)}
                           >
                             <X className="h-3 w-3" />
@@ -571,22 +756,20 @@ export default function AdminProductsPage() {
         </Dialog>
       </div>
 
-      <Card className="mb-6">
+      <Card className="apex-stat-card">
         <CardContent className="pt-6">
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search products..."
-                  className="pl-8"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
+          <div className="flex flex-col gap-4 lg:flex-row">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search products..."
+                className="rounded-xl pl-8"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-48">
+                <SelectTrigger className="w-48 rounded-xl border-border bg-background">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
@@ -599,11 +782,13 @@ export default function AdminProductsPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="apex-stat-card">
         <CardHeader>
-          <CardTitle>Products ({filteredProducts.length})</CardTitle>
+          <CardTitle className="text-base font-semibold tracking-tight text-foreground">
+            Products ({filteredProducts.length})
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
@@ -629,11 +814,15 @@ export default function AdminProductsPage() {
                   <TableCell>{product.category?.name ?? "-"}</TableCell>
                   <TableCell>
                     <div>
-                      <span>${Number(product.price).toFixed(2)}</span>
-                      {product.discountPrice && (
-                        <span className="text-sm text-muted-foreground line-through ml-2">
-                          ${Number(product.discountPrice).toFixed(2)}
-                        </span>
+                      {product.discountPrice ? (
+                        <>
+                          <span>${Number(product.discountPrice).toFixed(2)}</span>
+                          <span className="ml-2 text-sm text-muted-foreground line-through">
+                            ${Number(product.price).toFixed(2)}
+                          </span>
+                        </>
+                      ) : (
+                        <span>${Number(product.price).toFixed(2)}</span>
                       )}
                     </div>
                   </TableCell>
@@ -642,7 +831,7 @@ export default function AdminProductsPage() {
                       <Package className="h-4 w-4" />
                       <span>{product.quantity}</span>
                       {product.quantity < 10 && (
-                        <AlertTriangle className="h-4 w-4 text-orange-500" />
+                        <AlertTriangle className="h-4 w-4 text-warning" />
                       )}
                     </div>
                   </TableCell>
@@ -664,14 +853,19 @@ export default function AdminProductsPage() {
                       >
                         <Edit className="h-3 w-3" />
                       </Button>
-                      <Button size="sm" variant="outline">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        aria-label={`View ${product.name}`}
+                        onClick={() => router.push(`/products/${product.slug}`)}
+                      >
                         <Eye className="h-3 w-3" />
                       </Button>
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={() => handleDelete(product.id)}
-                        className="text-destructive hover:text-destructive"
+                        className="text-destructive hover:text-destructive/80"
                       >
                         <Trash2 className="h-3 w-3" />
                       </Button>
@@ -683,10 +877,10 @@ export default function AdminProductsPage() {
           </Table>
 
           {filteredProducts.length === 0 && (
-            <div className="text-center py-12">
-              <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No products found</h3>
-              <p className="text-muted-foreground">
+            <div className="py-12 text-center">
+              <Package className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+              <h3 className="mb-2 text-lg font-semibold text-foreground">No products found</h3>
+              <p className="text-sm text-muted-foreground">
                 {searchQuery || statusFilter !== "all"
                   ? "Try adjusting your filters."
                   : "Get started by adding your first product."}
@@ -695,8 +889,7 @@ export default function AdminProductsPage() {
           )}
         </CardContent>
       </Card>
+      </section>
     </div>
   );
 }
-
-     
