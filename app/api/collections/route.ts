@@ -7,7 +7,21 @@
  */
 
 import { type NextRequest, NextResponse } from "next/server";
+import { auth, isAdmin } from "@/lib/auth/config";
 import { prisma } from "@/lib/database";
+
+async function requireAdmin(request: NextRequest) {
+  const session = await auth.api.getSession({ headers: request.headers });
+
+  if (!isAdmin(session)) {
+    return NextResponse.json(
+      { error: "Unauthorized - Admin access required" },
+      { status: 403 },
+    );
+  }
+
+  return null;
+}
 
 // GET /api/collections - Get all collections
 export async function GET(request: NextRequest) {
@@ -106,6 +120,9 @@ export async function GET(request: NextRequest) {
 // POST /api/collections - Create a new collection
 export async function POST(request: NextRequest) {
   try {
+    const adminError = await requireAdmin(request);
+    if (adminError) return adminError;
+
     const body = await request.json();
     const { name, slug, description, image, isActive, isFeatured, sortOrder } =
       body;

@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,75 +8,117 @@ import type { EnhancedCartItem } from "@/types/cart";
 interface ReviewStepProps {
   cartItems: EnhancedCartItem[];
   cartTotal: number;
+  shippingCost: number;
+  tax: number;
   isSubmitting: boolean;
   onSubmit: () => void;
   onPrevious: () => void;
 }
 
+function formatCurrency(value: number) {
+  return `$${value.toFixed(2)}`;
+}
+
 export function ReviewStep({
   cartItems,
   cartTotal,
+  shippingCost,
+  tax,
   isSubmitting,
   onSubmit,
   onPrevious,
 }: ReviewStepProps) {
+  const total = cartTotal + shippingCost + tax;
+
   return (
-    <Card>
+    <Card className="rounded-[2rem] border border-primary/20 shadow-xl shadow-primary/10">
       <CardHeader>
-        <CardTitle>Order Review</CardTitle>
+        <CardTitle className="text-xl font-black text-foreground">
+          Order Review
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Order Items */}
-        <div>
-          <h3 className="font-semibold mb-4">Items</h3>
-          <div className="space-y-3">
-            {cartItems.map((item) => (
-              <div key={item.id} className="flex justify-between items-center">
-                <div className="flex items-center gap-3">
-                  <Badge variant="secondary">{item.quantity}</Badge>
-                  <span className="font-medium">{item.product.name}</span>
-                </div>
-                <span className="font-medium">
-                  $
-                  {(item.product.discount_price || item.product.price) *
-                    item.quantity}
-                </span>
-              </div>
-            ))}
+        <form onSubmit={onSubmit}>
+          <div>
+            <h3 className="mb-4 font-black text-foreground">Items</h3>
+            <div className="space-y-3">
+              {cartItems.map((item) => {
+                const image = item.product.product_pictures?.[0]?.picture?.url;
+                return (
+                  <div key={item.id} className="flex items-center justify-between gap-4">
+                    <div className="flex min-w-0 items-center gap-3">
+                      {image ? (
+                        <Image
+                          src={image}
+                          alt={item.product.name || "Cart product"}
+                          width={56}
+                          height={56}
+                          className="h-14 w-14 rounded-2xl object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
+                          <Badge variant="secondary">{item.quantity}</Badge>
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="truncate font-bold text-foreground">
+                          {item.product.name}
+                        </p>
+                        <p className="text-sm text-muted-foreground">Qty {item.quantity}</p>
+                      </div>
+                    </div>
+                    <span className="font-black text-foreground">
+                      {formatCurrency(
+                        (item.product.discount_price || item.product.price) *
+                          item.quantity,
+                      )}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
 
-        <Separator />
-
-        {/* Order Totals */}
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <span>Subtotal</span>
-            <span>${cartTotal.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Shipping</span>
-            <span>$5.99</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Tax</span>
-            <span>${(cartTotal * 0.08).toFixed(2)}</span>
-          </div>
           <Separator />
-          <div className="flex justify-between font-semibold text-lg">
-            <span>Total</span>
-            <span>${(cartTotal + 5.99 + cartTotal * 0.08).toFixed(2)}</span>
-          </div>
-        </div>
 
-        <div className="flex justify-between pt-4">
-          <Button variant="outline" onClick={onPrevious}>
-            Back to Payment
-          </Button>
-          <Button onClick={onSubmit} disabled={isSubmitting}>
-            {isSubmitting ? "Processing..." : "Place Order"}
-          </Button>
-        </div>
+          <div className="space-y-2 rounded-3xl bg-muted p-4">
+            <div className="flex justify-between text-muted-foreground">
+              <span>Subtotal</span>
+              <span>{formatCurrency(cartTotal)}</span>
+            </div>
+            <div className="flex justify-between text-muted-foreground">
+              <span>Shipping</span>
+              <span>{formatCurrency(shippingCost)}</span>
+            </div>
+            <div className="flex justify-between text-muted-foreground">
+              <span>Tax</span>
+              <span>{formatCurrency(tax)}</span>
+            </div>
+            <Separator />
+            <div className="flex justify-between text-lg font-black text-foreground">
+              <span>Total</span>
+              <span>{formatCurrency(total)}</span>
+            </div>
+          </div>
+
+          <div className="flex justify-between gap-3 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onPrevious}
+              className="rounded-full"
+            >
+              Back to Payment
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              {isSubmitting ? "Processing..." : "Place Order"}
+            </Button>
+          </div>
+        </form>
       </CardContent>
     </Card>
   );

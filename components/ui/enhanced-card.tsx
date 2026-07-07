@@ -112,7 +112,7 @@ const EnhancedCardComponent = React.forwardRef<
         default: "bg-card text-card-foreground shadow-sm",
         elevated: "bg-card text-card-foreground shadow-lg hover:shadow-xl",
         bordered: "border bg-card text-card-foreground",
-        glass: "backdrop-blur-xl bg-white/10 border border-white/20 text-white",
+        glass: "backdrop-blur-xl bg-background/60 border border-background/30 text-foreground shadow-sm",
         interactive:
           "bg-card text-card-foreground shadow-sm hover:shadow-lg cursor-pointer",
       }),
@@ -182,7 +182,7 @@ const EnhancedCardComponent = React.forwardRef<
                   <Heart
                     className={cn(
                       "h-4 w-4 transition-colors",
-                      isFavorited && "fill-red-500 text-red-500",
+                      isFavorited && "fill-destructive text-destructive",
                     )}
                   />
                 </Button>

@@ -11,7 +11,6 @@
 import { useEffect, useRef, useState } from "react";
 
 // Force Node.js runtime for account features
-export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 import {
@@ -416,3 +415,4 @@ export default function AccountPage() {
     </div>
   );
 }
+

@@ -75,8 +75,8 @@ export const ErrorRecoveryModal: React.FC<ErrorRecoveryModalProps> = ({
       <Dialog open={true} onOpenChange={handleClose}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
-              <Send className="h-6 w-6 text-green-600 dark:text-green-400" />
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-success/10">
+              <Send className="h-6 w-6 text-success" />
             </div>
             <DialogTitle className="text-center">Thank You!</DialogTitle>
             <DialogDescription className="text-center">
@@ -105,14 +105,14 @@ export const ErrorRecoveryModal: React.FC<ErrorRecoveryModalProps> = ({
 
         <div className="space-y-4">
           {/* Error summary */}
-          <div className="rounded-lg bg-red-50 dark:bg-red-900/20 p-4 border border-red-200 dark:border-red-800">
+          <div className="rounded-lg bg-destructive/10 p-4 border border-destructive/20">
             <div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+              <AlertCircle className="h-5 w-5 text-destructive mt-0.5 flex-shrink-0" />
               <div className="flex-1 min-w-0">
-                <h4 className="text-sm font-medium text-red-800 dark:text-red-200">
+                <h4 className="text-sm font-medium text-destructive">
                   What happened
                 </h4>
-                <p className="text-sm text-red-700 dark:text-red-300 mt-1">
+                <p className="text-sm text-destructive mt-1">
                   {error.message}
                 </p>
                 <div className="flex items-center gap-2 mt-2">
@@ -145,7 +145,7 @@ export const ErrorRecoveryModal: React.FC<ErrorRecoveryModalProps> = ({
                 disabled={isSubmitting}
                 required={true}
               />
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-muted-foreground">
                 Your feedback helps us understand the context and reproduce the
                 issue.
               </p>
@@ -178,7 +178,7 @@ export const ErrorRecoveryModal: React.FC<ErrorRecoveryModalProps> = ({
           </form>
 
           {/* Privacy notice */}
-          <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
+          <div className="text-xs text-muted-foreground text-center">
             <p>
               Your feedback is anonymous and will only be used to improve our
               application. We collect technical details automatically to help

@@ -133,13 +133,13 @@ export function PerformanceDashboard({
   const getStatusColor = (status: string) => {
     switch (status) {
       case "good":
-        return "text-green-600 bg-green-100";
+        return "text-success bg-success/10";
       case "needs-improvement":
-        return "text-yellow-600 bg-yellow-100";
+        return "text-warning bg-warning/10";
       case "poor":
-        return "text-red-600 bg-red-100";
+        return "text-destructive bg-destructive/10";
       default:
-        return "text-gray-600 bg-gray-100";
+        return "text-muted-foreground bg-muted";
     }
   };
 
@@ -196,7 +196,7 @@ export function PerformanceDashboard({
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Monitor className="h-5 w-5 text-blue-600" />
+              <Monitor className="h-5 w-5 text-primary" />
               <CardTitle className="text-lg">Performance Monitor</CardTitle>
             </div>
             <div className="flex items-center space-x-2">
@@ -299,8 +299,8 @@ export function PerformanceAlert({
     <div
       className={`fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg border-2 max-w-sm ${
         alert.type === "error"
-          ? "bg-red-50 border-red-200 text-red-800"
-          : "bg-yellow-50 border-yellow-200 text-yellow-800"
+          ? "bg-destructive/10 border-destructive text-destructive"
+          : "bg-warning/10 border-warning text-foreground"
       }`}
     >
       <div className="flex items-start justify-between">

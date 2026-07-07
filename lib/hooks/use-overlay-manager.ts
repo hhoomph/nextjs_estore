@@ -264,14 +264,14 @@ export function useOverlayManager(): OverlayManager {
       // Theme-specific classes
       const themeClasses = {
         light: {
-          overlay: "bg-black/20",
-          content: "bg-white border border-gray-200 shadow-xl",
-          backdrop: "bg-black/50 backdrop-blur-sm",
+          overlay: "bg-background/40",
+          content: "bg-card text-card-foreground border border-border shadow-xl",
+          backdrop: "bg-background/60 backdrop-blur-md",
         },
         dark: {
-          overlay: "bg-black/40",
-          content: "bg-gray-900 border border-gray-700 shadow-2xl",
-          backdrop: "bg-black/70 backdrop-blur-md",
+          overlay: "bg-background/60",
+          content: "bg-card text-card-foreground border border-border shadow-2xl",
+          backdrop: "bg-background/80 backdrop-blur-md",
         },
       };
 

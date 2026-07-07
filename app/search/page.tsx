@@ -1,51 +1,64 @@
-/**
- * Module for page
- *
- * @author hh.oomph@gmail.com
- * @version 1.0.0
- * @since 2025-01-01
- */
 "use client";
 
-import Image from "next/image";
-import { Suspense, useEffect, useState } from "react";
-
-// Force dynamic rendering to avoid prerendering issues
-export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
-
-import { Filter, Loader2, Search, X } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Loader2, Search, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ProductGrid } from "@/components/features/products/product-grid";
+import { SectionHeading } from "@/components/features/layout/section-heading";
+import { type ProductCardProduct } from "@/components/features/products/product-card";
 import { Input } from "@/components/ui/input";
-import { useCartStore } from "@/lib/stores/cart-store";
+import { useCartActions } from "@/lib/hooks/use-simplified-cart-sync";
 
 interface Product {
   id: string;
-  name: string;
-  desc: string;
-  slug: string;
+  name: string | null;
+  desc: string | null;
+  slug: string | null;
   price: number;
-  discount_price?: number;
+  discount_price?: number | null;
   quantity: number;
-  category: { id: string; name: string };
+  category?: { id: string; name: string } | null;
   images: string[];
   inStock: boolean;
   createdAt: string;
 }
 
+const popularSearches = [
+  "laptop",
+  "smartphone",
+  "headphones",
+  "watch",
+  "camera",
+  "tablet",
+  "gaming",
+  "wireless",
+  "bluetooth",
+  "charger",
+];
+
+function toProductCard(product: Product): ProductCardProduct {
+  return {
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    category: product.category,
+    price: product.price,
+    discount_price: product.discount_price,
+    images: product.images,
+    inStock: product.quantity > 0,
+  };
+}
+
 function SearchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations("products");
   const initialQuery = searchParams.get("q") || "";
+  const searchAbortRef = useRef<AbortController | null>(null);
 
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState<Product[]>([]);
@@ -53,93 +66,65 @@ function SearchContent() {
   const [error, setError] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
-  const { addItem } = useCartStore();
+  const { addToCart } = useCartActions();
 
-  // Popular search terms for suggestions
-  const popularSearches = [
-    "laptop",
-    "smartphone",
-    "headphones",
-    "watch",
-    "camera",
-    "tablet",
-    "gaming",
-    "wireless",
-    "bluetooth",
-    "charger",
-  ];
+  const handleSearch = useCallback(
+    async (searchQuery: string) => {
+      searchAbortRef.current?.abort();
+      searchAbortRef.current = new AbortController();
 
-  const handleSearch = async (searchQuery: string) => {
-    if (!searchQuery.trim()) {
-      setResults([]);
-      setSuggestions([]);
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-
-    try {
-      const response = await fetch(
-        `/api/products?search=${encodeURIComponent(searchQuery)}&limit=20`,
-      );
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Search failed");
+      if (!searchQuery.trim()) {
+        setResults([]);
+        setSuggestions([]);
+        router.replace("/search", { scroll: false });
+        return;
       }
 
-      setResults(data.products || []);
-      setSuggestions([]);
+      setLoading(true);
+      setError("");
 
-      // Update URL without triggering a page reload
-      const newUrl = searchQuery
-        ? `/search?q=${encodeURIComponent(searchQuery)}`
-        : "/search";
-      router.replace(newUrl, { scroll: false });
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Search failed");
-      setResults([]);
-    } finally {
-      setLoading(false);
+      try {
+        const response = await fetch(
+          `/api/products?search=${encodeURIComponent(searchQuery)}&limit=20`,
+          { signal: searchAbortRef.current.signal },
+        );
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Search failed");
+        }
+
+        const products = Array.isArray(data.data) ? data.data : [];
+        setResults(products);
+        setSuggestions([]);
+
+        router.replace(`/search?q=${encodeURIComponent(searchQuery)}`, {
+          scroll: false,
+        });
+      } catch (err) {
+        if (
+          err instanceof Error &&
+          (err.name === "AbortError" || err.message === "Failed to fetch")
+        ) {
+          return;
+        }
+        setError(err instanceof Error ? err.message : "Search failed");
+        setResults([]);
+      } finally {
+        if (!searchAbortRef.current?.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    },
+    [router],
+  );
+
+  useEffect(() => {
+    if (initialQuery) {
+      void handleSearch(initialQuery);
     }
-  };
+  }, [handleSearch, initialQuery]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    handleSearch(query);
-  };
-
-  const handleClear = () => {
-    setQuery("");
-    setResults([]);
-    setSuggestions([]);
-    router.replace("/search", { scroll: false });
-  };
-
-  const handleSuggestionClick = (suggestion: string) => {
-    setQuery(suggestion);
-    handleSearch(suggestion);
-  };
-
-  const handleAddToCart = (product: Product) => {
-    addItem({
-      product_id: product.id,
-      product: {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        discount_price: product.discount_price,
-        slug: product.slug,
-        product_pictures: product.images.map((url) => ({
-          picture: { url },
-        })),
-      },
-      quantity: 1,
-    });
-  };
-
-  // Generate suggestions based on current query
   useEffect(() => {
     if (query.length > 0) {
       const filtered = popularSearches.filter(
@@ -153,121 +138,157 @@ function SearchContent() {
     }
   }, [query]);
 
-  // Perform initial search if query exists
-  useEffect(() => {
-    if (initialQuery) {
-      handleSearch(initialQuery);
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    void handleSearch(query);
+  };
+
+  const handleClear = () => {
+    setQuery("");
+    setResults([]);
+    setSuggestions([]);
+    router.replace("/search", { scroll: false });
+  };
+
+  const handleSuggestionClick = useCallback((suggestion: string) => {
+    setQuery(suggestion);
+    void handleSearch(suggestion);
+  }, [handleSearch]);
+
+  const handleAddToCart = async (product: ProductCardProduct) => {
+    try {
+      const currentPrice = product.discount_price ?? product.price;
+
+      await addToCart({
+        product_id: product.id,
+        product: {
+          id: product.id,
+          name: product.name || t("unknownProduct"),
+          price: currentPrice,
+          discount_price: currentPrice,
+          slug: product.slug || "",
+          product_pictures: (product.images ?? []).map((url) => ({
+            picture: { url },
+          })),
+        },
+        quantity: 1,
+      });
+    } catch (err) {
+      console.error("Error adding search result to cart:", err);
     }
-  }, [initialQuery]);
+  };
+
+  const suggestionNodes = useMemo(
+    () =>
+      suggestions.map((suggestion, index) => (
+        <button
+          key={`${suggestion}-${index}`}
+          type="button"
+          onClick={() => handleSuggestionClick(suggestion)}
+          className="flex w-full items-center gap-2 rounded-2xl px-4 py-3 text-left font-semibold text-foreground transition hover:bg-primary/10 hover:text-primary"
+        >
+          <Search className="h-4 w-4 text-primary" />
+          {suggestion}
+        </button>
+      )),
+    [handleSuggestionClick, suggestions],
+  );
 
   return (
-    <div className="bg-background">
-      {/* Breadcrumb */}
-      <div className="border-b">
+    <div className="min-h-screen bg-background">
+      <div className="border-b bg-background/80 backdrop-blur">
         <div className="container px-4 py-3">
           <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
-            <Link href="/" className="hover:text-foreground">
+            <Link href="/" className="font-semibold text-foreground">
               Home
             </Link>
             <span>/</span>
-            <span className="text-foreground">Search</span>
+            <span className="font-bold text-foreground">Search</span>
           </nav>
         </div>
       </div>
 
-      <div className="container px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Search Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-4">Search Products</h1>
-            <p className="text-xl text-muted-foreground">
-              Find exactly what you're looking for
-            </p>
-          </div>
+      <div className="container px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
+        <div className="mx-auto max-w-4xl">
+          <SectionHeading
+            eyebrow="Product Search"
+            title="Find exactly what you need"
+            description="Search products, brands, categories, and descriptions."
+            className="mb-8"
+          />
 
-          {/* Search Form */}
-          <div className="mb-8">
-            <form
-              onSubmit={handleSubmit}
-              className="relative max-w-2xl mx-auto"
-            >
+          <div className="mb-10">
+            <form onSubmit={handleSubmit} className="relative mx-auto max-w-2xl">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Search className="absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   type="search"
-                  placeholder="Search for products, brands, categories&hellip;"
+                  placeholder={t("search")}
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  className="pl-12 pr-12 py-6 text-lg"
+                  onChange={(event) => setQuery(event.target.value)}
+                  className="rounded-full pl-14 pr-14 py-6 text-lg"
                   autoFocus={true}
                 />
                 {query && (
                   <Button
                     type="button"
                     variant="ghost"
-                    size="sm"
+                    size="icon"
                     onClick={handleClear}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                    className="absolute right-3 top-1/2 h-9 w-9 -translate-y-1/2 rounded-full"
                   >
                     <X className="h-4 w-4" />
+                    <span className="sr-only">Clear search</span>
                   </Button>
                 )}
               </div>
 
-              {/* Suggestions Dropdown */}
               {suggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-b-md shadow-lg z-10 max-w-2xl mx-auto">
-                  {suggestions.map((suggestion, index) => (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => handleSuggestionClick(suggestion)}
-                      className="w-full px-4 py-2 text-left hover:bg-muted flex items-center gap-2"
-                    >
-                      <Search className="h-4 w-4 text-muted-foreground" />
-                      {suggestion}
-                    </button>
-                  ))}
+                <div className="absolute left-0 right-0 top-full z-50 mx-auto max-w-2xl overflow-hidden rounded-b-3xl border border-border bg-background/98 backdrop-blur-xl shadow-2xl shadow-primary/10">
+                  {suggestionNodes}
                 </div>
               )}
             </form>
           </div>
 
-          {/* Loading State */}
           {loading && (
-            <div className="flex justify-center items-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin mr-2" />
-              <span>Searching...</span>
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="mr-3 h-8 w-8 animate-spin text-primary" />
+              <span className="font-semibold text-muted-foreground">Searching...</span>
             </div>
           )}
 
-          {/* Error State */}
           {error && (
-            <div className="text-center py-12">
-              <p className="text-destructive mb-4">{error}</p>
-              <Button onClick={() => handleSearch(query)}>Try Again</Button>
+            <div className="rounded-[2rem] border border-border/60 bg-card p-10 text-center shadow-xl shadow-primary/10">
+              <p className="mb-5 font-bold text-destructive">{error}</p>
+              <Button onClick={() => void handleSearch(query)} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+                Try Again
+              </Button>
             </div>
           )}
 
-          {/* No Query State */}
           {!loading && !error && !query && results.length === 0 && (
-            <div className="text-center py-12">
-              <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <h2 className="text-2xl font-semibold mb-4">Start Your Search</h2>
-              <p className="text-muted-foreground mb-8">
-                Enter a product name, category, or brand to find what you're
+            <div className="rounded-[2.5rem] border border-border/60 bg-card p-10 text-center shadow-xl shadow-primary/10">
+              <Search className="mx-auto mb-5 h-16 w-16 text-primary/60" />
+              <h2 className="mb-3 text-2xl font-black text-foreground">
+                Start Your Search
+              </h2>
+              <p className="mx-auto mb-8 max-w-xl text-muted-foreground">
+                Enter a product name, category, or brand to find what you are
                 looking for.
               </p>
 
-              {/* Popular Searches */}
               <div>
-                <h3 className="text-lg font-medium mb-4">Popular Searches</h3>
-                <div className="flex flex-wrap gap-2 justify-center">
+                <h3 className="mb-4 text-lg font-black text-foreground">
+                  Popular Searches
+                </h3>
+                <div className="flex flex-wrap justify-center gap-2">
                   {popularSearches.slice(0, 10).map((term) => (
                     <Button
                       key={term}
                       variant="outline"
                       onClick={() => handleSuggestionClick(term)}
+                      className="rounded-full"
                     >
                       {term}
                     </Button>
@@ -277,108 +298,46 @@ function SearchContent() {
             </div>
           )}
 
-          {/* Search Results */}
           {!loading && !error && query && (
             <div>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">
+              <div className="mb-6 flex items-center justify-between gap-4">
+                <h2 className="text-2xl font-black text-foreground">
                   Search Results for "{query}"
                 </h2>
-                <Badge variant="secondary">
+                <Badge className="rounded-full bg-primary/10 text-primary">
                   {results.length} {results.length === 1 ? "result" : "results"}
                 </Badge>
               </div>
 
               {results.length === 0 ? (
-                <div className="text-center py-12">
-                  <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-2xl font-semibold mb-4">
+                <div className="rounded-[2rem] border border-border/60 bg-card p-10 text-center shadow-xl shadow-primary/10">
+                  <Search className="mx-auto mb-4 h-14 w-14 text-muted-foreground" />
+                  <h3 className="mb-2 text-2xl font-black text-foreground">
                     No results found
                   </h3>
-                  <p className="text-muted-foreground mb-6">
-                    We couldn't find any products matching "{query}". Try
+                  <p className="mb-6 text-muted-foreground">
+                    We could not find any products matching "{query}". Try
                     different keywords or check your spelling.
                   </p>
-                  <div className="flex gap-4 justify-center">
-                    <Button onClick={handleClear}>Clear Search</Button>
-                    <Button variant="outline" asChild={true}>
+                  <div className="flex justify-center gap-3">
+                    <Button onClick={handleClear} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+                      Clear Search
+                    </Button>
+                    <Button variant="outline" asChild={true} className="rounded-full">
                       <Link href="/products">Browse All Products</Link>
                     </Button>
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {results.map((product) => (
-                    <Card
-                      key={product.id}
-                      className="group overflow-hidden hover:shadow-lg transition-shadow"
-                    >
-                      <CardHeader className="p-0">
-                        <div className="aspect-square relative overflow-hidden bg-muted">
-                          {product.images[0] ? (
-                            <Image
-                              src={product.images[0]}
-                              alt={product.name}
-                              fill={true}
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-linear-to-br from-muted to-muted-foreground/10 flex items-center justify-center">
-                              <div className="text-6xl opacity-20">📦</div>
-                            </div>
-                          )}
-                          {!product.inStock && (
-                            <Badge className="absolute top-2 left-2 bg-destructive">
-                              Out of Stock
-                            </Badge>
-                          )}
-                          {product.discount_price && (
-                            <Badge className="absolute top-2 right-2 bg-green-600">
-                              Sale
-                            </Badge>
-                          )}
-                        </div>
-                      </CardHeader>
-
-                      <CardContent className="p-4">
-                        <div className="space-y-2">
-                          <p className="text-xs text-muted-foreground uppercase tracking-wide">
-                            {product.category?.name || "Uncategorized"}
-                          </p>
-                          <h3 className="font-semibold line-clamp-2 group-hover:style={{ color: 'rgb(59, 130, 246)' }} transition-colors">
-                            <Link href={`/products/${product.slug}`}>
-                              {product.name}
-                            </Link>
-                          </h3>
-
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg font-bold">
-                              $
-                              {product.discount_price
-                                ? product.discount_price.toFixed(2)
-                                : product.price.toFixed(2)}
-                            </span>
-                            {product.discount_price && (
-                              <span className="text-sm text-muted-foreground line-through">
-                                ${product.price.toFixed(2)}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </CardContent>
-
-                      <CardFooter className="p-4 pt-0">
-                        <Button
-                          className="w-full"
-                          disabled={!product.inStock}
-                          onClick={() => handleAddToCart(product)}
-                        >
-                          {product.inStock ? "Add to Cart" : "Out of Stock"}
-                        </Button>
-                      </CardFooter>
-                    </Card>
-                  ))}
-                </div>
+                <ProductGrid
+                  products={results.map(toProductCard)}
+                  onAddToCart={handleAddToCart}
+                  unknownProductLabel={t("unknownProduct")}
+                  outOfStockLabel={t("outOfStock")}
+                  saleLabel={t("sale")}
+                  addToCartLabel={t("addToCart")}
+                  uncategorizedLabel={t("uncategorized")}
+                />
               )}
             </div>
           )}
@@ -390,17 +349,6 @@ function SearchContent() {
 
 export default function SearchPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="bg-background">
-          <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 style={{ borderBottomColor: 'rgb(59, 130, 246)' }}"></div>
-            <span className="ml-2">Loading search...</span>
-          </div>
-        </div>
-      }
-    >
-      <SearchContent />
-    </Suspense>
+    <SearchContent />
   );
 }

@@ -14,35 +14,14 @@ import { MessageCircle, Reply, Send } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-
-interface CommentAuthor {
-  id: string;
-  name: string | null;
-  image: string | null;
-}
-
-interface CommentReply {
-  id: string;
-  content: string;
-  createdAt: Date;
-  author: CommentAuthor;
-}
-
-interface Comment {
-  id: string;
-  content: string;
-  createdAt: Date;
-  author: CommentAuthor;
-  replies: CommentReply[];
-}
+import type { BlogCommentData } from "./types";
 
 interface BlogCommentsProps {
   postId: string;
-  comments: Comment[];
+  comments: BlogCommentData[];
   commentCount: number;
 }
 
@@ -197,14 +176,14 @@ export function BlogComments({
 }
 
 interface CommentItemProps {
-  comment: Comment;
+  comment: BlogCommentData;
   onReply: (commentId: string | null) => void;
   replyingTo: string | null;
   replyContent: string;
   setReplyContent: (content: string) => void;
   onSubmitReply: (commentId: string, e: React.FormEvent) => Promise<void>;
   isSubmitting: boolean;
-  t: any;
+  t: unknown;
 }
 
 function CommentItem({
@@ -217,6 +196,8 @@ function CommentItem({
   isSubmitting,
   t,
 }: CommentItemProps) {
+  const translate = t as (key: string) => string;
+
   return (
     <Card>
       <CardContent className="pt-6">
@@ -235,7 +216,7 @@ function CommentItem({
           <div className="flex-1 space-y-2">
             <div className="flex items-center space-x-2">
               <span className="font-semibold">
-                {comment.author.name || t("anonymous")}
+                {comment.author.name || translate("anonymous")}
               </span>
               <span className="text-sm text-muted-foreground">
                 {formatDistanceToNow(comment.createdAt, { addSuffix: true })}
@@ -253,7 +234,7 @@ function CommentItem({
                 className="h-auto p-1 text-muted-foreground hover:text-foreground"
               >
                 <Reply className="h-3 w-3 mr-1" />
-                {t("comments.reply")}
+                {translate("comments.reply")}
               </Button>
             </div>
 
@@ -265,7 +246,7 @@ function CommentItem({
                   className="space-y-3"
                 >
                   <Textarea
-                    placeholder={t("comments.replyPlaceholder")}
+                    placeholder={translate("comments.replyPlaceholder")}
                     value={replyContent}
                     onChange={(e) => setReplyContent(e.target.value)}
                     rows={3}
@@ -281,7 +262,7 @@ function CommentItem({
                         onReply(null);
                       }}
                     >
-                      {t("comments.cancel")}
+                      {translate("comments.cancel")}
                     </Button>
                     <Button
                       type="submit"
@@ -289,8 +270,8 @@ function CommentItem({
                       disabled={!replyContent.trim() || isSubmitting}
                     >
                       {isSubmitting
-                        ? t("comments.submitting")
-                        : t("comments.submitReply")}
+                        ? translate("comments.submitting")
+                        : translate("comments.submitReply")}
                     </Button>
                   </div>
                 </form>
@@ -320,7 +301,7 @@ function CommentItem({
                 <div className="flex-1 space-y-1">
                   <div className="flex items-center space-x-2">
                     <span className="text-sm font-semibold">
-                      {reply.author.name || t("anonymous")}
+                      {reply.author.name || translate("anonymous")}
                     </span>
                     <span className="text-xs text-muted-foreground">
                       {formatDistanceToNow(reply.createdAt, {

@@ -82,7 +82,7 @@ export default function SignUpPage() {
         <Card className="w-full max-w-md shadow-lg">
           <CardContent className="pt-6 text-center">
             <div className="flex justify-center mb-4">
-              <CheckCircle2 className="h-16 w-16 text-green-500" />
+              <CheckCircle2 className="h-16 w-16 text-success" />
             </div>
             <h2 className="text-2xl font-bold mb-2">Account Created!</h2>
             <p className="text-muted-foreground mb-4">

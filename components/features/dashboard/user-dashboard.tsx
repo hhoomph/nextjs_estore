@@ -74,30 +74,30 @@ export function UserDashboard({ session }: UserDashboardProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-card shadow-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <h1 className="text-2xl font-bold text-gray-900">My Account</h1>
+            <h1 className="text-2xl font-bold text-foreground">My Account</h1>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center text-white font-medium">
+                  <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-medium">
                   {user?.name?.charAt(0)?.toUpperCase() || "U"}
                 </div>
-                <span className="text-sm font-medium text-gray-700">
+                <span className="text-sm font-medium text-foreground">
                   {user?.name || "User"}
                 </span>
               </div>
               <button
                 onClick={() => handleSignOut()}
-                className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 text-sm text-foreground border border-border rounded-lg hover:bg-accent transition-colors"
               >
                 Sign Out
               </button>
@@ -110,14 +110,14 @@ export function UserDashboard({ session }: UserDashboardProps) {
         <div className="flex flex-col md:flex-row gap-8">
           {/* Sidebar */}
           <div className="w-full md:w-64">
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-card rounded-lg shadow p-6 border border-border">
               <nav className="space-y-2">
                 <button
                   onClick={() => setActiveTab("profile")}
                   className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     activeTab === "profile"
-                      ? "bg-indigo-100 text-indigo-700"
-                      : "text-gray-600 hover:bg-gray-100"
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:bg-accent"
                   }`}
                 >
                   Profile
@@ -126,8 +126,8 @@ export function UserDashboard({ session }: UserDashboardProps) {
                   onClick={() => setActiveTab("orders")}
                   className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     activeTab === "orders"
-                      ? "bg-indigo-100 text-indigo-700"
-                      : "text-gray-600 hover:bg-gray-100"
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:bg-accent"
                   }`}
                 >
                   Orders
@@ -136,8 +136,8 @@ export function UserDashboard({ session }: UserDashboardProps) {
                   onClick={() => setActiveTab("addresses")}
                   className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     activeTab === "addresses"
-                      ? "bg-indigo-100 text-indigo-700"
-                      : "text-gray-600 hover:bg-gray-100"
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:bg-accent"
                   }`}
                 >
                   Addresses
@@ -148,7 +148,7 @@ export function UserDashboard({ session }: UserDashboardProps) {
 
           {/* Main Content */}
           <div className="flex-1">
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-card rounded-lg shadow p-6 border border-border">
               {activeTab === "profile" && (
                 <ProfileTab user={user} onUpdate={handleUpdateProfile} />
               )}
@@ -194,12 +194,12 @@ function ProfileTab({
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-900">
+        <h2 className="text-xl font-semibold text-foreground">
           Profile Information
         </h2>
         <button
           onClick={() => setIsEditing(!isEditing)}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
         >
           {isEditing ? "Cancel" : "Edit Profile"}
         </button>
@@ -209,7 +209,7 @@ function ProfileTab({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 Full Name
               </label>
               <input
@@ -217,12 +217,12 @@ function ProfileTab({
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-3 py-2 border border-input rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-background text-foreground"
                 required={true}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 Username
               </label>
               <input
@@ -230,11 +230,11 @@ function ProfileTab({
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-3 py-2 border border-input rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-background text-foreground"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 Email
               </label>
               <input
@@ -242,12 +242,12 @@ function ProfileTab({
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-3 py-2 border border-input rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-background text-foreground"
                 required={true}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 Phone Number
               </label>
               <input
@@ -255,21 +255,21 @@ function ProfileTab({
                 name="phone_number"
                 value={formData.phone_number}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="w-full px-3 py-2 border border-input rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-background text-foreground"
               />
             </div>
           </div>
           <div className="flex gap-3">
             <button
               type="submit"
-              className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+              className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
             >
               Save Changes
             </button>
             <button
               type="button"
               onClick={() => setIsEditing(false)}
-              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              className="px-6 py-2 border border-border rounded-lg text-foreground hover:bg-accent transition-colors"
             >
               Cancel
             </button>
@@ -278,57 +278,57 @@ function ProfileTab({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
+            <h3 className="text-lg font-medium text-foreground mb-4">
               Personal Information
             </h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-foreground">
                   Full Name
                 </label>
-                <p className="mt-1 text-sm text-gray-900">
+                <p className="mt-1 text-sm text-foreground">
                   {user?.name || "Not set"}
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-foreground">
                   Username
                 </label>
-                <p className="mt-1 text-sm text-gray-900">
+                <p className="mt-1 text-sm text-foreground">
                   {user?.username || "Not set"}
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-foreground">
                   Email
                 </label>
-                <p className="mt-1 text-sm text-gray-900">{user?.email}</p>
+                <p className="mt-1 text-sm text-foreground">{user?.email}</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-foreground">
                   Phone Number
                 </label>
-                <p className="mt-1 text-sm text-gray-900">
+                <p className="mt-1 text-sm text-foreground">
                   {user?.phone_number || "Not set"}
                 </p>
               </div>
             </div>
           </div>
           <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
+            <h3 className="text-lg font-medium text-foreground mb-4">
               Account Information
             </h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-foreground">
                   Account Status
                 </label>
-                <p className="mt-1 text-sm text-gray-900">
+                <p className="mt-1 text-sm text-foreground">
                   <span
                     className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       user?.active
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
+                        ? "bg-success/10 text-success"
+                        : "bg-destructive/10 text-destructive"
                     }`}
                   >
                     {user?.active ? "Active" : "Inactive"}
@@ -336,26 +336,26 @@ function ProfileTab({
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-foreground">
                   Role
                 </label>
-                <p className="mt-1 text-sm text-gray-900">{user?.role}</p>
+                <p className="mt-1 text-sm text-foreground">{user?.role}</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-foreground">
                   Member Since
                 </label>
-                <p className="mt-1 text-sm text-gray-900">
+                <p className="mt-1 text-sm text-foreground">
                   {user?.created_at
                     ? new Date(user.created_at).toLocaleDateString()
                     : "Unknown"}
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-foreground">
                   Email Verified
                 </label>
-                <p className="mt-1 text-sm text-gray-900">
+                <p className="mt-1 text-sm text-foreground">
                   {user?.emailVerified ? "Yes" : "No"}
                 </p>
               </div>
@@ -371,11 +371,11 @@ function ProfileTab({
 function OrdersTab() {
   return (
     <div>
-      <h2 className="text-xl font-semibold text-gray-900 mb-6">
+      <h2 className="text-xl font-semibold text-foreground mb-6">
         Order History
       </h2>
       <div className="text-center py-12">
-        <p className="text-gray-500">Order history feature coming soon...</p>
+        <p className="text-muted-foreground">Order history feature coming soon...</p>
       </div>
     </div>
   );
@@ -386,8 +386,8 @@ function AddressesTab({ user }: { user: User | null }) {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-900">Addresses</h2>
-        <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+        <h2 className="text-xl font-semibold text-foreground">Addresses</h2>
+        <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
           Add Address
         </button>
       </div>
@@ -397,28 +397,28 @@ function AddressesTab({ user }: { user: User | null }) {
           {user.address.map((address) => (
             <div
               key={address.id}
-              className="border border-gray-200 rounded-lg p-4"
+              className="border border-border rounded-lg p-4"
             >
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="font-medium text-gray-900">
+                  <p className="font-medium text-foreground">
                     {address.address_line1}
                   </p>
                   {address.address_line2 && (
-                    <p className="text-gray-600">{address.address_line2}</p>
+                    <p className="text-muted-foreground">{address.address_line2}</p>
                   )}
-                  <p className="text-gray-600">
+                  <p className="text-muted-foreground">
                     {address.city}, {address.state} {address.postal_code}
                   </p>
                   {address.telephone && (
-                    <p className="text-gray-600">Phone: {address.telephone}</p>
+                    <p className="text-muted-foreground">Phone: {address.telephone}</p>
                   )}
                 </div>
                 <div className="flex gap-2">
-                  <button className="px-3 py-1 text-sm text-indigo-600 hover:text-indigo-900">
+                  <button className="px-3 py-1 text-sm text-primary hover:text-primary">
                     Edit
                   </button>
-                  <button className="px-3 py-1 text-sm text-red-600 hover:text-red-900">
+                  <button className="px-3 py-1 text-sm text-destructive hover:text-destructive">
                     Delete
                   </button>
                 </div>
@@ -428,8 +428,8 @@ function AddressesTab({ user }: { user: User | null }) {
         </div>
       ) : (
         <div className="text-center py-12">
-          <p className="text-gray-500">No addresses saved yet.</p>
-          <p className="text-sm text-gray-400 mt-1">
+          <p className="text-muted-foreground">No addresses saved yet.</p>
+          <p className="text-sm text-muted-foreground mt-1">
             Add your first address to get started.
           </p>
         </div>

@@ -8,26 +8,55 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import type * as React from "react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+interface UserGrowthDatum {
+  month: string;
+  users: number;
+}
+
+interface OrderStat {
+  status: string;
+  count: number;
+  percentage: number;
+}
+
+interface RevenueStat {
+  month: string;
+  revenue: number;
+}
+
+interface PopularProduct {
+  name: string;
+  sales: number;
+  revenue: number;
+}
+
+interface AnalyticsState {
+  userGrowth: UserGrowthDatum[];
+  orderStats: OrderStat[];
+  revenueStats: RevenueStat[];
+  popularProducts: PopularProduct[];
+}
+
+const analyticsInitialState: AnalyticsState = {
+  userGrowth: [],
+  orderStats: [],
+  revenueStats: [],
+  popularProducts: [],
+};
 
 export function Analytics() {
-  const [analytics, setAnalytics] = useState<{
-    userGrowth: Array<{ month: string; users: number }>;
-    orderStats: Array<{ status: string; count: number; percentage: number }>;
-    revenueStats: Array<{ month: string; revenue: number }>;
-    popularProducts: Array<{ name: string; sales: number; revenue: number }>;
-  }>({
-    userGrowth: [],
-    orderStats: [],
-    revenueStats: [],
-    popularProducts: [],
-  });
+  const [analytics, setAnalytics] = useState<AnalyticsState>(
+    analyticsInitialState,
+  );
   const [loading, setLoading] = useState(true);
 
   const fetchAnalytics = useCallback(async () => {
     setLoading(true);
     try {
-      // This would typically fetch from an analytics API
-      // For now, we'll use mock data
       setTimeout(() => {
         setAnalytics({
           userGrowth: [
@@ -69,147 +98,268 @@ export function Analytics() {
 
   useEffect(() => {
     fetchAnalytics();
-  }, []); // Remove fetchAnalytics from deps to avoid cascading renders
+  }, [fetchAnalytics]);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="flex h-64 items-center justify-center">
+        <div className="text-center">
+          <div className="mx-auto mb-3 h-12 w-12 animate-spin rounded-full border-b-2 border-primary" />
+          <p className="text-sm text-muted-foreground">Loading analytics...</p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* User Growth Chart */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-4">User Growth</h3>
-          <div className="h-64 flex items-end justify-between space-x-2">
-            {analytics.userGrowth.map((data, index) => (
-              <div key={index} className="flex flex-col items-center flex-1">
+      <section className="overflow-hidden rounded-[2rem] border border-border bg-card p-6 shadow-xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+          Analytics workspace
+        </p>
+        <h2 className="mt-2 text-3xl font-bold tracking-tight text-foreground">
+          Performance insights
+        </h2>
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
+          Apex-style cards keep growth, revenue, product demand, and customer
+          activity visually separated without losing the shared design language.
+        </p>
+      </section>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <MetricCard
+          title="User Growth"
+          description="Monthly visitor traffic trends"
+          accent="primary"
+        >
+          <div className="flex h-64 items-end justify-between gap-3 pt-4">
+            {analytics.userGrowth.map((data) => (
+              <div key={data.month} className="flex flex-1 flex-col items-center gap-2">
                 <div
-                  className="bg-indigo-500 rounded-t w-full mb-2"
-                  style={{ height: `${(data.users / 400) * 200}px` }}
-                ></div>
-                <span className="text-xs text-gray-600">{data.month}</span>
-                <span className="text-xs font-medium">{data.users}</span>
+                  className="w-full rounded-t-2xl bg-primary transition-all duration-300 hover:bg-primary/90"
+                  style={{ height: `${(data.users / 400) * 220}px` }}
+                />
+                <span className="text-xs font-medium text-muted-foreground">
+                  {data.month}
+                </span>
+                <span className="text-xs font-semibold text-foreground">
+                  {data.users}
+                </span>
               </div>
             ))}
           </div>
-        </div>
+        </MetricCard>
 
-        {/* Order Status Distribution */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-4">
-            Order Status Distribution
-          </h3>
-          <div className="space-y-3">
-            {analytics.orderStats.map((stat, index) => (
-              <div key={index} className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">{stat.status}</span>
-                <div className="flex items-center space-x-2">
-                  <div className="w-24 bg-gray-200 rounded-full h-2">
-                    <div
-                      className={`h-2 rounded-full ${
-                        stat.status === "Completed"
-                          ? "bg-green-500"
-                          : stat.status === "Pending"
-                            ? "bg-yellow-500"
-                            : "bg-red-500"
-                      }`}
-                      style={{ width: `${stat.percentage}%` }}
-                    ></div>
-                  </div>
-                  <span className="text-sm font-medium w-12 text-right">
-                    {stat.count}
+        <MetricCard
+          title="Order Status Distribution"
+          description="Current order health"
+          accent="success"
+        >
+          <div className="space-y-4 pt-4">
+            {analytics.orderStats.map((stat) => (
+              <div key={stat.status} className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium text-foreground">
+                    {stat.status}
                   </span>
+                  <span className="font-semibold text-muted-foreground">
+                    {stat.count} · {stat.percentage}%
+                  </span>
+                </div>
+                <div className="h-2.5 overflow-hidden rounded-full bg-muted">
+                  <div
+                    className={cnStatusClass(stat.status)}
+                    style={{ width: `${stat.percentage}%` }}
+                  />
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </MetricCard>
 
-        {/* Revenue Trend */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-4">Revenue Trend</h3>
-          <div className="h-64 flex items-end justify-between space-x-2">
-            {analytics.revenueStats.map((data, index) => (
-              <div key={index} className="flex flex-col items-center flex-1">
+        <MetricCard
+          title="Revenue Trend"
+          description="Monthly revenue movement"
+          accent="warning"
+        >
+          <div className="flex h-64 items-end justify-between gap-3 pt-4">
+            {analytics.revenueStats.map((data) => (
+              <div key={data.month} className="flex flex-1 flex-col items-center gap-2">
                 <div
-                  className="bg-green-500 rounded-t w-full mb-2"
-                  style={{ height: `${(data.revenue / 40000) * 200}px` }}
-                ></div>
-                <span className="text-xs text-gray-600">{data.month}</span>
-                <span className="text-xs font-medium">
+                  className="w-full rounded-t-2xl bg-warning transition-all duration-300 hover:bg-primary"
+                  style={{ height: `${(data.revenue / 40000) * 220}px` }}
+                />
+                <span className="text-xs font-medium text-muted-foreground">
+                  {data.month}
+                </span>
+                <span className="text-xs font-semibold text-foreground">
                   ${data.revenue.toLocaleString()}
                 </span>
               </div>
             ))}
           </div>
-        </div>
+        </MetricCard>
 
-        {/* Popular Products */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-4">Popular Products</h3>
-          <div className="space-y-3">
+        <MetricCard
+          title="Popular Products"
+          description="Best sellers by revenue"
+          accent="primary"
+        >
+          <div className="space-y-4 pt-4">
             {analytics.popularProducts.slice(0, 5).map((product, index) => (
-              <div key={index} className="flex items-center justify-between">
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">
-                    {product.name}
-                  </p>
-                  <p className="text-xs text-gray-500">{product.sales} sales</p>
+              <div
+                key={product.name}
+                className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-muted/60 p-4"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-sm font-bold text-primary">
+                    {index + 1}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">
+                      {product.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {product.sales} sales
+                    </p>
+                  </div>
                 </div>
-                <span className="text-sm font-medium text-green-600">
+                <span className="text-sm font-bold text-success">
                   ${product.revenue.toLocaleString()}
                 </span>
               </div>
             ))}
           </div>
-        </div>
+        </MetricCard>
       </div>
 
-      {/* Recent Activity */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
-        <div className="space-y-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <div className="flex-1">
-              <p className="text-sm">
-                <span className="font-medium">John Doe</span> placed an order
-                for $299.99
-              </p>
-              <p className="text-xs text-gray-500">2 hours ago</p>
-            </div>
+      <Card className="apex-stat-card">
+        <CardHeader>
+          <CardTitle className="text-base font-semibold tracking-tight text-foreground">
+            Recent Activity
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <ActivityItem
+              color="success"
+              title="John Doe placed an order for $299.99"
+              time="2 hours ago"
+            />
+            <ActivityItem
+              color="primary"
+              title="Jane Smith registered as a new user"
+              time="4 hours ago"
+            />
+            <ActivityItem
+              color="warning"
+              title="Order #1234 status changed to completed"
+              time="6 hours ago"
+            />
+            <ActivityItem
+              color="danger"
+              title="Payment failed for order #1235"
+              time="8 hours ago"
+            />
           </div>
-          <div className="flex items-center space-x-3">
-            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-            <div className="flex-1">
-              <p className="text-sm">
-                <span className="font-medium">Jane Smith</span> registered as a
-                new user
-              </p>
-              <p className="text-xs text-gray-500">4 hours ago</p>
-            </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function MetricCard({
+  title,
+  description,
+  accent,
+  children,
+}: {
+  title: string;
+  description: string;
+  accent: "primary" | "success" | "warning";
+  children: React.ReactNode;
+}) {
+  return (
+    <Card className="apex-stat-card">
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <CardTitle className="text-base font-semibold tracking-tight text-foreground">
+              {title}
+            </CardTitle>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {description}
+            </p>
           </div>
-          <div className="flex items-center space-x-3">
-            <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-            <div className="flex-1">
-              <p className="text-sm">Order #1234 status changed to completed</p>
-              <p className="text-xs text-gray-500">6 hours ago</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-3">
-            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-            <div className="flex-1">
-              <p className="text-sm">Payment failed for order #1235</p>
-              <p className="text-xs text-gray-500">8 hours ago</p>
-            </div>
-          </div>
+          <Badge className={cnAccentBadge(accent)}>
+            {accent === "primary"
+              ? "Growth"
+              : accent === "success"
+                ? "Healthy"
+                : "Revenue"}
+          </Badge>
         </div>
+      </CardHeader>
+      <CardContent>{children}</CardContent>
+    </Card>
+  );
+}
+
+function ActivityItem({
+  color,
+  title,
+  time,
+}: {
+  color: "primary" | "success" | "warning" | "danger";
+  title: string;
+  time: string;
+}) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className={cnActivityDot(color)} />
+      <div className="flex-1">
+        <p className="text-sm text-foreground">
+          <span className="font-semibold">{title}</span>
+        </p>
+        <p className="text-xs text-muted-foreground">{time}</p>
       </div>
     </div>
   );
+}
+
+function cnStatusClass(status: string) {
+  if (status === "Completed") {
+    return "h-2.5 rounded-full bg-success";
+  }
+
+  if (status === "Pending") {
+    return "h-2.5 rounded-full bg-warning";
+  }
+
+  return "h-2.5 rounded-full bg-destructive";
+}
+
+function cnAccentBadge(accent: "primary" | "success" | "warning") {
+  if (accent === "success") {
+    return "border-transparent bg-success/10 text-success";
+  }
+
+  if (accent === "warning") {
+    return "border-transparent bg-warning/10 text-warning";
+  }
+
+  return "border-transparent bg-primary/10 text-primary";
+}
+
+function cnActivityDot(color: "primary" | "success" | "warning" | "danger") {
+  const colorClass =
+    color === "success"
+      ? "bg-success"
+      : color === "warning"
+        ? "bg-warning"
+        : color === "danger"
+          ? "bg-destructive"
+          : "bg-primary";
+
+  return `h-2.5 w-2.5 rounded-full ${colorClass}`;
 }

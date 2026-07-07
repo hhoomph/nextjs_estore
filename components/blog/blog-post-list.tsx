@@ -12,42 +12,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Pagination } from "@/components/ui/pagination";
+import type { BlogPostListData } from "./types";
 import { BlogPostCard } from "./blog-post-card";
 
-interface BlogPostWithRelations {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string | null;
-  featuredImage: string | null;
-  publishedAt: Date | null;
-  readingTime: number | null;
-  viewCount: number;
-  author: {
-    id: string;
-    name: string | null;
-    image: string | null;
-  };
-  category: {
-    id: string;
-    name: string;
-    slug: string;
-    color: string | null;
-  };
-  tags: {
-    tag: {
-      id: string;
-      name: string;
-      slug: string;
-      color: string | null;
-    };
-  }[];
-  comments: { id: string }[];
-}
-
 interface BlogPostListProps {
-  posts: BlogPostWithRelations[];
+  posts: BlogPostListData[];
   totalPages: number;
   currentPage: number;
   category?: string;

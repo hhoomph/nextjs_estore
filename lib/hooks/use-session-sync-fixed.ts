@@ -203,15 +203,16 @@ export function useAdminSessionMonitor() {
  */
 export function useSessionCartSync() {
   const { isAuthenticated, user } = useOptimizedSessionSync();
+  const isLoading = useSessionLoading();
 
   // Memoize cart sync logic
   return useMemo(
     () => ({
       shouldMergeCart: isAuthenticated && !!user,
       userId: user?.id || null,
-      isReady: !useSessionLoading(),
+      isReady: !isLoading,
     }),
-    [isAuthenticated, user, useSessionLoading],
+    [isAuthenticated, user, isLoading],
   );
 }
 

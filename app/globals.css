@@ -53,23 +53,24 @@
 
 @import "tailwindcss";
 @import "tw-animate-css";
+@custom-variant dark (&:is(.dark *));
 /* Third-party styles */
 @import "leaflet/dist/leaflet.css";
 
 /* Modern Design System Variables */
 :root {
-  /* Core Brand Colors - Professional Blue Palette */
-  --color-primary-50: #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #3b82f6;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a8a;
-  --color-primary-950: #172554;
+  /* Core Brand Colors - Cozy Orange Palette */
+  --color-primary-50: #fff7ed;
+  --color-primary-100: #ffedd5;
+  --color-primary-200: #fed7aa;
+  --color-primary-300: #fdba74;
+  --color-primary-400: #fb923c;
+  --color-primary-500: #f97316;
+  --color-primary-600: #ea580c;
+  --color-primary-700: #c2410c;
+  --color-primary-800: #9a3412;
+  --color-primary-900: #7c2d12;
+  --color-primary-950: #431407;
   /* Secondary Colors - Sophisticated Warm Grays */
   --color-secondary-50: #fafaf9;
   --color-secondary-100: #f5f5f4;
@@ -272,7 +273,7 @@
   --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
   --shadow-inner: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
   /* Colored Shadows */
-  --shadow-primary: 0 4px 14px 0 rgb(59 130 246 / 0.15);
+  --shadow-primary: 0 4px 14px 0 rgb(249 115 22 / 0.15);
   --shadow-secondary: 0 4px 14px 0 rgb(120 113 108 / 0.15);
   --shadow-success: 0 4px 14px 0 rgb(34 197 94 / 0.15);
   --shadow-warning: 0 4px 14px 0 rgb(245 158 11 / 0.15);
@@ -324,59 +325,215 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --radius: 0.75rem;
+  --background: oklch(0.985 0.015 75);
+  --foreground: oklch(0.21 0.03 45);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.21 0.03 45);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.145 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.205 0 0);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.145 0 0);
-  --input: oklch(0.97 0 0);
-  --ring: oklch(0.205 0 0);
-  --chart-1: oklch(0.205 0 0);
-  --chart-2: oklch(0.205 0 0);
-  --chart-3: oklch(0.205 0 0);
-  --chart-4: oklch(0.205 0 0);
-  --chart-5: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.21 0.03 45);
+  --primary: oklch(0.62 0.2 28);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.96 0.025 75);
+  --secondary-foreground: oklch(0.28 0.03 45);
+  --muted: oklch(0.965 0.02 75);
+  --muted-foreground: oklch(0.48 0.03 70);
+  --accent: oklch(0.96 0.03 35);
+  --accent-foreground: oklch(0.28 0.03 45);
+  --destructive: oklch(0.58 0.2 25);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.92 0.025 75);
+  --input: oklch(0.985 0.01 75);
+  --ring: oklch(0.62 0.2 28);
+  --chart-1: oklch(0.62 0.2 28);
+  --chart-2: oklch(0.68 0.18 80);
+  --chart-3: oklch(0.55 0.18 150);
+  --chart-4: oklch(0.72 0.16 65);
+  --chart-5: oklch(0.62 0.2 330);
 }
 
 /* Dark mode variables */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.205 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.205 0 0);
-  --muted-foreground: oklch(0.705 0 0);
-  --accent: oklch(0.205 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.985 0 0);
-  --destructive-foreground: oklch(0.205 0 0);
-  --border: oklch(0.205 0 0);
-  --input: oklch(0.205 0 0);
-  --ring: oklch(0.985 0 0);
-  --chart-1: oklch(0.985 0 0);
-  --chart-2: oklch(0.985 0 0);
-  --chart-3: oklch(0.985 0 0);
-  --chart-4: oklch(0.985 0 0);
-  --chart-5: oklch(0.985 0 0);
+  --background: oklch(0.16 0.02 45);
+  --foreground: oklch(0.97 0 0);
+  --card: oklch(0.2 0.02 45);
+  --card-foreground: oklch(0.97 0 0);
+  --popover: oklch(0.2 0.02 45);
+  --popover-foreground: oklch(0.97 0 0);
+  --primary: oklch(0.68 0.2 28);
+  --primary-foreground: oklch(0.2 0.02 45);
+  --secondary: oklch(0.27 0.02 45);
+  --secondary-foreground: oklch(0.97 0 0);
+  --muted: oklch(0.26 0.02 45);
+  --muted-foreground: oklch(0.72 0.02 70);
+  --accent: oklch(0.28 0.03 35);
+  --accent-foreground: oklch(0.97 0 0);
+  --destructive: oklch(0.58 0.2 25);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.28 0.02 45);
+  --input: oklch(0.24 0.02 45);
+  --ring: oklch(0.68 0.2 28);
+  --chart-1: oklch(0.68 0.2 28);
+  --chart-2: oklch(0.7 0.18 80);
+  --chart-3: oklch(0.55 0.18 150);
+  --chart-4: oklch(0.72 0.16 65);
+  --chart-5: oklch(0.62 0.2 330);
+}
+
+/* Apex admin visual identity */
+[data-admin-theme="apex"] {
+  --apex-bg: #f8fafc;
+  --apex-bg-subtle: #f1f5f9;
+  --apex-surface: #ffffff;
+  --apex-surface-elevated: #ffffff;
+  --apex-foreground: #0f172a;
+  --apex-muted: #64748b;
+  --apex-muted-strong: #475569;
+  --apex-border: #e2e8f0;
+  --apex-border-soft: #eef2f7;
+  --apex-primary: #2563eb;
+  --apex-primary-soft: #dbeafe;
+  --apex-primary-foreground: #ffffff;
+  --apex-secondary: #64748b;
+  --apex-success: #16a34a;
+  --apex-success-soft: #dcfce7;
+  --apex-warning: #d97706;
+  --apex-warning-soft: #fef3c7;
+  --apex-danger: #dc2626;
+  --apex-danger-soft: #fee2e2;
+  --apex-violet: #7c3aed;
+  --apex-cyan: #0891b2;
+  --apex-sidebar: #0f172a;
+  --apex-sidebar-accent: #172033;
+  --apex-sidebar-border: #1e293b;
+  --apex-sidebar-foreground: #e2e8f0;
+  --apex-sidebar-muted: #94a3b8;
+  --apex-sidebar-hover: #1e293b;
+  --apex-sidebar-active: #2563eb;
+  --apex-card-shadow: 0 18px 45px rgb(15 23 42 / 0.08);
+  --apex-card-shadow-soft: 0 10px 28px rgb(15 23 42 / 0.06);
+  --apex-sidebar-shadow: 0 24px 70px rgb(15 23 42 / 0.18);
+  --apex-gradient-primary: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  --apex-gradient-success: linear-gradient(135deg, #16a34a 0%, #06b6d4 100%);
+  --apex-gradient-warning: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+  --apex-page-glow: radial-gradient(circle at top left, rgb(37 99 235 / 0.12), transparent 34rem),
+    radial-gradient(circle at 85% 10%, rgb(124 58 237 / 0.1), transparent 28rem);
+
+  --background: var(--apex-bg);
+  --foreground: var(--apex-foreground);
+  --card: var(--apex-surface);
+  --card-foreground: var(--apex-foreground);
+  --popover: var(--apex-surface);
+  --popover-foreground: var(--apex-foreground);
+  --primary: var(--apex-primary);
+  --primary-foreground: var(--apex-primary-foreground);
+  --secondary: var(--apex-secondary);
+  --secondary-foreground: var(--apex-foreground);
+  --muted: var(--apex-bg-subtle);
+  --muted-foreground: var(--apex-muted);
+  --accent: var(--apex-bg-subtle);
+  --accent-foreground: var(--apex-foreground);
+  --destructive: var(--apex-danger);
+  --destructive-foreground: var(--apex-danger-soft);
+  --border: var(--apex-border-soft);
+  --input: var(--apex-surface);
+  --ring: var(--apex-primary);
+  --chart-1: var(--apex-primary);
+  --chart-2: var(--apex-cyan);
+  --chart-3: var(--apex-success);
+  --chart-4: var(--apex-warning);
+  --chart-5: var(--apex-violet);
+}
+
+.dark[data-admin-theme="apex"] {
+  --apex-bg: #020617;
+  --apex-bg-subtle: #0f172a;
+  --apex-surface: #0f172a;
+  --apex-surface-elevated: #111827;
+  --apex-foreground: #f8fafc;
+  --apex-muted: #94a3b8;
+  --apex-muted-strong: #cbd5e1;
+  --apex-border: #1e293b;
+  --apex-border-soft: #1e293b;
+  --apex-sidebar: #020617;
+  --apex-sidebar-accent: #0f172a;
+  --apex-sidebar-border: #1e293b;
+  --apex-sidebar-foreground: #e2e8f0;
+  --apex-sidebar-muted: #94a3b8;
+  --apex-sidebar-hover: #1e293b;
+  --apex-card-shadow: 0 18px 45px rgb(0 0 0 / 0.28);
+  --apex-card-shadow-soft: 0 10px 28px rgb(0 0 0 / 0.22);
+  --apex-sidebar-shadow: 0 24px 70px rgb(0 0 0 / 0.34);
+
+  --background: var(--apex-bg);
+  --foreground: var(--apex-foreground);
+  --card: var(--apex-surface);
+  --card-foreground: var(--apex-foreground);
+  --popover: var(--apex-surface);
+  --popover-foreground: var(--apex-foreground);
+  --primary: var(--apex-primary);
+  --primary-foreground: var(--apex-primary-foreground);
+  --secondary: var(--apex-secondary);
+  --secondary-foreground: var(--apex-foreground);
+  --muted: var(--apex-bg-subtle);
+  --muted-foreground: var(--apex-muted);
+  --accent: var(--apex-bg-subtle);
+  --accent-foreground: var(--apex-foreground);
+  --destructive: var(--apex-danger);
+  --destructive-foreground: var(--apex-danger-soft);
+  --border: var(--apex-border-soft);
+  --input: var(--apex-surface);
+  --ring: var(--apex-primary);
+}
+
+.apex-admin-shell {
+  background:
+    var(--apex-page-glow),
+    var(--apex-bg);
+}
+
+.apex-admin-sidebar {
+  background:
+    linear-gradient(180deg, var(--apex-sidebar) 0%, var(--apex-sidebar-accent) 100%);
+  box-shadow: var(--apex-sidebar-shadow);
+}
+
+.apex-admin-topbar {
+  background: color-mix(in oklch, var(--apex-surface) 88%, transparent);
+  border-bottom: 1px solid var(--apex-border-soft);
+  backdrop-filter: blur(20px);
+}
+
+.apex-stat-card,
+.apex-action-card {
+  border: 1px solid var(--apex-border-soft);
+  border-radius: 1.25rem;
+  background: var(--apex-surface);
+  box-shadow: var(--apex-card-shadow-soft);
+}
+
+.apex-action-card {
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.apex-action-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in oklch, var(--apex-primary) 35%, var(--apex-border-soft));
+  box-shadow: var(--apex-card-shadow);
+}
+
+.apex-gradient-icon {
+  background: var(--apex-gradient-primary);
+  box-shadow: 0 12px 24px rgb(37 99 235 / 0.25);
+}
+
+.apex-soft-badge {
+  border: 1px solid var(--apex-border-soft);
+  background: var(--apex-bg-subtle);
+  color: var(--apex-muted-strong);
 }
 
 /* Base styles */
@@ -390,6 +547,29 @@ body {
   font-feature-settings:
     "rlig" 1,
     "calt" 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: oklch(0.75 0.18 35 / 0.28);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body::-webkit-scrollbar {
+  width: 0.75rem;
+}
+
+body::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+body::-webkit-scrollbar-thumb {
+  background: oklch(0.72 0.16 65 / 0.55);
+  border-radius: 9999px;
 }
 
 /* Persian text styles */

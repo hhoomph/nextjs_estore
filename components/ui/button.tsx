@@ -23,7 +23,7 @@ const buttonVariants = cva(
         default:
           "bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] shadow-md",
         destructive:
-          "bg-destructive text-white hover:bg-destructive/90 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 shadow-md",
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 shadow-md",
         outline:
           "border bg-background shadow-sm hover:bg-accent hover:text-accent-foreground hover:border-accent-foreground/20 hover:shadow-md dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
         secondary:
@@ -34,9 +34,9 @@ const buttonVariants = cva(
         gradient:
           "bg-gradient-to-r from-primary via-primary/90 to-primary text-primary-foreground hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] shadow-md",
         success:
-          "bg-green-600 text-white hover:bg-green-700 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] shadow-md",
+          "bg-success text-success-foreground hover:bg-success/90 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] shadow-md",
         warning:
-          "bg-yellow-600 text-white hover:bg-yellow-700 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] shadow-md",
+          "bg-warning text-warning-foreground hover:bg-warning/90 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] shadow-md",
       },
       size: {
         default: "h-10 px-4 py-2 has-[>svg]:px-3",

@@ -66,6 +66,8 @@ interface SettingsFormProps {
 }
 
 const CURRENCIES = [
+  { value: "IRR", label: "Iranian Rial (ریال)" },
+  { value: "TOMAN", label: "Iranian Toman (تومان)" },
   { value: "USD", label: "US Dollar ($)" },
   { value: "EUR", label: "Euro (€)" },
   { value: "GBP", label: "British Pound (£)" },
@@ -94,7 +96,7 @@ export function SettingsForm({
       contactEmail: initialSettings?.contactEmail || "",
       maintenanceMode: initialSettings?.maintenanceMode || false,
       allowRegistration: initialSettings?.allowRegistration !== false, // default true
-      defaultCurrency: initialSettings?.defaultCurrency || "USD",
+      defaultCurrency: initialSettings?.defaultCurrency || "IRR",
       lowStockThreshold: initialSettings?.lowStockThreshold || 10,
       adminPassword: "",
     },
@@ -119,9 +121,9 @@ export function SettingsForm({
       )}
 
       {success && (
-        <div className="flex items-center gap-2 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <CheckCircle className="h-5 w-5 text-green-600" />
-          <p className="text-green-800">{success}</p>
+        <div className="flex items-center gap-2 p-4 bg-success/10 border border-success/20 rounded-lg">
+          <CheckCircle className="h-5 w-5 text-success" />
+          <p className="text-success">{success}</p>
         </div>
       )}
 

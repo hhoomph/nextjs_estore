@@ -1,7 +1,6 @@
 "use client";
 
 export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
 
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -232,10 +231,10 @@ export default function AdminUsersPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex h-64 items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto" />
-          <p className="mt-2 text-muted-foreground">Loading users...</p>
+          <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
+          <p className="mt-2 text-sm text-muted-foreground">Loading users...</p>
         </div>
       </div>
     );
@@ -243,162 +242,21 @@ export default function AdminUsersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <section className="overflow-hidden rounded-[2rem] border border-border bg-card p-6 shadow-xl">
         <div>
-          <h1 className="text-3xl font-bold">Users</h1>
-          <p className="text-muted-foreground">Manage user accounts and roles</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+            User administration
+          </p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground">
+            Users
+          </h1>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Manage user accounts and roles with Apex-style filters and tables.
+          </p>
         </div>
+      </section>
 
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button
-              onClick={() => {
-                setEditingUser(null);
-                form.reset({
-                  name: "",
-                  email: "",
-                  phoneNumber: "",
-                  role: "USER",
-                  active: true,
-                });
-              }}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add User
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>
-                {editingUser ? "Edit User" : "Add New User"}
-              </DialogTitle>
-            </DialogHeader>
-
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(handleSubmit)}
-                className="space-y-4"
-              >
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Full Name</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input type="email" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="phoneNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phone Number (Optional)</FormLabel>
-                      <FormControl>
-                        <Input {...field} value={field.value ?? ""} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="role"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Role</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select role" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="USER">User</SelectItem>
-                          <SelectItem value="ADMIN">Admin</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="active"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Status</FormLabel>
-                      <Select
-                        onValueChange={(value) => field.onChange(value === "true")}
-                        value={field.value ? "true" : "false"}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="true">Active</SelectItem>
-                          <SelectItem value="false">Inactive</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="flex gap-2 pt-4">
-                  <Button type="submit" disabled={submitting}>
-                    {submitting ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Saving...
-                      </>
-                    ) : editingUser ? (
-                      "Update User"
-                    ) : (
-                      "Create User"
-                    )}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setDialogOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      <Card>
+      <Card className="apex-stat-card">
         <CardContent className="pt-6">
           <div className="flex gap-4">
             <div className="flex-1">
@@ -406,14 +264,14 @@ export default function AdminUsersPage() {
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search users..."
-                  className="pl-8"
+                  className="rounded-xl pl-8"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
             </div>
             <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger className="w-32">
+              <SelectTrigger className="w-32 rounded-xl border-border bg-background">
                 <SelectValue placeholder="Role" />
               </SelectTrigger>
               <SelectContent>
@@ -423,7 +281,7 @@ export default function AdminUsersPage() {
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-32">
+              <SelectTrigger className="w-32 rounded-xl border-border bg-background">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
@@ -436,21 +294,23 @@ export default function AdminUsersPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="apex-stat-card">
         <CardHeader>
-          <CardTitle>Users ({users.length})</CardTitle>
+          <CardTitle className="text-base font-semibold tracking-tight text-foreground">
+            Users ({users.length})
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {error && (
-            <div className="text-center py-4">
-              <p className="text-destructive">{error}</p>
+            <div className="rounded-2xl border border-border bg-destructive/10 p-4 text-center">
+              <p className="text-sm text-destructive">{error}</p>
             </div>
           )}
 
           {users.length === 0 ? (
-            <div className="text-center py-12">
-              <UserCheck className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No users found</p>
+            <div className="py-12 text-center">
+              <UserCheck className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">No users found</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -471,7 +331,7 @@ export default function AdminUsersPage() {
                     <TableRow key={user.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-full bg-blue-500/10 flex items-center justify-center">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary text-sm font-bold text-primary-foreground">
                             <span className="text-sm font-medium">
                               {(user.name || user.email).charAt(0).toUpperCase()}
                             </span>
@@ -487,7 +347,7 @@ export default function AdminUsersPage() {
                           value={user.role}
                           onValueChange={(value) => updateUserRole(user.id, value)}
                         >
-                          <SelectTrigger className="w-24">
+                          <SelectTrigger className="w-24 rounded-xl border-border bg-background">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -499,7 +359,11 @@ export default function AdminUsersPage() {
                       <TableCell>
                         <Badge
                           variant={user.active ? "default" : "secondary"}
-                          className={user.active ? "bg-green-100 text-green-800" : ""}
+                          className={
+                            user.active
+                              ? "border-transparent bg-success/10 text-success"
+                              : "border-transparent bg-destructive/10 text-destructive"
+                          }
                         >
                           {user.active ? "Active" : "Inactive"}
                         </Badge>
@@ -512,14 +376,14 @@ export default function AdminUsersPage() {
                         <div className="flex gap-2">
                           <Button
                             variant="ghost"
-                            size="sm"
+                            className="rounded-xl"
                             onClick={() => handleEdit(user)}
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="ghost"
-                            size="sm"
+                            className="rounded-xl"
                             onClick={() => toggleUserStatus(user.id, user.active)}
                           >
                             {user.active ? (
@@ -528,14 +392,13 @@ export default function AdminUsersPage() {
                               <UserCheck className="h-4 w-4" />
                             )}
                           </Button>
-                          <Button variant="ghost" size="sm">
+                          <Button variant="ghost" className="rounded-xl">
                             <Eye className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="ghost"
-                            size="sm"
+                            className="rounded-xl text-destructive hover:text-destructive/80"
                             onClick={() => handleDelete(user.id)}
-                            className="text-destructive hover:text-destructive"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -551,22 +414,24 @@ export default function AdminUsersPage() {
       </Card>
 
       {totalPages > 1 && (
-        <div className="flex justify-center">
-          <div className="flex gap-2">
+        <div className="flex justify-center rounded-[1.5rem] border border-border bg-card p-4 shadow-lg">
+          <div className="flex flex-col gap-3 text-sm text-muted-foreground md:flex-row md:items-center">
             <Button
               variant="outline"
               disabled={currentPage === 1}
               onClick={() => setCurrentPage(currentPage - 1)}
+              className="rounded-xl"
             >
               Previous
             </Button>
-            <span className="flex items-center px-4">
+            <span className="flex items-center justify-center px-4">
               Page {currentPage} of {totalPages}
             </span>
             <Button
               variant="outline"
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage(currentPage + 1)}
+              className="rounded-xl"
             >
               Next
             </Button>
@@ -576,3 +441,4 @@ export default function AdminUsersPage() {
     </div>
   );
 }
+

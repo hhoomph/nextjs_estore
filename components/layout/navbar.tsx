@@ -130,15 +130,15 @@ export function Navbar() {
   return (
     <CursorEnhancer>
       <IranSansLoader>
-        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+        <header       className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/95 text-foreground shadow-sm">
           <div className="container flex h-16 items-center justify-between px-4">
             {/* Logo */}
             <Link
               href="/"
               className="flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer"
             >
-              <Package className="h-6 w-6 text-blue-600" />
-              <span className="font-bold text-xl text-foreground hover:text-blue-600 transition-colors font-persian">
+              <Package className="h-6 w-6 text-primary" />
+              <span className="font-bold text-xl text-foreground hover:text-primary transition-colors font-persian">
                 {siteTitle}
               </span>
             </Link>
@@ -209,10 +209,10 @@ export function Navbar() {
                   variant="outline"
                   size="icon"
                   onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-                  className="relative border-2 hover:border-blue-600 transition-all duration-300 bg-background hover:bg-accent"
+                  className="relative border-border hover:border-primary transition-all duration-300 bg-background hover:bg-accent"
                 >
-                  <Sun className="h-4 w-4 rotate-0 scale-100 transition-all duration-300 dark:-rotate-90 dark:scale-0 text-yellow-500" />
-                  <Moon className="absolute inset-0 h-4 w-4 rotate-90 scale-0 transition-all duration-300 dark:rotate-0 dark:scale-100 text-blue-400" />
+                  <Sun className="h-4 w-4 rotate-0 scale-100 transition-all duration-300 dark:-rotate-90 dark:scale-0 text-warning" />
+                  <Moon className="absolute inset-0 h-4 w-4 rotate-90 scale-0 transition-all duration-300 dark:rotate-0 dark:scale-100 text-primary" />
                   <span className="sr-only">Toggle theme</span>
                 </Button>
               )}
@@ -252,7 +252,7 @@ export function Navbar() {
                             alt={sessionData.user.name || ""}
                             loading="lazy"
                           />
-                          <AvatarFallback className="bg-blue-600/10 text-blue-600 font-medium">
+                          <AvatarFallback className="bg-primary/10 text-primary font-medium">
                             {sessionData.user.name?.charAt(0).toUpperCase() ||
                               "U"}
                           </AvatarFallback>
@@ -298,7 +298,7 @@ export function Navbar() {
                           href="/wishlist"
                           className="flex items-center px-2 py-2 hover:bg-accent/80 transition-colors duration-200 rounded-md cursor-pointer focus:bg-accent focus:text-accent-foreground"
                         >
-                          <Heart className="mr-3 h-4 w-4 text-red-500 group-hover:text-red-600 transition-colors" />
+                          <Heart className="mr-3 h-4 w-4 text-destructive group-hover:text-destructive transition-colors" />
                           <span className="font-medium">Wishlist</span>
                         </Link>
                       </DropdownMenuItem>
@@ -319,8 +319,8 @@ export function Navbar() {
                               href="/admin"
                               className="flex items-center px-2 py-2 hover:bg-accent/80 transition-colors duration-200 rounded-md cursor-pointer focus:bg-accent focus:text-accent-foreground"
                             >
-                              <Package className="mr-3 h-4 w-4 text-blue-600" />
-                              <span className="font-medium text-blue-600">
+                              <Package className="mr-3 h-4 w-4 text-primary" />
+                              <span className="font-medium text-primary">
                                 Admin Panel
                               </span>
                             </Link>

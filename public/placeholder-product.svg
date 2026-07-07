@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900">
+  <rect width="900" height="900" rx="80" fill="#ffedd5"/>
+  <path d="M250 620V280h400v340H250Z" fill="#fff7ed"/>
+  <path d="M250 430 450 310l200 120" fill="none" stroke="#fb923c" stroke-width="42" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="450" cy="450" r="120" fill="#fed7aa"/>
+  <text x="450" y="500" text-anchor="middle" font-family="Arial, sans-serif" font-size="56" font-weight="800" fill="#c2410c">E-Store</text>
+</svg>

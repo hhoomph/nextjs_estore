@@ -99,6 +99,17 @@ export async function PUT(
       );
     }
 
+    // Prevent circular parent references
+    if (parentId && parentId !== id) {
+      const wouldCreateCycle = await containsDescendant(id, parentId);
+      if (wouldCreateCycle) {
+        return NextResponse.json(
+          { error: "Cannot set parent: category hierarchy would become circular" },
+          { status: 409 },
+        );
+      }
+    }
+
     // Determine level based on parent
     let level = 0;
     if (parentId) {
@@ -139,6 +150,35 @@ export async function PUT(
       { status: 500 },
     );
   }
+}
+
+async function containsDescendant(
+  categoryId: string,
+  targetParentId: string,
+): Promise<boolean> {
+  let currentId: string | null = targetParentId;
+  const visited = new Set<string>([categoryId]);
+
+  while (currentId) {
+    if (currentId === categoryId) {
+      return true;
+    }
+
+    if (visited.has(currentId)) {
+      return true;
+    }
+
+    visited.add(currentId);
+
+    const categoryNode: { parentId: string | null } | null = await prisma.category.findUnique({
+      where: { id: currentId },
+      select: { parentId: true },
+    });
+
+    currentId = (categoryNode as { parentId: string | null } | null)?.parentId ?? null;
+  }
+
+  return false;
 }
 
 // DELETE /api/admin/categories/[id] - Delete category

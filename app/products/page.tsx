@@ -20,7 +20,7 @@ export default async function ProductsPage() {
     initialData = await getProducts({
       page: 1,
       limit: 12,
-      sortBy: "created_at",
+      sortBy: "createdAt",
       sortOrder: "desc",
     });
   } catch (error) {

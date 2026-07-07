@@ -12,13 +12,9 @@
  */
 
 import {
-  ArrowLeft,
-  Check,
   GitCompare,
   Heart,
-  Minus,
   Plus,
-  ShoppingCart,
   Star,
   Trash2,
   X,
@@ -32,16 +28,20 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CurrencyDisplay from "@/components/ui/currency-display";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ProductActionButton } from "@/components/ui/product-action-button";
+import { StockBadge } from "@/components/ui/stock-badge";
 import { useToast } from "@/lib/hooks/use-toast";
-import { useCartStore } from "@/lib/stores/cart-store";
-import { useComparisonStore } from "@/lib/stores/comparison-store";
+import { useCartActions } from "@/lib/hooks/use-simplified-cart-sync";
+import {
+  type ComparisonProduct,
+  useComparisonStore,
+} from "@/lib/stores/comparison-store";
 import { useWishlistStore } from "@/lib/stores/wishlist-store";
 
 export default function ComparePage() {
   const { items: comparisonItems, removeItem, clearAll } = useComparisonStore();
-  const { addItem: addToCart } = useCartStore();
+  const { addToCart } = useCartActions();
   const {
     addItem: addToWishlist,
     removeItem: removeFromWishlist,
@@ -50,14 +50,16 @@ export default function ComparePage() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("overview");
 
-  const handleAddToCart = (product: any) => {
-    addToCart({
+  const handleAddToCart = async (product: ComparisonProduct) => {
+    const currentPrice = product.discount_price ?? product.price;
+
+    await addToCart({
       product_id: product.id,
       product: {
         id: product.id,
         name: product.name,
-        price: product.price,
-        discount_price: product.discount_price,
+        price: currentPrice,
+        discount_price: currentPrice,
         slug: product.slug,
         product_pictures: product.product_pictures,
       },
@@ -70,7 +72,7 @@ export default function ComparePage() {
     });
   };
 
-  const handleWishlistToggle = (product: any) => {
+  const handleWishlistToggle = (product: ComparisonProduct) => {
     const isInWishlist = wishlistItems.some(
       (item) => item.product_id === product.id,
     );
@@ -88,7 +90,7 @@ export default function ComparePage() {
           id: product.id,
           name: product.name,
           price: product.price,
-          discount_price: product.discount_price,
+          discount_price: product.discount_price ?? null,
           slug: product.slug,
           product_pictures: product.product_pictures,
         },
@@ -100,46 +102,45 @@ export default function ComparePage() {
     }
   };
 
-  const renderProductImage = (product: any, index: number) => (
+  const renderProductImage = (product: ComparisonProduct, index: number) => (
     <div className="relative aspect-square bg-muted rounded-lg overflow-hidden">
       <Image
         src={
           product.product_pictures?.[0]?.picture?.url ||
-          "/placeholder-product.jpg"
+          "/placeholder-product.svg"
         }
         alt={product.name}
         fill={true}
         className="object-cover"
       />
       <div className="absolute top-2 left-2 flex gap-1">
-        {product.discount_price && <Badge className="bg-green-600">Sale</Badge>}
+        {product.discount_price && <Badge className="bg-success text-success-foreground">Sale</Badge>}
         <Badge variant="secondary">#{index + 1}</Badge>
       </div>
     </div>
   );
 
-  const renderProductActions = (product: any) => {
+  const renderProductActions = (product: ComparisonProduct) => {
     const isInWishlist = wishlistItems.some(
       (item) => item.product_id === product.id,
     );
 
     return (
       <div className="flex gap-2 mt-4">
-        <Button
+        <ProductActionButton
           className="flex-1"
-          onClick={() => handleAddToCart(product)}
-          disabled={!product.in_stock}
-        >
-          <ShoppingCart className="h-4 w-4 mr-2" />
-          {product.in_stock ? "Add to Cart" : "Out of Stock"}
-        </Button>
+          inStock={product.in_stock}
+          label="Add to Cart"
+          outOfStockLabel="Out of Stock"
+          onClick={() => void handleAddToCart(product)}
+        />
         <Button
           variant="outline"
           size="icon"
           onClick={() => handleWishlistToggle(product)}
         >
           <Heart
-            className={`h-4 w-4 ${isInWishlist ? "fill-current text-red-500" : ""}`}
+            className={`h-4 w-4 ${isInWishlist ? "fill-current text-destructive" : ""}`}
           />
         </Button>
         <Button
@@ -185,7 +186,7 @@ export default function ComparePage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold flex items-center gap-2 font-persian">
-              <GitCompare className="h-8 w-8 style={{ color: 'rgb(59, 130, 246)' }}" />
+              <GitCompare className="h-8 w-8 text-primary" />
               مقایسه محصولات
             </h1>
             <p className="text-muted-foreground font-persian">
@@ -241,7 +242,7 @@ export default function ComparePage() {
                   <CardContent className="p-4">
                     <div className="space-y-3">
                       <Link href={`/products/${product.slug}`}>
-                        <h3 className="font-semibold line-clamp-2 hover:style={{ color: 'rgb(59, 130, 246)' }} transition-colors font-persian">
+                        <h3 className="font-semibold line-clamp-2 hover:text-primary transition-colors font-persian">
                           {product.name}
                         </h3>
                       </Link>
@@ -249,7 +250,7 @@ export default function ComparePage() {
                       <div className="flex items-center gap-2">
                         {product.rating && (
                           <div className="flex items-center gap-1">
-                            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                              <Star className="h-4 w-4 fill-warning text-warning" />
                             <span className="text-sm">{product.rating}</span>
                             {product.review_count && (
                               <span className="text-xs text-muted-foreground">
@@ -278,15 +279,13 @@ export default function ComparePage() {
                       </div>
 
                       <div className="flex items-center gap-2 text-sm">
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs ${
-                            product.in_stock
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {product.in_stock ? "موجود" : "ناموجود"}
-                        </span>
+                        <StockBadge
+                          inStock={product.in_stock}
+                          inStockLabel="موجود"
+                          outOfStockLabel="ناموجود"
+                          showQuantity={false}
+                          className="px-2 py-1 text-xs"
+                        />
                         {product.brand && (
                           <span className="text-muted-foreground">
                             {product.brand}
@@ -302,7 +301,7 @@ export default function ComparePage() {
 
               {/* Add Product Placeholder */}
               {comparisonItems.length < 4 && (
-                <Card className="border-dashed border-2 hover:style={{ borderColor: 'rgb(59, 130, 246)' }} transition-colors">
+                <Card className="border-dashed border-2 hover:border-primary transition-colors">
                   <CardContent className="p-8 text-center">
                     <Plus className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <p className="text-muted-foreground font-persian mb-4">
@@ -328,7 +327,7 @@ export default function ComparePage() {
                     {/* Basic Info Row */}
                     <div className="grid grid-cols-5 gap-4 p-4 bg-muted rounded-lg">
                       <div className="font-semibold font-persian">مشخصات</div>
-                      {comparisonItems.map((product, index) => (
+                      {comparisonItems.map((product) => (
                         <div key={product.id} className="text-center">
                           <div className="font-semibold font-persian">
                             {product.name}
@@ -366,15 +365,13 @@ export default function ComparePage() {
                       </div>
                       {comparisonItems.map((product) => (
                         <div key={product.id} className="text-center">
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs ${
-                              product.in_stock
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
-                            }`}
-                          >
-                            {product.in_stock ? "موجود" : "ناموجود"}
-                          </span>
+                          <StockBadge
+                            inStock={product.in_stock}
+                            inStockLabel="موجود"
+                            outOfStockLabel="ناموجود"
+                            showQuantity={false}
+                            className="px-2 py-1 text-xs"
+                          />
                         </div>
                       ))}
                     </div>
@@ -399,7 +396,7 @@ export default function ComparePage() {
                         <div key={product.id} className="text-center">
                           {product.rating ? (
                             <div className="flex items-center justify-center gap-1">
-                              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                            <Star className="h-4 w-4 fill-warning text-warning" />
                               <span>{product.rating}</span>
                             </div>
                           ) : (
@@ -443,8 +440,8 @@ export default function ComparePage() {
                                 key={i}
                                 className={`h-4 w-4 ${
                                   i < Math.floor(product.rating!)
-                                    ? "fill-yellow-400 text-yellow-400"
-                                    : "text-gray-300"
+                                    ? "fill-warning text-warning"
+                                    : "text-muted-foreground/40"
                                 }`}
                               />
                             ))}

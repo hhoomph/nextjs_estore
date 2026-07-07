@@ -446,14 +446,14 @@ export function PersianCalendar({
                         ? "text-foreground"
                         : "text-muted-foreground",
                       // Selection styling
-                      isSelected &&
-                        "style={{ backgroundColor: 'rgb(59, 130, 246)' }} style={{ color: 'rgb(59, 130, 246)' }}-foreground hover:style={{ backgroundColor: 'rgb(59, 130, 246)' }}/90",
+                        isSelected &&
+                        "bg-primary text-primary-foreground hover:bg-primary/90",
                       // Today styling
                       isToday && !isSelected && "bg-accent font-semibold",
                       // Highlighted dates
                       isHighlightedDate &&
                         !isSelected &&
-                        "bg-yellow-50 text-yellow-900 border-yellow-200",
+                        "bg-warning/10 text-warning border-warning/20",
                       // Disabled dates
                       isDisabledDate && "opacity-30 cursor-not-allowed",
                     )}
@@ -463,7 +463,7 @@ export function PersianCalendar({
                         language === "fa" && "font-vazirmatn",
                         isToday &&
                           dayData.isCurrentMonth &&
-                          "ring-2 ring-blue-500 ring-offset-1 rounded-full w-6 h-6 flex items-center justify-center",
+                          "ring-2 ring-primary ring-offset-1 rounded-full w-6 h-6 flex items-center justify-center",
                       )}
                     >
                       {language === "fa"
@@ -473,7 +473,7 @@ export function PersianCalendar({
 
                     {/* Holiday indicator */}
                     {isHighlightedDate && (
-                      <div className="absolute top-1 right-1 w-1 h-1 bg-yellow-500 rounded-full" />
+                      <div className="absolute top-1 right-1 w-1 h-1 bg-warning rounded-full" />
                     )}
                   </button>
                 );

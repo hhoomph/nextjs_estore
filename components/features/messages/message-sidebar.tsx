@@ -265,7 +265,7 @@ export function MessageSidebar({
                             </AvatarFallback>
                           </Avatar>
                           {message.sender.online && (
-                            <div className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 border-2 border-background rounded-full" />
+                            <div className="absolute bottom-0 right-0 h-3 w-3 bg-success border-2 border-background rounded-full" />
                           )}
                         </div>
                         <div className="flex-1 min-w-0">

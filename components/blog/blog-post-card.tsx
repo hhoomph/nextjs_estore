@@ -15,40 +15,10 @@ import { useTranslations } from "next-intl";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-
-interface BlogPostWithRelations {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string | null;
-  featuredImage: string | null;
-  publishedAt: Date | null;
-  readingTime: number | null;
-  viewCount: number;
-  author: {
-    id: string;
-    name: string | null;
-    image: string | null;
-  };
-  category: {
-    id: string;
-    name: string;
-    slug: string;
-    color: string | null;
-  };
-  tags: {
-    tag: {
-      id: string;
-      name: string;
-      slug: string;
-      color: string | null;
-    };
-  }[];
-  comments: { id: string }[];
-}
+import type { BlogPostListData } from "./types";
 
 interface BlogPostCardProps {
-  post: BlogPostWithRelations;
+  post: BlogPostListData;
 }
 
 export function BlogPostCard({ post }: BlogPostCardProps) {

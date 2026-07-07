@@ -282,20 +282,20 @@ const colorMap = {
   default: "text-foreground",
   primary: "text-primary",
   secondary: "text-secondary-foreground",
-  success: "text-green-600 dark:text-green-400",
-  warning: "text-yellow-600 dark:text-yellow-400",
-  error: "text-red-600 dark:text-red-400",
-  info: "text-blue-600 dark:text-blue-400",
+  success: "text-success",
+  warning: "text-warning",
+  error: "text-destructive",
+  info: "text-primary",
 };
 
 const badgeColorMap = {
   default: "bg-muted text-muted-foreground",
   primary: "bg-primary text-primary-foreground",
   secondary: "bg-secondary text-secondary-foreground",
-  success: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+  success: "bg-success/10 text-success",
   warning:
-    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
-  error: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+    "bg-warning/10 text-warning",
+  error: "bg-destructive/10 text-destructive",
 };
 
 const EnhancedIconComponent = React.forwardRef<

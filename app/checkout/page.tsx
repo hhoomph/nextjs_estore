@@ -7,25 +7,16 @@
  */
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState } from "react";
 
-// Force dynamic rendering to avoid prerendering issues
-export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
-
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import {
-  AlertTriangle,
   Check,
   ChevronLeft,
   CreditCard,
   Loader2,
-  MapPin,
-  Plus,
   ShoppingBag,
-  Truck,
-  User,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -35,26 +26,19 @@ import { AdvancedErrorBoundary } from "@/components/errors/advanced-error-bounda
 import { AddressForm } from "@/components/features/addresses/AddressForm";
 import { AddressSelector } from "@/components/features/addresses/AddressSelector";
 import { GuestCheckoutFlow } from "@/components/features/checkout/guest-checkout-flow";
+import { OrderSummary } from "@/components/features/checkout/order-summary";
+import { SectionHeading } from "@/components/features/layout/section-heading";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { useSession } from "@/lib/auth-client";
 import { SHIPPING_COST, TAX_RATE } from "@/lib/constants/checkout";
 import { useCartStore } from "@/lib/stores/cart-store";
@@ -75,32 +59,38 @@ type PaymentFormData = z.infer<typeof paymentSchema>;
 export default function CheckoutPage() {
   const router = useRouter();
   const { data: session, isPending } = useSession();
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  // Determine if user is guest or authenticated
-  const isGuest = !isClient || !session?.user;
-  const cartStore = isGuest ? useGuestCartStore() : useCartStore();
+  const userCartStore = useCartStore();
+  const guestCartStore = useGuestCartStore();
+  const [cartReady, setCartReady] = useState(false);
+  const isGuest = !session?.user;
+  const cartStore = isGuest ? guestCartStore : userCartStore;
 
   const { items: cartItems, getTotal, clearCart } = cartStore;
 
+  useEffect(() => {
+    let mounted = true;
+    const waitForHydration = (store: { persist: { hasHydrated: () => boolean | Promise<boolean> } }) =>
+      Promise.race([
+        store.persist.hasHydrated(),
+        new Promise((resolve) => setTimeout(resolve, 100)),
+      ]);
+
+    void Promise.all([
+      waitForHydration(useCartStore),
+      waitForHydration(useGuestCartStore),
+    ]).then(() => {
+      if (mounted) setCartReady(true);
+    });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   const cartTotal = getTotal();
 
-  // Keep the initial client render aligned with the server render.
-  if (!isClient) {
-    return (
-      <div className="flex justify-center items-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Loading...</span>
-      </div>
-    );
-  }
-
   // Loading state while checking authentication
-  if (isPending) {
+  if (isPending || !cartReady) {
     return (
       <div className="flex justify-center items-center py-20">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -152,22 +142,16 @@ export default function CheckoutPage() {
 
         <div className="container px-4 py-8">
           {/* Checkout Header */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-3xl font-bold">Checkout</h1>
-              {isGuest && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
-                  <User className="h-4 w-4" />
-                  <span>Guest Checkout</span>
-                </div>
-              )}
-            </div>
-            <p className="text-muted-foreground">
-              {isGuest
+          <SectionHeading
+            eyebrow={isGuest ? "Guest Checkout" : "Secure Checkout"}
+            title="Checkout"
+            description={
+              isGuest
                 ? "Complete your order as a guest or sign in to access your account features."
-                : "Review your order details and complete your purchase."}
-            </p>
-          </div>
+                : "Review your order details and complete your purchase."
+            }
+            className="mb-8"
+          />
 
           {isGuest ? (
             /* Guest Checkout Flow */
@@ -202,83 +186,20 @@ export default function CheckoutPage() {
                 />
               </div>
 
-              {/* Order Summary Sidebar */}
               <div className="lg:col-span-1">
-                <Card className="sticky top-20">
-                  <CardHeader>
-                    <CardTitle>Order Summary</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {/* Cart Items */}
-                    <div className="space-y-3">
-                      {cartItems.map((item) => (
-                        <div key={item.id} className="flex gap-3">
-                          <div className="w-12 h-12 bg-muted rounded-md overflow-hidden shrink-0">
-                            {item.product.product_pictures?.[0] ? (
-                              <Image
-                                src={
-                                  item.product.product_pictures[0].picture.url
-                                }
-                                alt={item.product.name}
-                                fill={true}
-                                className="object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full bg-muted-foreground/10 flex items-center justify-center">
-                                <div className="text-xs opacity-50">📦</div>
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate">
-                              {item.product.name}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              Qty: {item.quantity}
-                            </p>
-                            <p className="text-sm font-medium">
-                              $
-                              {(
-                                item.product.discount_price ||
-                                item.product.price
-                              ).toFixed(2)}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    <Separator />
-
-                    {/* Totals */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>Subtotal</span>
-                        <span>${cartTotal.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Shipping</span>
-                        <span>${SHIPPING_COST.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Tax</span>
-                        <span>${(cartTotal * TAX_RATE).toFixed(2)}</span>
-                      </div>
-                      <Separator />
-                      <div className="flex justify-between font-semibold">
-                        <span>Total</span>
-                        <span>
-                          $
-                          {(
-                            cartTotal +
-                            SHIPPING_COST +
-                            cartTotal * TAX_RATE
-                          ).toFixed(2)}
-                        </span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <OrderSummary
+                  items={cartItems.map((item) => ({
+                    id: item.id,
+                    name: item.product.name,
+                    quantity: item.quantity,
+                    image: item.product.product_pictures?.[0]?.picture.url ?? null,
+                    price: item.product.price,
+                    discountPrice: item.product.discount_price,
+                  }))}
+                  subtotal={cartTotal}
+                  shippingCost={SHIPPING_COST}
+                  taxRate={TAX_RATE}
+                />
               </div>
             </div>
           )}
@@ -318,7 +239,6 @@ function AuthenticatedCheckoutFlow({
   onSuccess: (orderId: string) => void;
   onError: (error: string) => void;
 }) {
-  const { data: session } = useSession();
   const { selectedShippingAddress, setShippingAddress } = useCartStore();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);

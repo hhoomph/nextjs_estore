@@ -52,6 +52,28 @@ export async function PATCH(
       );
     }
 
+    if (updateData.active === false && (role === "ADMIN" || (!role && session?.user?.role === "ADMIN"))) {
+      const activeAdmins = await prisma.user.count({
+        where: { role: "ADMIN", active: true },
+      });
+
+      const currentUser = await prisma.user.findUnique({
+        where: { id },
+        select: { role: true, active: true },
+      });
+
+      const currentIsActiveAdmin =
+        (role === "ADMIN" || currentUser?.role === "ADMIN") &&
+        (currentUser?.active !== false);
+
+      if (currentIsActiveAdmin && activeAdmins <= 1) {
+        return NextResponse.json(
+          { error: "Cannot deactivate the last active admin" },
+          { status: 409 },
+        );
+      }
+    }
+
     // Update user
     const updatedUser = await prisma.user.update({
       where: { id },

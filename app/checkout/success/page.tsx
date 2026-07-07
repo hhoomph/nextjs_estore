@@ -7,19 +7,20 @@
  */
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
 // Force dynamic rendering to avoid prerendering issues
 export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
 
 import { CheckCircle, Download, Home, Package, Truck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { SafeSessionStorage } from "@/lib/utils/storage-ssr";
 
 interface OrderDetails {
   id: string;
@@ -28,6 +29,18 @@ interface OrderDetails {
   total: number;
   createdAt: string;
   transactionCode?: string;
+  items: Array<{
+    id: string;
+    product: {
+      id: string;
+      name: string;
+      slug: string;
+      price: number;
+      discountPrice: number | null;
+      image: string | null;
+    };
+    quantity: number;
+  }>;
 }
 
 function CheckoutSuccessContent() {
@@ -45,28 +58,54 @@ function CheckoutSuccessContent() {
       return;
     }
 
-    // In a real app, you'd fetch order details from API
-    // For now, we'll simulate the order details
-    const mockOrder: OrderDetails = {
-      id: orderId,
-      orderNumber: orderId.slice(0, 8).toUpperCase(),
-      status: "confirmed",
-      total: 0, // Would be fetched from API
-      createdAt: new Date().toISOString(),
-      transactionCode: `txn_${orderId.slice(0, 8)}`,
+    const getCheckoutSessionId = () => {
+      try {
+        const stored = SafeSessionStorage.getItem("checkout_session");
+        if (!stored) return null;
+
+        const parsed = JSON.parse(stored) as { id?: unknown };
+        return typeof parsed.id === "string" ? parsed.id : null;
+      } catch {
+        return null;
+      }
     };
 
-    // Use setTimeout to make state updates asynchronous
-    setTimeout(() => {
-      setOrder(mockOrder);
-      setLoading(false);
-    }, 0);
+    const loadOrder = async () => {
+      const checkoutSessionId = getCheckoutSessionId();
+      const headers: HeadersInit = checkoutSessionId
+        ? { "x-checkout-session-id": checkoutSessionId }
+        : {};
+
+      try {
+        const response = await fetch(`/api/orders/${encodeURIComponent(orderId)}`, {
+          headers,
+        });
+        const data = (await response.json()) as
+          | OrderDetails
+          | { error?: string };
+
+        if (!response.ok) {
+          throw new Error(
+            "error" in data && data.error ? data.error : "Order not found",
+          );
+        }
+
+        setOrder(data as OrderDetails);
+        SafeSessionStorage.removeItem("checkout_session");
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Order not found");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void loadOrder();
   }, [orderId, router]);
 
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         <span className="ml-2">Loading order details...</span>
       </div>
     );
@@ -111,8 +150,8 @@ function CheckoutSuccessContent() {
       <div className="container px-4 py-12">
         {/* Success Header */}
         <div className="text-center mb-12">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="h-8 w-8 text-green-600" />
+          <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <CheckCircle className="h-8 w-8 text-success" />
           </div>
           <h1 className="text-4xl font-bold mb-4">Order Confirmed!</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -153,7 +192,7 @@ function CheckoutSuccessContent() {
                     <h3 className="font-semibold mb-2">Order Status</h3>
                     <Badge
                       variant="default"
-                      className="bg-green-100 text-green-800"
+                      className="bg-success/10 text-success"
                     >
                       {order.status}
                     </Badge>
@@ -192,13 +231,52 @@ function CheckoutSuccessContent() {
                   </div>
                 </div>
 
+                <div>
+                  <h3 className="font-semibold mb-4">Purchased Items</h3>
+                  <div className="space-y-3">
+                    {order.items.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center gap-3 border rounded-lg p-3"
+                      >
+                        {item.product.image ? (
+                          <div className="relative h-12 w-12 overflow-hidden rounded-md bg-muted">
+                            <Image
+                              src={item.product.image}
+                              alt={item.product.name}
+                              fill={true}
+                              className="object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="h-12 w-12 rounded-md bg-muted flex items-center justify-center text-xs text-muted-foreground">
+                            No image
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium truncate">
+                            {item.product.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Qty {item.quantity} · $
+                            {(item.product.discountPrice ?? item.product.price).toFixed(2)}
+                          </p>
+                        </div>
+                        <p className="text-sm font-semibold">
+                          ${(item.product.discountPrice ?? item.product.price) * item.quantity}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Next Steps */}
                 <div>
                   <h3 className="font-semibold mb-4">What's Next?</h3>
                   <div className="space-y-4">
                     <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                        <span className="text-xs font-semibold text-blue-600">
+                      <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                        <span className="text-xs font-semibold text-primary">
                           1
                         </span>
                       </div>
@@ -211,8 +289,8 @@ function CheckoutSuccessContent() {
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                        <span className="text-xs font-semibold text-blue-600">
+                      <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                        <span className="text-xs font-semibold text-primary">
                           2
                         </span>
                       </div>
@@ -225,8 +303,8 @@ function CheckoutSuccessContent() {
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                        <span className="text-xs font-semibold text-blue-600">
+                      <div className="w-6 h-6 bg-primary/10 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                        <span className="text-xs font-semibold text-primary">
                           3
                         </span>
                       </div>
@@ -311,7 +389,7 @@ function CheckoutSuccessContent() {
                     Contact our support team at{" "}
                     <a
                       href="mailto:support@estore.com"
-                      className="text-blue-600 hover:underline"
+                      className="text-primary hover:underline"
                     >
                       support@estore.com
                     </a>
@@ -320,7 +398,7 @@ function CheckoutSuccessContent() {
                     Or call us at{" "}
                     <a
                       href="tel:1-800-123-4567"
-                      className="text-blue-600 hover:underline"
+                      className="text-primary hover:underline"
                     >
                       1-800-123-4567
                     </a>
@@ -334,7 +412,7 @@ function CheckoutSuccessContent() {
         {/* Continue Shopping CTA */}
         <div className="text-center mt-12">
           <div className="bg-muted/50 rounded-lg p-8 max-w-2xl mx-auto">
-            <Package className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+            <Package className="h-12 w-12 text-primary mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">
               Love Shopping With Us?
             </h3>
@@ -358,7 +436,7 @@ export default function CheckoutSuccessPage() {
       fallback={
         <div className="min-h-screen bg-background">
           <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             <span className="ml-2">Loading...</span>
           </div>
         </div>
@@ -368,3 +446,4 @@ export default function CheckoutSuccessPage() {
     </Suspense>
   );
 }
+

@@ -75,7 +75,6 @@ export function CartSidebar({}: CartSidebarProps = {}) {
   const guestIsLoading = useGuestCartStore((s) => s.isLoading);
 
   const isGuest = !session?.user;
-  const items = isGuest ? guestItems : userItems;
   const isOpen = isGuest ? guestIsOpen : userIsOpen;
   const setCartOpen = isGuest ? guestSetCartOpen : userSetCartOpen;
   const removeItem = isGuest ? guestRemoveItem : userRemoveItem;
@@ -85,14 +84,15 @@ export function CartSidebar({}: CartSidebarProps = {}) {
 
   // Only guest cart has isLoading
   const isLoading = isGuest ? guestIsLoading : false;
+  const normalizeCartItems = (value: unknown) => (Array.isArray(value) ? value : []);
 
-  // Compute totals defensively from the items array we already have
-  const total = (items ?? []).reduce((sum, item) => {
+  const items = normalizeCartItems(isGuest ? guestItems : userItems);
+  const total = items.reduce((sum, item) => {
     const price = item.product.discount_price || item.product.price;
     const optionPrice = item.options?.price_increment || 0;
     return sum + (price + optionPrice) * item.quantity;
   }, 0);
-  const itemCount = (items ?? []).reduce(
+  const itemCount = items.reduce(
     (count, item) => count + (item.quantity || 0),
     0,
   );

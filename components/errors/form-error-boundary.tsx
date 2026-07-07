@@ -303,7 +303,7 @@ export class FormErrorBoundary extends Component<
         <div className="min-h-[300px] flex items-center justify-center p-4">
           <Card className="w-full max-w-2xl">
             <CardHeader className="text-center">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/20">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-warning/10">
                 {this.getErrorIcon()}
               </div>
               <CardTitle className="text-lg font-semibold">

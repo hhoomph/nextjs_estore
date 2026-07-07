@@ -66,7 +66,7 @@ export const Loading = React.forwardRef<HTMLDivElement, LoadingProps>(
             {variant === "gradient" && (
               <div
                 className="absolute inset-0 rounded-full border-2 animate-ping"
-                style={{ borderColor: "rgb(59, 130, 246, 0.2)" }}
+                style={{ borderColor: "hsl(var(--primary) / 0.2)" }}
               />
             )}
           </div>
@@ -114,13 +114,13 @@ export function LoadingPage({ text = "Loading..." }: { text?: string }) {
           <div
             className="w-16 h-16 border-4 rounded-full animate-spin mx-auto"
             style={{
-              borderColor: "rgb(156, 163, 175)",
-              borderTopColor: "rgb(59, 130, 246)",
+              borderColor: "hsl(var(--muted))",
+              borderTopColor: "hsl(var(--primary))",
             }}
           />
           <div
             className="absolute inset-0 w-16 h-16 border-4 border-transparent rounded-full animate-spin mx-auto animate-reverse"
-            style={{ borderRightColor: "rgb(59, 130, 246, 0.4)" }}
+            style={{ borderRightColor: "hsl(var(--primary) / 0.4)" }}
           />
         </div>
         <p className="text-muted-foreground animate-pulse">{text}</p>
@@ -256,12 +256,10 @@ export function PageTransition({ isLoading }: { isLoading: boolean }) {
       <div className="text-center space-y-4">
         <div className="relative">
           <Package
-            className="w-12 h-12 animate-bounce mx-auto"
-            style={{ color: "rgb(59, 130, 246)" }}
+            className="w-12 h-12 animate-bounce mx-auto text-primary"
           />
           <div
-            className="absolute -inset-2 border-2 rounded-full animate-ping"
-            style={{ borderColor: "rgb(59, 130, 246, 0.2)" }}
+            className="absolute -inset-2 border-2 rounded-full animate-ping border-primary/20"
           />
         </div>
         <p className="text-muted-foreground">Loading page...</p>
@@ -276,8 +274,7 @@ export function LoadingCart() {
     <div className="flex items-center justify-center p-8">
       <div className="text-center space-y-4">
         <ShoppingBag
-          className="w-12 h-12 animate-pulse mx-auto"
-          style={{ color: "rgb(59, 130, 246)" }}
+          className="w-12 h-12 animate-pulse mx-auto text-primary"
         />
         <p className="text-muted-foreground">Loading cart...</p>
       </div>
@@ -290,8 +287,7 @@ export function LoadingWishlist() {
     <div className="flex items-center justify-center p-8">
       <div className="text-center space-y-4">
         <Heart
-          className="w-12 h-12 animate-pulse mx-auto"
-          style={{ color: "rgb(239, 68, 68)" }}
+          className="w-12 h-12 animate-pulse mx-auto text-destructive"
         />
         <p className="text-muted-foreground">Loading wishlist...</p>
       </div>

@@ -8,7 +8,20 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import type * as React from "react";
 import { authClient } from "@/lib/auth-client";
+import {
+  AlertTriangle,
+  DollarSign,
+  Package,
+  Settings,
+  ShoppingCart,
+  TrendingUp,
+  Users,
+  UserCheck,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Analytics } from "./analytics";
 import { UserManagement } from "./user-management";
 
@@ -31,15 +44,14 @@ export function AdminDashboard({ session }: AdminDashboardProps) {
 
   const fetchStats = useCallback(async () => {
     try {
-      // Fetch user count
       const usersResponse = await fetch("/api/users?page=1&limit=1");
       if (usersResponse.ok) {
         const usersData = await usersResponse.json();
-        setStats((prev) => ({
-          ...prev,
+        setStats((current) => ({
+          ...current,
           totalUsers: usersData.pagination.total,
           activeUsers: usersData.users.filter(
-            (u: { active: boolean }) => u.active,
+            (user: { active: boolean }) => user.active,
           ).length,
         }));
       }
@@ -49,11 +61,7 @@ export function AdminDashboard({ session }: AdminDashboardProps) {
   }, []);
 
   useEffect(() => {
-    // Fetch dashboard stats asynchronously
-    const loadStats = async () => {
-      await fetchStats();
-    };
-    loadStats();
+    void fetchStats();
   }, [fetchStats]);
 
   const handleSignOut = async () => {
@@ -62,221 +70,222 @@ export function AdminDashboard({ session }: AdminDashboardProps) {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <div className="w-64 bg-white shadow-lg">
-        <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className="flex items-center justify-center h-16 px-4 bg-indigo-600 text-white">
-            <h1 className="text-xl font-bold">Admin Panel</h1>
+    <div className="min-h-screen bg-background text-foreground">
+      <div className="flex min-h-screen">
+        <aside className="apex-admin-sidebar fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-border text-foreground">
+          <div className="flex h-16 items-center border-b border-border px-5">
+            <div className="flex mr-3 h-9 w-9 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+              <Package className="h-5 w-5" />
+            </div>
+            <h1 className="text-base font-bold tracking-tight">Admin Panel</h1>
           </div>
 
-          {/* User Info */}
-          <div className="px-4 py-4 border-b border-gray-200">
-            <div className="flex items-center">
-              <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold">
+          <div className="px-4 py-5">
+            <div className="rounded-3xl border border-border bg-muted p-4">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-lg font-bold text-primary-foreground">
                 {session?.user?.name?.charAt(0)?.toUpperCase() || "A"}
               </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900">
-                  {session?.user?.name}
-                </p>
-                <p className="text-xs text-gray-500">Administrator</p>
-              </div>
+              <p className="font-semibold text-foreground">
+                {session?.user?.name}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Administrator
+              </p>
             </div>
           </div>
 
-          {/* Navigation */}
-          <nav className="flex-1 px-4 py-4 space-y-2">
-            <button
+          <nav className="flex-1 space-y-6 overflow-y-auto px-4 py-2">
+            <NavItem
+              active={activeTab === "overview"}
+              icon={Package}
+              label="Overview"
               onClick={() => setActiveTab("overview")}
-              className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                activeTab === "overview"
-                  ? "bg-indigo-100 text-indigo-700"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
-            >
-              Overview
-            </button>
-            <button
+            />
+            <NavItem
+              active={activeTab === "users"}
+              icon={Users}
+              label="User Management"
               onClick={() => setActiveTab("users")}
-              className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                activeTab === "users"
-                  ? "bg-indigo-100 text-indigo-700"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
-            >
-              User Management
-            </button>
-            <button
+            />
+            <NavItem
+              active={activeTab === "analytics"}
+              icon={TrendingUp}
+              label="Analytics"
               onClick={() => setActiveTab("analytics")}
-              className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                activeTab === "analytics"
-                  ? "bg-indigo-100 text-indigo-700"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
-            >
-              Analytics
-            </button>
-            <button
+            />
+            <NavItem
+              active={activeTab === "settings"}
+              icon={Settings}
+              label="Settings"
               onClick={() => setActiveTab("settings")}
-              className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                activeTab === "settings"
-                  ? "bg-indigo-100 text-indigo-700"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
-            >
-              Settings
-            </button>
+            />
           </nav>
 
-          {/* Sign Out */}
-          <div className="px-4 py-4 border-t border-gray-200">
-            <button
-              onClick={() => handleSignOut()}
-              className="w-full px-4 py-2 text-left text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          <div className="border-t border-border p-4">
+            <Button
+              variant="ghost"
+              onClick={handleSignOut}
+              className="w-full justify-start rounded-xl px-3 py-2.5 text-muted-foreground hover:bg-muted hover:text-foreground"
             >
+              <AlertTriangle className="mr-3 h-5 w-5" />
               Sign Out
-            </button>
+            </Button>
           </div>
-        </div>
-      </div>
+        </aside>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
-          <h1 className="text-2xl font-bold text-gray-900 capitalize">
-            {activeTab}
-          </h1>
-        </header>
+        <main className="min-h-screen flex-1 space-y-6 pl-72 p-6">
+          <header className="overflow-hidden rounded-[2rem] border border-border bg-card p-6 shadow-xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+              Apex workspace
+            </p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-foreground">
+              {activeTab === "overview"
+                ? "Dashboard"
+                : activeTab === "users"
+                  ? "User Management"
+                  : activeTab === "analytics"
+                    ? "Analytics"
+                    : "Settings"}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              A clean, modern admin surface with crisp cards, subtle borders, and
+              focused action colors.
+            </p>
+          </header>
 
-        {/* Content */}
-        <main className="flex-1 overflow-y-auto p-6">
           {activeTab === "overview" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center">
-                  <div className="p-2 bg-blue-500 rounded-lg">
-                    <svg
-                      className="w-6 h-6 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
-                      />
-                    </svg>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">
-                      Total Users
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {stats.totalUsers}
-                    </p>
-                  </div>
-                </div>
+            <>
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+                <MetricCard
+                  title="Total Users"
+                  value={stats.totalUsers}
+                  description="registered accounts"
+                  icon={Users}
+                  accent="primary"
+                />
+                <MetricCard
+                  title="Active Users"
+                  value={stats.activeUsers}
+                  description="currently engaged"
+                  icon={UserCheck}
+                  accent="success"
+                />
+                <MetricCard
+                  title="Total Orders"
+                  value={stats.totalOrders}
+                  description="all time orders"
+                  icon={ShoppingCart}
+                  accent="warning"
+                />
+                <MetricCard
+                  title="Revenue"
+                  value={stats.totalRevenue}
+                  description="lifetime earnings"
+                  icon={DollarSign}
+                  accent="primary"
+                  prefix="$"
+                />
               </div>
-
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center">
-                  <div className="p-2 bg-green-500 rounded-lg">
-                    <svg
-                      className="w-6 h-6 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">
-                      Active Users
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {stats.activeUsers}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center">
-                  <div className="p-2 bg-yellow-500 rounded-lg">
-                    <svg
-                      className="w-6 h-6 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                      />
-                    </svg>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">
-                      Total Orders
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {stats.totalOrders}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow p-6">
-                <div className="flex items-center">
-                  <div className="p-2 bg-purple-500 rounded-lg">
-                    <svg
-                      className="w-6 h-6 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-                      />
-                    </svg>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Revenue</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      ${stats.totalRevenue}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            </>
           )}
 
           {activeTab === "users" && <UserManagement />}
           {activeTab === "analytics" && <Analytics />}
           {activeTab === "settings" && (
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold mb-4">Admin Settings</h2>
-              <p className="text-gray-600">Settings panel coming soon...</p>
-            </div>
+            <Card className="apex-stat-card">
+              <CardHeader>
+                <CardTitle className="text-base font-semibold tracking-tight text-foreground">
+                  Admin Settings
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  Settings panel coming soon.
+                </p>
+              </CardContent>
+            </Card>
           )}
         </main>
       </div>
     </div>
   );
+}
+
+function NavItem({
+  active,
+  icon: Icon,
+  label,
+  onClick,
+}: {
+  active: boolean;
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cnAdminNavItem(active)}
+    >
+      <Icon className="mr-3 h-5 w-5 shrink-0" />
+      <span>{label}</span>
+    </button>
+  );
+}
+
+function MetricCard({
+  title,
+  value,
+  description,
+  icon: Icon,
+  accent,
+  prefix,
+}: {
+  title: string;
+  value: number;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  accent: "primary" | "success" | "warning";
+  prefix?: string;
+}) {
+  return (
+    <Card className="apex-stat-card">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <CardTitle className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          {title}
+        </CardTitle>
+        <div className={cnMetricIcon(accent)}>
+          <Icon className="h-5 w-5" />
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="text-3xl font-bold tracking-tight text-foreground">
+          {prefix}
+          {value}
+        </div>
+        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
+function cnAdminNavItem(active: boolean) {
+  if (active) {
+    return "mb-1 flex w-full items-center rounded-xl bg-primary/10 px-3 py-2.5 text-sm font-semibold text-primary shadow-primary/20 transition";
+  }
+
+  return "mb-1 flex w-full items-center rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground";
+}
+
+function cnMetricIcon(accent: "primary" | "success" | "warning") {
+  if (accent === "success") {
+    return "flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary";
+  }
+
+  if (accent === "warning") {
+    return "flex h-11 w-11 items-center justify-center rounded-2xl bg-warning/10 text-warning";
+  }
+
+  return "apex-gradient-icon flex h-11 w-11 items-center justify-center rounded-2xl";
 }

@@ -472,63 +472,6 @@ export const persianNumberFormatter = {
  */
 export const persianCurrencyFormatter = {
   /**
-   * Enhanced Iranian Toman formatting with Persian numbers (1 Toman = 10 Rials)
-   * @param amount - Amount in Tomans
-   * @param options - Formatting options
-   * @returns Formatted currency string
-   */
-  formatToman: (
-    amount: number | string,
-    options: {
-      showCurrency?: boolean;
-      usePersianNumbers?: boolean;
-      compact?: boolean;
-      decimals?: number;
-    } = {},
-  ): string => {
-    const {
-      showCurrency = true,
-      usePersianNumbers = true,
-      compact = false,
-      decimals = 0,
-    } = options;
-
-    // Convert Persian numbers to English first
-    const cleanAmount = convertPersianToEnglish(String(amount));
-    const numAmount = parseFloat(cleanAmount.replace(/,/g, ""));
-
-    if (isNaN(numAmount)) return "۰";
-
-    let formatted: string;
-
-    if (compact && numAmount >= 100000) {
-      // Use compact notation for large amounts (divide by 1000 for Toman)
-      const thousands = numAmount / 1000;
-      formatted = `${thousands.toFixed(1)}K`;
-    } else {
-      // Standard formatting with thousands separator
-      formatted = Math.floor(numAmount).toLocaleString("fa-IR");
-    }
-
-    // Apply Persian numbers if requested
-    if (usePersianNumbers) {
-      formatted = toPersianNumbers(formatted);
-    }
-
-    // Add decimals if specified
-    if (decimals > 0 && !compact) {
-      const decimalPart = (numAmount % 1).toFixed(decimals).slice(1);
-      if (decimalPart !== ".000") {
-        formatted += usePersianNumbers
-          ? toPersianNumbers(decimalPart)
-          : decimalPart;
-      }
-    }
-
-    return showCurrency ? `${formatted} تومان` : formatted;
-  },
-
-  /**
    * Enhanced Iranian Rial formatting with Persian numbers
    * @param amount - Amount in Rials
    * @param options - Formatting options
@@ -562,6 +505,63 @@ export const persianCurrencyFormatter = {
       // Use compact notation for large amounts
       const millions = numAmount / 1000000;
       formatted = `${millions.toFixed(1)}M`;
+    } else {
+      // Standard formatting with thousands separator
+      formatted = Math.floor(numAmount).toLocaleString("fa-IR");
+    }
+
+    // Apply Persian numbers if requested
+    if (usePersianNumbers) {
+      formatted = toPersianNumbers(formatted);
+    }
+
+    // Add decimals if specified
+    if (decimals > 0 && !compact) {
+      const decimalPart = (numAmount % 1).toFixed(decimals).slice(1);
+      if (decimalPart !== ".000") {
+        formatted += usePersianNumbers
+          ? toPersianNumbers(decimalPart)
+          : decimalPart;
+      }
+    }
+
+    return showCurrency ? `${formatted} ریال` : formatted;
+  },
+
+  /**
+   * Enhanced Iranian Toman formatting with Persian numbers (1 Toman = 10 Rials)
+   * @param amount - Amount in Tomans
+   * @param options - Formatting options
+   * @returns Formatted currency string
+   */
+  formatToman: (
+    amount: number | string,
+    options: {
+      showCurrency?: boolean;
+      usePersianNumbers?: boolean;
+      compact?: boolean;
+      decimals?: number;
+    } = {},
+  ): string => {
+    const {
+      showCurrency = true,
+      usePersianNumbers = true,
+      compact = false,
+      decimals = 0,
+    } = options;
+
+    // Convert Persian numbers to English first
+    const cleanAmount = convertPersianToEnglish(String(amount));
+    const numAmount = parseFloat(cleanAmount.replace(/,/g, ""));
+
+    if (isNaN(numAmount)) return "۰";
+
+    let formatted: string;
+
+    if (compact && numAmount >= 100000) {
+      // Use compact notation for large amounts (divide by 1000 for Toman)
+      const thousands = numAmount / 1000;
+      formatted = `${thousands.toFixed(1)}K`;
     } else {
       // Standard formatting with thousands separator
       formatted = Math.floor(numAmount).toLocaleString("fa-IR");

@@ -32,13 +32,13 @@ export function createOverlayTheme(isDark: boolean = false): OverlayTheme {
       ? "bg-background/95 backdrop-blur-xl border-border/50"
       : "bg-background/98 backdrop-blur-2xl border-border/30",
     backdrop: isDark
-      ? "bg-black/60 backdrop-blur-md"
-      : "bg-black/40 backdrop-blur-lg",
+      ? "bg-background/70 backdrop-blur-xl"
+      : "bg-background/60 backdrop-blur-xl",
     border: isDark
       ? "border-border/60 shadow-2xl"
       : "border-border/40 shadow-xl",
     text: isDark ? "text-foreground" : "text-foreground",
-    shadow: isDark ? "shadow-black/50" : "shadow-black/25",
+    shadow: isDark ? "shadow-black/30" : "shadow-black/10",
   };
 }
 
@@ -105,7 +105,7 @@ export function getEnhancedBackdropClasses(
 ): ClassValue {
   return clsx(
     "fixed inset-0 z-50",
-    isDark ? "bg-black/70 backdrop-blur-sm" : "bg-black/50 backdrop-blur-md",
+    isDark ? "bg-background/70 backdrop-blur-xl" : "bg-background/60 backdrop-blur-xl",
     "animate-in fade-in-0 duration-200",
     "animate-out fade-out-0 duration-150",
   );
@@ -139,7 +139,7 @@ export function getOverlayContentClasses(
     case "sidebar":
       return clsx("flex h-full flex-col", theme.background, "shadow-2xl");
     case "dropdown":
-      return clsx(...baseClasses, "p-1", "shadow-lg");
+      return clsx(...baseClasses, "relative z-50 p-1", "shadow-lg");
     default:
       return clsx(baseClasses);
   }

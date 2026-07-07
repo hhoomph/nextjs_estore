@@ -159,7 +159,9 @@ const CurrencyDisplay = React.forwardRef<HTMLSpanElement, CurrencyDisplayProps>(
 
       switch (currency) {
         case "IRR":
-          return language === "fa" ? "تومان" : "IRR";
+          return language === "fa" ? "ریال" : "IRR";
+        case "TOMAN":
+          return language === "fa" ? "تومان" : "TOMAN";
         case "USD":
           return language === "fa" ? "دلار" : "$";
         case "EUR":
@@ -203,13 +205,13 @@ const CurrencyDisplay = React.forwardRef<HTMLSpanElement, CurrencyDisplayProps>(
             </span>
 
             {/* Discount percentage badge */}
-            <span className="px-2 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-full">
+            <span className="px-2 py-1 text-xs font-medium bg-success/10 text-success rounded-full">
               {discount.percentage}
             </span>
           </span>
 
           {/* Savings amount */}
-          <span className={cn("text-sm text-green-600", sizeClasses.sm)}>
+          <span className={cn("text-sm text-success", sizeClasses.sm)}>
             {language === "fa" ? "صرفه اقتصادی: " : "Save: "}
             {discount.savings}
           </span>

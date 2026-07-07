@@ -75,7 +75,7 @@ export function RecentlyViewedClient() {
   if (error) {
     return (
       <div className="text-center py-12">
-        <p className="text-red-600 mb-4">{error}</p>
+        <p className="text-destructive mb-4">{error}</p>
         <Button onClick={() => fetchRecentlyViewed()}>Try Again</Button>
       </div>
     );
@@ -86,7 +86,7 @@ export function RecentlyViewedClient() {
       <div className="text-center py-12">
         <div className="mb-4">
           <svg
-            className="mx-auto h-12 w-12 text-gray-400"
+            className="mx-auto h-12 w-12 text-muted-foreground"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -105,10 +105,10 @@ export function RecentlyViewedClient() {
             />
           </svg>
         </div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <h3 className="text-lg font-medium text-foreground mb-2">
           {t("noRecentlyViewed")}
         </h3>
-        <p className="text-gray-500 mb-6">
+        <p className="text-muted-foreground mb-6">
           You haven't viewed any products recently.
         </p>
         <Link href="/products">
@@ -121,14 +121,14 @@ export function RecentlyViewedClient() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           {products.length} {t("recentlyViewedProducts").toLowerCase()}
         </p>
         <Button
           variant="outline"
           size="sm"
           onClick={clearRecentlyViewed}
-          className="text-red-600 hover:text-red-700"
+          className="text-destructive hover:text-destructive"
         >
           Clear All
         </Button>
@@ -154,7 +154,7 @@ function ProductCard({
     <Card className="group hover:shadow-md transition-shadow">
       <CardContent className="p-4">
         <Link href={`/products/${product.slug}`}>
-          <div className="aspect-square relative mb-4 overflow-hidden rounded-lg bg-gray-100">
+          <div className="aspect-square relative mb-4 overflow-hidden rounded-lg bg-muted">
             {mainImage ? (
               <OptimizedImage
                 src={mainImage}
@@ -164,7 +164,7 @@ function ProductCard({
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
               />
             ) : (
-              <div className="flex items-center justify-center h-full text-gray-400">
+              <div className="flex items-center justify-center h-full text-muted-foreground">
                 <svg
                   className="w-12 h-12"
                   fill="none"
@@ -185,7 +185,7 @@ function ProductCard({
 
         <div className="space-y-2">
           <Link href={`/products/${product.slug}`}>
-            <h3 className="font-medium text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors">
+            <h3 className="font-medium text-foreground line-clamp-2 group-hover:text-primary transition-colors">
               {product.name}
             </h3>
           </Link>
@@ -193,13 +193,13 @@ function ProductCard({
           <div className="flex items-center space-x-2">
             <CurrencyDisplay
               amount={product.price}
-              className="text-lg font-semibold text-gray-900"
+              className="text-lg font-semibold text-foreground"
             />
             {product.discount_price &&
               product.discount_price < product.price && (
                 <CurrencyDisplay
                   amount={product.discount_price}
-                  className="text-sm text-green-600"
+                  className="text-sm text-success"
                 />
               )}
           </div>
@@ -213,12 +213,12 @@ function RecentlyViewedSkeleton() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="bg-white rounded-lg shadow-sm border p-4">
-          <div className="aspect-square bg-gray-200 rounded-lg mb-4 animate-pulse" />
+        <div key={i} className="bg-card rounded-lg shadow-sm border p-4">
+          <div className="aspect-square bg-muted rounded-lg mb-4 animate-pulse" />
           <div className="space-y-2">
-            <div className="h-4 bg-gray-200 rounded animate-pulse" />
-            <div className="h-4 bg-gray-200 rounded w-2/3 animate-pulse" />
-            <div className="h-6 bg-gray-200 rounded w-1/2 animate-pulse" />
+            <div className="h-4 bg-muted rounded animate-pulse" />
+            <div className="h-4 bg-muted rounded w-2/3 animate-pulse" />
+            <div className="h-6 bg-muted rounded w-1/2 animate-pulse" />
           </div>
         </div>
       ))}

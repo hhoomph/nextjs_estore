@@ -43,15 +43,24 @@ import { useBrowserSession } from "@/lib/hooks/use-browser-session";
 
 // Force dynamic rendering to avoid prerendering issues
 export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
 
 interface DashboardStats {
   totalUsers?: number;
   totalOrders: number;
   totalRevenue: number;
   totalProducts: number;
-  recentOrders: number;
-  lowStockProducts?: number;
+  recentOrders: Array<{
+    id: string;
+    total: number;
+    createdAt: string;
+    items: number;
+    user?: { name: string | null };
+  }>;
+  lowStockProducts: Array<{
+    id: string;
+    name: string;
+    quantity: number;
+  }>;
 }
 
 interface Order {
@@ -90,6 +99,15 @@ const formatDate = (value: string) => {
   }
 };
 
+const getOrderItemCount = (items: unknown) => {
+  if (typeof items === "number") return items;
+  if (items && typeof items === "object" && "length" in items) {
+    const length = (items as { length?: unknown }).length;
+    return typeof length === "number" ? length : 0;
+  }
+  return 0;
+};
+
 const orderStatusVariant = (status: string) => {
   const normalized = status.toUpperCase();
   if (normalized === "DELIVERED" || normalized === "COMPLETED")
@@ -105,7 +123,7 @@ function DashboardSkeleton() {
       className="flex justify-center items-center py-20"
       data-testid="dashboard-skeleton"
     >
-      <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
       <span className="ml-2">Loading dashboard...</span>
     </div>
   );
@@ -263,7 +281,7 @@ function DashboardContent() {
               {stats?.totalOrders ?? 0}
             </div>
             <p className="text-xs text-muted-foreground">
-              {stats?.recentOrders ?? 0} in the last period
+              {getOrderItemCount(stats?.recentOrders)} in the last period
             </p>
           </CardContent>
         </Card>
@@ -291,7 +309,7 @@ function DashboardContent() {
               {stats?.totalProducts ?? 0}
             </div>
             <p className="text-xs text-muted-foreground">
-              {stats?.lowStockProducts ?? 0} low on stock
+              {Array.isArray(stats?.lowStockProducts) ? stats.lowStockProducts.length : 0} low on stock
             </p>
           </CardContent>
         </Card>
@@ -326,8 +344,8 @@ function DashboardContent() {
                         </p>
                         <p className="text-sm text-muted-foreground">
                           {formatDate(order.created_at)} ·{" "}
-                          {order.items ?? 0} item
-                          {(order.items ?? 0) === 1 ? "" : "s"}
+                          {getOrderItemCount(order.items)} item
+                          {getOrderItemCount(order.items) === 1 ? "" : "s"}
                         </p>
                       </div>
                       <div className="text-right">
@@ -433,3 +451,5 @@ export default function DashboardPage() {
     </Suspense>
   );
 }
+
+

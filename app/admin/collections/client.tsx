@@ -312,7 +312,7 @@ export default function AdminCollectionsClient() {
                     <TableCell>{col.productCount}</TableCell>
                     <TableCell>
                       {col.isFeatured ? (
-                        <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                        <Star className="h-4 w-4 text-warning fill-warning" />
                       ) : (
                         <StarOff className="h-4 w-4 text-muted-foreground" />
                       )}

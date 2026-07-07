@@ -237,8 +237,8 @@ const StepWizard: React.FC<StepWizardProps> = ({
                 className={cn(
                   "flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all",
                   isActive && "bg-primary/10 border border-primary/20",
-                  isCompleted && "bg-green-50 border border-green-200",
-                  hasError && "bg-red-50 border border-red-200",
+                  isCompleted && "bg-success/10 border border-success/20",
+                  hasError && "bg-destructive/10 border border-destructive/20",
                 )}
                 onClick={() => handleStepChange(index)}
                 whileHover={{ scale: 1.02 }}
@@ -250,8 +250,8 @@ const StepWizard: React.FC<StepWizardProps> = ({
                     currentSize.step,
                     isActive &&
                       "border-primary bg-primary text-primary-foreground",
-                    isCompleted && "border-green-500 bg-green-500 text-white",
-                    hasError && "border-red-500 bg-red-500 text-white",
+                    isCompleted && "border-success bg-success text-success-foreground",
+                    hasError && "border-destructive bg-destructive text-destructive-foreground",
                     !isActive &&
                       !isCompleted &&
                       !hasError &&
@@ -271,7 +271,7 @@ const StepWizard: React.FC<StepWizardProps> = ({
                       "font-medium truncate",
                       currentSize.text,
                       isActive && "text-primary",
-                      hasError && "text-red-600",
+                      hasError && "text-destructive",
                     )}
                   >
                     {step.title}
@@ -340,8 +340,8 @@ const StepWizard: React.FC<StepWizardProps> = ({
                         isActive &&
                           "border-primary bg-primary text-primary-foreground",
                         isCompleted &&
-                          "border-green-500 bg-green-500 text-white",
-                        hasError && "border-red-500 bg-red-500 text-white",
+                          "border-success bg-success text-success-foreground",
+                        hasError && "border-destructive bg-destructive text-destructive-foreground",
                         !isActive &&
                           !isCompleted &&
                           !hasError &&
@@ -365,7 +365,7 @@ const StepWizard: React.FC<StepWizardProps> = ({
                           "font-medium truncate",
                           currentSize.text,
                           isActive && "text-primary",
-                          hasError && "text-red-600",
+                          hasError && "text-destructive",
                         )}
                       >
                         {step.title}
@@ -382,7 +382,7 @@ const StepWizard: React.FC<StepWizardProps> = ({
                     <motion.div
                       className={cn(
                         "h-px w-12 transition-colors",
-                        isCompleted ? "bg-green-500" : "bg-muted-foreground/30",
+                        isCompleted ? "bg-success" : "bg-muted-foreground/30",
                       )}
                       initial={{ scaleX: 0 }}
                       animate={{ scaleX: 1 }}

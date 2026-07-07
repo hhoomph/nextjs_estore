@@ -27,7 +27,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-50 bg-black/60 backdrop-blur-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "fixed inset-0 z-50 bg-background/80 backdrop-blur-xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className,
     )}
     {...props}
@@ -41,6 +41,7 @@ interface EnhancedDialogContentProps
   showCloseButton?: boolean;
   loading?: boolean;
   glassmorphism?: boolean;
+  title?: string;
 }
 
 const DialogContent = React.forwardRef<
@@ -55,6 +56,7 @@ const DialogContent = React.forwardRef<
       showCloseButton = true,
       loading = false,
       glassmorphism = false,
+      title,
       ["aria-label"]: ariaLabel,
       ["aria-labelledby"]: ariaLabelledBy,
       ...props
@@ -62,7 +64,8 @@ const DialogContent = React.forwardRef<
     ref,
   ) => {
     const generatedTitleId = React.useId();
-    const hasAriaLabel = typeof ariaLabel === "string" && ariaLabel.trim().length > 0;
+    const displayName = ariaLabel || title;
+    const hasAriaLabel = typeof displayName === "string" && displayName.trim().length > 0;
     const hasAriaLabelledBy =
       typeof ariaLabelledBy === "string" && ariaLabelledBy.trim().length > 0;
     const hasAccessibleName = hasAriaLabel || hasAriaLabelledBy;
@@ -87,11 +90,11 @@ const DialogContent = React.forwardRef<
           className={cn(
             variants[variant],
             glassmorphism &&
-              "backdrop-blur-xl bg-white/10 border-white/20 shadow-2xl",
+              "backdrop-blur-xl bg-background/10 border-border/30 shadow-2xl",
             loading && "cursor-wait",
             className,
           )}
-          aria-label={ariaLabel || undefined}
+          aria-label={displayName || undefined}
           aria-labelledby={
             hasAriaLabelledBy
               ? ariaLabelledBy
@@ -103,7 +106,7 @@ const DialogContent = React.forwardRef<
         >
           {shouldRenderFallbackTitle && (
             <DialogPrimitive.Title id={generatedTitleId} className="sr-only">
-              {ariaLabel ?? "Modal"}
+              {displayName ?? "Modal"}
             </DialogPrimitive.Title>
           )}
           {/* Loading overlay */}
@@ -240,6 +243,7 @@ const EnhancedModal: React.FC<EnhancedModalProps> = ({
         variant={variant}
         className={cn(sizeClasses[size])}
         glassmorphism={glassmorphism}
+        title={title}
         showCloseButton={showCloseButton}
         loading={loading}
       >

@@ -11,7 +11,6 @@ import { useEffect, useState } from "react";
 
 // Force dynamic rendering to avoid prerendering issues
 export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -19,14 +18,13 @@ import {
   Camera,
   Eye,
   EyeOff,
-  Globe,
   Save,
   Shield,
   LogOut,
   User,
 } from "lucide-react";
 import Link from "next/link";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/providers/theme-provider";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -39,6 +37,70 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { signOut, useSession } from "@/lib/auth-client";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
+import { useTranslations } from "next-intl";
+
+const CURRENCIES = [
+  { value: "IRR", label: "Iranian Rial (ریال)" },
+  { value: "TOMAN", label: "Iranian Toman (تومان)" },
+  { value: "USD", label: "US Dollar ($)" },
+  { value: "EUR", label: "Euro (€)" },
+  { value: "GBP", label: "British Pound (£)" },
+  { value: "CAD", label: "Canadian Dollar (CA$)" },
+  { value: "AUD", label: "Australian Dollar (A$)" },
+  { value: "JPY", label: "Japanese Yen (¥)" },
+  { value: "CNY", label: "Chinese Yuan (¥)" },
+  { value: "INR", label: "Indian Rupee (₹)" },
+];
+
+function CurrencySelector() {
+  const [currency, setCurrency] = useState("IRR");
+
+  useEffect(() => {
+    // Fetch current currency from settings
+    const fetchCurrency = async () => {
+      try {
+        const response = await fetch("/api/admin/settings");
+        if (response.ok) {
+          const data = await response.json();
+          if (data?.settings?.defaultCurrency) {
+            setCurrency(data.settings.defaultCurrency);
+          }
+        }
+      } catch {
+        // Use default
+      }
+    };
+    fetchCurrency();
+  }, []);
+
+  const handleCurrencyChange = async (newCurrency: string) => {
+    setCurrency(newCurrency);
+    try {
+      await fetch("/api/admin/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ defaultCurrency: newCurrency }),
+      });
+    } catch (error) {
+      console.error("Failed to update currency:", error);
+    }
+  };
+
+  return (
+    <select
+      value={currency}
+      onChange={(e) => handleCurrencyChange(e.target.value)}
+      className="px-3 py-1.5 text-sm border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+    >
+      {CURRENCIES.map((c) => (
+        <option key={c.value} value={c.value}>
+          {c.label}
+        </option>
+      ))}
+    </select>
+  );
+}
 
 const profileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -68,6 +130,9 @@ export default function SettingsPage() {
     setIsClient(true);
   }, []);
   const { theme, setTheme } = useTheme();
+  const t = useTranslations("Settings");
+  const tCommon = useTranslations("Common Actions");
+  const tNav = useTranslations("Navigation");
   const [activeTab, setActiveTab] = useState("profile");
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -624,14 +689,14 @@ export default function SettingsPage() {
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Appearance</CardTitle>
+                    <CardTitle>{t("appearance") || "Appearance"}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium">Theme</p>
+                        <p className="font-medium">{t("theme") || "Theme"}</p>
                         <p className="text-sm text-muted-foreground">
-                          Choose your preferred theme
+                          {t("chooseTheme") || "Choose your preferred theme"}
                         </p>
                       </div>
                       <div className="flex gap-2">
@@ -640,21 +705,21 @@ export default function SettingsPage() {
                           size="sm"
                           onClick={() => setTheme("light")}
                         >
-                          Light
+                          {tCommon("light") || "Light"}
                         </Button>
                         <Button
                           variant={theme === "dark" ? "default" : "outline"}
                           size="sm"
                           onClick={() => setTheme("dark")}
                         >
-                          Dark
+                          {tCommon("dark") || "Dark"}
                         </Button>
                         <Button
                           variant={theme === "system" ? "default" : "outline"}
                           size="sm"
                           onClick={() => setTheme("system")}
                         >
-                          System
+                          {tCommon("system") || "System"}
                         </Button>
                       </div>
                     </div>
@@ -663,32 +728,29 @@ export default function SettingsPage() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Language & Region</CardTitle>
+                    <CardTitle>{t("languageRegion") || "Language & Region"}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium">Language</p>
+                        <p className="font-medium">{tNav("language") || "Language"}</p>
                         <p className="text-sm text-muted-foreground">
-                          Select your preferred language
+                          {t("selectLanguage") || "Select your preferred language"}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Globe className="h-4 w-4" />
-                        <span>English (US)</span>
-                      </div>
+                      <LanguageSwitcher />
                     </div>
 
                     <Separator />
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium">Currency</p>
+                        <p className="font-medium">{t("currency") || "Currency"}</p>
                         <p className="text-sm text-muted-foreground">
-                          Display prices in your preferred currency
+                          {t("displayCurrency") || "Display prices in your preferred currency"}
                         </p>
                       </div>
-                      <span>USD ($)</span>
+                      <CurrencySelector />
                     </div>
                   </CardContent>
                 </Card>
@@ -700,3 +762,4 @@ export default function SettingsPage() {
     </div>
   );
 }
+

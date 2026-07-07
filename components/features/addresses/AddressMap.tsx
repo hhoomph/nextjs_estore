@@ -200,7 +200,7 @@ export function AddressMap({}: AddressMapProps) {
         <span>Total addresses: {addresses.length}</span>
         <span>Addresses with coordinates: {addressesWithCoords.length}</span>
         {addressesWithCoords.length === 0 && (
-          <Badge variant="outline" className="text-orange-600">
+          <Badge variant="outline" className="text-warning">
             No addresses with coordinates yet
           </Badge>
         )}
@@ -281,13 +281,13 @@ export function AddressMap({}: AddressMapProps) {
       </Card>
 
       {/* Instructions */}
-      <Card className="bg-blue-50 border-blue-200">
+      <Card className="bg-primary/10 border-primary/20">
         <CardContent className="pt-4">
           <div className="flex items-start gap-3">
-            <MapPin className="h-5 w-5 text-blue-600 mt-0.5" />
+            <MapPin className="h-5 w-5 text-primary mt-0.5" />
             <div>
-              <h4 className="font-medium text-blue-900">How to use the map</h4>
-              <ul className="text-sm text-blue-700 mt-1 space-y-1">
+              <h4 className="font-medium text-foreground">How to use the map</h4>
+              <ul className="text-sm text-muted-foreground mt-1 space-y-1">
                 <li>
                   • Click anywhere on the map to copy coordinates to your
                   clipboard

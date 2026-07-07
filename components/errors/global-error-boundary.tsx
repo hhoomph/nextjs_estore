@@ -114,19 +114,19 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({
   const severity = getErrorSeverity(error);
   const severityConfig = {
     low: {
-      color: "text-yellow-600",
-      bgColor: "bg-yellow-50",
-      borderColor: "border-yellow-200",
+      color: "text-warning",
+      bgColor: "bg-warning/10",
+      borderColor: "border-warning/30",
     },
     medium: {
-      color: "text-orange-600",
-      bgColor: "bg-orange-50",
-      borderColor: "border-orange-200",
+      color: "text-primary",
+      bgColor: "bg-primary/10",
+      borderColor: "border-primary/30",
     },
     high: {
-      color: "text-red-600",
-      bgColor: "bg-red-50",
-      borderColor: "border-red-200",
+      color: "text-destructive",
+      bgColor: "bg-destructive/10",
+      borderColor: "border-destructive/30",
     },
   };
 

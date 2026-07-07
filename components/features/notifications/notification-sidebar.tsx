@@ -121,20 +121,20 @@ const getNotificationColor = (
   type: NotificationItem["type"],
   priority: NotificationItem["priority"] = "medium",
 ) => {
-  if (priority === "high") return "text-red-600 dark:text-red-400";
-  if (priority === "low") return "text-blue-600 dark:text-blue-400";
+  if (priority === "high") return "text-destructive";
+  if (priority === "low") return "text-primary";
 
   switch (type) {
     case "shipping":
-      return "text-green-600 dark:text-green-400";
+      return "text-success";
     case "promotion":
-      return "text-purple-600 dark:text-purple-400";
+      return "text-secondary-foreground";
     case "security":
-      return "text-orange-600 dark:text-orange-400";
+      return "text-warning";
     case "order":
-      return "text-blue-600 dark:text-blue-400";
+      return "text-primary";
     default:
-      return "text-gray-600 dark:text-gray-400";
+      return "text-muted-foreground";
   }
 };
 

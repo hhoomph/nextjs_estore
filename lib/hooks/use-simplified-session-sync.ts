@@ -28,7 +28,7 @@ export function useSimplifiedSessionSync() {
     return {
       user,
       isAuthenticated,
-      isGuest,
+      isGuest: !isAuthenticated || isPending,
       isLoading: isPending,
       isReady: !isPending,
     };

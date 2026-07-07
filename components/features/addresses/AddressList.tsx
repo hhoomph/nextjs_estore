@@ -186,7 +186,7 @@ export function AddressList({ onEdit, onAddNew }: AddressListProps) {
               <div className="absolute top-3 right-3">
                 <Badge
                   variant="default"
-                  className="style={{ backgroundColor: 'rgb(59, 130, 246)' }}"
+                  className="bg-primary"
                 >
                   <Star className="h-3 w-3 mr-1" />
                   Default
@@ -288,7 +288,7 @@ export function AddressList({ onEdit, onAddNew }: AddressListProps) {
       </div>
 
       {/* Add New Address Card */}
-      <Card className="border-dashed border-2 hover:style={{ borderColor: 'rgb(59, 130, 246)' }}/50 transition-colors cursor-pointer">
+      <Card className="border-dashed border-2 hover:border-primary/50 transition-colors cursor-pointer">
         <CardContent
           className="flex flex-col items-center justify-center py-8"
           onClick={onAddNew}

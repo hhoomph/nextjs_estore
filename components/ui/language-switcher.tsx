@@ -10,7 +10,7 @@
  */
 "use client";
 
-import { Languages } from "lucide-react";
+import { Check, Languages } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
@@ -33,8 +33,6 @@ export function LanguageSwitcher() {
     { code: "fa" as const, name: "فارسی", flag: "🇮🇷" },
     { code: "en" as const, name: "English", flag: "🇺🇸" },
   ];
-
-  const currentLanguage = languages.find((lang) => lang.code === locale);
 
   const switchLanguage = async (newLocale: CookieLocale) => {
     if (newLocale === locale || isLoading) return;
@@ -71,10 +69,10 @@ export function LanguageSwitcher() {
           size="icon"
           className="relative cursor-pointer"
           disabled={isLoading}
-          aria-label={locale === "fa" ? "زبان - Language" : "Language - زبان"}
+          aria-label={locale === "fa" ? "زبان - Language" : "Language"}
         >
           <Languages className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
-          <span className="sr-only">{t("settings")}</span>
+          <span className="sr-only">{t("language")}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-40">
@@ -90,7 +88,7 @@ export function LanguageSwitcher() {
             <span className="text-lg">{lang.flag}</span>
             <span>{lang.name}</span>
             {locale === lang.code && (
-              <span className="ml-auto text-xs text-muted-foreground">✓</span>
+              <Check className="ml-auto h-4 w-4 text-primary" />
             )}
           </DropdownMenuItem>
         ))}

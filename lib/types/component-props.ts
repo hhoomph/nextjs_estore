@@ -565,12 +565,12 @@ export interface UploadListProgressProps {
 }
 
 // Utility types for extending HTML elements
-export type ComponentWithAs<T extends React.ElementType, P = {}> = P &
+export type ComponentWithAs<T extends React.ElementType, P = object> = P &
   Omit<ComponentProps<T>, keyof P> & {
     as?: T;
   };
 
-export type PolymorphicComponent<P = {}> = <
+export type PolymorphicComponent<P = object> = <
   T extends React.ElementType = "div",
 >(
   props: ComponentWithAs<T, P>,

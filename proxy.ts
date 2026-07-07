@@ -1,5 +1,5 @@
 /**
- * Next.js Middleware for Cookie-based Internationalization
+ * Next.js Proxy for Cookie-based Internationalization
  *
  * Handles locale detection via cookies (Persian/fa default, RTL).
  * Auth is handled separately by API routes to avoid Edge Runtime issues.
@@ -17,12 +17,12 @@ import {
 } from "./lib/i18n/cookie-locale";
 
 /**
- * Middleware function
+ * Proxy function
  */
-export default function middleware(request: NextRequest) {
+export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip middleware for static files, API routes, and Next.js internals
+  // Skip proxy for static files, API routes, and Next.js internals
   if (
     pathname.startsWith("/_next/") ||
     pathname.startsWith("/api/") ||
@@ -63,7 +63,7 @@ export default function middleware(request: NextRequest) {
 }
 
 /**
- * Middleware configuration
+ * Proxy configuration
  */
 export const config = {
   matcher: [

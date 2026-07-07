@@ -1,28 +1,14 @@
-/**
- * Guest Checkout Flow Component
- *
- * Allows users to complete checkout without authentication,
- * with form validation and enhanced user experience.
- * Uses lazy loading for step components to optimize bundle size.
- *
- * @author hh.oomph@gmail.com
- * @version 1.0.0
- * @since 2025-01-01
- */
-
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { lazy, Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useCheckoutSession } from "@/lib/hooks/use-cart-sync";
+import { SHIPPING_COST, TAX_RATE } from "@/lib/constants/checkout";
 import type { EnhancedCartItem } from "@/types/cart";
 import { CheckoutProgress } from "./checkout-progress";
 
-// Lazy load step components for better performance
 const ContactStep = lazy(() =>
   import("./steps/contact-step").then((m) => ({ default: m.ContactStep })),
 );
@@ -36,7 +22,6 @@ const ReviewStep = lazy(() =>
   import("./steps/review-step").then((m) => ({ default: m.ReviewStep })),
 );
 
-// Validation schemas
 const guestCheckoutSchema = z
   .object({
     email: z.string().email("Please enter a valid email address"),
@@ -61,6 +46,14 @@ const guestCheckoutSchema = z
         country: z.string().min(1, "Country is required"),
       })
       .optional(),
+    payment: z.object({
+      cardNumber: z.string().min(16, "Card number must be 16 digits"),
+      expiryDate: z
+        .string()
+        .regex(/^\d{2}\/\d{2}$/, "Expiry date must be MM/YY format"),
+      cvv: z.string().min(3, "CVV must be at least 3 digits"),
+      cardName: z.string().min(1, "Cardholder name is required"),
+    }),
     createAccount: z.boolean(),
     password: z.string().optional(),
     confirmPassword: z.string().optional(),
@@ -68,7 +61,7 @@ const guestCheckoutSchema = z
   .refine(
     (data) => {
       if (data.createAccount) {
-        return data.password && data.password.length >= 8;
+        return Boolean(data.password && data.password.length >= 8);
       }
       return true;
     },
@@ -90,7 +83,7 @@ const guestCheckoutSchema = z
     },
   );
 
-type GuestCheckoutFormData = z.infer<typeof guestCheckoutSchema>;
+export type GuestCheckoutFormData = z.infer<typeof guestCheckoutSchema>;
 
 interface GuestCheckoutFlowProps {
   cartItems: EnhancedCartItem[];
@@ -105,9 +98,6 @@ export function GuestCheckoutFlow({
   onSuccess,
   onError,
 }: GuestCheckoutFlowProps) {
-  const router = useRouter();
-  const { createCheckoutSession } = useCheckoutSession();
-
   const [currentStep, setCurrentStep] = useState<
     "contact" | "shipping" | "payment" | "review"
   >("contact");
@@ -130,16 +120,21 @@ export function GuestCheckoutFlow({
         country: "United States",
       },
       billingAddress: undefined,
+      payment: {
+        cardNumber: "",
+        expiryDate: "",
+        cvv: "",
+        cardName: "",
+      },
       createAccount: false,
       password: "",
       confirmPassword: "",
     },
   });
 
-  // Watch form values for conditional rendering
   const watchedCreateAccount = form.watch("createAccount");
 
-  const handleContactSubmit = form.handleSubmit((data) => {
+  const handleContactSubmit = form.handleSubmit(() => {
     setCurrentStep("shipping");
   });
 
@@ -153,7 +148,7 @@ export function GuestCheckoutFlow({
     setCurrentStep("payment");
   });
 
-  const handlePaymentSubmit = form.handleSubmit(async (data) => {
+  const handlePaymentSubmit = form.handleSubmit(() => {
     setCurrentStep("review");
   });
 
@@ -161,10 +156,9 @@ export function GuestCheckoutFlow({
     setIsSubmitting(true);
 
     try {
-      // Create checkout session
-      const session = await createCheckoutSession(cartItems);
+      const tax = cartTotal * TAX_RATE;
+      const total = cartTotal + SHIPPING_COST + tax;
 
-      // Prepare order data
       const orderData = {
         guestInfo: {
           email: data.email,
@@ -176,17 +170,16 @@ export function GuestCheckoutFlow({
         },
         shippingAddress: data.shippingAddress,
         billingAddress: data.billingAddress || data.shippingAddress,
+        payment: data.payment,
         items: cartItems,
-        sessionId: session.id,
         totals: {
           subtotal: cartTotal,
-          shipping: 5.99, // Default shipping
-          tax: cartTotal * 0.08, // 8% tax
-          total: cartTotal + 5.99 + cartTotal * 0.08,
+          shipping: SHIPPING_COST,
+          tax,
+          total,
         },
       };
 
-      // Submit order
       const response = await fetch("/api/orders/guest", {
         method: "POST",
         headers: {
@@ -201,13 +194,6 @@ export function GuestCheckoutFlow({
       }
 
       const result = await response.json();
-
-      // Clear checkout session
-      sessionStorage.removeItem("checkout_session");
-
-      // Redirect to success page
-      router.push(`/checkout/success?order=${result.orderId}`);
-
       onSuccess?.(result.orderId);
     } catch (error) {
       const errorMessage =
@@ -232,19 +218,16 @@ export function GuestCheckoutFlow({
     }
   };
 
-  // Loading fallback component
   const LoadingStep = () => (
     <div className="animate-pulse">
-      <div className="h-96 bg-muted rounded-lg"></div>
+      <div className="h-96 rounded-lg bg-muted" />
     </div>
   );
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      {/* Progress Indicator */}
+    <div className="mx-auto max-w-2xl space-y-6">
       <CheckoutProgress currentStep={currentStep} />
 
-      {/* Step Content with Lazy Loading */}
       <Suspense fallback={<LoadingStep />}>
         {currentStep === "contact" && (
           <ContactStep form={form} onNext={() => setCurrentStep("shipping")} />
@@ -262,6 +245,7 @@ export function GuestCheckoutFlow({
 
         {currentStep === "payment" && (
           <PaymentStep
+            form={form}
             onNext={() => setCurrentStep("review")}
             onPrevious={goToPreviousStep}
           />
@@ -271,6 +255,8 @@ export function GuestCheckoutFlow({
           <ReviewStep
             cartItems={cartItems}
             cartTotal={cartTotal}
+            shippingCost={SHIPPING_COST}
+            tax={cartTotal * TAX_RATE}
             isSubmitting={isSubmitting}
             onSubmit={handleFinalSubmit}
             onPrevious={goToPreviousStep}
@@ -278,7 +264,6 @@ export function GuestCheckoutFlow({
         )}
       </Suspense>
 
-      {/* Sign in prompt */}
       <div className="text-center">
         <p className="text-sm text-muted-foreground">
           Already have an account?{" "}
@@ -291,3 +276,4 @@ export function GuestCheckoutFlow({
     </div>
   );
 }
+

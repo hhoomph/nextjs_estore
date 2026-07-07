@@ -10,12 +10,14 @@ import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { LoadingPage } from "@/components/ui/loading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { ProductPrice } from "@/components/ui/product-price";
+import { StockBadge } from "@/components/ui/stock-badge";
 import { AddToCartSection } from "@/components/features/add-to-cart-section";
-import Image from "next/image";
+import { ImageSlider } from "@/components/ui/image-slider";
 import Link from "next/link";
 import { Star, ChevronLeft } from "lucide-react";
+import { PLACEHOLDER_IMAGE } from "@/lib/utils/image-utils";
 
 interface ProductPageProps {
   params: Promise<{
@@ -73,12 +75,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
 
-  // Calculate discount percentage
-  const discountPercent = product.discountPrice
-    ? Math.round((1 - Number(product.discountPrice) / Number(product.price)) * 100)
-    : 0;
-
   // Calculate average rating
+  const productImages = product.productPictures.length > 0
+    ? product.productPictures.map((pp) => pp.picture.url)
+    : product.ogImage
+      ? [product.ogImage]
+      : [PLACEHOLDER_IMAGE];
   const avgRating = product.reviews.length > 0
     ? product.reviews.reduce((acc, r) => acc + r.rating, 0) / product.reviews.length
     : 0;
@@ -103,49 +105,16 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Product Images */}
             <div className="space-y-4">
-              <div className="aspect-square relative overflow-hidden rounded-lg border bg-muted">
-                {product.productPictures[0]?.picture.url ? (
-                  <Image
-                    src={product.productPictures[0].picture.url}
-                    alt={product.name || "Product"}
-                    fill
-                    className="object-cover"
-                    priority
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                    No image available
-                  </div>
-                )}
-                {discountPercent > 0 && (
-                  <Badge className="absolute top-4 right-4 bg-red-500">
-                    {discountPercent}% OFF
-                  </Badge>
-                )}
-              </div>
-              
-              {/* Thumbnail Gallery */}
-              {product.productPictures.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto">
-                  {product.productPictures.map((pp, index) => (
-                    <div
-                      key={pp.picture.id}
-                      className="relative w-20 h-20 rounded-md overflow-hidden border-2 border-transparent hover:border-primary cursor-pointer"
-                    >
-                      <Image
-                        src={pp.picture.url}
-                        alt={`${product.name} - ${index + 1}`}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
+              <ImageSlider
+                images={productImages}
+                alt={product.name || "Product"}
+                className="rounded-[2rem] border border-border/60 bg-card p-3 shadow-xl shadow-primary/10"
+              />
             </div>
 
             {/* Product Details */}
-            <div className="space-y-6">
+            <div className="rounded-[2.5rem] border border-border/60 bg-card/95 p-6 shadow-2xl shadow-primary/10 lg:p-8">
+              <div className="space-y-6">
               {/* Category & Title */}
               <div>
                 <Link
@@ -165,8 +134,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
                           key={i}
                           className={`h-4 w-4 ${
                             i < Math.round(avgRating)
-                              ? "fill-yellow-400 text-yellow-400"
-                              : "text-muted"
+                              ? "fill-warning text-warning"
+                              : "text-muted-foreground/40"
                           }`}
                         />
                       ))}
@@ -179,18 +148,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </div>
 
               {/* Price */}
-              <div className="flex items-baseline gap-3">
-                <span className="text-3xl font-bold">
-                  ${product.discountPrice
-                    ? Number(product.discountPrice).toFixed(2)
-                    : Number(product.price).toFixed(2)}
-                </span>
-                {product.discountPrice && (
-                  <span className="text-lg text-muted-foreground line-through">
-                    ${Number(product.price).toFixed(2)}
-                  </span>
-                )}
-              </div>
+              <ProductPrice
+                price={Number(product.price)}
+                discountPrice={product.discountPrice ? Number(product.discountPrice) : null}
+                amountClassName="text-3xl"
+              />
 
               {/* Description */}
               <div>
@@ -201,16 +163,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </div>
 
               {/* Stock Status */}
-              <div className="flex items-center gap-2">
-                <span className="text-sm">Availability:</span>
-                {product.quantity > 0 ? (
-                  <Badge variant="outline" className="text-green-500 border-green-500">
-                    In Stock ({product.quantity} available)
-                  </Badge>
-                ) : (
-                  <Badge variant="destructive">Out of Stock</Badge>
-                )}
-              </div>
+              <StockBadge
+                inStock={product.quantity > 0}
+                quantity={product.quantity}
+              />
 
               <Separator />
 
@@ -235,6 +191,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   Back to Products
                 </Link>
               </div>
+              </div>
             </div>
           </div>
 
@@ -256,8 +213,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
                               key={i}
                               className={`h-4 w-4 ${
                                 i < review.rating
-                                  ? "fill-yellow-400 text-yellow-400"
-                                  : "text-muted"
+                                  ? "fill-warning text-warning"
+                                  : "text-muted-foreground/40"
                               }`}
                             />
                           ))}

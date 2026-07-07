@@ -54,8 +54,8 @@ export function getThemeAwareBackgroundClasses(): {
   dark: string;
 } {
   return {
-    light: "bg-background/95 backdrop-blur-sm",
-    dark: "bg-background/95 backdrop-blur-sm",
+    light: "bg-background/95 backdrop-blur-xl",
+    dark: "bg-background/95 backdrop-blur-xl",
   };
 }
 

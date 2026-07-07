@@ -107,8 +107,8 @@ export default function AdminSignInPage() {
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
-            <div className="p-3 bg-blue-600/10 rounded-full">
-              <Shield className="w-8 h-8 text-blue-600" />
+            <div className="p-3 bg-primary/10 rounded-full">
+              <Shield className="w-8 h-8 text-primary" />
             </div>
           </div>
           <CardTitle className="text-2xl font-bold">
@@ -169,7 +169,7 @@ export default function AdminSignInPage() {
             <p className="mb-2">Admin access is restricted to authorized personnel only.</p>
             <p>
               Not an admin?{" "}
-              <Link href="/auth/signin" className="text-blue-600 hover:underline">
+              <Link href="/auth/signin" className="text-primary hover:underline">
                 Sign in as user
               </Link>
             </p>

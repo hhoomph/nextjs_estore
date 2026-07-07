@@ -165,7 +165,7 @@ export function EnhancedNavbarIcon({
               variant="destructive"
               className={cn(
                 "flex h-5 w-5 items-center justify-center rounded-full p-0 text-xs font-bold",
-                "bg-red-500 hover:bg-red-600 text-white",
+                "bg-destructive hover:bg-destructive/90 text-destructive-foreground",
                 "shadow-lg ring-2 ring-background",
                 count > 99 && "text-[10px]",
               )}

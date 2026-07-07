@@ -1,84 +1,138 @@
-/**
- * Module for page
- *
- * @author hh.oomph@gmail.com
- * @version 1.0.0
- * @since 2025-01-01
- */
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-
-// Force dynamic rendering to avoid prerendering issues
-export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
-
+import { useTranslations } from "next-intl";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, Grid3X3, Package, Search } from "lucide-react";
+import { SectionHeading } from "@/components/features/layout/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
 interface Category {
   id: string;
   name: string;
-  level: number | null;
+  level: number;
   productCount: number;
 }
 
+function categorySlug(name: string) {
+  return encodeURIComponent(name.toLowerCase().replace(/\s+/g, "-"));
+}
+
+function CategoryCard({ category }: { category: Category }) {
+  const t = useTranslations("categories");
+  const indent = category.level > 0 ? { marginLeft: `${category.level * 1.25}rem` } : undefined;
+
+  return (
+    <Card
+      style={indent}
+      className="group overflow-hidden rounded-[2rem] border border-border/60 bg-card shadow-sm transition hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
+    >
+      <CardHeader className="pb-3">
+        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-3xl bg-primary text-primary-foreground shadow-lg shadow-primary/20 transition group-hover:scale-105">
+          <Package className="h-6 w-6" />
+        </div>
+        <CardTitle className="text-xl font-black text-foreground group-hover:text-primary">
+          {category.name}
+        </CardTitle>
+      </CardHeader>
+
+      <CardContent className="space-y-4 pt-0">
+        <div className="flex items-center justify-between">
+          <Badge className="rounded-full bg-primary/10 text-primary">
+            {category.productCount}{" "}
+            {category.productCount === 1
+              ? t("product.singular")
+              : t("product.plural")}
+          </Badge>
+          <Grid3X3 className="h-5 w-5 text-primary/70" />
+        </div>
+          <Button
+            asChild={true}
+            className="w-full rounded-full bg-primary text-primary-foreground font-bold hover:bg-primary/90"
+          >
+            <Link href={`/categories/${categorySlug(category.name)}`}>
+              {t("category.browse")}
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function CategoriesPage() {
+  const t = useTranslations("categories");
   const [categories, setCategories] = useState<Category[]>([]);
-  const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchCategories = async () => {
       setLoading(true);
       setError("");
 
       try {
-        const response = await fetch("/api/categories");
+        const response = await fetch("/api/categories", {
+          signal: controller.signal,
+        });
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.error || "Failed to fetch categories");
+          throw new Error(data.error || t("error.fetchFailed"));
         }
 
-        setCategories(data.categories);
-        setFilteredCategories(data.categories);
+        setCategories(data.categories || []);
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to fetch categories",
-        );
+        if (
+          err instanceof Error &&
+          (err.name === "AbortError" || err.message === "Failed to fetch")
+        ) {
+          return;
+        }
+        setError(err instanceof Error ? err.message : t("error.fetchFailed"));
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
-    fetchCategories();
-  }, []);
+    void fetchCategories();
 
-  useEffect(() => {
-    if (searchQuery.trim() === "") {
-      setFilteredCategories(categories);
-    } else {
-      const filtered = categories.filter((category) =>
-        category.name?.toLowerCase().includes(searchQuery.toLowerCase()),
-      );
-      setFilteredCategories(filtered);
-    }
-  }, [searchQuery, categories]);
+    return () => controller.abort();
+  }, [t]);
+
+  const filteredCategories = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return categories;
+    return categories.filter((category) =>
+      category.name.toLowerCase().includes(query),
+    );
+  }, [categories, searchQuery]);
+
+  const totalProducts = filteredCategories.reduce(
+    (total, category) => total + category.productCount,
+    0,
+  );
 
   if (loading) {
     return (
-      <div className="bg-background">
-        <div className="container px-4 py-20">
-          <div className="flex justify-center items-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 style={{ borderBottomColor: 'rgb(59, 130, 246)' }}"></div>
-            <span className="ml-2">Loading categories...</span>
+      <div className="min-h-screen bg-background">
+        <div className="container flex min-h-[60vh] items-center justify-center px-4 py-20">
+          <div className="text-center">
+            <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-border border-t-primary" />
+            <p className="font-semibold text-muted-foreground">{t("loading")}</p>
           </div>
         </div>
       </div>
@@ -87,14 +141,20 @@ export default function CategoriesPage() {
 
   if (error) {
     return (
-      <div className="bg-background">
+      <div className="min-h-screen bg-background">
         <div className="container px-4 py-20">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">
-              Error Loading Categories
+          <div className="mx-auto max-w-lg rounded-[2rem] border border-border/60 bg-card p-8 text-center shadow-xl shadow-primary/10">
+            <Package className="mx-auto mb-4 h-14 w-14 text-primary" />
+            <h1 className="mb-3 text-2xl font-black text-foreground">
+              {t("error.title")}
             </h1>
-            <p className="text-muted-foreground mb-8">{error}</p>
-            <Button onClick={() => window.location.reload()}>Try Again</Button>
+            <p className="mb-6 text-muted-foreground">{error}</p>
+            <Button
+              onClick={() => window.location.reload()}
+              className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              {t("error.tryAgain")}
+            </Button>
           </div>
         </div>
       </div>
@@ -102,137 +162,105 @@ export default function CategoriesPage() {
   }
 
   return (
-    <div className="bg-background">
-      {/* Breadcrumb */}
-      <div className="border-b">
+    <div className="min-h-screen bg-background">
+      <div className="border-b bg-background/80 backdrop-blur">
         <div className="container px-4 py-3">
           <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
-            <Link href="/" className="hover:text-foreground">
+            <Link href="/" className="font-semibold text-foreground">
               Home
             </Link>
             <span>/</span>
-            <span className="text-foreground">Categories</span>
+            <span className="font-bold text-foreground">{t("title")}</span>
           </nav>
         </div>
       </div>
 
-      <div className="container px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Shop by Category</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Browse our wide selection of products organized by category. Find
-            exactly what you're looking for with ease.
-          </p>
-        </div>
+      <div className="container px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
+        <SectionHeading
+          eyebrow={t("subtitle")}
+          title={t("header.title")}
+          description={t("header.subtitle")}
+          className="mb-10"
+        />
 
-        {/* Search */}
-        <div className="max-w-md mx-auto mb-8">
+        <div className="mx-auto mb-10 max-w-xl">
           <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Search categories..."
-              className="pl-8"
+              placeholder={t("search.placeholder")}
+              className="rounded-full pl-12 pr-12 py-6 text-base"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(event) => setSearchQuery(event.target.value)}
             />
+            {searchQuery && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-2 top-1/2 h-9 w-9 -translate-y-1/2 rounded-full"
+                onClick={() => setSearchQuery("")}
+              >
+                <span className="sr-only">Clear search</span>×
+              </Button>
+            )}
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="flex justify-center mb-8">
-          <div className="flex items-center gap-6 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Grid3X3 className="h-4 w-4" />
-              <span>{filteredCategories.length} categories</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Package className="h-4 w-4" />
-              <span>
-                {filteredCategories.reduce(
-                  (total, cat) => total + cat.productCount,
-                  0,
-                )}{" "}
-                products
-              </span>
-            </div>
+        <div className="mb-10 flex justify-center">
+          <div className="flex flex-wrap items-center gap-3 text-sm font-bold text-muted-foreground">
+            <span className="rounded-full border border-border bg-card px-4 py-2 shadow-sm">
+              <Grid3X3 className="mr-2 inline h-4 w-4 text-primary" />
+              {filteredCategories.length} {t("stats.categories")}
+            </span>
+            <span className="rounded-full border border-border bg-card px-4 py-2 shadow-sm">
+              <Package className="mr-2 inline h-4 w-4 text-primary" />
+              {totalProducts} {t("stats.products")}
+            </span>
           </div>
         </div>
 
-        {/* Categories Grid */}
         {filteredCategories.length === 0 ? (
-          <div className="text-center py-12">
-            <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No categories found</h3>
-            <p className="text-muted-foreground">
-              {searchQuery
-                ? "Try adjusting your search terms."
-                : "No categories are available at the moment."}
+          <div className="mx-auto max-w-xl rounded-[2rem] border border-border/60 bg-card p-10 text-center shadow-xl shadow-primary/10">
+            <Package className="mx-auto mb-4 h-14 w-14 text-muted-foreground" />
+            <h3 className="mb-2 text-xl font-black text-foreground">
+              {t("empty.title")}
+            </h3>
+            <p className="mb-6 text-muted-foreground">
+              {searchQuery ? t("empty.searchMessage") : t("empty.noCategories")}
             </p>
             {searchQuery && (
               <Button
                 variant="outline"
-                className="mt-4"
+                className="rounded-full"
                 onClick={() => setSearchQuery("")}
               >
-                Clear Search
+                {t("empty.clearSearch")}
               </Button>
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {filteredCategories.map((category) => (
-              <Card
-                key={category.id}
-                className="group overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
-              >
-                <CardHeader className="pb-3">
-                  <div className="w-12 h-12 style={{ backgroundColor: 'rgb(59, 130, 246)' }}/10 rounded-lg flex items-center justify-center mb-3">
-                    <Package className="h-6 w-6 style={{ color: 'rgb(59, 130, 246)' }}" />
-                  </div>
-                  <CardTitle className="text-lg group-hover:style={{ color: 'rgb(59, 130, 246)' }} transition-colors">
-                    {category.name}
-                  </CardTitle>
-                </CardHeader>
-
-                <CardContent className="pt-0">
-                  <div className="flex items-center justify-between mb-4">
-                    <Badge variant="secondary" className="text-xs">
-                      {category.productCount}{" "}
-                      {category.productCount === 1 ? "product" : "products"}
-                    </Badge>
-                  </div>
-
-                  <Link
-                    href={`/categories/${encodeURIComponent(category.name.toLowerCase().replace(/\s+/g, "-"))}`}
-                  >
-                    <Button className="w-full group-hover:bg-blue-600 group-hover:text-blue-foreground transition-colors">
-                      Browse Category
-                      <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
+              <CategoryCard key={category.id} category={category} />
             ))}
           </div>
         )}
 
-        {/* Browse All Products CTA */}
-        <div className="text-center mt-16">
-          <div className="bg-muted/50 rounded-lg p-8">
-            <Package className="h-12 w-12 style={{ color: 'rgb(59, 130, 246)' }} mx-auto mb-4" />
-            <h3 className="text-xl font-semibold mb-2">
-              Can't find what you're looking for?
+        <div className="mt-16 text-center">
+          <div className="rounded-[2.5rem] border border-border/60 bg-card p-8 shadow-xl shadow-primary/10">
+            <Package className="mx-auto mb-4 h-14 w-14 text-primary" />
+            <h3 className="text-2xl font-black text-foreground">
+              {t("cta.title")}
             </h3>
-            <p className="text-muted-foreground mb-6">
-              Browse all our products to discover more options.
+            <p className="mx-auto mt-2 max-w-xl text-muted-foreground">
+              {t("cta.subtitle")}
             </p>
-            <Link href="/products">
-              <Button size="lg">
-                Browse All Products
-                <ArrowRight className="h-4 w-4 ml-2" />
+              <Button asChild={true} size="lg" className="mt-6 rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+                <Link href="/products">
+                  {t("cta.browseAll")}
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
               </Button>
-            </Link>
           </div>
         </div>
       </div>

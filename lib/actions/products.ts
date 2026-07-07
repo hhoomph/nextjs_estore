@@ -31,6 +31,7 @@ interface ProductWithPictures {
   discountPrice: any | null; // Prisma Decimal
   quantity: number;
   categoryId: string | null;
+  ogImage: string | null;
   productPictures: Array<{
     picture: {
       url: string;
@@ -113,82 +114,103 @@ async function fetchProducts(
       where.quantity = { gt: 0 };
     }
 
-    // Build order by
-    type ProductOrderBy = {
-      createdAt?: "asc" | "desc";
-      price?: "asc" | "desc";
-      name?: "asc" | "desc";
-    };
+     // Build order by
+     type ProductOrderBy = {
+       createdAt?: "asc" | "desc";
+       price?: "asc" | "desc";
+       name?: "asc" | "desc";
+       wishlists?: { _count: "asc" | "desc" };
+     };
 
-    let orderBy: ProductOrderBy = { createdAt: "desc" };
-    if (sortBy === "price") {
-      orderBy = { price: sortOrder === "desc" ? "desc" : "asc" };
-    } else if (sortBy === "price-high") {
-      orderBy = { price: "desc" };
-    } else if (sortBy === "name") {
-      orderBy = { name: sortOrder === "desc" ? "desc" : "asc" };
-    }
+     let orderBy: ProductOrderBy = { createdAt: "desc" };
+     if (sortBy === "price") {
+       orderBy = { price: sortOrder === "desc" ? "desc" : "asc" };
+     } else if (sortBy === "price-high") {
+       orderBy = { price: "desc" };
+     } else if (sortBy === "name") {
+       orderBy = { name: sortOrder === "desc" ? "desc" : "asc" };
+     } else if (sortBy === "wishlistCount") {
+       orderBy = { wishlists: { _count: sortOrder === "desc" ? "desc" : "asc" } };
+     }
 
-    // Fetch products with pagination
-    const [products, total] = await Promise.all([
-      prisma.product.findMany({
-        where,
-        include: {
-          productPictures: {
-            take: 1,
-            orderBy: { displayOrder: "asc" },
-            include: {
-              picture: {
-                select: {
-                  id: true,
-                  url: true,
-                },
-              },
-            },
-          },
+     // Fetch products with pagination
+     const [products, total] = await Promise.all([
+       prisma.product.findMany({
+         where,
+         include: {
+           productPictures: {
+             take: 1,
+             orderBy: { displayOrder: "asc" },
+             include: {
+               picture: {
+                 select: {
+                   id: true,
+                   url: true,
+                 },
+               },
+             },
+           },
+           _count: {
+             select: { wishlists: true }
+           }
+         },
+         orderBy,
+         skip,
+         take: limit,
+       }),
+       prisma.product.count({ where }),
+     ]);
+
+     // Get category info
+     const categoryIds = [
+       ...new Set((products as ProductWithPictures[]).map((p) => p.categoryId)),
+     ].filter((id): id is string => typeof id === "string");
+     const categoryMap = new Map<string, { id: string; name: string }>();
+
+     if (categoryIds.length > 0) {
+       const categories = await prisma.category.findMany({
+         where: { id: { in: categoryIds } },
+         select: { id: true, name: true },
+       });
+
+       categories.forEach((cat: { id: string; name: string | null }) => {
+         categoryMap.set(cat.id, { id: cat.id, name: cat.name || "Unknown" });
+       });
+     }
+
+     // Transform products
+     type ProductWithPicturesAndWishlistCount = ProductWithPictures & {
+       _count: {
+         wishlists: number;
+       }
+     };
+
+      const transformedProducts = (products as ProductWithPicturesAndWishlistCount[]).map(
+        (product) => {
+          const images = product.productPictures.length > 0
+            ? product.productPictures.map((pp) => pp.picture.url)
+            : product.ogImage
+              ? [product.ogImage]
+              : [];
+
+          return {
+            id: product.id,
+            name: product.name,
+            desc: product.desc,
+            slug: product.slug,
+            price: Number(product.price),
+            discount_price: product.discountPrice
+              ? Number(product.discountPrice)
+              : null,
+            quantity: product.quantity,
+            category: categoryMap.get(product.categoryId || ""),
+            images,
+            inStock: product.quantity > 0,
+            createdAt: product.createdAt,
+            wishlistCount: product._count.wishlists,
+          };
         },
-        orderBy,
-        skip,
-        take: limit,
-      }),
-      prisma.product.count({ where }),
-    ]);
-
-    // Get category info
-    const categoryIds = [
-      ...new Set((products as ProductWithPictures[]).map((p) => p.categoryId)),
-    ].filter((id): id is string => typeof id === "string");
-    const categoryMap = new Map<string, { id: string; name: string }>();
-
-    if (categoryIds.length > 0) {
-      const categories = await prisma.category.findMany({
-        where: { id: { in: categoryIds } },
-        select: { id: true, name: true },
-      });
-
-      categories.forEach((cat: { id: string; name: string | null }) => {
-        categoryMap.set(cat.id, { id: cat.id, name: cat.name || "Unknown" });
-      });
-    }
-
-    // Transform products
-    const transformedProducts = (products as ProductWithPictures[]).map(
-      (product) => ({
-        id: product.id,
-        name: product.name,
-        desc: product.desc,
-        slug: product.slug,
-        price: Number(product.price),
-        discount_price: product.discountPrice
-          ? Number(product.discountPrice)
-          : null,
-        quantity: product.quantity,
-        category: categoryMap.get(product.categoryId || ""),
-        images: product.productPictures.map((pp) => pp.picture.url),
-        inStock: product.quantity > 0,
-        createdAt: product.createdAt,
-      }),
-    );
+      );
 
     const pagination = {
       page,

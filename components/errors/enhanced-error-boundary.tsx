@@ -492,24 +492,24 @@ export class EnhancedErrorBoundary extends Component<Props, State> {
         error?.message?.includes("fetch");
 
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 px-4">
-          <div className="max-w-lg w-full bg-white rounded-xl shadow-xl p-8 text-center border border-gray-200">
+        <div className="min-h-screen flex items-center justify-center bg-background px-4">
+          <div className="max-w-lg w-full bg-card rounded-xl shadow-xl p-8 text-center border border-border">
             {/* Network Status Indicator */}
             <div className="flex justify-center mb-4">
               {isOnline ? (
-                <Wifi className="h-6 w-6 text-green-500" />
+                <Wifi className="h-6 w-6 text-success" />
               ) : (
-                <WifiOff className="h-6 w-6 text-red-500" />
+                <WifiOff className="h-6 w-6 text-destructive" />
               )}
             </div>
 
-            <AlertTriangle className="mx-auto h-16 w-16 text-red-500 mb-6" />
+            <AlertTriangle className="mx-auto h-16 w-16 text-destructive mb-6" />
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-3">
+            <h2 className="text-2xl font-bold text-foreground mb-3">
               {isNetworkError ? "Connection Problem" : "Something went wrong"}
             </h2>
 
-            <p className="text-gray-600 mb-6 leading-relaxed">
+            <p className="text-muted-foreground mb-6 leading-relaxed">
               {isNetworkError
                 ? "It looks like you're having connection issues. Please check your internet and try again."
                 : "We encountered an unexpected error. Our team has been notified and is working to fix this."}
@@ -517,7 +517,7 @@ export class EnhancedErrorBoundary extends Component<Props, State> {
 
             {/* Retry Count Indicator */}
             {retryCount > 0 && (
-              <div className="text-sm text-gray-500 mb-4">
+              <div className="text-sm text-muted-foreground mb-4">
                 Retry attempts: {retryCount}/{maxRetries}
               </div>
             )}
@@ -558,26 +558,26 @@ export class EnhancedErrorBoundary extends Component<Props, State> {
             {showErrorDetails &&
               process.env.NODE_ENV === "development" &&
               error && (
-                <details className="mt-6 text-left bg-gray-50 rounded-lg p-4">
-                  <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900">
+                <details className="mt-6 text-left bg-muted rounded-lg p-4">
+                  <summary className="cursor-pointer text-sm font-medium text-foreground">
                     Error Details (Development Only)
                   </summary>
                   <div className="mt-3 space-y-2">
                     <div>
-                      <strong className="text-xs text-gray-500 uppercase tracking-wide">
+                      <strong className="text-xs text-muted-foreground uppercase tracking-wide">
                         Error:
                       </strong>
-                      <pre className="mt-1 text-xs bg-red-50 text-red-800 p-2 rounded overflow-auto max-h-20">
+                        <pre className="mt-1 text-xs bg-destructive/10 text-destructive p-2 rounded overflow-auto max-h-20">
                         {error.toString()}
                       </pre>
                     </div>
 
                     {errorInfo?.componentStack && (
                       <div>
-                        <strong className="text-xs text-gray-500 uppercase tracking-wide">
+                        <strong className="text-xs text-muted-foreground uppercase tracking-wide">
                           Component Stack:
                         </strong>
-                        <pre className="mt-1 text-xs bg-blue-50 text-blue-800 p-2 rounded overflow-auto max-h-32">
+                        <pre className="mt-1 text-xs bg-primary/10 text-primary p-2 rounded overflow-auto max-h-32">
                           {errorInfo.componentStack}
                         </pre>
                       </div>
@@ -587,7 +587,7 @@ export class EnhancedErrorBoundary extends Component<Props, State> {
               )}
 
             {/* User-friendly error message */}
-            <div className="mt-4 text-xs text-gray-400">
+            <div className="mt-4 text-xs text-muted-foreground">
               Error ID: {Date.now().toString(36)}
             </div>
           </div>

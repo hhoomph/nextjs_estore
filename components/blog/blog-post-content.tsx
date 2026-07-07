@@ -10,49 +10,16 @@
 "use client";
 
 import { format } from "date-fns";
-import { ArrowLeft, Calendar, Clock, Eye, MessageCircle } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, Eye } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-
-interface BlogPostWithContent {
-  id: string;
-  title: string;
-  slug: string;
-  content: string;
-  excerpt: string | null;
-  featuredImage: string | null;
-  publishedAt: Date | null;
-  readingTime: number | null;
-  viewCount: number;
-  seoTitle: string | null;
-  seoDescription: string | null;
-  author: {
-    id: string;
-    name: string | null;
-    image: string | null;
-    bio?: string | null;
-  };
-  category: {
-    id: string;
-    name: string;
-    slug: string;
-    color: string | null;
-  };
-  tags: {
-    tag: {
-      id: string;
-      name: string;
-      slug: string;
-      color: string | null;
-    };
-  }[];
-}
+import type { BlogPostContentData } from "./types";
 
 interface BlogPostContentProps {
-  post: BlogPostWithContent;
+  post: BlogPostContentData;
 }
 
 export function BlogPostContent({ post }: BlogPostContentProps) {

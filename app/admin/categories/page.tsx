@@ -1,7 +1,6 @@
 "use client";
 
 export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -362,9 +361,9 @@ export default function AdminCategoriesPage() {
                         }}
                       >
                         {category.level === 0 ? (
-                          <Folder className="h-4 w-4 text-blue-500" />
+                          <Folder className="h-4 w-4 text-primary" />
                         ) : (
-                          <FolderOpen className="h-4 w-4 text-gray-400" />
+                          <FolderOpen className="h-4 w-4 text-muted-foreground" />
                         )}
                       </div>
                       <span className="font-medium">{category.name}</span>
@@ -424,3 +423,4 @@ export default function AdminCategoriesPage() {
     </div>
   );
 }
+

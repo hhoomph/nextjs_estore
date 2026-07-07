@@ -1,19 +1,10 @@
-/**
- * Theme Provider with Hydration Fixes
- *
- * Provides theme context with hydration-safe rendering to prevent mismatches.
- * Uses custom implementation to avoid script injection issues.
- *
- * @author hh.oomph@gmail.com
- * @version 1.5.0
- * @since 2025-01-01
- */
 "use client";
 
 import type * as React from "react";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 type Theme = "dark" | "light" | "system";
+type ResolvedTheme = "dark" | "light";
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -27,16 +18,85 @@ type ThemeProviderProps = {
 type ThemeProviderState = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-  actualTheme: Theme;
+  actualTheme: ResolvedTheme;
+  mounted: boolean;
 };
+
+const VALID_THEMES = new Set<Theme>(["light", "dark", "system"]);
 
 const initialState: ThemeProviderState = {
   theme: "system",
   setTheme: () => null,
   actualTheme: "light",
+  mounted: false,
 };
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
+
+function isTheme(value: unknown): value is Theme {
+  return typeof value === "string" && VALID_THEMES.has(value as Theme);
+}
+
+function getSystemTheme(): ResolvedTheme {
+  if (typeof window === "undefined") return "light";
+
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
+
+function resolveTheme(theme: Theme, enableSystem: boolean): ResolvedTheme {
+  if (theme === "system" && enableSystem) {
+    return getSystemTheme();
+  }
+
+  return theme === "dark" ? "dark" : "light";
+}
+
+function applyThemeToDocument(
+  resolvedTheme: ResolvedTheme,
+  attribute: string,
+  disableTransitionOnChange: boolean,
+) {
+  const root = document.documentElement;
+  const previousTransition = root.style.transition;
+
+  root.classList.remove("light", "dark");
+  root.classList.add(resolvedTheme);
+  root.setAttribute("data-theme", resolvedTheme);
+  root.style.colorScheme = resolvedTheme;
+
+  if (attribute !== "class") {
+    root.setAttribute(attribute, resolvedTheme);
+  }
+
+  if (disableTransitionOnChange) {
+    root.style.transition = "none";
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        root.style.transition = previousTransition;
+      });
+    });
+  }
+}
+
+function readStoredTheme(storageKey: string): Theme | null {
+  try {
+    const storedTheme = window.localStorage.getItem(storageKey);
+    return isTheme(storedTheme) ? storedTheme : null;
+  } catch (error) {
+    console.warn("Failed to read stored theme:", error);
+    return null;
+  }
+}
+
+function writeStoredTheme(storageKey: string, theme: Theme) {
+  try {
+    window.localStorage.setItem(storageKey, theme);
+  } catch (error) {
+    console.warn("Failed to store theme:", error);
+  }
+}
 
 export function ThemeProvider({
   children,
@@ -45,104 +105,84 @@ export function ThemeProvider({
   attribute = "class",
   enableSystem = true,
   disableTransitionOnChange = true,
-  ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(defaultTheme);
-  const [actualTheme, setActualTheme] = useState<Theme>("light");
+  const [theme, setThemeState] = useState<Theme>(defaultTheme);
+  const [actualTheme, setActualTheme] = useState<ResolvedTheme>("light");
   const [mounted, setMounted] = useState(false);
 
-  // Load theme from localStorage on mount (client-side only)
   useEffect(() => {
-    let storedTheme: Theme | null = null;
+    const storedTheme = readStoredTheme(storageKey);
+    const resolvedTheme = resolveTheme(storedTheme ?? defaultTheme, enableSystem);
 
-    // Safely access localStorage only on client
-    try {
-      if (typeof window !== "undefined") {
-        storedTheme = localStorage.getItem(storageKey) as Theme;
-      }
-    } catch (error) {
-      console.warn("Failed to access localStorage:", error);
-    }
-
-    if (storedTheme) {
-      setTheme(storedTheme);
-    }
-
-    // Initialize system theme preference
-    if (typeof window !== "undefined") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
-      setActualTheme(systemTheme);
-    }
-
+    setThemeState(storedTheme ?? defaultTheme);
+    setActualTheme(resolvedTheme);
     setMounted(true);
-  }, [storageKey]);
+    applyThemeToDocument(
+      resolvedTheme,
+      attribute,
+      disableTransitionOnChange,
+    );
+  }, [attribute, defaultTheme, disableTransitionOnChange, enableSystem, storageKey]);
 
-  // Update actual theme based on theme preference
   useEffect(() => {
-    if (!mounted || typeof window === "undefined") return;
+    if (!mounted) return;
 
-    let resolvedTheme: Theme;
-
-    if (theme === "system" && enableSystem) {
-      resolvedTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light";
-    } else {
-      resolvedTheme = theme;
-    }
+    const resolvedTheme = resolveTheme(theme, enableSystem);
 
     setActualTheme(resolvedTheme);
+    applyThemeToDocument(
+      resolvedTheme,
+      attribute,
+      disableTransitionOnChange,
+    );
+    writeStoredTheme(storageKey, theme);
+  }, [
+    attribute,
+    disableTransitionOnChange,
+    enableSystem,
+    mounted,
+    storageKey,
+    theme,
+  ]);
 
-    // Apply theme to document (client-side only)
-    try {
-      const root = document.documentElement;
-      root.classList.remove("light", "dark");
-      root.classList.add(resolvedTheme);
-
-      if (attribute === "class") {
-        root.setAttribute("data-theme", resolvedTheme);
-      }
-
-      // Store theme preference
-      localStorage.setItem(storageKey, theme);
-    } catch (error) {
-      console.warn("Failed to apply theme:", error);
-    }
-  }, [theme, mounted, enableSystem, storageKey, attribute]);
-
-  // Listen for system theme changes
   useEffect(() => {
-    if (!enableSystem || theme !== "system" || typeof window === "undefined")
-      return;
+    if (!mounted || !enableSystem || theme !== "system") return;
 
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = () => {
-      const newTheme = mediaQuery.matches ? "dark" : "light";
-      setActualTheme(newTheme);
+    const handleSystemThemeChange = () => {
+      const resolvedTheme = mediaQuery.matches ? "dark" : "light";
 
-      try {
-        const root = document.documentElement;
-        root.classList.remove("light", "dark");
-        root.classList.add(newTheme);
-      } catch (error) {
-        console.warn("Failed to update system theme:", error);
-      }
+      setActualTheme(resolvedTheme);
+      applyThemeToDocument(
+        resolvedTheme,
+        attribute,
+        disableTransitionOnChange,
+      );
     };
 
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, [theme, enableSystem]);
+    handleSystemThemeChange();
+    mediaQuery.addEventListener("change", handleSystemThemeChange);
 
-  const value = {
-    theme,
-    setTheme,
-    actualTheme,
+    return () => {
+      mediaQuery.removeEventListener("change", handleSystemThemeChange);
+    };
+  }, [attribute, disableTransitionOnChange, enableSystem, mounted, theme]);
+
+  const setTheme = (nextTheme: Theme) => {
+    if (!isTheme(nextTheme)) return;
+    setThemeState(nextTheme);
   };
 
-  // Render children immediately on server, prevent hydration mismatch
+  const value = useMemo(
+    () => ({
+      theme,
+      setTheme,
+      actualTheme,
+      mounted,
+    }),
+    [actualTheme, mounted, theme],
+  );
+
   return (
     <ThemeProviderContext.Provider value={value}>
       {children}
@@ -153,8 +193,9 @@ export function ThemeProvider({
 export const useTheme = () => {
   const context = useContext(ThemeProviderContext);
 
-  if (context === undefined)
+  if (context === undefined) {
     throw new Error("useTheme must be used within a ThemeProvider");
+  }
 
   return context;
 };

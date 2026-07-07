@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import type { GuestCheckoutFormData } from "../guest-checkout-flow";
 
 interface ShippingStepProps {
   form: any;
@@ -21,15 +22,29 @@ export function ShippingStep({
   onNext,
   onPrevious,
 }: ShippingStepProps) {
-  const handleSubmit = form.handleSubmit((data: any) => {
-    if (!billingSameAsShipping && !data.billingAddress) {
-      form.setError("billingAddress.address_line1", {
-        message: "Billing address is required",
-      });
-      return;
+  const handleNext = async () => {
+    const isShippingValid = await form.trigger([
+      "shippingAddress.address_line1",
+      "shippingAddress.city",
+      "shippingAddress.state",
+      "shippingAddress.postal_code",
+      "shippingAddress.country",
+    ]);
+    if (!isShippingValid) return;
+
+    if (!billingSameAsShipping) {
+      const isBillingValid = await form.trigger([
+        "billingAddress.address_line1",
+        "billingAddress.city",
+        "billingAddress.state",
+        "billingAddress.postal_code",
+        "billingAddress.country",
+      ]);
+      if (!isBillingValid) return;
     }
+
     onNext();
-  });
+  };
 
   return (
     <Card>
@@ -40,129 +55,131 @@ export function ShippingStep({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div>
-          <Label htmlFor="shippingAddress.address_line1">Address Line 1</Label>
-          <Input
-            id="shippingAddress.address_line1"
-            {...form.register("shippingAddress.address_line1")}
-            className={
-              form.formState.errors.shippingAddress?.address_line1
-                ? "border-destructive"
-                : ""
-            }
-          />
-          {form.formState.errors.shippingAddress?.address_line1 && (
-            <p className="text-sm text-destructive mt-1">
-              {form.formState.errors.shippingAddress.address_line1.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <Label htmlFor="shippingAddress.address_line2">
-            Address Line 2 (Optional)
-          </Label>
-          <Input
-            id="shippingAddress.address_line2"
-            {...form.register("shippingAddress.address_line2")}
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
+        <form>
           <div>
-            <Label htmlFor="shippingAddress.city">City</Label>
+            <Label htmlFor="shippingAddress.address_line1">Address Line 1</Label>
             <Input
-              id="shippingAddress.city"
-              {...form.register("shippingAddress.city")}
+              id="shippingAddress.address_line1"
+              {...form.register("shippingAddress.address_line1")}
               className={
-                form.formState.errors.shippingAddress?.city
+                form.formState.errors.shippingAddress?.address_line1
                   ? "border-destructive"
                   : ""
               }
             />
-            {form.formState.errors.shippingAddress?.city && (
+            {form.formState.errors.shippingAddress?.address_line1 && (
               <p className="text-sm text-destructive mt-1">
-                {form.formState.errors.shippingAddress.city.message}
+                {form.formState.errors.shippingAddress.address_line1.message}
               </p>
             )}
           </div>
+
           <div>
-            <Label htmlFor="shippingAddress.state">State/Province</Label>
+            <Label htmlFor="shippingAddress.address_line2">
+              Address Line 2 (Optional)
+            </Label>
             <Input
-              id="shippingAddress.state"
-              {...form.register("shippingAddress.state")}
-              className={
-                form.formState.errors.shippingAddress?.state
-                  ? "border-destructive"
-                  : ""
+              id="shippingAddress.address_line2"
+              {...form.register("shippingAddress.address_line2")}
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="shippingAddress.city">City</Label>
+              <Input
+                id="shippingAddress.city"
+                {...form.register("shippingAddress.city")}
+                className={
+                  form.formState.errors.shippingAddress?.city
+                    ? "border-destructive"
+                    : ""
+                }
+              />
+              {form.formState.errors.shippingAddress?.city && (
+                <p className="text-sm text-destructive mt-1">
+                  {form.formState.errors.shippingAddress.city.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <Label htmlFor="shippingAddress.state">State/Province</Label>
+              <Input
+                id="shippingAddress.state"
+                {...form.register("shippingAddress.state")}
+                className={
+                  form.formState.errors.shippingAddress?.state
+                    ? "border-destructive"
+                    : ""
+                }
+              />
+              {form.formState.errors.shippingAddress?.state && (
+                <p className="text-sm text-destructive mt-1">
+                  {form.formState.errors.shippingAddress.state.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="shippingAddress.postal_code">Postal Code</Label>
+              <Input
+                id="shippingAddress.postal_code"
+                {...form.register("shippingAddress.postal_code")}
+                className={
+                  form.formState.errors.shippingAddress?.postal_code
+                    ? "border-destructive"
+                    : ""
+                }
+              />
+              {form.formState.errors.shippingAddress?.postal_code && (
+                <p className="text-sm text-destructive mt-1">
+                  {form.formState.errors.shippingAddress.postal_code.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <Label htmlFor="shippingAddress.country">Country</Label>
+              <Input
+                id="shippingAddress.country"
+                {...form.register("shippingAddress.country")}
+                className={
+                  form.formState.errors.shippingAddress?.country
+                    ? "border-destructive"
+                    : ""
+                }
+              />
+              {form.formState.errors.shippingAddress?.country && (
+                <p className="text-sm text-destructive mt-1">
+                  {form.formState.errors.shippingAddress.country.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <Separator />
+
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="billingSame"
+              checked={billingSameAsShipping}
+              onCheckedChange={(checked) =>
+                setBillingSameAsShipping(checked === true)
               }
             />
-            {form.formState.errors.shippingAddress?.state && (
-              <p className="text-sm text-destructive mt-1">
-                {form.formState.errors.shippingAddress.state.message}
-              </p>
-            )}
+            <Label htmlFor="billingSame" className="text-sm">
+              Billing address is the same as shipping address
+            </Label>
           </div>
-        </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="shippingAddress.postal_code">Postal Code</Label>
-            <Input
-              id="shippingAddress.postal_code"
-              {...form.register("shippingAddress.postal_code")}
-              className={
-                form.formState.errors.shippingAddress?.postal_code
-                  ? "border-destructive"
-                  : ""
-              }
-            />
-            {form.formState.errors.shippingAddress?.postal_code && (
-              <p className="text-sm text-destructive mt-1">
-                {form.formState.errors.shippingAddress.postal_code.message}
-              </p>
-            )}
+          <div className="flex justify-between pt-4">
+            <Button type="button" variant="outline" onClick={onPrevious}>
+              Back to Contact
+            </Button>
+            <Button type="button" onClick={handleNext}>Continue to Payment</Button>
           </div>
-          <div>
-            <Label htmlFor="shippingAddress.country">Country</Label>
-            <Input
-              id="shippingAddress.country"
-              {...form.register("shippingAddress.country")}
-              className={
-                form.formState.errors.shippingAddress?.country
-                  ? "border-destructive"
-                  : ""
-              }
-            />
-            {form.formState.errors.shippingAddress?.country && (
-              <p className="text-sm text-destructive mt-1">
-                {form.formState.errors.shippingAddress.country.message}
-              </p>
-            )}
-          </div>
-        </div>
-
-        <Separator />
-
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="billingSame"
-            checked={billingSameAsShipping}
-            onCheckedChange={(checked) =>
-              setBillingSameAsShipping(checked === true)
-            }
-          />
-          <Label htmlFor="billingSame" className="text-sm">
-            Billing address is the same as shipping address
-          </Label>
-        </div>
-
-        <div className="flex justify-between pt-4">
-          <Button variant="outline" onClick={onPrevious}>
-            Back to Contact
-          </Button>
-          <Button onClick={handleSubmit}>Continue to Payment</Button>
-        </div>
+        </form>
       </CardContent>
     </Card>
   );

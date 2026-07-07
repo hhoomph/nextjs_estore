@@ -22,6 +22,7 @@ export default defineConfig({
     ],
     include: [
       "tests/components/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
+      "components/**/__tests__/**/*.{test,spec}.{ts,tsx}",
     ],
     exclude: [
       "**/node_modules/**",

@@ -9,13 +9,16 @@
  * - Toast notifications for user feedback
  *
  * @author hh.oomph@gmail.com
- * @version 2.0.0
+ * @version 3.0.0
  * @since 2025-01-01
  */
 
 import { create } from "zustand";
-import { persist, subscribeWithSelector } from "zustand/middleware";
+import { devtools, persist, subscribeWithSelector } from "zustand/middleware";
 import { toast } from "@/lib/hooks/use-toast";
+import { CART_CONSTANTS } from "@/lib/constants/cart";
+import { QuantitySchema, type CartItemInput } from "@/lib/validations/cart";
+import { fetchWithRetry } from "@/lib/utils/fetch-with-retry";
 import type { Address } from "@/types/address";
 import type { EnhancedCartItem } from "@/types/cart";
 
@@ -30,12 +33,7 @@ interface CartStore {
   billingSameAsShipping: boolean;
   guestCart: EnhancedCartItem[]; // Store guest cart separately
   cartMergeInProgress: boolean;
-  addItem: (
-    item: Omit<
-      EnhancedCartItem,
-      "id" | "addedAt" | "updatedAt" | "sessionId" | "isPersisted" | "quantity"
-    > & { quantity?: number },
-  ) => void;
+  addItem: (item: CartItemInput) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
@@ -51,237 +49,299 @@ interface CartStore {
 }
 
 export const useCartStore = create<CartStore>()(
-  subscribeWithSelector(
-    persist(
-      (set, get) => ({
-        items: [],
-        isOpen: false, // Ensure cart starts closed
-        billingSameAsShipping: true,
-        guestCart: [], // Initialize guest cart
-        cartMergeInProgress: false, // Initialize merge progress flag
+  devtools(
+    subscribeWithSelector(
+      persist(
+        (set, get) => ({
+          items: [],
+          isOpen: false, // Ensure cart starts closed
+          billingSameAsShipping: true,
+          guestCart: [], // Initialize guest cart
+          cartMergeInProgress: false, // Initialize merge progress flag
 
-        addItem: (newItem) => {
-          const safeItems = get().items ?? [];
-          const existingItemIndex = safeItems.findIndex(
-            (item) =>
-              item.product_id === newItem.product_id &&
-              item.product_options_id === newItem.product_options_id,
-          );
+          addItem: (newItem) => {
+            const safeItems = get().items ?? [];
 
-          if (existingItemIndex >= 0) {
-            // Update quantity of existing item
-            const updatedItems = [...safeItems];
-            updatedItems[existingItemIndex].quantity += newItem.quantity || 1;
-            updatedItems[existingItemIndex].updatedAt = new Date();
-            set({ items: updatedItems }); // Removed auto-opening of cart sidebar
-            toast({
-              title: "Cart Updated",
-              description: `Quantity updated for ${newItem.product.name}`,
-              variant: "success",
-            });
-          } else {
-            // Add new item with all EnhancedCartItem properties
-            const cartItem: EnhancedCartItem = {
-              ...newItem,
-              id: `${newItem.product_id}-${newItem.product_options_id || "default"}-${Date.now()}`,
-              quantity: newItem.quantity || 1,
-              addedAt: new Date(),
-              updatedAt: new Date(),
-              isPersisted: false,
-            };
-            set({
-              items: [...safeItems, cartItem],
-              // Removed isOpen: true to prevent auto-opening of cart sidebar
-            });
-            toast({
-              title: "Added to Cart",
-              description: `${newItem.product.name} has been added to your cart`,
-              variant: "success",
-            });
-          }
-        },
+            // Validate the input item
+            if (!newItem.product_id) {
+              toast({
+                title: "Invalid Item",
+                description: "Product ID is required",
+                variant: "destructive",
+              });
+              return;
+            }
 
-        removeItem: (id) => {
-          set((state) => ({
-            items: (state.items ?? []).filter((item) => item.id !== id),
-          }));
-        },
-
-        updateQuantity: (id, quantity) => {
-          if (quantity <= 0) {
-            get().removeItem(id);
-            return;
-          }
-
-          set((state) => ({
-            items: (state.items ?? []).map((item) =>
-              item.id === id ? { ...item, quantity } : item,
-            ),
-          }));
-        },
-
-        clearCart: () => set({ items: [] }),
-
-        toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
-
-        setCartOpen: (open) => set({ isOpen: open }),
-
-        setShippingAddress: (address) =>
-          set({ selectedShippingAddress: address }),
-
-        setBillingAddress: (address) =>
-          set({ selectedBillingAddress: address }),
-
-        setBillingSameAsShipping: (same) =>
-          set({ billingSameAsShipping: same }),
-
-        getTotal: () => {
-          const items = get().items ?? [];
-          return Math.max(
-            0,
-            items.reduce((total, item) => {
-              const price = item.product.discount_price || item.product.price;
-              const optionPrice = item.options?.price_increment || 0;
-              return total + (price + optionPrice) * item.quantity;
-            }, 0),
-          );
-        },
-
-        getItemCount: () => {
-          const items = get().items ?? [];
-          return Math.max(
-            0,
-            items.reduce((count, item) => count + item.quantity, 0),
-          );
-        },
-
-        mergeGuestCartWithUser: async (userId) => {
-          const { guestCart } = get();
-          const items = get().items ?? [];
-          const safeGuestCart = guestCart ?? [];
-
-          if (safeGuestCart.length === 0) return;
-
-          try {
-            // Merge guest cart with user cart
-            const mergedItems = [...items];
-
-            safeGuestCart.forEach((guestItem) => {
-              const existingIndex = mergedItems.findIndex(
-                (item) =>
-                  item.product_id === guestItem.product_id &&
-                  item.product_options_id === guestItem.product_options_id,
-              );
-
-              if (existingIndex >= 0) {
-                // Update quantity if item exists
-                mergedItems[existingIndex].quantity += guestItem.quantity;
-              } else {
-                // Add new item
-                mergedItems.push(guestItem);
+            // Validate quantity if provided
+            if (newItem.quantity !== undefined) {
+              const validated = QuantitySchema.safeParse(newItem.quantity);
+              if (!validated.success) {
+                toast({
+                  title: "Invalid Quantity",
+                  description: "Quantity must be between 1 and 999",
+                  variant: "destructive",
+                });
+                return;
               }
-            });
-
-            // Update the cart with merged items
-            set({ items: mergedItems, guestCart: [] });
-
-            // Sync with database
-            await get().syncWithDatabase(userId);
-
-            toast({
-              title: "Cart Merged",
-              description: "Your guest cart has been merged with your account",
-              variant: "success",
-            });
-          } catch (error) {
-            console.error("Failed to merge guest cart:", error);
-            toast({
-              title: "Merge Failed",
-              description: "Could not merge your cart. Please try again.",
-              variant: "destructive",
-            });
-          }
-        },
-
-        syncWithDatabase: async (userId) => {
-          try {
-            const items = get().items ?? [];
-
-            // Get current session
-            const sessionResponse = await fetch("/api/auth/session");
-            const session = await sessionResponse.json();
-
-            if (!session?.session?.id) {
-              throw new Error("No active session found");
             }
 
-            const sessionId = session.session.id;
+            const quantity = newItem.quantity || 1;
+            const productId = newItem.product_id;
+            const optionsId = newItem.product_options_id;
 
-            // Clear existing cart items for this user/session
-            const clearResponse = await fetch("/api/cart/clear", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ userId, sessionId }),
-            });
-            if (!clearResponse.ok) {
-              // Surface the failure instead of silently swallowing it: the
-              // local cart is about to be re-synced from scratch, so an
-              // unsuccessful clear will leave the user with duplicated
-              // server-side items. Warn loudly but do not abort the merge
-              // — the subsequent /api/cart/sync will still write the
-              // intended set, and the user is told their cart may be out
-              // of sync so they can re-trigger sync manually.
-              console.warn(
-                "[cart] /api/cart/clear returned",
-                clearResponse.status,
-                clearResponse.statusText,
-                "— server-side cart may have stale items after sync.",
+            const existingItemIndex = safeItems.findIndex(
+              (item) =>
+                item.product_id === productId &&
+                item.product_options_id === optionsId,
+            );
+
+            if (existingItemIndex >= 0) {
+              // Validate combined quantity would be valid
+              const existingItem = safeItems[existingItemIndex];
+              const combinedQuantity = existingItem.quantity + quantity;
+
+              if (combinedQuantity > CART_CONSTANTS.MAX_QUANTITY) {
+                toast({
+                  title: "Cart Limit Reached",
+                  description: `Maximum ${CART_CONSTANTS.MAX_QUANTITY} items per product`,
+                  variant: "destructive",
+                });
+                return;
+              }
+
+              // Update quantity of existing item using immutable pattern
+              const updatedItems = safeItems.map((item, index) =>
+                index === existingItemIndex
+                  ? {
+                      ...item,
+                      quantity: combinedQuantity,
+                      updatedAt: new Date(),
+                    }
+                  : item,
               );
+
+              set({ items: updatedItems });
+              toast({
+                title: "Cart Updated",
+                description: `Quantity updated for ${newItem.product.name}`,
+                variant: "success",
+              });
+            } else {
+              // Add new item with all EnhancedCartItem properties
+              const cartItem: EnhancedCartItem = {
+                ...(newItem as any),
+                id: `${productId}-${optionsId || "default"}-${Date.now()}`,
+                quantity,
+                addedAt: new Date(),
+                updatedAt: new Date(),
+                isPersisted: false,
+              };
+              set({
+                items: [...safeItems, cartItem],
+              });
+              toast({
+                title: "Added to Cart",
+                description: `${newItem.product.name} has been added to your cart`,
+                variant: "success",
+              });
+            }
+          },
+
+          removeItem: (id) => {
+            set((state) => ({
+              items: (state.items ?? []).filter((item) => item.id !== id),
+            }));
+          },
+
+          updateQuantity: (id, quantity) => {
+            // Validate quantity before processing
+            const validated = QuantitySchema.safeParse(quantity);
+            if (!validated.success) {
+              toast({
+                title: "Invalid Quantity",
+                description: "Quantity must be between 1 and 999",
+                variant: "destructive",
+              });
+              return;
             }
 
-            // Add current items to database
-            if (items.length > 0) {
-              const cartItems = items.map((item) => ({
-                productId: item.product_id,
-                productOptionsId: item.product_options_id,
-                quantity: item.quantity,
-                userId: item.userId || userId,
-                sessionId: item.sessionId || sessionId,
-              }));
+            set((state) => ({
+              items: (state.items ?? []).map((item) =>
+                item.id === id
+                  ? { ...item, quantity: validated.data, updatedAt: new Date() }
+                  : item,
+              ),
+            }));
+          },
 
-              const response = await fetch("/api/cart/sync", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ items: cartItems }),
+          clearCart: () => set({ items: [] }),
+
+          toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
+
+          setCartOpen: (open) => set({ isOpen: open }),
+
+          setShippingAddress: (address) =>
+            set({ selectedShippingAddress: address }),
+
+          setBillingAddress: (address) =>
+            set({ selectedBillingAddress: address }),
+
+          setBillingSameAsShipping: (same) =>
+            set({ billingSameAsShipping: same }),
+
+          getTotal: () => {
+            const items = get().items ?? [];
+            return Math.max(
+              0,
+              items.reduce((total, item) => {
+                const price =
+                  item.product.discount_price || item.product.price;
+                const optionPrice = item.options?.price_increment || 0;
+                return total + (price + optionPrice) * item.quantity;
+              }, 0),
+            );
+          },
+
+          getItemCount: () => {
+            const items = get().items ?? [];
+            return Math.max(
+              0,
+              items.reduce((count, item) => count + item.quantity, 0),
+            );
+          },
+
+          mergeGuestCartWithUser: async (userId) => {
+            const { guestCart } = get();
+            const items = get().items ?? [];
+            const safeGuestCart = guestCart ?? [];
+
+            if (safeGuestCart.length === 0) return;
+
+            try {
+              // Merge guest cart with user cart
+              const mergedItems = [...items];
+
+              safeGuestCart.forEach((guestItem) => {
+                const existingIndex = mergedItems.findIndex(
+                  (item) =>
+                    item.product_id === guestItem.product_id &&
+                    item.product_options_id === guestItem.product_options_id,
+                );
+
+                if (existingIndex >= 0) {
+                  // Update quantity if item exists
+                  mergedItems[existingIndex].quantity += guestItem.quantity;
+                } else {
+                  // Add new item
+                  mergedItems.push(guestItem);
+                }
               });
 
-              if (!response.ok) {
-                throw new Error("Failed to sync cart items");
-              }
-            }
+              // Update the cart with merged items
+              set({ items: mergedItems, guestCart: [] });
 
-            // Mark items as persisted
-            set((state) => ({
-              items: (state.items ?? []).map((item) => ({
-                ...item,
-                isPersisted: true,
-                userId: userId,
-                sessionId: sessionId,
-              })),
-            }));
-          } catch (error) {
-            console.error("Failed to sync cart with database:", error);
-            throw error;
-          }
+              // Sync with database
+              await get().syncWithDatabase(userId);
+
+              toast({
+                title: "Cart Merged",
+                description:
+                  "Your guest cart has been merged with your account",
+                variant: "success",
+              });
+            } catch (error) {
+              console.error("Failed to merge guest cart:", error);
+              toast({
+                title: "Merge Failed",
+                description: "Could not merge your cart. Please try again.",
+                variant: "destructive",
+              });
+            }
+          },
+
+          syncWithDatabase: async (userId) => {
+            try {
+              const items = get().items ?? [];
+
+              // Get current session
+              const sessionResponse = await fetchWithRetry(
+                "/api/auth/session",
+                {
+                  method: "GET",
+                },
+              );
+              const session = await sessionResponse.json();
+
+              if (!session?.session?.id) {
+                throw new Error("No active session found");
+              }
+
+              const sessionId = session.session.id;
+
+              // Clear existing cart items for this user/session
+              const clearResponse = await fetchWithRetry("/api/cart/clear", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId, sessionId }),
+              });
+              if (!clearResponse.ok) {
+                console.warn(
+                  "[cart] /api/cart/clear returned",
+                  clearResponse.status,
+                  clearResponse.statusText,
+                  "— server-side cart may have stale items after sync.",
+                );
+              }
+
+              // Add current items to database
+              if (items.length > 0) {
+                const cartItems = items.map((item) => ({
+                  productId: item.product_id,
+                  productOptionsId: item.product_options_id,
+                  quantity: item.quantity,
+                  userId: item.userId || userId,
+                  sessionId: item.sessionId || sessionId,
+                }));
+
+                const response = await fetchWithRetry("/api/cart/sync", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ items: cartItems }),
+                });
+
+                if (!response.ok) {
+                  throw new Error("Failed to sync cart items");
+                }
+              }
+
+              // Mark items as persisted
+              set((state) => ({
+                items: (state.items ?? []).map((item) => ({
+                  ...item,
+                  isPersisted: true,
+                  userId: userId,
+                  sessionId: sessionId,
+                })),
+              }));
+            } catch (error) {
+              console.error("Failed to sync cart with database:", error);
+              throw error;
+            }
+          },
+        }),
+        {
+          name: "cart-storage",
+          partialize: (state) => ({
+            items: state.items ?? [],
+            isOpen: state.isOpen,
+            billingSameAsShipping: state.billingSameAsShipping,
+          }),
+          // Skip hydration on server side
+          skipHydration: typeof window === "undefined",
         },
-      }),
-      {
-        name: "cart-storage",
-        partialize: (state) => ({ items: state.items ?? [] }),
-        // Skip hydration on server side
-        skipHydration: typeof window === "undefined",
-      },
+      ),
     ),
+    { name: "cart-store" },
   ),
 );
 

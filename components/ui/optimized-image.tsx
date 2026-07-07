@@ -177,7 +177,7 @@ export const OptimizedImage = React.forwardRef<
               // Force reload
               setOptimizedSrc(src + "?t=" + Date.now());
             }}
-            className="absolute inset-0 flex items-center justify-center bg-black/50 text-white text-sm hover:bg-black/70 transition-colors"
+            className="absolute inset-0 flex items-center justify-center bg-background/70 text-foreground text-sm backdrop-blur-sm hover:bg-background/80 transition-colors"
           >
             Retry
           </button>
@@ -276,8 +276,8 @@ export function HeroImage({
       />
 
       {overlay && (
-        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-          <div className="text-center text-white">{overlayContent}</div>
+        <div className="absolute inset-0 bg-background/50 flex items-center justify-center backdrop-blur-sm">
+          <div className="text-center text-foreground">{overlayContent}</div>
         </div>
       )}
     </div>

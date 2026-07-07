@@ -1,218 +1,220 @@
-/**
- * Module for page
- *
- * @author hh.oomph@gmail.com
- * @version 1.0.0
- * @since 2025-01-01
- */
 "use client";
 
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-
-// Force dynamic rendering to avoid prerendering issues
-export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
-
+import { useEffect, useState } from "react";
 import { ArrowRight, Clock, Percent, Tag } from "lucide-react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ProductGrid } from "@/components/features/products/product-grid";
+import { SectionHeading } from "@/components/features/layout/section-heading";
+import { type ProductCardProduct } from "@/components/features/products/product-card";
+import { useCartActions } from "@/lib/hooks/use-simplified-cart-sync";
+
+interface Product {
+  id: string;
+  name: string | null;
+  slug: string | null;
+  price: number;
+  discount_price?: number | null;
+  category?: { id: string; name: string } | null;
+  images: string[];
+  inStock: boolean;
+}
+
+interface ProductResult {
+  data: Product[];
+  pagination: {
+    total: number;
+  };
+}
+
+function toProductCard(product: Product): ProductCardProduct {
+  return {
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    category: product.category,
+    price: product.price,
+    discount_price: product.discount_price,
+    images: product.images,
+    inStock: product.inStock,
+  };
+}
 
 export default function DealsPage() {
-  // Mock deals data - in a real app, this would come from an API
-  const deals = [
-    {
-      id: 1,
-      title: "Flash Sale - 50% Off Electronics",
-      description: "Limited time offer on all electronics. Don't miss out!",
-      discount: 50,
-      originalPrice: 999,
-      salePrice: 499,
-      category: "Electronics",
-      endsIn: "2 days",
-      image: "/placeholder-electronics.jpg",
-    },
-    {
-      id: 2,
-      title: "Fashion Week Special",
-      description: "Up to 70% off on summer collection",
-      discount: 70,
-      originalPrice: 299,
-      salePrice: 89,
-      category: "Fashion",
-      endsIn: "5 days",
-      image: "/placeholder-fashion.jpg",
-    },
-    {
-      id: 3,
-      title: "Home & Garden Clearance",
-      description: "End of season clearance on garden tools and decor",
-      discount: 40,
-      originalPrice: 199,
-      salePrice: 119,
-      category: "Home & Garden",
-      endsIn: "1 week",
-      image: "/placeholder-home.jpg",
-    },
-  ];
+  const [deals, setDeals] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const { addToCart } = useCartActions();
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchDeals = async () => {
+      try {
+        const response = await fetch("/api/products?limit=12&onSale=true", {
+          signal: controller.signal,
+        });
+        const data: ProductResult = await response.json();
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch deals");
+        }
+
+        setDeals(data.data);
+      } catch (err) {
+        if (
+          err instanceof Error &&
+          (err.name === "AbortError" || err.message === "Failed to fetch")
+        ) {
+          return;
+        }
+        setError(err instanceof Error ? err.message : "Failed to fetch deals");
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void fetchDeals();
+
+    return () => controller.abort();
+  }, []);
+
+  const handleAddToCart = async (product: ProductCardProduct) => {
+    try {
+      const currentPrice = product.discount_price ?? product.price;
+
+      await addToCart({
+        product_id: product.id,
+        product: {
+          id: product.id,
+          name: product.name || "Unknown Product",
+          price: currentPrice,
+          discount_price: currentPrice,
+          slug: product.slug || "",
+          product_pictures: (product.images ?? []).map((url) => ({
+            picture: { url },
+          })),
+        },
+        quantity: 1,
+      });
+    } catch (err) {
+      console.error("Error adding deal to cart:", err);
+    }
+  };
+
+  const featuredDeal = deals[0];
 
   return (
-    <div className="bg-background">
-      {/* Breadcrumb */}
-      <div className="border-b">
+    <main className="min-h-screen bg-background">
+      <div className="border-b bg-background/80 backdrop-blur">
         <div className="container px-4 py-3">
           <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
-            <Link href="/" className="hover:text-foreground">
+            <Link href="/" className="font-semibold text-foreground">
               Home
             </Link>
             <span>/</span>
-            <span className="text-foreground">Deals</span>
+            <span className="font-bold text-foreground">Deals</span>
           </nav>
         </div>
       </div>
 
-      <div className="container px-4 py-8">
-        <div className="text-center mb-12">
-          <Badge variant="secondary" className="mb-4">
-            <Percent className="mr-1 h-3 w-3" />
-            Limited Time Offers
-          </Badge>
-          <h1 className="text-4xl font-bold mb-4">Special Deals & Offers</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Discover amazing discounts and special offers on our best products.
-            Save big before these deals expire!
-          </p>
+      <section className="overflow-hidden bg-background">
+        <div className="container px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+          <SectionHeading
+            eyebrow="Limited Time Offers"
+            title="Special Deals & Offers"
+            description="Save big on discounted products before these offers expire."
+            className="mb-0"
+          />
         </div>
+      </section>
 
-        {/* Featured Deal */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">Featured Deal</h2>
-          <Card className="bg-linear-to-r from-primary/5 to-secondary/5 style={{ borderColor: 'rgb(59, 130, 246)' }}/20">
-            <CardContent className="p-8">
-              <div className="flex flex-col md:flex-row items-center gap-8">
-                <div className="flex-1">
-                  <Badge className="mb-4 bg-red-500">🔥 Hot Deal</Badge>
-                  <h3 className="text-3xl font-bold mb-4">
-                    Mega Electronics Sale
-                  </h3>
-                  <p className="text-lg text-muted-foreground mb-6">
-                    Up to 70% off on laptops, smartphones, and accessories.
-                    Limited stock available!
-                  </p>
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-5 w-5 text-orange-500" />
-                      <span className="font-semibold">Ends in 24 hours</span>
+      <section className="container px-4 py-12 sm:px-6 lg:px-8">
+        {loading ? (
+          <div className="rounded-[2rem] border border-border/60 bg-card p-10 text-center shadow-xl shadow-primary/10">
+            <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-border border-t-primary" />
+            <p className="font-semibold text-muted-foreground">Loading deals...</p>
+          </div>
+        ) : error ? (
+          <div className="rounded-[2rem] border border-border/60 bg-card p-10 text-center shadow-xl shadow-primary/10">
+            <p className="mb-5 font-bold text-destructive">{error}</p>
+            <Button onClick={() => window.location.reload()} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+              Try Again
+            </Button>
+          </div>
+        ) : deals.length === 0 ? (
+          <div className="rounded-[2rem] border border-border/60 bg-card p-10 text-center shadow-xl shadow-primary/10">
+            <Tag className="mx-auto mb-4 h-14 w-14 text-muted-foreground" />
+            <h2 className="text-2xl font-black text-foreground">No active deals</h2>
+            <p className="mt-2 text-muted-foreground">Check back soon for new offers.</p>
+          </div>
+        ) : (
+          <>
+            {featuredDeal && (
+              <div className="mb-12 overflow-hidden rounded-[2.5rem] border border-border/60 bg-card shadow-2xl shadow-primary/10">
+                <div className="grid gap-8 p-6 md:grid-cols-[1fr_auto] md:p-10">
+                  <div>
+                    <Badge className="mb-4 rounded-full bg-destructive text-destructive-foreground">
+                      Hot Deal
+                    </Badge>
+                    <h2 className="text-3xl font-black text-foreground">
+                      {featuredDeal.name}
+                    </h2>
+                    <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
+                      Featured discount from our current product catalog.
+                    </p>
+                    <div className="mt-6 flex flex-wrap items-center gap-3 text-sm font-bold text-muted-foreground">
+                      <span className="rounded-full border border-primary/25 bg-primary/10 px-4 py-2">
+                        <Clock className="mr-2 inline h-4 w-4 text-primary" />
+                        Limited stock
+                      </span>
+                      <span className="rounded-full border border-primary/25 bg-primary/10 px-4 py-2">
+                        Save today
+                      </span>
+                    </div>
+                    <div className="mt-8 flex flex-wrap gap-3">
+                      <Button asChild={true} size="lg" className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+                        <Link href={`/products/${featuredDeal.slug}`}>
+                          Shop This Deal
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <Button variant="outline" size="lg" className="rounded-full" onClick={() => void handleAddToCart(toProductCard(featuredDeal))}>
+                        Add to Cart
+                      </Button>
                     </div>
                   </div>
-                  <Button size="lg" asChild={true}>
-                    <Link href="/products?category=electronics&onSale=true">
-                      Shop Electronics Deals
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
-                </div>
-                <div className="w-full md:w-96 h-64 bg-linear-to-br from-primary/10 to-secondary/10 rounded-lg flex items-center justify-center">
-                  <Percent className="h-24 w-24 style={{ color: 'rgb(59, 130, 246)' }}/50" />
+                  <div className="flex h-72 items-center justify-center rounded-[2rem] bg-muted md:h-80 md:w-80">
+                    <Percent className="h-32 w-32 text-muted-foreground/50" />
+                  </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            )}
 
-        {/* All Deals */}
-        <div>
-          <h2 className="text-2xl font-bold mb-6">All Current Deals</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {deals.map((deal) => (
-              <Card
-                key={deal.id}
-                className="group hover:shadow-lg transition-shadow"
-              >
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <Badge variant="destructive" className="mb-2">
-                      -{deal.discount}%
-                    </Badge>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <Clock className="h-3 w-3" />
-                      {deal.endsIn}
-                    </div>
-                  </div>
-                  <div className="aspect-square bg-muted rounded-lg mb-4 flex items-center justify-center">
-                    <Tag className="h-12 w-12 text-muted-foreground" />
-                  </div>
-                  <CardTitle className="line-clamp-2 group-hover:style={{ color: 'rgb(59, 130, 246)' }} transition-colors">
-                    {deal.title}
-                  </CardTitle>
-                </CardHeader>
+            <div className="mb-6 flex items-center justify-between">
+              <h2 className="text-2xl font-black text-foreground">
+                All Current Deals
+              </h2>
+              <Button asChild={true} variant="outline" className="rounded-full">
+                <Link href="/products?onSale=true">View All Deals</Link>
+              </Button>
+            </div>
 
-                <CardContent>
-                  <p className="text-muted-foreground mb-4 line-clamp-3">
-                    {deal.description}
-                  </p>
-
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">
-                        Original Price:
-                      </span>
-                      <span className="text-sm line-through text-muted-foreground">
-                        ${deal.originalPrice}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">
-                        Sale Price:
-                      </span>
-                      <span className="text-lg font-bold text-green-600">
-                        ${deal.salePrice}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">
-                        You Save:
-                      </span>
-                      <span className="text-sm font-semibold text-green-600">
-                        ${(deal.originalPrice - deal.salePrice).toFixed(2)}
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-
-                <CardFooter>
-                  <Button className="w-full" asChild={true}>
-                    <Link
-                      href={`/products?category=${deal.category.toLowerCase().replace(" & ", "-").replace(" ", "-")}&onSale=true`}
-                    >
-                      View Deal
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        {/* Newsletter Signup */}
-        <div className="mt-16 bg-muted/30 rounded-lg p-8 text-center">
-          <h3 className="text-2xl font-bold mb-4">Never Miss a Deal</h3>
-          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-            Subscribe to our newsletter and be the first to know about new deals
-            and special offers.
-          </p>
-          <Button size="lg" asChild={true}>
-            <Link href="/auth/signup?redirect=/deals">Subscribe for Deals</Link>
-          </Button>
-        </div>
-      </div>
-    </div>
+            <ProductGrid
+              products={deals.map(toProductCard)}
+              onAddToCart={handleAddToCart}
+              unknownProductLabel="Unknown Product"
+              outOfStockLabel="Out of Stock"
+              saleLabel="Sale"
+              addToCartLabel="Add to Cart"
+              uncategorizedLabel="Uncategorized"
+            />
+          </>
+        )}
+      </section>
+    </main>
   );
 }

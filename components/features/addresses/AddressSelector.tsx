@@ -190,7 +190,7 @@ export function AddressSelector({
                       )}
                     </div>
                     {selectedId === address.id && (
-                      <CheckCircle className="h-5 w-5 text-green-600" />
+                      <CheckCircle className="h-5 w-5 text-success" />
                     )}
                   </div>
 
@@ -225,12 +225,12 @@ export function AddressSelector({
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
             {selectedId ? (
-              <span className="flex items-center gap-2 text-green-600">
+              <span className="flex items-center gap-2 text-success">
                 <CheckCircle className="h-4 w-4" />
                 Address selected
               </span>
             ) : (
-              <span className="flex items-center gap-2 text-orange-600">
+              <span className="flex items-center gap-2 text-warning">
                 <AlertTriangle className="h-4 w-4" />
                 Please select an address
               </span>

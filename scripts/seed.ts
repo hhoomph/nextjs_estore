@@ -1,6 +1,4 @@
 import { randomUUID } from "node:crypto";
-import { promises as fs } from "node:fs";
-import path from "node:path";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../app/generated/prisma/client";
 import "dotenv/config";
@@ -16,8 +14,8 @@ const SEED_CONFIG = {
   isDevelopment: process.env.NODE_ENV === "development",
 
   // Data sizes
-  categoriesCount: 8,
-  productsPerCategory: 15,
+  categoriesCount: 12,
+  productsPerCategory: 5,
   usersCount: 50,
   reviewsPerProduct: 5,
 
@@ -27,6 +25,54 @@ const SEED_CONFIG = {
   enableProgress: true,
 };
 
+type CategorySeedData = {
+  id: string;
+  name: string;
+  description?: string;
+};
+
+type ProductTemplate = {
+  name: string;
+  price: number;
+  discountPrice?: number;
+  categoryId: string;
+};
+
+type SeedProduct = {
+  id: string;
+};
+
+type SeedCategory = {
+  id: string;
+};
+
+const sampleProductImages = [
+  "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400",
+  "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400",
+  "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400",
+  "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400",
+  "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400",
+  "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400",
+  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
+  "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400",
+  "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400",
+  "https://images.unsplash.com/photo-1526178417617-24d1387740a9?w=400",
+];
+
+function getDeterministicImageIndex(value: string, offset = 0): number {
+  let hash = 0;
+
+  for (let index = 0; index < value.length; index++) {
+    hash = (hash * 31 + value.charCodeAt(index)) >>> 0;
+  }
+
+  return (hash + offset) % sampleProductImages.length;
+}
+
+function getProductImageUrl(value: string, offset = 0): string {
+  return sampleProductImages[getDeterministicImageIndex(value, offset)];
+}
+
 // Progress tracking
 class SeedProgress {
   private total = 0;
@@ -35,6 +81,10 @@ class SeedProgress {
 
   setTotal(total: number) {
     this.total = total;
+  }
+
+  addTotal(total: number) {
+    this.total += total;
   }
 
   increment() {
@@ -80,7 +130,7 @@ class SeedValidator {
   static async validateDataIntegrity() {
     const issues: string[] = [];
 
-    // Basic integrity checks (skip null-reference checks because foreign keys are non-nullable)
+    // Basic integrity checks for seeded storefront data
     const productCount = await prisma.product.count();
     if (productCount === 0) {
       issues.push(`No products found in database`);
@@ -89,6 +139,50 @@ class SeedValidator {
     const reviewCount = await prisma.review.count();
     if (reviewCount === 0) {
       issues.push(`No reviews found in database`);
+    }
+
+    const minimumProductImages = 2;
+
+    const seededProducts = await prisma.product.findMany({
+      select: {
+        id: true,
+        name: true,
+        categoryId: true,
+        ogImage: true,
+        productPictures: {
+          select: { id: true },
+        },
+      },
+    });
+
+    const productsWithoutCategory = seededProducts.filter(
+      (product) => !product.categoryId,
+    );
+
+    const productsWithoutOgImage = seededProducts.filter(
+      (product) => !product.ogImage,
+    );
+
+    const productsWithoutImages = seededProducts.filter(
+      (product) => product.productPictures.length < minimumProductImages,
+    );
+
+    if (productsWithoutCategory.length > 0) {
+      issues.push(
+        `${productsWithoutCategory.length} products do not have a category`,
+      );
+    }
+
+    if (productsWithoutOgImage.length > 0) {
+      issues.push(
+        `${productsWithoutOgImage.length} products do not have an og image`,
+      );
+    }
+
+    if (productsWithoutImages.length > 0) {
+      issues.push(
+        `${productsWithoutImages.length} products have fewer than ${minimumProductImages} product images`,
+      );
     }
 
     if (issues.length > 0) {
@@ -139,11 +233,15 @@ async function main() {
     );
 
     // Calculate total operations for progress tracking
+    const productCount =
+      SEED_CONFIG.categoriesCount * SEED_CONFIG.productsPerCategory;
     const totalOperations =
       SEED_CONFIG.categoriesCount +
-      SEED_CONFIG.categoriesCount * SEED_CONFIG.productsPerCategory +
+      productCount +
+      productCount +
       SEED_CONFIG.usersCount +
-      10; // Additional operations
+      productCount * SEED_CONFIG.reviewsPerProduct +
+      4;
 
     progress.setTotal(totalOperations);
 
@@ -153,11 +251,16 @@ async function main() {
 
     // Create products for each category
     const products = await createProducts(categories, progress, rollback);
-    console.log(`📦 Created ${products.length} products`);
+    console.log(`📦 Created or updated ${products.length} products`);
 
-    // Create product images and media
-    await createProductMedia(products, progress, rollback);
-    console.log("🖼️ Created product images and media");
+    const allProducts = await prisma.product.findMany({
+      select: { id: true },
+    });
+    progress.addTotal(Math.max(0, allProducts.length - products.length));
+
+    // Update product images and media
+    await createProductMedia(allProducts, progress);
+    console.log("🖼️ Updated product images and media");
 
     // Create users and accounts
     const users = await createUsers(progress, rollback);
@@ -216,7 +319,7 @@ async function createCategories(
   progress: SeedProgress,
   rollback: SeedRollback,
 ) {
-  const categoriesData = [
+  const categoriesData: CategorySeedData[] = [
     {
       id: "electronics",
       name: "Electronics",
@@ -245,6 +348,26 @@ async function createCategories(
       description: "Car parts and accessories",
     },
     { id: "toys", name: "Toys & Games", description: "Toys and entertainment" },
+    {
+      id: "sample-products",
+      name: "Sample Products",
+      description: "Sample products for testing storefront flows",
+    },
+    {
+      id: "sample-deals",
+      name: "Sample Deals",
+      description: "Sample discounted products for promotion flows",
+    },
+    {
+      id: "sample-bundles",
+      name: "Sample Bundles",
+      description: "Sample product bundles for cart and checkout flows",
+    },
+    {
+      id: "sample-featured",
+      name: "Sample Featured",
+      description: "Sample featured products for merchandising flows",
+    },
   ];
 
   const categories = [];
@@ -278,69 +401,69 @@ async function createCategories(
 
 // Enhanced product creation
 async function createProducts(
-  categories: any[],
+  categories: SeedCategory[],
   progress: SeedProgress,
   rollback: SeedRollback,
 ) {
   const products = [];
-  const productTemplates = [
+  const productTemplates: ProductTemplate[] = [
     // Electronics
     {
       name: "Wireless Bluetooth Headphones",
       price: 99.99,
       discountPrice: 79.99,
-      categoryIndex: 0,
+      categoryId: "electronics",
     },
     {
       name: "Smart Fitness Watch",
       price: 249.99,
       discountPrice: 199.99,
-      categoryIndex: 0,
+      categoryId: "electronics",
     },
     {
       name: "4K Ultra HD Monitor",
       price: 399.99,
       discountPrice: 349.99,
-      categoryIndex: 0,
+      categoryId: "electronics",
     },
     {
       name: "Wireless Gaming Mouse",
       price: 79.99,
       discountPrice: 59.99,
-      categoryIndex: 0,
+      categoryId: "electronics",
     },
     {
       name: "Mechanical Keyboard",
       price: 149.99,
       discountPrice: 129.99,
-      categoryIndex: 0,
+      categoryId: "electronics",
     },
 
     // Fashion
-    { name: "Premium Leather Jacket", price: 299.99, categoryIndex: 1 },
+    { name: "Premium Leather Jacket", price: 299.99, categoryId: "fashion" },
     {
       name: "Designer Sunglasses",
       price: 199.99,
       discountPrice: 149.99,
-      categoryIndex: 1,
+      categoryId: "fashion",
     },
     {
       name: "Running Sneakers",
       price: 129.99,
       discountPrice: 99.99,
-      categoryIndex: 1,
+      categoryId: "fashion",
     },
     {
       name: "Cotton T-Shirt",
       price: 29.99,
       discountPrice: 19.99,
-      categoryIndex: 1,
+      categoryId: "fashion",
     },
     {
       name: "Denim Jeans",
       price: 89.99,
       discountPrice: 69.99,
-      categoryIndex: 1,
+      categoryId: "fashion",
     },
 
     // Home & Garden
@@ -348,31 +471,31 @@ async function createProducts(
       name: "Programmable Coffee Maker",
       price: 89.99,
       discountPrice: 69.99,
-      categoryIndex: 2,
+      categoryId: "home-garden",
     },
     {
       name: "Robot Vacuum Cleaner",
       price: 349.99,
       discountPrice: 299.99,
-      categoryIndex: 2,
+      categoryId: "home-garden",
     },
     {
       name: "Garden Hose Set",
       price: 49.99,
       discountPrice: 39.99,
-      categoryIndex: 2,
+      categoryId: "home-garden",
     },
     {
       name: "LED Desk Lamp",
       price: 79.99,
       discountPrice: 59.99,
-      categoryIndex: 2,
+      categoryId: "home-garden",
     },
     {
       name: "Throw Pillow Set",
       price: 34.99,
       discountPrice: 24.99,
-      categoryIndex: 2,
+      categoryId: "home-garden",
     },
 
     // Sports & Outdoors
@@ -380,31 +503,31 @@ async function createProducts(
       name: "Yoga Mat Premium",
       price: 39.99,
       discountPrice: 29.99,
-      categoryIndex: 3,
+      categoryId: "sports",
     },
     {
       name: "Adjustable Dumbbell Set",
       price: 199.99,
       discountPrice: 149.99,
-      categoryIndex: 3,
+      categoryId: "sports",
     },
     {
       name: "Mountain Bike Helmet",
       price: 89.99,
       discountPrice: 69.99,
-      categoryIndex: 3,
+      categoryId: "sports",
     },
     {
       name: "Camping Tent 4-Person",
       price: 249.99,
       discountPrice: 199.99,
-      categoryIndex: 3,
+      categoryId: "sports",
     },
     {
       name: "Resistance Bands Kit",
       price: 29.99,
       discountPrice: 19.99,
-      categoryIndex: 3,
+      categoryId: "sports",
     },
 
     // Books
@@ -412,31 +535,31 @@ async function createProducts(
       name: "The Art of Programming",
       price: 49.99,
       discountPrice: 39.99,
-      categoryIndex: 4,
+      categoryId: "books",
     },
     {
       name: "JavaScript: The Good Parts",
       price: 34.99,
       discountPrice: 24.99,
-      categoryIndex: 4,
+      categoryId: "books",
     },
     {
       name: "Clean Code Handbook",
       price: 44.99,
       discountPrice: 34.99,
-      categoryIndex: 4,
+      categoryId: "books",
     },
     {
       name: "System Design Interview",
       price: 39.99,
       discountPrice: 29.99,
-      categoryIndex: 4,
+      categoryId: "books",
     },
     {
       name: "Data Structures & Algorithms",
       price: 54.99,
       discountPrice: 44.99,
-      categoryIndex: 4,
+      categoryId: "books",
     },
 
     // Beauty & Personal Care
@@ -444,31 +567,31 @@ async function createProducts(
       name: "Organic Face Serum",
       price: 34.99,
       discountPrice: 24.99,
-      categoryIndex: 5,
+      categoryId: "beauty",
     },
     {
       name: "Professional Hair Dryer",
       price: 79.99,
       discountPrice: 59.99,
-      categoryIndex: 5,
+      categoryId: "beauty",
     },
     {
       name: "Essential Oils Collection",
       price: 44.99,
       discountPrice: 34.99,
-      categoryIndex: 5,
+      categoryId: "beauty",
     },
     {
       name: "Electric Toothbrush",
       price: 69.99,
       discountPrice: 49.99,
-      categoryIndex: 5,
+      categoryId: "beauty",
     },
     {
       name: "Moisturizing Cream Set",
       price: 29.99,
       discountPrice: 19.99,
-      categoryIndex: 5,
+      categoryId: "beauty",
     },
 
     // Automotive
@@ -476,31 +599,31 @@ async function createProducts(
       name: "Dash Cam 4K",
       price: 129.99,
       discountPrice: 99.99,
-      categoryIndex: 6,
+      categoryId: "automotive",
     },
     {
       name: "Car Vacuum Cleaner",
       price: 59.99,
       discountPrice: 44.99,
-      categoryIndex: 6,
+      categoryId: "automotive",
     },
     {
       name: "LED Interior Lights Kit",
       price: 24.99,
       discountPrice: 19.99,
-      categoryIndex: 6,
+      categoryId: "automotive",
     },
     {
       name: "Portable Jump Starter",
       price: 89.99,
       discountPrice: 69.99,
-      categoryIndex: 6,
+      categoryId: "automotive",
     },
     {
       name: "Car Phone Mount",
       price: 19.99,
       discountPrice: 14.99,
-      categoryIndex: 6,
+      categoryId: "automotive",
     },
 
     // Toys & Games
@@ -508,59 +631,208 @@ async function createProducts(
       name: "Building Blocks Set 1000pc",
       price: 49.99,
       discountPrice: 39.99,
-      categoryIndex: 7,
+      categoryId: "toys",
     },
     {
       name: "Remote Control Car",
       price: 59.99,
       discountPrice: 44.99,
-      categoryIndex: 7,
+      categoryId: "toys",
     },
     {
       name: "Board Game Collection",
       price: 34.99,
       discountPrice: 24.99,
-      categoryIndex: 7,
+      categoryId: "toys",
     },
     {
       name: "Stuffed Animal Bear",
       price: 24.99,
       discountPrice: 19.99,
-      categoryIndex: 7,
+      categoryId: "toys",
     },
     {
       name: "Science Experiment Kit",
       price: 39.99,
       discountPrice: 29.99,
-      categoryIndex: 7,
+      categoryId: "toys",
+    },
+
+    // Sample Products
+    {
+      name: "Sample Starter Kit",
+      price: 24.99,
+      discountPrice: 19.99,
+      categoryId: "sample-products",
+    },
+    {
+      name: "Sample Demo Bundle",
+      price: 39.99,
+      discountPrice: 29.99,
+      categoryId: "sample-products",
+    },
+    {
+      name: "Sample Storefront Pack",
+      price: 49.99,
+      discountPrice: 39.99,
+      categoryId: "sample-products",
+    },
+    {
+      name: "Sample Checkout Item",
+      price: 14.99,
+      discountPrice: 9.99,
+      categoryId: "sample-products",
+    },
+    {
+      name: "Sample Featured Product",
+      price: 59.99,
+      discountPrice: 44.99,
+      categoryId: "sample-products",
+    },
+
+    // Sample Deals
+    {
+      name: "Sample Flash Sale Item",
+      price: 29.99,
+      discountPrice: 14.99,
+      categoryId: "sample-deals",
+    },
+    {
+      name: "Sample Clearance Product",
+      price: 34.99,
+      discountPrice: 17.99,
+      categoryId: "sample-deals",
+    },
+    {
+      name: "Sample Limited Offer",
+      price: 44.99,
+      discountPrice: 24.99,
+      categoryId: "sample-deals",
+    },
+    {
+      name: "Sample Discount Bundle",
+      price: 64.99,
+      discountPrice: 39.99,
+      categoryId: "sample-deals",
+    },
+    {
+      name: "Sample Deal of the Day",
+      price: 54.99,
+      discountPrice: 34.99,
+      categoryId: "sample-deals",
+    },
+
+    // Sample Bundles
+    {
+      name: "Sample Starter Bundle",
+      price: 79.99,
+      discountPrice: 59.99,
+      categoryId: "sample-bundles",
+    },
+    {
+      name: "Sample Family Bundle",
+      price: 99.99,
+      discountPrice: 79.99,
+      categoryId: "sample-bundles",
+    },
+    {
+      name: "Sample Gift Bundle",
+      price: 69.99,
+      discountPrice: 49.99,
+      categoryId: "sample-bundles",
+    },
+    {
+      name: "Sample Trial Bundle",
+      price: 39.99,
+      discountPrice: 29.99,
+      categoryId: "sample-bundles",
+    },
+    {
+      name: "Sample Premium Bundle",
+      price: 119.99,
+      discountPrice: 89.99,
+      categoryId: "sample-bundles",
+    },
+
+    // Sample Featured
+    {
+      name: "Sample Featured Hero",
+      price: 129.99,
+      discountPrice: 99.99,
+      categoryId: "sample-featured",
+    },
+    {
+      name: "Sample Featured Bestseller",
+      price: 89.99,
+      discountPrice: 69.99,
+      categoryId: "sample-featured",
+    },
+    {
+      name: "Sample Featured New Arrival",
+      price: 74.99,
+      discountPrice: 54.99,
+      categoryId: "sample-featured",
+    },
+    {
+      name: "Sample Featured Seasonal",
+      price: 64.99,
+      discountPrice: 44.99,
+      categoryId: "sample-featured",
+    },
+    {
+      name: "Sample Featured Premium",
+      price: 149.99,
+      discountPrice: 119.99,
+      categoryId: "sample-featured",
     },
   ];
 
   for (const category of categories) {
     const categoryProducts = productTemplates
-      .filter(
-        (template) => template.categoryIndex === categories.indexOf(category),
-      )
+      .filter((template) => template.categoryId === category.id)
       .slice(0, SEED_CONFIG.productsPerCategory);
 
+    if (categoryProducts.length === 0) {
+      throw new Error(`No product templates found for category ${category.id}`);
+    }
+
     for (const template of categoryProducts) {
-      const productId = `${category.id}-${template.name.toLowerCase().replace(/\s+/g, "-")}`;
+      const productId = `${category.id}-${template.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")}`;
       const product = await prisma.product.upsert({
         where: { id: productId },
-        update: {},
+        update: {
+          name: template.name,
+          desc: `High-quality ${template.name.toLowerCase()} perfect for your needs.`,
+          slug: productId,
+          categoryId: template.categoryId,
+          quantity: Math.max(10, Math.floor(Math.random() * 100) + 10),
+          price: template.price,
+          discountPrice: template.discountPrice,
+          ogImage: getProductImageUrl(productId, 0),
+          status: 1,
+          modifiedAt: new Date(),
+        },
         create: {
           id: productId,
           name: template.name,
           desc: `High-quality ${template.name.toLowerCase()} perfect for your needs.`,
           slug: productId,
-          categoryId: category.id,
-          quantity: Math.floor(Math.random() * 100) + 10,
+          categoryId: template.categoryId,
+          quantity: Math.max(10, Math.floor(Math.random() * 100) + 10),
           price: template.price,
           discountPrice: template.discountPrice,
+          ogImage: getProductImageUrl(productId, 0),
           status: 1,
           modifiedAt: new Date(),
         },
       });
+
+      if (!product.categoryId) {
+        throw new Error(`Product ${product.id} was created without a category`);
+      }
 
       products.push(product);
       progress.increment();
@@ -577,52 +849,67 @@ async function createProducts(
 
 // Enhanced media creation
 async function createProductMedia(
-  products: any[],
+  products: SeedProduct[],
   progress: SeedProgress,
-  rollback: SeedRollback,
 ) {
-  const unsplashImages = [
-    "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400",
-    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400",
-    "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400",
-    "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400",
-    "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400",
-    "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400",
-    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
-    "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400",
-  ];
+  const imagesPerProduct = 2;
 
   for (const product of products) {
-    const imageCount = Math.floor(Math.random() * 3) + 1; // 1-3 images per product
+    await prisma.product.update({
+      where: { id: product.id },
+      data: {
+        ogImage: getProductImageUrl(product.id, 0),
+        modifiedAt: new Date(),
+      },
+    });
 
-    for (let i = 0; i < imageCount; i++) {
-      const imageUrl =
-        unsplashImages[Math.floor(Math.random() * unsplashImages.length)];
+    const existingProductPictures = await prisma.productPicture.findMany({
+      where: { productId: product.id },
+      select: { id: true },
+    });
 
-      const picture = await prisma.picture.create({
-        data: {
-          id: randomUUID(),
+    if (existingProductPictures.length > 0) {
+      await prisma.productPicture.deleteMany({
+        where: {
+          id: {
+            in: existingProductPictures.map((productPicture) => productPicture.id),
+          },
+        },
+      });
+    }
+
+    for (let i = 0; i < imagesPerProduct; i++) {
+      const pictureId = `sample-picture-${product.id}-${i}`;
+      const productPictureId = `sample-product-picture-${product.id}-${i}`;
+      const imageUrl = getProductImageUrl(product.id, i + 1);
+
+      await prisma.picture.upsert({
+        where: { id: pictureId },
+        update: {
+          url: imageUrl,
+          type: "product",
+          modifiedAt: new Date(),
+        },
+        create: {
+          id: pictureId,
           url: imageUrl,
           type: "product",
           modifiedAt: new Date(),
         },
       });
 
-      await prisma.productPicture.create({
-        data: {
-          id: randomUUID(),
-          pictureId: picture.id,
+      await prisma.productPicture.upsert({
+        where: { id: productPictureId },
+        update: {
+          pictureId,
+          displayOrder: i,
+        },
+        create: {
+          id: productPictureId,
+          pictureId,
           productId: product.id,
           displayOrder: i,
         },
-      });
-
-      // Add rollback operation
-      rollback.addRollback(async () => {
-        await prisma.productPicture.deleteMany({
-          where: { productId: product.id },
-        });
-        await prisma.picture.deleteMany({ where: { id: picture.id } });
       });
     }
 
@@ -718,8 +1005,8 @@ async function createUsers(progress: SeedProgress, rollback: SeedRollback) {
 
 // Create reviews and ratings
 async function createReviews(
-  products: any[],
-  users: any[],
+  products: SeedProduct[],
+  users: SeedProduct[],
   progress: SeedProgress,
   rollback: SeedRollback,
 ) {
@@ -771,7 +1058,7 @@ async function createReviews(
 
 // Create collections
 async function createCollections(
-  products: any[],
+  products: SeedProduct[],
   progress: SeedProgress,
   rollback: SeedRollback,
 ) {

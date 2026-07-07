@@ -9,31 +9,68 @@ import { type NextRequest, NextResponse } from "next/server";
 import { auth, isAdmin } from "@/lib/auth/config";
 import { prisma } from "@/lib/database";
 
+async function getCategoryDescendantIds(categoryId: string) {
+  const rows = await prisma.$queryRaw<Array<{ id: string }>>`
+    WITH RECURSIVE category_tree AS (
+      SELECT id
+      FROM "category"
+      WHERE id = ${categoryId}
+
+      UNION ALL
+
+      SELECT child.id
+      FROM "category" AS child
+      INNER JOIN category_tree AS parent
+        ON child."parentId" = parent.id
+    )
+    SELECT id
+    FROM category_tree
+  `;
+
+  return rows.map((row) => row.id);
+}
+
+async function countActiveProductsInCategories(categoryIds: string[]) {
+  if (categoryIds.length === 0) return 0;
+
+  return prisma.product.count({
+    where: {
+      status: 1,
+      categoryId: {
+        in: categoryIds,
+      },
+    },
+  });
+}
+
 // GET /api/categories - Get all categories
 export async function GET() {
   try {
     const categories = await prisma.category.findMany({
-      where: {
-        level: 0, // Only get root categories
+      select: {
+        id: true,
+        name: true,
+        level: true,
       },
-      include: {
-        products: {
-          select: {
-            id: true,
-          },
-        },
-      },
-      orderBy: {
-        name: "asc",
-      },
+      orderBy: [
+        { level: "asc" },
+        { name: "asc" },
+      ],
     });
 
-    // Transform for frontend
-    const transformedCategories = categories.map((category) => ({
-      id: category.id,
-      name: category.name,
-      productCount: category.products.length,
-    }));
+    const transformedCategories = await Promise.all(
+      categories.map(async (category) => {
+        const categoryIds = await getCategoryDescendantIds(category.id);
+        const productCount = await countActiveProductsInCategories(categoryIds);
+
+        return {
+          id: category.id,
+          name: category.name ?? "Uncategorized",
+          level: category.level ?? 0,
+          productCount,
+        };
+      }),
+    );
 
     return NextResponse.json({
       categories: transformedCategories,

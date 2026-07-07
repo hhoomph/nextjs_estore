@@ -10,28 +10,6 @@ import { getSiteSettings, updateSiteSettings } from "@/lib/actions/seo";
 import { auth } from "@/lib/auth/config";
 import type { SiteSettingsData } from "@/lib/validations/schemas/seo";
 
-// Type for current settings (could be database result or defaults)
-type CurrentSettings =
-  | {
-      language_mode?: string;
-      default_language?: string;
-      enable_product_suggestions?: boolean;
-      suggestion_algorithm?: string;
-      max_suggestions?: number;
-      siteTitleEn?: string;
-      siteTitleFa?: string;
-      descriptionEn?: string;
-      descriptionFa?: string;
-      phoneEn?: string;
-      phoneFa?: string;
-      maintenanceMode?: boolean;
-      allowRegistration?: boolean;
-      defaultCurrency?: string;
-      lowStockThreshold?: number;
-    }
-  | typeof DEFAULT_SETTINGS;
-
-// Default settings for when no database record exists
 const DEFAULT_SETTINGS = {
   site_title_en: "My E-commerce Store",
   site_title_fa: "فروشگاه آنلاین من",
@@ -46,17 +24,38 @@ const DEFAULT_SETTINGS = {
   google_analytics_id: null,
   maintenance_mode: false,
   allow_registration: true,
-  default_currency: "USD",
+  default_currency: "IRR",
   low_stock_threshold: 10,
 };
 
-// GET /api/admin/settings - Get current settings (public - no auth required)
+const LANGUAGE_MODE_OPTIONS = ["multilingual", "single_fa", "single_en"] as const;
+const LANGUAGE_OPTIONS = ["fa", "en"] as const;
+const SUGGESTION_ALGORITHM_OPTIONS = ["popularity", "similarity", "recent", "hybrid"] as const;
+
+function normalizeLanguageMode(value: unknown): SiteSettingsData["language_mode"] {
+  if (LANGUAGE_MODE_OPTIONS.includes(value as SiteSettingsData["language_mode"])) {
+    return value as SiteSettingsData["language_mode"];
+  }
+  return "multilingual";
+}
+
+function normalizeLanguage(value: unknown): SiteSettingsData["default_language"] {
+  if (LANGUAGE_OPTIONS.includes(value as SiteSettingsData["default_language"])) {
+    return value as SiteSettingsData["default_language"];
+  }
+  return "fa";
+}
+
+function normalizeSuggestionAlgorithm(value: unknown): SiteSettingsData["suggestion_algorithm"] {
+  if (SUGGESTION_ALGORITHM_OPTIONS.includes(value as SiteSettingsData["suggestion_algorithm"])) {
+    return value as SiteSettingsData["suggestion_algorithm"];
+  }
+  return "hybrid";
+}
+
+// GET /api/admin/settings - Get current settings
 export async function GET(request: NextRequest) {
   try {
-    // Site settings are public - no authentication required for reading
-    // Only admin can write (PUT), but anyone can read (GET)
-
-    // Fetch settings from database
     const result = await getSiteSettings();
     if (!result.success) {
       return NextResponse.json(
@@ -65,30 +64,27 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Convert database format to frontend format
     let frontendSettings;
 
     if (result.settings) {
-      // Database result (camelCase)
-      const dbSettings = result.settings;
+      const s = result.settings;
       frontendSettings = {
-        siteName: dbSettings.siteTitleEn || "",
-        siteDescription: dbSettings.descriptionEn || "",
-        contactEmail: dbSettings.phoneEn || "",
-        maintenanceMode: dbSettings.maintenanceMode ?? false,
-        allowRegistration: dbSettings.allowRegistration ?? true,
-        defaultCurrency: dbSettings.defaultCurrency || "USD",
-        lowStockThreshold: dbSettings.lowStockThreshold || 10,
-        siteTitleFa: dbSettings.siteTitleFa || "",
-        phoneFa: dbSettings.phoneFa || "",
-        descriptionFa: dbSettings.descriptionFa || "",
-        defaultSeoTitle: dbSettings.defaultSeoTitle || "",
-        defaultSeoDescription: dbSettings.defaultSeoDescription || "",
-        defaultOgImage: dbSettings.defaultOgImage || "",
-        googleAnalyticsId: dbSettings.googleAnalyticsId || "",
+        siteName: s.siteTitleEn ?? "",
+        siteDescription: s.descriptionEn ?? "",
+        contactEmail: s.phoneEn ?? "",
+        maintenanceMode: s.maintenanceMode ?? false,
+        allowRegistration: s.allowRegistration ?? true,
+        defaultCurrency: s.defaultCurrency || "IRR",
+        lowStockThreshold: s.lowStockThreshold ?? 10,
+        siteTitleFa: s.siteTitleFa || "",
+        phoneFa: s.phoneFa || "",
+        descriptionFa: s.descriptionFa || "",
+        defaultSeoTitle: s.defaultSeoTitle || "",
+        defaultSeoDescription: s.defaultSeoDescription || "",
+        defaultOgImage: s.defaultOgImage || "",
+        googleAnalyticsId: s.googleAnalyticsId || "",
       };
     } else {
-      // Default settings (snake_case)
       frontendSettings = {
         siteName: DEFAULT_SETTINGS.site_title_en,
         siteDescription: DEFAULT_SETTINGS.description_en,
@@ -117,7 +113,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// PUT /api/admin/settings - Update settings
+// PUT /api/admin/settings - Update settings (supports partial updates)
 export async function PUT(request: NextRequest) {
   try {
     const session = await auth.api.getSession({ headers: request.headers });
@@ -130,60 +126,72 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const {
-      siteName,
-      siteDescription,
-      contactEmail,
-      maintenanceMode,
-      allowRegistration,
-      defaultCurrency,
-      lowStockThreshold,
-      siteTitleFa,
-      phoneFa,
-      descriptionFa,
-      defaultSeoTitle,
-      defaultSeoDescription,
-      defaultOgImage,
-      googleAnalyticsId,
-    } = body;
+    const partial = body as Partial<{
+      siteName: string;
+      siteDescription: string;
+      contactEmail: string;
+      maintenanceMode: boolean;
+      allowRegistration: boolean;
+      defaultCurrency: string;
+      lowStockThreshold: number;
+      siteTitleFa: string;
+      phoneFa: string;
+      descriptionFa: string;
+      defaultSeoTitle: string;
+      defaultSeoDescription: string;
+      defaultOgImage: string | null;
+      googleAnalyticsId: string | null;
+    }>;
 
     // Validate input
-    if (siteName && typeof siteName !== "string") {
+    if (partial.siteName !== undefined && typeof partial.siteName !== "string") {
       return NextResponse.json({ error: "Invalid site name" }, { status: 400 });
     }
-    if (siteDescription && typeof siteDescription !== "string") {
+    if (
+      partial.siteDescription !== undefined &&
+      typeof partial.siteDescription !== "string"
+    ) {
       return NextResponse.json(
         { error: "Invalid site description" },
         { status: 400 },
       );
     }
-    if (contactEmail && typeof contactEmail !== "string") {
+    if (
+      partial.contactEmail !== undefined &&
+      typeof partial.contactEmail !== "string"
+    ) {
       return NextResponse.json(
         { error: "Invalid contact email" },
         { status: 400 },
       );
     }
-    if (maintenanceMode !== undefined && typeof maintenanceMode !== "boolean") {
+    if (
+      partial.maintenanceMode !== undefined &&
+      typeof partial.maintenanceMode !== "boolean"
+    ) {
       return NextResponse.json(
         { error: "Invalid maintenance mode" },
         { status: 400 },
       );
     }
     if (
-      allowRegistration !== undefined &&
-      typeof allowRegistration !== "boolean"
+      partial.allowRegistration !== undefined &&
+      typeof partial.allowRegistration !== "boolean"
     ) {
       return NextResponse.json(
         { error: "Invalid registration setting" },
         { status: 400 },
       );
     }
-    if (defaultCurrency && typeof defaultCurrency !== "string") {
+    if (
+      partial.defaultCurrency !== undefined &&
+      typeof partial.defaultCurrency !== "string"
+    ) {
       return NextResponse.json({ error: "Invalid currency" }, { status: 400 });
     }
     if (
-      lowStockThreshold !== undefined &&
-      (typeof lowStockThreshold !== "number" || lowStockThreshold < 0)
+      partial.lowStockThreshold !== undefined &&
+      (typeof partial.lowStockThreshold !== "number" || partial.lowStockThreshold < 0)
     ) {
       return NextResponse.json(
         { error: "Invalid low stock threshold" },
@@ -191,35 +199,45 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Prepare update data for database
-    const updateData: SiteSettingsData = {
-      site_title_en: siteName,
-      site_title_fa: siteTitleFa,
-      phone_en: contactEmail, // Using phone as contact for now
-      phone_fa: phoneFa,
-      description_en: siteDescription,
-      description_fa: descriptionFa,
-      // Language settings - use defaults (these properties not in current schema)
-      language_mode: "multilingual",
-      default_language: "fa",
-      // Product suggestions - use defaults (these properties not in current schema)
-      enable_product_suggestions: true,
-      suggestion_algorithm: "hybrid",
-      max_suggestions: 6,
-      // SEO settings
-      default_seo_title: defaultSeoTitle,
-      default_seo_description: defaultSeoDescription,
-      default_og_image: defaultOgImage,
-      google_analytics_id: googleAnalyticsId,
-      // Site configuration
-      maintenance_mode: maintenanceMode,
-      allow_registration: allowRegistration,
-      default_currency: defaultCurrency,
-      low_stock_threshold: lowStockThreshold,
+    // Fetch current settings and merge with partial update to avoid
+    // sibling fields being reset when individual tabs save.
+    const currentResult = await getSiteSettings();
+    if (!currentResult.success || !currentResult.settings) {
+      return NextResponse.json(
+        { error: "Failed to load current settings" },
+        { status: 500 },
+      );
+    }
+
+    const current = currentResult.settings;
+    const normalizeString = (value: unknown) => (typeof value === "string" ? value : "");
+    const normalizeNullableString = (value: unknown) => (value === null || value === undefined ? null : normalizeString(value));
+
+    const currentSite = current as Record<string, unknown>;
+
+    const payload: SiteSettingsData = {
+      site_title_en: normalizeString(partial.siteName ?? currentSite.site_title_en ?? currentSite.siteTitleEn),
+      site_title_fa: normalizeString(partial.siteTitleFa ?? currentSite.site_title_fa ?? currentSite.siteTitleFa),
+      phone_en: normalizeString(partial.contactEmail ?? currentSite.phone_en ?? currentSite.phoneEn),
+      phone_fa: normalizeString(partial.phoneFa ?? currentSite.phone_fa ?? currentSite.phoneFa),
+      description_en: normalizeString(partial.siteDescription ?? currentSite.description_en ?? currentSite.descriptionEn),
+      description_fa: normalizeString(partial.descriptionFa ?? currentSite.description_fa ?? currentSite.descriptionFa),
+      language_mode: normalizeLanguageMode(currentSite.language_mode ?? currentSite.languageMode ?? "multilingual"),
+      default_language: normalizeLanguage(currentSite.default_language ?? currentSite.defaultLanguage ?? "fa"),
+      enable_product_suggestions: (currentSite.enable_product_suggestions as boolean | undefined) ?? (currentSite.enableProductSuggestions as boolean | undefined) ?? true,
+      suggestion_algorithm: normalizeSuggestionAlgorithm(currentSite.suggestion_algorithm ?? currentSite.suggestionAlgorithm ?? "hybrid"),
+      max_suggestions: (currentSite.max_suggestions as number | undefined) ?? (currentSite.maxSuggestions as number | undefined) ?? 6,
+      default_seo_title: normalizeNullableString(partial.defaultSeoTitle ?? currentSite.default_seo_title ?? currentSite.defaultSeoTitle) ?? "",
+      default_seo_description: normalizeNullableString(partial.defaultSeoDescription ?? currentSite.default_seo_description ?? currentSite.defaultSeoDescription) ?? "",
+      default_og_image: normalizeNullableString(partial.defaultOgImage ?? currentSite.default_og_image ?? currentSite.defaultOgImage) ?? "",
+      google_analytics_id: normalizeNullableString(partial.googleAnalyticsId ?? currentSite.google_analytics_id ?? currentSite.googleAnalyticsId) ?? "",
+      maintenance_mode: partial.maintenanceMode ?? (currentSite.maintenance_mode as boolean | undefined) ?? (currentSite.maintenanceMode as boolean | undefined) ?? false,
+      allow_registration: partial.allowRegistration ?? (currentSite.allow_registration as boolean | undefined) ?? (currentSite.allowRegistration as boolean | undefined) ?? true,
+      default_currency: partial.defaultCurrency ?? (currentSite.default_currency as string | undefined) ?? (currentSite.defaultCurrency as string | undefined) ?? "IRR",
+      low_stock_threshold: partial.lowStockThreshold ?? (currentSite.low_stock_threshold as number | undefined) ?? (currentSite.lowStockThreshold as number | undefined) ?? 0,
     };
 
-    // Update settings in database
-    const result = await updateSiteSettings(updateData);
+    const result = await updateSiteSettings(payload);
     if (!result.success || !result.settings) {
       return NextResponse.json(
         { error: result.error || "Failed to update settings" },
@@ -227,7 +245,6 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Convert back to frontend format for response
     const settings = result.settings;
     const frontendSettings = {
       siteName: settings.siteTitleEn,

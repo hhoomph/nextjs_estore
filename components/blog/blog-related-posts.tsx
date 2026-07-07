@@ -16,31 +16,10 @@ import { useTranslations } from "next-intl";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-
-interface RelatedPost {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string | null;
-  featuredImage: string | null;
-  publishedAt: Date | null;
-  readingTime: number | null;
-  viewCount: number;
-  author: {
-    id: string;
-    name: string | null;
-    image: string | null;
-  };
-  category: {
-    id: string;
-    name: string;
-    slug: string;
-    color: string | null;
-  };
-}
+import type { BlogPostListData } from "./types";
 
 interface BlogRelatedPostsProps {
-  posts: RelatedPost[];
+  posts: BlogPostListData[];
 }
 
 export function BlogRelatedPosts({ posts }: BlogRelatedPostsProps) {

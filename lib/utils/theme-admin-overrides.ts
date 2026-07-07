@@ -9,7 +9,7 @@
  * @version 1.0.0
  * @since 2025-01-01
  */
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/providers/theme-provider";
 /**
  * Admin-specific theme color overrides
  * Provides enhanced contrast and accessibility for admin interfaces
@@ -17,36 +17,36 @@ import { useTheme } from "next-themes";
 export const adminThemeOverrides = {
   // Background colors
   background: {
-    primary: "bg-slate-50 dark:bg-slate-900",
-    secondary: "bg-white dark:bg-violet-300",
-    accent: "bg-slate-100 dark:bg-slate-700",
-    card: "bg-white dark:bg-slate-800",
+    primary: "bg-background",
+    secondary: "bg-secondary",
+    accent: "bg-muted",
+    card: "bg-card",
   },
   // Text colors
   text: {
-    primary: "text-slate-900 dark:text-slate-100",
-    secondary: "text-slate-600 dark:text-slate-400",
-    accent: "text-slate-500 dark:text-slate-300",
-    muted: "text-slate-400 dark:text-slate-500",
+    primary: "text-foreground",
+    secondary: "text-muted-foreground",
+    accent: "text-primary",
+    muted: "text-muted-foreground",
   },
   // Border colors
   border: {
-    primary: "border-slate-200 dark:border-slate-700",
-    secondary: "border-slate-300 dark:border-slate-600",
-    accent: "border-slate-400 dark:border-slate-500",
+    primary: "border-border",
+    secondary: "border-border",
+    accent: "border-primary/20",
   },
   // Interactive elements
   interactive: {
-    hover: "hover:bg-slate-100 dark:hover:bg-slate-700",
-    focus: "focus:bg-slate-200 dark:focus:bg-slate-600",
-    active: "active:bg-slate-200 dark:active:bg-slate-600",
+    hover: "hover:bg-muted",
+    focus: "focus:bg-muted",
+    active: "active:bg-muted",
   },
   // Status colors
   status: {
-    success: "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800",
-    warning: "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800",
-    error: "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800",
-    info: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800",
+    success: "bg-success/10 text-success border-success/20",
+    warning: "bg-warning/10 text-warning border-warning/20",
+    error: "bg-destructive/10 text-destructive border-destructive/20",
+    info: "bg-primary/10 text-primary border-primary/20",
   },
 } as const;
 /**
@@ -68,43 +68,43 @@ export function useAdminTheme() {
    * Get theme-aware admin navbar classes
    */
   const getAdminNavbarClasses = () => ({
-    background: "bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700",
-    text: "text-slate-900 dark:text-slate-100",
-    logo: "text-slate-800 dark:text-slate-200",
+    background: "apex-admin-topbar",
+    text: "text-foreground",
+    logo: "text-foreground",
     menu: {
-      item: "text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700",
-      active: "bg-slate-300 dark:bg-slate-600 text-slate-900 dark:text-slate-100",
+      item: "text-muted-foreground hover:bg-muted hover:text-foreground",
+      active: "bg-primary/10 text-primary",
     },
     avatar: {
-      background: "bg-slate-200 dark:bg-slate-700",
-      text: "text-slate-800 dark:text-slate-200",
+      background: "bg-primary/10",
+      text: "text-primary",
     },
   });
   /**
    * Get theme-aware admin sidebar classes
    */
   const getAdminSidebarClasses = () => ({
-    background: "bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700",
-    text: "text-slate-900 dark:text-slate-100",
+    background: "apex-admin-sidebar text-foreground border-r border-border",
+    text: "text-foreground",
     menu: {
-      item: "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700",
-      active: "bg-slate-200 dark:bg-slate-600 text-slate-900 dark:text-slate-100 border-r-2 border-slate-900 dark:border-slate-100",
+      item: "text-muted-foreground hover:bg-muted hover:text-foreground",
+      active: "bg-primary/10 text-primary shadow-primary/20",
     },
     section: {
-      title: "text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider",
+      title: "text-muted-foreground opacity-70 text-xs font-semibold uppercase tracking-[0.14em]",
     },
   });
   /**
    * Get theme-aware admin content area classes
    */
   const getAdminContentClasses = () => ({
-    background: "bg-slate-50 dark:bg-slate-900",
-    card: "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700",
-    header: "bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700",
+    background: "apex-admin-shell text-foreground",
+    card: "bg-card border border-border shadow-lg",
+    header: "bg-card border-b border-border",
     text: {
-      primary: "text-slate-900 dark:text-slate-100",
-      secondary: "text-slate-600 dark:text-slate-400",
-      muted: "text-slate-400 dark:text-slate-500",
+      primary: "text-foreground",
+      secondary: "text-muted-foreground",
+      muted: "text-muted-foreground",
     },
   });
   /**
@@ -112,29 +112,29 @@ export function useAdminTheme() {
    */
   const getAdminFormClasses = () => ({
     input:
-      "bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400",
-    label: "text-slate-700 dark:text-slate-300",
-    error: "text-red-600 dark:text-red-400",
-    success: "text-green-600 dark:text-green-400",
+      "bg-background border-input text-foreground placeholder:text-muted-foreground",
+    label: "text-muted-foreground",
+    error: "text-destructive",
+    success: "text-success",
   });
   /**
    * Get theme-aware admin table classes
    */
   const getAdminTableClasses = () => ({
-    header: "bg-slate-100 dark:bg-slate-700 border-b border-slate-200 dark:border-slate-600",
-    row: "border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50",
-    cell: "text-slate-900 dark:text-slate-100",
-    pagination: "bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700",
+    header: "bg-muted/40 border-b border-border",
+    row: "border-b border-border hover:bg-muted/50",
+    cell: "text-foreground",
+    pagination: "bg-card border-t border-border",
   });
   /**
    * Get theme-aware admin modal classes
    */
   const getAdminModalClasses = () => ({
-    backdrop: "bg-black/50",
-    content: "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700",
-    header: "border-b border-slate-200 dark:border-slate-700",
-    title: "text-slate-900 dark:text-slate-100",
-    description: "text-slate-600 dark:text-slate-400",
+    backdrop: "bg-background/80 backdrop-blur-xl",
+    content: "bg-card border border-border shadow-xl",
+    header: "border-b border-border",
+    title: "text-foreground",
+    description: "text-muted-foreground",
   });
   /**
    * Toggle admin theme
@@ -181,17 +181,17 @@ export function getAdminThemeProviderData() {
 export function getAdminThemeCSSVariables() {
   return {
     // Admin-specific CSS variables
-    "--admin-bg-primary": "hsl(var(--slate-50))",
-    "--admin-bg-secondary": "hsl(var(--white))",
-    "--admin-text-primary": "hsl(var(--slate-900))",
-    "--admin-text-secondary": "hsl(var(--slate-600))",
-    "--admin-border": "hsl(var(--slate-200))",
+    "--admin-bg-primary": "hsl(var(--background))",
+    "--admin-bg-secondary": "hsl(var(--secondary))",
+    "--admin-text-primary": "hsl(var(--foreground))",
+    "--admin-text-secondary": "hsl(var(--muted-foreground))",
+    "--admin-border": "hsl(var(--border))",
     // Dark mode overrides
-    "--admin-bg-primary-dark": "hsl(var(--slate-900))",
-    "--admin-bg-secondary-dark": "hsl(var(--slate-800))",
-    "--admin-text-primary-dark": "hsl(var(--slate-100))",
-    "--admin-text-secondary-dark": "hsl(var(--slate-400))",
-    "--admin-border-dark": "hsl(var(--slate-700))",
+    "--admin-bg-primary-dark": "hsl(var(--background))",
+    "--admin-bg-secondary-dark": "hsl(var(--secondary))",
+    "--admin-text-primary-dark": "hsl(var(--foreground))",
+    "--admin-text-secondary-dark": "hsl(var(--muted-foreground))",
+    "--admin-border-dark": "hsl(var(--border))",
   };
 }
 /**

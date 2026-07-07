@@ -57,6 +57,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
+import { PLACEHOLDER_IMAGE } from "@/lib/utils/image-utils";
 
 const productSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -129,7 +130,8 @@ function extractProductImages(product: {
     .map((productPicture) => productPicture.picture.url);
 
   if (images.length > 0) return images;
-  return product.ogImage ? [product.ogImage] : [];
+  if (product.ogImage) return [product.ogImage];
+  return [PLACEHOLDER_IMAGE];
 }
 
 async function uploadImageFile(file: File) {

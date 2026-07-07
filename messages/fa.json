@@ -1,9 +1,30 @@
 {
   "loading": "در حال بارگذاری...",
   "Navigation": {
+    "popular": "محبوب",
     "products": "محصولات",
+    "shop": "فروشگاه",
     "categories": "دسته‌بندی‌ها",
+    "pages": {
+      "shopWithoutSidebar": "فروشگاه بدون سایدبار",
+      "checkout": "پرداخت",
+      "cart": "سبد خرید",
+      "wishlist": "لیست علاقه‌مندی‌ها",
+      "signIn": "ورود",
+      "signUp": "ثبت نام",
+      "error": "خطا",
+      "mailSuccess": "موفقیت در ارسال ایمیل",
+      "privacyPolicy": "حریم خصوصی",
+      "termsConditions": "شرایط و قوانین"
+    },
+    "blog": {
+      "grid": "وبلاگ به صورت شبکه",
+      "gridWithSidebar": "وبلاگ به صورت شبکه با سایدبار",
+      "detailsWithSidebar": "جزئیات وبلاگ با سایدبار",
+      "details": "جزئیات وبلاگ"
+    },
     "deals": "تخفیف‌ها",
+    "contact": "تماس با ما",
     "search": "جستجو",
     "account": "حساب کاربری",
     "orders": "سفارشات",
@@ -13,6 +34,7 @@
     "cart": "سبد خرید",
     "profile": "پروفایل",
     "adminPanel": "پنل مدیریت",
+    "language": "زبان",
     "signOut": "خروج"
   },
   "Authentication": {
@@ -53,7 +75,15 @@
     "lowStockThreshold": "آستانه موجودی کم",
     "maintenanceMode": "حالت تعمیر و نگهداری",
     "allowRegistration": "اجازه ثبت نام کاربران",
-    "saveSettings": "ذخیره تنظیمات"
+    "saveSettings": "ذخیره تنظیمات",
+    "appearance": "نمایش",
+    "theme": "تم",
+    "chooseTheme": "تم مورد نظر خود را انتخاب کنید",
+    "languageRegion": "زبان و منطقه",
+    "language": "زبان",
+    "selectLanguage": "زبان مورد نظر خود را انتخاب کنید",
+    "currency": "واحد پول",
+    "displayCurrency": "نمایش قیمت‌ها به واحد پول مورد نظر"
   },
   "API Messages": {
     "loading": "در حال بارگذاری...",
@@ -123,7 +153,10 @@
     "back": "بازگشت",
     "next": "بعدی",
     "previous": "قبلی",
-    "submit": "ارسال"
+    "submit": "ارسال",
+    "light": "روشن",
+    "dark": "تاریک",
+    "system": "سیستم"
   },
   "Placeholders": {
     "enterSiteName": "نام سایت را وارد کنید",
@@ -135,14 +168,17 @@
     "enterQuantity": "مقدار را وارد کنید"
   },
   "Currencies": {
-    "irr": "تومان (تومان)",
-    "toman": "تومان (تومان)",
-    "rial": "ریال (ریال)",
+    "irr": "ریال ایران (ریال)",
+    "toman": "تومان ایران (تومان)",
+    "rial": "ریال ایران (ریال)",
     "usd": "دلار آمریکا ($)",
     "eur": "یورو (€)",
     "gbp": "پوند انگلیس (£)",
     "cad": "دلار کانادا (CA$)",
-    "aud": "دلار استرالیا (A$)"
+    "aud": "دلار استرالیا (A$)",
+    "jpy": "ین ژاپن (¥)",
+    "cny": "یوان چین (¥)",
+    "inr": "روپیه هند (₹)"
   },
   "Time Periods": {
     "last7Days": "۷ روز گذشته",
@@ -871,15 +907,6 @@
     "description": "آخرین اخبار و مقالات از تیم ما",
     "keywords": "بلاگ، اخبار، مقالات",
     "category": "دسته‌بندی",
-    "search": "جستجو",
-    "error": {
-      "title": "خطا",
-      "description": "مشکلی پیش آمده"
-    },
-    "categories": {
-      "title": "دسته‌بندی‌ها",
-      "all": "همه دسته‌بندی‌ها"
-    },
     "search": {
       "title": "جستجو",
       "placeholder": "جستجوی مقالات...",
@@ -891,6 +918,14 @@
         "content": "جستجو در محتوای مقالات",
         "tags": "جستجو در برچسب‌ها"
       }
+    },
+    "error": {
+      "title": "خطا",
+      "description": "مشکلی پیش آمده"
+    },
+    "categories": {
+      "title": "دسته‌بندی‌ها",
+      "all": "همه دسته‌بندی‌ها"
     },
     "showingResults": "نمایش {count} از {total} نتیجه",
     "noPosts": {

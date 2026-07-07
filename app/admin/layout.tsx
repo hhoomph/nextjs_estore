@@ -77,6 +77,22 @@ const navGroups: Record<string, { label: string }> = {
 };
 const groupOrder = ["dashboard", "commerce", "content", "users", "settings"];
 
+function applyAdminVisualIdentity() {
+  const root = document.documentElement;
+  const previousTheme = root.dataset.adminTheme ?? "";
+
+  root.dataset.adminTheme = "apex";
+
+  return () => {
+    if (previousTheme) {
+      root.dataset.adminTheme = previousTheme;
+      return;
+    }
+
+    delete root.dataset.adminTheme;
+  };
+}
+
 /**
  * Normalize the Better Auth session shape into a single user record.
  *
@@ -108,11 +124,11 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const sidebarTheme = useAdminTheme();
   const navbarClasses = sidebarTheme.getAdminNavbarClasses();
   const sidebarClasses = sidebarTheme.getAdminSidebarClasses();
-  const contentClasses = sidebarTheme.getAdminContentClasses();
   // Skip auth check on sign-in page
   const isSignInPage = pathname === "/admin/signin";
   // Track whether session has been fetched at least once
   const hasFetchedSession = useRef(false);
+  useEffect(() => applyAdminVisualIdentity(), []);
   useEffect(() => {
     if (!isPending && !hasFetchedSession.current) {
       hasFetchedSession.current = true;
@@ -135,10 +151,10 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   if (isSignInPage) {
     if (isPending) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-primary"></div>
+            <h2 className="mb-2 text-xl font-semibold text-foreground">
               Loading...
             </h2>
           </div>
@@ -151,7 +167,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
         enableReporting={true}
       >
         <div className="min-h-screen bg-background">
-          <main className={`p-6 ${contentClasses.card}`}>{children}</main>
+          <main className="p-6">{children}</main>
         </div>
       </AdvancedErrorBoundary>
     );
@@ -159,13 +175,13 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   // While session is loading, show a spinner (do NOT redirect yet)
   if (isPending) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-primary"></div>
+          <h2 className="mb-2 text-xl font-semibold text-foreground">
             Checking Permissions
           </h2>
-          <p className="text-gray-600">Redirecting to admin panel...</p>
+          <p className="text-muted-foreground">Redirecting to admin panel...</p>
         </div>
       </div>
     );
@@ -181,10 +197,10 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   // Show loading while redirect is in progress
   if (!userObj || !isAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-primary"></div>
+          <h2 className="mb-2 text-xl font-semibold text-foreground">
             Redirecting...
           </h2>
         </div>
@@ -212,21 +228,22 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
       showErrorDetails={process.env.NODE_ENV === "development"}
       enableReporting={true}
     >
-      <div className={`min-h-screen ${contentClasses.background}`}>
+      <div className="min-h-screen overflow-hidden bg-background text-foreground">
         {/* Sidebar */}
         <div
           className={cn(
-            "fixed inset-y-0 left-0 z-50 w-64",
+            "fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-border",
             sidebarClasses.background,
-            "shadow-lg",
           )}
         >
           {/* Logo area */}
-          <div className={cn("flex h-16 items-center px-6", sidebarClasses.background, "border-b")}>
-            <Link href="/admin" className="flex items-center space-x-2">
-              <LayoutDashboard className={cn("h-6 w-6", sidebarClasses.text)} />
+          <div className={cn("flex h-16 items-center border-b border-border px-5", sidebarClasses.background)}>
+            <Link href="/admin" className="flex items-center gap-3">
+              <div className="apex-gradient-icon flex h-9 w-9 items-center justify-center rounded-2xl">
+                <LayoutDashboard className="h-5 w-5" />
+              </div>
               <span
-                className={cn("font-bold text-xl", sidebarClasses.text)}
+                className={cn("text-base font-bold tracking-tight", sidebarClasses.text)}
                 suppressHydrationWarning={true}
               >
                 {t("adminPanel")}
@@ -234,7 +251,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
           {/* Navigation */}
-          <nav className="mt-6 px-3 overflow-y-auto h-[calc(100vh-4rem)]">
+          <nav className="mt-6 flex-1 space-y-6 overflow-y-auto px-4 pb-5">
             {groupOrder.map((groupKey) => {
               const groupItems = adminNavItems.filter((item) => item.group === groupKey);
               if (groupItems.length === 0) return null;
@@ -243,7 +260,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                   {/* Group section title */}
                   <p
                     className={cn(
-                      "px-3 mb-2 text-xs font-semibold uppercase tracking-wider",
+                      "mb-2 px-3 text-xs font-semibold uppercase tracking-[0.14em]",
                       sidebarClasses.section.title,
                     )}
                   >
@@ -259,9 +276,9 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                           key={item.href}
                           href={item.href}
                           className={cn(
-                            "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200",
+                            "mb-1 flex items-center rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
                             active
-                              ? sidebarClasses.menu.active
+                              ? cn("text-primary", sidebarClasses.menu.active)
                               : sidebarClasses.menu.item,
                           )}
                         >
@@ -277,12 +294,12 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
               );
             })}
             {/* Sign Out at bottom */}
-            <div className="mt-8 pt-4 border-t">
+            <div className="mt-auto border-t border-border px-2 pt-4">
               <Button
                 onClick={() => handleSignOut()}
                 variant="ghost"
                 className={cn(
-                  "w-full justify-start",
+                  "mb-1 justify-start rounded-xl px-3 py-2.5 text-sm font-medium",
                   sidebarClasses.menu.item,
                 )}
               >
@@ -293,12 +310,12 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
           </nav>
         </div>
         {/* Main Content */}
-        <div className="pl-64">
+        <div className="pl-72">
           {/* Top Bar */}
-          <div className={navbarClasses.background}>
+          <div className={cn("sticky top-0 z-40", navbarClasses.background)}>
             <div className="flex items-center justify-between px-6 py-4">
               <h1
-                className={cn("text-2xl font-semibold", navbarClasses.text)}
+                className={cn("text-xl font-bold tracking-tight", navbarClasses.text)}
                 suppressHydrationWarning={true}
               >
                 {t("adminPanel")}
@@ -309,10 +326,10 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                     <Button
                       variant="ghost"
                       className={cn(
-                        "relative h-8 w-8 rounded-full",
+                        "relative h-10 w-10 rounded-2xl border border-border",
                         navbarClasses.avatar.background,
                         "transition-colors",
-                      )}
+                        )}
                     >
                       <Avatar className="h-8 w-8">
                         <AvatarImage
@@ -321,7 +338,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                           loading="lazy"
                         />
                         <AvatarFallback
-                          className={cn(navbarClasses.avatar.text, "font-medium")}
+                          className={cn(navbarClasses.avatar.text, "font-semibold")}
                         >
                           {(userObj.name || "A").charAt(0).toUpperCase()}
                         </AvatarFallback>
@@ -329,35 +346,35 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
-                    className="w-56 bg-slate-800/95 backdrop-blur-sm border border-slate-700 shadow-lg z-50"
+                    className="w-64 rounded-2xl border border-border bg-popover/95 p-2 shadow-lg z-50 backdrop-blur-sm"
                     align="end"
                     forceMount={true}
                   >
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none text-slate-100">
+                        <p className="text-sm font-semibold leading-none text-foreground">
                           {userObj.name}
                         </p>
-                        <p className="text-xs leading-none text-slate-400">
+                        <p className="text-xs leading-none text-muted-foreground">
                           {userObj.email}
                         </p>
                         <Badge
                           variant="secondary"
-                          className="w-fit text-xs bg-slate-700 text-slate-300"
+                          className="w-fit text-xs bg-primary/10 text-primary"
                         >
                           {userObj.role}
                         </Badge>
                       </div>
                     </DropdownMenuLabel>
-                    <DropdownMenuSeparator className="bg-slate-700" />
+                    <DropdownMenuSeparator className="bg-border" />
                     <DropdownMenuItem asChild={true}>
                       <Link
                         href="/admin"
-                        className="flex items-center px-2 py-2 hover:bg-slate-700 transition-colors duration-200 rounded-md"
+                        className="flex items-center rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                       >
-                        <LayoutDashboard className="mr-3 h-4 w-4 text-slate-400 group-hover:text-slate-100 transition-colors" />
+                        <LayoutDashboard className="mr-3 h-4 w-4 text-muted-foreground transition-colors group-hover:text-foreground" />
                         <span
-                          className="font-medium text-slate-100"
+                          className="font-medium text-foreground"
                           suppressHydrationWarning={true}
                         >
                           {t("dashboard")}
@@ -367,21 +384,21 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                     <DropdownMenuItem asChild={true}>
                       <Link
                         href="/account"
-                        className="flex items-center px-2 py-2 hover:bg-slate-700 transition-colors duration-200 rounded-md"
+                        className="flex items-center rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                       >
-                        <User className="mr-3 h-4 w-4 text-slate-400 group-hover:text-slate-100 transition-colors" />
+                        <User className="mr-3 h-4 w-4 text-muted-foreground transition-colors group-hover:text-foreground" />
                         <span
-                          className="font-medium text-slate-100"
+                          className="font-medium text-foreground"
                           suppressHydrationWarning={true}
                         >
                           {t("profile")}
                         </span>
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-slate-700" />
+                    <DropdownMenuSeparator className="bg-border" />
                     <DropdownMenuItem
                       onClick={() => handleSignOut()}
-                      className="text-red-400 focus:text-red-400 hover:bg-red-900/20"
+                      className="rounded-xl text-destructive focus:text-destructive hover:bg-destructive/10"
                     >
                       <LogOut className="mr-2 h-4 w-4" />
                       <span suppressHydrationWarning={true}>
@@ -395,7 +412,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
           </div>
           {/* Page Content */}
           <ApiErrorBoundary showNetworkStatus={true}>
-            <main className={`p-6 ${contentClasses.card}`}>{children}</main>
+            <main className="space-y-6 p-6">{children}</main>
           </ApiErrorBoundary>
         </div>
       </div>

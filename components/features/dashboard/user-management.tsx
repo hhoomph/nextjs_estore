@@ -8,6 +8,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import type * as React from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import type { User } from "@/types/user";
 
 interface UserWithCounts extends User {
@@ -147,184 +152,187 @@ export function UserManagement() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-gray-900">User Management</h2>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-        >
-          Add User
-        </button>
-      </div>
-
-      {/* Filters */}
-      <div className="flex gap-4">
-        <div className="flex-1">
-          <input
-            type="text"
-            placeholder="Search users..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-          />
+      <section className="overflow-hidden rounded-[2rem] border border-border bg-card p-6 shadow-xl">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+              User administration
+            </p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-foreground">
+              User Management
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Search, filter, create, and maintain customer accounts from a clean
+              Apex-inspired table surface.
+            </p>
+          </div>
+          <Button
+            onClick={() => setShowCreateModal(true)}
+            className="rounded-xl bg-primary text-primary-foreground px-5 text-sm font-semibold shadow-primary/25 hover:bg-primary/90"
+          >
+            Add User
+          </Button>
         </div>
-        <select
-          value={roleFilter}
-          onChange={(e) => setRoleFilter(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-        >
-          <option value="">All Roles</option>
-          <option value="USER">User</option>
-          <option value="ADMIN">Admin</option>
-        </select>
-      </div>
+      </section>
 
-      {/* Users Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  User
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Role
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Orders
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Joined
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {loading ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="px-6 py-4 text-center text-gray-500"
-                  >
-                    Loading...
-                  </td>
+      <Card className="apex-stat-card">
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-[1fr_14rem]">
+            <Input
+              type="text"
+              placeholder="Search users..."
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              className="rounded-xl"
+            />
+            <select
+              value={roleFilter}
+              onChange={(event) => setRoleFilter(event.target.value)}
+              className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+            >
+              <option value="">All Roles</option>
+              <option value="USER">User</option>
+              <option value="ADMIN">Admin</option>
+            </select>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="apex-stat-card overflow-hidden">
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full caption-bottom text-sm">
+              <thead>
+                <tr className="border-b border-border/50 bg-muted/40 text-left">
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                    User
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                    Role
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                    Status
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                    Orders
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                    Joined
+                  </th>
+                  <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                    Actions
+                  </th>
                 </tr>
-              ) : users.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="px-6 py-4 text-center text-gray-500"
-                  >
-                    No users found
-                  </td>
-                </tr>
-              ) : (
-                users.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center text-white font-medium">
-                          {user.name?.charAt(0)?.toUpperCase() || "U"}
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
-                            {user.name || "No name"}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {user.email}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          user.role === "ADMIN"
-                            ? "bg-purple-100 text-purple-800"
-                            : "bg-blue-100 text-blue-800"
-                        }`}
-                      >
-                        {user.role}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          user.active
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {user.active ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {user._count?.order || 0}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(user.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button
-                        onClick={() => setEditingUser(user)}
-                        className="text-indigo-600 hover:text-indigo-900 mr-4"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteUser(user.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        Delete
-                      </button>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-10 text-center text-muted-foreground">
+                      Loading users...
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                ) : users.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-10 text-center text-muted-foreground">
+                      No users found
+                    </td>
+                  </tr>
+                ) : (
+                  users.map((user) => (
+                    <tr
+                      key={user.id}
+                      className="border-b border-border/50 last:border-b-0 transition hover:bg-muted/50"
+                    >
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary text-sm font-bold text-primary-foreground">
+                            {user.name?.charAt(0)?.toUpperCase() || "U"}
+                          </div>
+                          <div>
+                            <div className="text-sm font-semibold text-foreground">
+                              {user.name || "No name"}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              {user.email}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <RoleBadge role={user.role} />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Badge
+                          className={
+                            user.active
+                              ? "border-transparent bg-success/10 text-success"
+                              : "border-transparent bg-destructive/10 text-destructive"
+                          }
+                        >
+                          {user.active ? "Active" : "Inactive"}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-foreground">
+                        {user._count?.order || 0}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                        {new Date(user.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <button
+                          onClick={() => setEditingUser(user)}
+                          className="mr-4 text-sm font-semibold text-primary hover:text-primary/80"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteUser(user.id)}
+                          className="text-sm font-semibold text-destructive hover:text-destructive/80"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Pagination */}
       {pagination.pages > 1 && (
-        <div className="flex justify-between items-center">
-          <div className="text-sm text-gray-700">
+        <div className="flex flex-col gap-4 rounded-[1.5rem] border border-border bg-card p-4 shadow-lg md:flex-row md:items-center md:justify-between">
+          <div className="text-sm text-muted-foreground">
             Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
             {Math.min(pagination.page * pagination.limit, pagination.total)} of{" "}
             {pagination.total} users
           </div>
           <div className="flex gap-2">
-            <button
+            <Button
+              variant="outline"
               onClick={() =>
                 setPagination((prev) => ({ ...prev, page: prev.page - 1 }))
               }
               disabled={pagination.page === 1}
-              className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              className="rounded-xl"
             >
               Previous
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="outline"
               onClick={() =>
                 setPagination((prev) => ({ ...prev, page: prev.page + 1 }))
               }
               disabled={pagination.page === pagination.pages}
-              className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+              className="rounded-xl"
             >
               Next
-            </button>
+            </Button>
           </div>
         </div>
       )}
 
-      {/* Create User Modal */}
       {showCreateModal && (
         <UserModal
           onClose={() => setShowCreateModal(false)}
@@ -333,7 +341,6 @@ export function UserManagement() {
         />
       )}
 
-      {/* Edit User Modal */}
       {editingUser && (
         <UserModal
           onClose={() => setEditingUser(null)}
@@ -343,6 +350,20 @@ export function UserManagement() {
         />
       )}
     </div>
+  );
+}
+
+function RoleBadge({ role }: { role: string }) {
+  return (
+    <Badge
+      className={
+        role === "ADMIN"
+          ? "border-transparent bg-primary/10 text-primary"
+          : "border-transparent bg-secondary text-secondary-foreground"
+      }
+    >
+      {role}
+    </Badge>
   );
 }
 
@@ -371,8 +392,8 @@ function UserModal({ onClose, onSubmit, title, initialData }: UserModalProps) {
     active: initialData?.active ?? true,
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
     onSubmit({
       ...formData,
       role: formData.role as "USER" | "ADMIN" | undefined,
@@ -380,130 +401,136 @@ function UserModal({ onClose, onSubmit, title, initialData }: UserModalProps) {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
-    const { name, value, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
+    const { name, value, type } = event.target;
+    setFormData((current) => ({
+      ...current,
       [name]:
-        type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
+        type === "checkbox" ? (event.target as HTMLInputElement).checked : value,
     }));
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold">{title}</h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-xl">
+      <div className="w-full max-w-md overflow-hidden rounded-[2rem] border border-border bg-card shadow-xl">
+        <div className="flex items-center justify-between border-b border-border p-6">
+          <h3 className="text-lg font-bold text-foreground">
+            {title}
+          </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-muted-foreground transition hover:text-foreground"
+            aria-label="Close modal"
           >
             ✕
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Name
-            </label>
-            <input
+        <form onSubmit={handleSubmit} className="space-y-4 p-6">
+          <FormField label="Name">
+            <Input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
               required={true}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="rounded-xl"
             />
-          </div>
+          </FormField>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
+          <FormField label="Email">
+            <Input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
               required={true}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="rounded-xl"
             />
-          </div>
+          </FormField>
 
           {!initialData && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <input
+            <FormField label="Password">
+              <Input
                 type="password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
                 required={!initialData}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="rounded-xl"
               />
-            </div>
+            </FormField>
           )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Phone Number
-            </label>
-            <input
+          <FormField label="Phone Number">
+            <Input
               type="tel"
               name="phone_number"
               value={formData.phone_number}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="rounded-xl"
             />
-          </div>
+          </FormField>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Role
-            </label>
+          <FormField label="Role">
             <select
               name="role"
               value={formData.role}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
             >
               <option value="USER">User</option>
               <option value="ADMIN">Admin</option>
             </select>
-          </div>
+          </FormField>
 
-          <div className="flex items-center">
+          <label className="flex items-center gap-3 rounded-2xl border border-border bg-muted p-3 text-sm text-foreground">
             <input
               type="checkbox"
               name="active"
               checked={formData.active}
               onChange={handleChange}
-              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              className="h-4 w-4 accent-primary"
             />
-            <label className="ml-2 block text-sm text-gray-900">Active</label>
-          </div>
+            Active
+          </label>
 
           <div className="flex gap-3 pt-4">
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+              className="flex-1 rounded-xl"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+              className="flex-1 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {initialData ? "Update" : "Create"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
+    </div>
+  );
+}
+
+function FormField({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-muted-foreground">
+        {label}
+      </label>
+      {children}
     </div>
   );
 }

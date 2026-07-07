@@ -7,7 +7,7 @@
  * @version 1.0.0
  * @since 2025-01-01
  */
-import React from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { AnalyticsEvents } from "../analytics/advanced-analytics";
 
 // Performance metric thresholds (based on Core Web Vitals)
@@ -818,9 +818,9 @@ export class AdvancedPerformanceMonitor {
 
 // React hook for performance monitoring
 export function usePerformanceMonitoring(config?: Partial<PerformanceConfig>) {
-  const monitorRef = React.useRef<AdvancedPerformanceMonitor | null>(null);
+  const monitorRef = useRef<AdvancedPerformanceMonitor | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!monitorRef.current) {
       monitorRef.current = new AdvancedPerformanceMonitor(config);
       monitorRef.current.startMonitoring().catch(console.error);
@@ -833,33 +833,33 @@ export function usePerformanceMonitoring(config?: Partial<PerformanceConfig>) {
     };
   }, []);
 
-  const trackTiming = React.useCallback((name: string, startMark?: string) => {
-    if (
-      monitorRef.current &&
-      typeof window !== "undefined" &&
-      window.performance
-    ) {
-      const markName = startMark || `${name}_start`;
+   const trackTiming = useCallback((name: string, startMark?: string) => {
+     if (
+       monitorRef.current &&
+       typeof window !== "undefined" &&
+       window.performance
+     ) {
+       const markName = startMark || `${name}_start`;
 
-      if (startMark) {
-        // End timing
-        window.performance.mark(`${name}_end`);
-        window.performance.measure(name, markName, `${name}_end`);
-      } else {
-        // Start timing
-        window.performance.mark(markName);
-      }
-    }
-  }, []);
+       if (startMark) {
+         // End timing
+         window.performance.mark(`${name}_end`);
+         window.performance.measure(name, markName, `${name}_end`);
+       } else {
+         // Start timing
+         window.performance.mark(markName);
+       }
+     }
+   }, []);
 
-  const recordMetric = React.useCallback(
-    (name: string, value: number, unit: string = "ms", metadata?: any) => {
-      if (monitorRef.current) {
-        monitorRef.current.recordMetric({ name, value, unit, metadata });
-      }
-    },
-    [],
-  );
+   const recordMetric = useCallback(
+     (name: string, value: number, unit: string = "ms", metadata?: any) => {
+       if (monitorRef.current) {
+         monitorRef.current.recordMetric({ name, value, unit, metadata });
+       }
+     },
+     [],
+   );
 
   return {
     trackTiming,
@@ -966,18 +966,17 @@ export const PerformanceUtils = {
     monitor?: AdvancedPerformanceMonitor,
   ) => {
     const start = performance.now();
+    const duration = performance.now() - start;
 
-    React.useEffect(() => {
-      const duration = performance.now() - start;
+    if (monitor) {
+      monitor.recordMetric({
+        name: `Render_Time_${componentName}`,
+        value: duration,
+        unit: "ms",
+      });
+    }
 
-      if (monitor) {
-        monitor.recordMetric({
-          name: `Render_Time_${componentName}`,
-          value: duration,
-          unit: "ms",
-        });
-      }
-    });
+    return () => undefined;
   },
 
   // Monitor memory usage

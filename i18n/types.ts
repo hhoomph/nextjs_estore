@@ -18,9 +18,30 @@ export type AppLocales = readonly [AppLocale, ...AppLocale[]];
 
 // Message structure types for each namespace
 export interface NavigationMessages {
+  popular: string;
   products: string;
+  shop: string;
   categories: string;
+  pages: {
+    shopWithoutSidebar: string;
+    checkout: string;
+    cart: string;
+    wishlist: string;
+    signIn: string;
+    signUp: string;
+    error: string;
+    mailSuccess: string;
+    privacyPolicy: string;
+    termsConditions: string;
+  };
+  blog: {
+    grid: string;
+    gridWithSidebar: string;
+    detailsWithSidebar: string;
+    details: string;
+  };
   deals: string;
+  contact: string;
   search: string;
   account: string;
   orders: string;
@@ -30,6 +51,7 @@ export interface NavigationMessages {
   cart: string;
   profile: string;
   adminPanel: string;
+  language: string;
   signOut: string;
 }
 
@@ -74,6 +96,14 @@ export interface SettingsMessages {
   maintenanceMode: string;
   allowRegistration: string;
   saveSettings: string;
+  appearance: string;
+  theme: string;
+  chooseTheme: string;
+  languageRegion: string;
+  language: string;
+  selectLanguage: string;
+  currency: string;
+  displayCurrency: string;
 }
 
 export interface StatusMessages {
@@ -101,6 +131,9 @@ export interface CommonActions {
   next: string;
   previous: string;
   submit: string;
+  light: string;
+  dark: string;
+  system: string;
 }
 
 export interface Placeholders {

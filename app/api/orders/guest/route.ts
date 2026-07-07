@@ -22,6 +22,7 @@ interface GuestOrderItem {
     name: string;
     price: number;
     discountPrice?: number;
+    discount_price?: number;
     current_price?: number;
   };
 }
@@ -52,7 +53,7 @@ interface GuestOrderData {
     country: string;
   };
   items: GuestOrderItem[];
-  sessionId: string;
+  sessionId?: string;
   totals: {
     subtotal: number;
     shipping: number;
@@ -100,11 +101,12 @@ const guestOrderSchema = z.object({
           name: z.string(),
           price: z.number(),
           discountPrice: z.number().optional(),
+          discount_price: z.number().optional(),
         }),
       }),
     )
     .min(1, "At least one item is required"),
-  sessionId: z.string(),
+  sessionId: z.string().optional(),
   totals: z.object({
     subtotal: z.number(),
     shipping: z.number(),
@@ -343,3 +345,4 @@ async function createGuestOrder(orderData: GuestOrderData) {
     return orderId;
   });
 }
+

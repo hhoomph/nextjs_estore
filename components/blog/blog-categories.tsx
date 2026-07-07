@@ -12,18 +12,7 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
-
-interface BlogCategoryWithCount {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  color: string | null;
-  icon: string | null;
-  order: number;
-  active: boolean;
-  posts: { id: string }[];
-}
+import type { BlogCategoryWithCount } from "./types";
 
 interface BlogCategoriesProps {
   categories: BlogCategoryWithCount[];

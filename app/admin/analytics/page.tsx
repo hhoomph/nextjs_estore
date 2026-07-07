@@ -1,9 +1,7 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
-
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
+import type * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -28,6 +26,8 @@ import {
   DollarSign,
   Loader2,
 } from "lucide-react";
+import { useAdminSettingsStore } from "@/lib/stores/admin-settings-store";
+import { formatAmount } from "@/lib/utils/currency";
 
 interface AnalyticsData {
   salesData: Array<{ date: string; revenue: number; orders: number }>;
@@ -47,7 +47,7 @@ interface AnalyticsData {
   };
 }
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
+const COLORS = ["hsl(var(--primary))", "hsl(var(--success))", "hsl(var(--warning))", "hsl(var(--destructive))", "hsl(var(--secondary))"];
 
 const EMPTY_STATS: AnalyticsData["totalStats"] = {
   totalRevenue: 0,
@@ -61,6 +61,8 @@ export default function AdminAnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [period, setPeriod] = useState("30");
+
+  const defaultCurrency = useAdminSettingsStore((state) => state.defaultCurrency);
 
   const fetchAnalytics = useCallback(async () => {
     setLoading(true);
@@ -83,15 +85,15 @@ export default function AdminAnalyticsPage() {
   }, [period]);
 
   useEffect(() => {
-    fetchAnalytics();
+    void fetchAnalytics();
   }, [fetchAnalytics]);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex h-64 items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto" />
-          <p className="mt-2 text-muted-foreground">Loading analytics...</p>
+          <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
+          <p className="mt-2 text-sm text-muted-foreground">Loading analytics...</p>
         </div>
       </div>
     );
@@ -99,9 +101,14 @@ export default function AdminAnalyticsPage() {
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <p className="text-destructive mb-4">{error}</p>
-        <Button onClick={() => fetchAnalytics()}>Try Again</Button>
+      <div className="rounded-[2rem] border border-border bg-card py-12 text-center shadow-lg">
+        <p className="mb-4 text-destructive">{error}</p>
+        <Button
+          onClick={() => void fetchAnalytics()}
+          className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
+        >
+          Try Again
+        </Button>
       </div>
     );
   }
@@ -114,199 +121,184 @@ export default function AdminAnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Analytics</h1>
-          <p className="text-muted-foreground">
-            Sales performance and insights
-          </p>
+      <section className="overflow-hidden rounded-[2rem] border border-border bg-card p-6 shadow-xl">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+              Analytics workspace
+            </p>
+            <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground">
+              Analytics
+            </h1>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Sales performance, customer growth, and category insights in a clean
+              Apex-inspired layout.
+            </p>
+          </div>
+
+          <Select value={period} onValueChange={setPeriod}>
+            <SelectTrigger className="w-48 rounded-xl border-border bg-background">
+              <SelectValue placeholder="Select period" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7">Last 7 days</SelectItem>
+              <SelectItem value="30">Last 30 days</SelectItem>
+              <SelectItem value="90">Last 90 days</SelectItem>
+              <SelectItem value="365">Last year</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
+      </section>
 
-        <Select value={period} onValueChange={setPeriod}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="Select period" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="7">Last 7 days</SelectItem>
-            <SelectItem value="30">Last 30 days</SelectItem>
-            <SelectItem value="90">Last 90 days</SelectItem>
-            <SelectItem value="365">Last year</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <MetricCard
+          title="Total Revenue"
+          value={formatAmount(Number(totalStats.totalRevenue || 0), defaultCurrency)}
+          description="for the selected period"
+          icon={DollarSign}
+        />
+        <MetricCard
+          title="Total Orders"
+          value={String(totalStats.totalOrders ?? 0)}
+          description="for the selected period"
+          icon={ShoppingCart}
+        />
+        <MetricCard
+          title="Total Customers"
+          value={String(totalStats.totalCustomers ?? 0)}
+          description="unique buyers"
+          icon={Users}
+        />
+        <MetricCard
+          title="Average Order Value"
+          value={formatAmount(Number(totalStats.averageOrderValue || 0), defaultCurrency)}
+          description="per order"
+          icon={TrendingUp}
+        />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              ${Number(totalStats.totalRevenue || 0).toFixed(2)}
-            </div>
-            <p className="text-xs text-muted-foreground">for the selected period</p>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <ChartCard title="Sales Trend">
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={salesData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis
+                dataKey="date"
+                tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                tickFormatter={(value) =>
+                  new Date(value).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  })
+                }
+              />
+              <YAxis yAxisId="revenue" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
+              <YAxis
+                yAxisId="orders"
+                orientation="right"
+                tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+              />
+              <Tooltip
+                contentStyle={{
+                  borderRadius: 16,
+                  border: "1px solid hsl(var(--border))",
+                  boxShadow: "0 18px 45px hsl(var(--foreground) / 0.08)",
+                }}
+                labelFormatter={(value) =>
+                  new Date(value as string).toLocaleDateString()
+                }
+                formatter={(value, name) => [
+                  name === "revenue" ? `$${Number(value).toFixed(2)}` : value,
+                  name === "revenue" ? "Revenue" : "Orders",
+                ]}
+              />
+              <Line
+                yAxisId="revenue"
+                type="monotone"
+                dataKey="revenue"
+                  stroke="hsl(var(--primary))"
+                strokeWidth={2}
+                dot={{ r: 4 }}
+              />
+              <Line
+                yAxisId="orders"
+                type="monotone"
+                dataKey="orders"
+                  stroke="hsl(var(--success))"
+                strokeWidth={2}
+                dot={{ r: 4 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </ChartCard>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
-            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {totalStats.totalOrders ?? 0}
-            </div>
-            <p className="text-xs text-muted-foreground">for the selected period</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Customers</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {totalStats.totalCustomers ?? 0}
-            </div>
-            <p className="text-xs text-muted-foreground">unique buyers</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Order Value</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              ${Number(totalStats.averageOrderValue || 0).toFixed(2)}
-            </div>
-            <p className="text-xs text-muted-foreground">per order</p>
-          </CardContent>
-        </Card>
+        <ChartCard title="User Growth">
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={userGrowth}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis
+                dataKey="date"
+                tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                tickFormatter={(value) =>
+                  new Date(value).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  })
+                }
+              />
+              <YAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
+              <Tooltip
+                contentStyle={{
+                  borderRadius: 16,
+                  border: "1px solid hsl(var(--border))",
+                  boxShadow: "0 18px 45px hsl(var(--foreground) / 0.08)",
+                }}
+                labelFormatter={(value) =>
+                  new Date(value as string).toLocaleDateString()
+                }
+                formatter={(value) => [value, "New Users"]}
+              />
+                  <Bar dataKey="users" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <Card className="apex-stat-card">
           <CardHeader>
-            <CardTitle>Sales Trend</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={salesData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fontSize: 12 }}
-                  tickFormatter={(value) =>
-                    new Date(value).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })
-                  }
-                />
-                <YAxis yAxisId="revenue" tick={{ fontSize: 12 }} />
-                <YAxis
-                  yAxisId="orders"
-                  orientation="right"
-                  tick={{ fontSize: 12 }}
-                />
-                <Tooltip
-                  labelFormatter={(value) =>
-                    new Date(value as string).toLocaleDateString()
-                  }
-                  formatter={(value, name) => [
-                    name === "revenue"
-                      ? `$${Number(value).toFixed(2)}`
-                      : value,
-                    name === "revenue" ? "Revenue" : "Orders",
-                  ]}
-                />
-                <Line
-                  yAxisId="revenue"
-                  type="monotone"
-                  dataKey="revenue"
-                  stroke="#8884d8"
-                  strokeWidth={2}
-                  dot={{ r: 4 }}
-                />
-                <Line
-                  yAxisId="orders"
-                  type="monotone"
-                  dataKey="orders"
-                  stroke="#82ca9d"
-                  strokeWidth={2}
-                  dot={{ r: 4 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>User Growth</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={userGrowth}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fontSize: 12 }}
-                  tickFormatter={(value) =>
-                    new Date(value).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })
-                  }
-                />
-                <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip
-                  labelFormatter={(value) =>
-                    new Date(value as string).toLocaleDateString()
-                  }
-                  formatter={(value) => [value, "New Users"]}
-                />
-                <Bar dataKey="users" fill="#8884d8" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Top Products</CardTitle>
+            <CardTitle className="text-base font-semibold tracking-tight text-foreground">
+              Top Products
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {topProducts.length === 0 ? (
-                <p className="text-muted-foreground">No sales data available</p>
+                <p className="text-center py-12 text-sm text-muted-foreground">
+                  No sales data available
+                </p>
               ) : (
                 topProducts.slice(0, 5).map((product, index) => (
                   <div
                     key={`${product.name}-${index}`}
-                    className="flex items-center justify-between"
+                    className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-muted/60 p-4"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-sm font-medium">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-sm font-bold text-primary">
                         {index + 1}
                       </div>
                       <div>
-                        <p className="font-medium">{product.name}</p>
+                        <p className="font-semibold text-foreground">
+                          {product.name}
+                        </p>
                         <p className="text-sm text-muted-foreground">
                           {product.sales} sold
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">
-                        ${Number(product.revenue).toFixed(2)}
+                      <p className="font-bold text-success">
+                        {formatAmount(Number(product.revenue), defaultCurrency)}
                       </p>
                     </div>
                   </div>
@@ -316,13 +308,15 @@ export default function AdminAnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="apex-stat-card">
           <CardHeader>
-            <CardTitle>Category Performance</CardTitle>
+            <CardTitle className="text-base font-semibold tracking-tight text-foreground">
+              Category Performance
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {categoryPerformance.length === 0 ? (
-              <p className="text-muted-foreground text-center py-12">
+              <p className="py-12 text-center text-sm text-muted-foreground">
                 No category data available
               </p>
             ) : (
@@ -334,7 +328,7 @@ export default function AdminAnalyticsPage() {
                     cy="50%"
                     labelLine={false}
                     outerRadius={80}
-                    fill="#8884d8"
+                    fill="hsl(var(--primary))"
                     dataKey="revenue"
                   >
                     {categoryPerformance.slice(0, 5).map((entry, index) => (
@@ -346,9 +340,14 @@ export default function AdminAnalyticsPage() {
                   </Pie>
                   <Tooltip
                     formatter={(value) => [
-                      `$${Number(value).toFixed(2)}`,
+                      formatAmount(Number(value), defaultCurrency),
                       "Revenue",
                     ]}
+                    contentStyle={{
+                      borderRadius: 16,
+                  border: "1px solid hsl(var(--border))",
+                  boxShadow: "0 18px 45px hsl(var(--foreground) / 0.08)",
+                    }}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -357,5 +356,55 @@ export default function AdminAnalyticsPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+function MetricCard({
+  title,
+  value,
+  description,
+  icon: Icon,
+}: {
+  title: string;
+  value: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+}) {
+  return (
+    <Card className="apex-stat-card">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <CardTitle className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          {title}
+        </CardTitle>
+        <div className="apex-gradient-icon flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <Icon className="h-5 w-5" />
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="text-3xl font-bold tracking-tight text-foreground">
+          {value}
+        </div>
+        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
+function ChartCard({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Card className="apex-stat-card">
+      <CardHeader>
+        <CardTitle className="text-base font-semibold tracking-tight text-foreground">
+          {title}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>{children}</CardContent>
+    </Card>
   );
 }

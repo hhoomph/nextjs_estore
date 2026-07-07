@@ -1,10 +1,3 @@
-/**
- * Module for client
- *
- * @author hh.oomph@gmail.com
- * @version 1.0.0
- * @since 2025-01-01
- */
 "use client";
 
 import {
@@ -12,17 +5,13 @@ import {
   Filter,
   Grid3X3,
   List,
-  Loader2,
+  Package,
   RefreshCw,
   Search,
   Star,
-  X,
 } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -47,6 +36,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Slider } from "@/components/ui/slider";
+import { type ProductCardProduct } from "@/components/features/products/product-card";
+import { ProductGrid } from "@/components/features/products/product-grid";
+import { SectionHeading } from "@/components/features/layout/section-heading";
 import { useCartActions } from "@/lib/hooks/use-simplified-cart-sync";
 
 interface Product {
@@ -61,6 +53,12 @@ interface Product {
   images: string[];
   inStock: boolean;
   createdAt: Date | string;
+}
+
+interface CategoryOption {
+  id: string;
+  name: string;
+  productCount: number;
 }
 
 interface ProductResult {
@@ -79,45 +77,31 @@ interface ProductsPageClientProps {
   initialData: ProductResult;
 }
 
-// Use translations for categories and sort options
-const getCategories = (t: any) => [
-  { key: "All", label: t("categories.All") },
-  { key: "Electronics", label: t("categories.Electronics") },
-  { key: "Fashion", label: t("categories.Fashion") },
-  { key: "Home & Garden", label: t("categories.Home & Garden") },
-  { key: "Sports", label: t("categories.Sports") },
-  { key: "Books", label: t("categories.Books") },
+const sortOptions = [
+  { value: "createdAt", labelKey: "sortOptions.newest" as const },
+  { value: "price", labelKey: "sortOptions.priceLowHigh" as const },
+  { value: "price-high", labelKey: "sortOptions.priceHighLow" as const },
+  { value: "name", labelKey: "sortOptions.name" as const },
 ];
 
-const getSortOptions = (t: any) => [
-  { value: "created_at", label: t("sortOptions.newest") },
-  { value: "price", label: t("sortOptions.priceLowHigh") },
-  { value: "price-high", label: t("sortOptions.priceHighLow") },
-  { value: "name", label: t("sortOptions.name") },
-];
-
-// Skeleton Loading Component
 function ProductSkeleton() {
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden rounded-[2rem] border border-border/60 bg-card shadow-sm">
       <CardHeader className="p-0">
         <div className="aspect-square bg-muted animate-pulse" />
       </CardHeader>
-      <CardContent className="p-4">
-        <div className="space-y-2">
-          <div className="h-3 bg-muted animate-pulse rounded" />
-          <div className="h-4 bg-muted animate-pulse rounded" />
-          <div className="h-4 bg-muted animate-pulse rounded w-3/4" />
-        </div>
+      <CardContent className="space-y-3 p-4">
+        <div className="h-3 w-1/3 rounded bg-muted" />
+        <div className="h-4 w-3/4 rounded bg-muted" />
+        <div className="h-4 w-1/2 rounded bg-muted" />
       </CardContent>
       <CardFooter className="p-4 pt-0">
-        <div className="h-9 bg-muted animate-pulse rounded w-full" />
+        <div className="h-11 rounded-full bg-muted" />
       </CardFooter>
     </Card>
   );
 }
 
-// Error Component
 function ErrorDisplay({
   error,
   onRetry,
@@ -125,26 +109,23 @@ function ErrorDisplay({
   error: string;
   onRetry: () => void;
 }) {
+  const t = useTranslations("products");
+
   return (
-    <div className="text-center py-12">
-      <div className="flex flex-col items-center space-y-4">
-        <div className="p-3 rounded-full bg-destructive/10">
-          <AlertCircle className="h-8 w-8 text-destructive" />
-        </div>
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold">{error}</h3>
-          <p className="text-muted-foreground max-w-md">{error}</p>
-        </div>
-        <Button onClick={onRetry} className="flex items-center gap-2">
-          <RefreshCw className="h-4 w-4" />
-          Try Again
-        </Button>
+    <div className="rounded-[2rem] border border-border/60 bg-card p-10 text-center shadow-xl shadow-primary/10">
+      <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+        <AlertCircle className="h-7 w-7" />
       </div>
+      <h3 className="mb-2 text-xl font-black text-foreground">{error}</h3>
+      <p className="mb-6 text-muted-foreground">{t("somethingWentWrong")}</p>
+      <Button onClick={onRetry} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+        <RefreshCw className="mr-2 h-4 w-4" />
+        {t("tryAgain")}
+      </Button>
     </div>
   );
 }
 
-// Filter Content Component
 function FilterContent({
   searchQuery,
   setSearchQuery,
@@ -154,7 +135,7 @@ function FilterContent({
   setPriceRange,
   inStockOnly,
   setInStockOnly,
-  categories,
+  categoryOptions,
 }: {
   searchQuery: string;
   setSearchQuery: (value: string) => void;
@@ -164,57 +145,54 @@ function FilterContent({
   setPriceRange: (value: number[]) => void;
   inStockOnly: boolean;
   setInStockOnly: (value: boolean) => void;
-  categories: Array<{ key: string; label: string }>;
+  categoryOptions: Array<{ key: string; label: string }>;
 }) {
   const t = useTranslations("products");
 
   return (
-    <>
-      {/* Search */}
+    <div className="space-y-7">
       <div>
-        <h3 className="font-semibold mb-3">{t("filters.search")}</h3>
+        <h3 className="mb-3 text-sm font-black uppercase tracking-widest text-muted-foreground">
+          {t("filters.search")}
+        </h3>
         <div className="relative">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder={t("search")}
-            className="pl-8"
+            className="rounded-full pl-10"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(event) => setSearchQuery(event.target.value)}
           />
         </div>
       </div>
 
-      {/* Categories */}
       <div>
-        <h3 className="font-semibold mb-3">{t("filters.categories")}</h3>
+        <h3 className="mb-3 text-sm font-black uppercase tracking-widest text-muted-foreground">
+          {t("filters.categories")}
+        </h3>
         <div className="space-y-2">
-          {categories.map((category) => (
-            <div key={category.key} className="flex items-center space-x-2">
-              <Checkbox
-                id={category.key}
-                checked={selectedCategory === category.key}
-                onCheckedChange={(checked) => {
-                  if (checked) {
-                    setSelectedCategory(category.key);
-                  } else {
-                    setSelectedCategory("");
-                  }
-                }}
-              />
-              <label
-                htmlFor={category.key}
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                {category.label}
-              </label>
-            </div>
+          {categoryOptions.map((category) => (
+            <button
+              key={category.key}
+              type="button"
+              onClick={() => setSelectedCategory(category.key)}
+              className={`flex w-full items-center justify-between rounded-2xl px-3 py-2 text-sm font-bold transition ${
+                selectedCategory === category.key
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-primary/10 hover:text-primary"
+              }`}
+            >
+              <span>{category.label}</span>
+              {selectedCategory === category.key && <span aria-hidden="true">•</span>}
+            </button>
           ))}
         </div>
       </div>
 
-      {/* Price Range */}
       <div>
-        <h3 className="font-semibold mb-3">{t("filters.priceRange")}</h3>
+        <h3 className="mb-3 text-sm font-black uppercase tracking-widest text-muted-foreground">
+          {t("filters.priceRange")}
+        </h3>
         <div className="space-y-4">
           <Slider
             value={priceRange}
@@ -223,106 +201,112 @@ function FilterContent({
             step={10}
             className="w-full"
           />
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <div className="flex items-center justify-between text-sm font-bold text-muted-foreground">
             <span>${priceRange[0]}</span>
             <span>${priceRange[1]}</span>
           </div>
         </div>
       </div>
 
-      {/* Rating */}
       <div>
-        <h3 className="font-semibold mb-3">{t("filters.rating")}</h3>
-        <div className="space-y-2">
+        <h3 className="mb-3 text-sm font-black uppercase tracking-widest text-muted-foreground">
+          {t("filters.rating")}
+        </h3>
+        <div className="space-y-2 text-sm text-muted-foreground">
           {[4, 3, 2, 1].map((rating) => (
-            <div key={rating} className="flex items-center space-x-2">
-              <Checkbox id={`rating-${rating}`} />
-              <label
-                htmlFor={`rating-${rating}`}
-                className="flex items-center space-x-1 text-sm"
-              >
-                {Array.from({ length: 5 }).map((_, i) => (
+            <div key={rating} className="flex items-center gap-2 rounded-2xl px-3 py-2 hover:bg-primary/10">
+              <Checkbox id={`rating-${rating}`} disabled />
+              <div className="flex items-center gap-1">
+                {Array.from({ length: 5 }).map((_, index) => (
                   <Star
-                    key={i}
-                    className={`h-3 w-3 ${
-                      i < rating
-                        ? "fill-yellow-400 text-yellow-400"
-                        : "text-muted-foreground"
+                    key={index}
+                    className={`h-3.5 w-3.5 ${
+                      index < rating
+                        ? "fill-warning text-warning"
+                        : "text-muted-foreground/40"
                     }`}
                   />
                 ))}
                 <span>{t("filters.andUp")}</span>
-              </label>
+              </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Availability */}
       <div>
-        <h3 className="font-semibold mb-3">{t("filters.availability")}</h3>
-        <div className="space-y-2">
-          <div className="flex items-center space-x-2">
+        <h3 className="mb-3 text-sm font-black uppercase tracking-widest text-muted-foreground">
+          {t("filters.availability")}
+        </h3>
+        <div className="space-y-3">
+          <label className="flex cursor-pointer items-center gap-3 rounded-2xl px-3 py-2 text-sm font-bold text-foreground hover:bg-primary/10">
             <Checkbox
               id="in-stock"
               checked={inStockOnly}
-              onCheckedChange={setInStockOnly}
+              onCheckedChange={(checked) => setInStockOnly(Boolean(checked))}
             />
-            <label htmlFor="in-stock" className="text-sm">
-              {t("filters.inStockOnly")}
-            </label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox id="on-sale" />
-            <label htmlFor="on-sale" className="text-sm">
-              {t("filters.onSale")}
-            </label>
-          </div>
+            {t("filters.inStockOnly")}
+          </label>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
-// Debounce hook for search input
 function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+  const [debouncedValue, setDebouncedValue] = useState(value);
 
   useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
+    const handler = window.setTimeout(() => setDebouncedValue(value), delay);
+    return () => window.clearTimeout(handler);
+  }, [delay, value]);
 
   return debouncedValue;
 }
 
+function toProductCard(product: Product): ProductCardProduct {
+  return {
+    id: product.id,
+    name: product.name,
+    slug: product.slug,
+    category: product.category,
+    price: product.price,
+    discount_price: product.discount_price,
+    images: product.images,
+    inStock: product.inStock,
+  };
+}
+
 export function ProductsPageClient({ initialData }: ProductsPageClientProps) {
   const t = useTranslations("products");
-  const categories = getCategories(t);
-  const sortOptions = getSortOptions(t);
+  const [availableCategories, setAvailableCategories] = useState<CategoryOption[]>([]);
   const [products, setProducts] = useState<Product[]>(initialData.data);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [sortBy, setSortBy] = useState("created_at");
-  const [sortOrder, setSortOrder] = useState("desc");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder] = useState("desc");
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [inStockOnly, setInStockOnly] = useState(false);
   const [currentPage, setCurrentPage] = useState(initialData.pagination.page);
   const [totalPages, setTotalPages] = useState(initialData.pagination.pages);
-  const [totalProducts, setTotalProducts] = useState(
-    initialData.pagination.total,
-  );
+  const [totalProducts, setTotalProducts] = useState(initialData.pagination.total);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const { addToCart } = useCartActions();
 
-  // Debounce search query to avoid too many API calls
+  const categoryOptions = useMemo(
+    () => [
+      { key: "all", label: t("categories.All") },
+      ...availableCategories.map((category) => ({
+        key: category.id,
+        label: category.name,
+      })),
+    ],
+    [availableCategories, t],
+  );
+
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   const fetchProducts = useCallback(async () => {
@@ -337,79 +321,109 @@ export function ProductsPageClient({ initialData }: ProductsPageClientProps) {
         sortOrder,
       });
 
+      if (selectedCategory !== "all") params.set("category", selectedCategory);
       if (debouncedSearchQuery) params.set("search", debouncedSearchQuery);
-      if (selectedCategory && selectedCategory !== "All")
-        params.set("category", selectedCategory);
       if (priceRange[0] > 0) params.set("minPrice", priceRange[0].toString());
-      if (priceRange[1] < 1000)
-        params.set("maxPrice", priceRange[1].toString());
+      if (priceRange[1] < 1000) params.set("maxPrice", priceRange[1].toString());
       if (inStockOnly) params.set("inStock", "true");
 
       const response = await fetch(`/api/products?${params}`);
-      const data = await response.json();
+      const data: ProductResult = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to fetch products");
+        throw new Error("Failed to fetch products");
       }
 
       setProducts(data.data);
       setTotalPages(data.pagination.pages);
       setTotalProducts(data.pagination.total);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch products");
+      setError(err instanceof Error ? err.message : t("somethingWentWrong"));
     } finally {
       setLoading(false);
     }
   }, [
     currentPage,
+    debouncedSearchQuery,
+    inStockOnly,
+    priceRange,
+    selectedCategory,
     sortBy,
     sortOrder,
-    selectedCategory,
-    debouncedSearchQuery,
-    priceRange,
-    inStockOnly,
+    t,
   ]);
 
   useEffect(() => {
-    fetchProducts();
-  }, [
-    currentPage,
-    sortBy,
-    sortOrder,
-    selectedCategory,
-    debouncedSearchQuery,
-    priceRange[0],
-    priceRange[1],
-    inStockOnly,
-  ]);
+    const controller = new AbortController();
 
-  const handleAddToCart = async (product: Product) => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("/api/categories", {
+          signal: controller.signal,
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        setAvailableCategories(data.categories || []);
+      } catch (err) {
+        if (
+          err instanceof Error &&
+          (err.name === "AbortError" || err.message === "Failed to fetch")
+        ) {
+          return;
+        }
+      }
+    };
+
+    void fetchCategories();
+
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearchQuery, inStockOnly, priceRange, selectedCategory, sortBy]);
+
+  useEffect(() => {
+    void fetchProducts();
+  }, [fetchProducts]);
+
+  const handleAddToCart = async (product: ProductCardProduct) => {
     try {
+      const currentPrice = product.discount_price ?? product.price;
+
       await addToCart({
         product_id: product.id,
         product: {
           id: product.id,
           name: product.name || t("unknownProduct"),
-          price: product.price,
-          discount_price: product.discount_price || undefined,
+          price: currentPrice,
+          discount_price: currentPrice,
           slug: product.slug || "",
-          product_pictures: product.images.map((url) => ({
+          product_pictures: (product.images ?? []).map((url) => ({
             picture: { url },
           })),
         },
         quantity: 1,
       });
-    } catch (error) {
-      console.error("Error adding to cart:", error);
+    } catch (err) {
+      console.error("Error adding to cart:", err);
     }
   };
 
+  const gridClass =
+    viewMode === "grid"
+      ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+      : "grid-cols-1";
+
   return (
-    <div className="container px-4 py-8">
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Filters Sidebar - Hidden on mobile, visible on large screens */}
-        <aside className="hidden lg:block w-64 shrink-0">
-          <div className="sticky top-20 space-y-6">
+    <div className="container px-4 py-8 sm:px-6 lg:px-8">
+      <div className="grid gap-8 lg:grid-cols-[17rem_1fr]">
+        <aside className="hidden lg:block">
+          <div className="sticky top-24 rounded-[2rem] border border-border/60 bg-card/95 p-5 shadow-xl shadow-primary/10 backdrop-blur">
+            <div className="mb-6 flex items-center gap-2">
+              <Filter className="h-5 w-5 text-primary" />
+              <h2 className="font-black text-foreground">{t("filtersText")}</h2>
+            </div>
             <FilterContent
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
@@ -419,44 +433,60 @@ export function ProductsPageClient({ initialData }: ProductsPageClientProps) {
               setPriceRange={setPriceRange}
               inStockOnly={inStockOnly}
               setInStockOnly={setInStockOnly}
-              categories={categories}
+              categoryOptions={categoryOptions}
             />
           </div>
         </aside>
 
-        {/* Main Content */}
-        <main className="flex-1">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-3xl font-bold">{t("title")}</h1>
-              <p className="text-muted-foreground">{t("subtitle")}</p>
-            </div>
+        <main>
+          <div className="mb-6 flex flex-col justify-between gap-4 rounded-[2rem] border border-border/60 bg-card/95 p-5 shadow-xl shadow-primary/10 md:flex-row md:items-end">
+            <SectionHeading
+              eyebrow={t("title")}
+              title={t("subtitle")}
+              align="left"
+              className="max-w-none"
+            />
 
-            <div className="flex items-center gap-4">
-              {/* Sort */}
+            <div className="flex flex-wrap items-center gap-3">
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-48">
+                <SelectTrigger className="w-48 rounded-full">
                   <SelectValue placeholder={t("sortBy")} />
                 </SelectTrigger>
                 <SelectContent>
                   {sortOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
-                      {option.label}
+                      {t(option.labelKey)}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
 
-              {/* View Toggle */}
-              <div className="flex border rounded-md">
-                <Button variant="ghost" size="sm" className="rounded-r-none">
+              <div className="flex rounded-full border border-border bg-background p-1">
+                <Button
+                  type="button"
+                  variant={viewMode === "grid" ? "default" : "ghost"}
+                  size="icon"
+                  aria-pressed={viewMode === "grid"}
+                  onClick={() => setViewMode("grid")}
+                  className={
+                    viewMode === "grid"
+                      ? "rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
+                      : "rounded-full text-muted-foreground"
+                  }
+                >
                   <Grid3X3 className="h-4 w-4" />
                 </Button>
                 <Button
-                  variant="ghost"
-                  size="sm"
-                  className="rounded-l-none border-l"
+                  type="button"
+                  variant={viewMode === "list" ? "default" : "ghost"}
+                  size="icon"
+                  aria-pressed={viewMode === "list"}
+                  onClick={() => setViewMode("list")}
+                  className={
+                    viewMode === "list"
+                      ? "rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
+                      : "rounded-full text-muted-foreground"
+                  }
                 >
                   <List className="h-4 w-4" />
                 </Button>
@@ -464,47 +494,39 @@ export function ProductsPageClient({ initialData }: ProductsPageClientProps) {
             </div>
           </div>
 
-          {/* Loading/Error States */}
           {loading && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <ProductSkeleton key={i} />
-                ))}
-              </div>
+            <div className={`grid gap-5 ${gridClass}`}>
+              {Array.from({ length: 8 }).map((_, index) => (
+                <ProductSkeleton key={index} />
+              ))}
             </div>
           )}
 
           {error && (
-            <ErrorDisplay
-              error={t("somethingWentWrong")}
-              onRetry={fetchProducts}
-            />
+            <ErrorDisplay error={error} onRetry={fetchProducts} />
           )}
 
           {!loading && !error && (
             <>
-              {/* Results Summary */}
-              <div className="flex items-center justify-between mb-6">
-                <p className="text-muted-foreground">
+              <div className="mb-6 flex items-center justify-between gap-4">
+                <p className="text-sm font-bold text-muted-foreground">
                   {t("showing")} {products.length} {t("of")} {totalProducts}{" "}
                   {t("products")}
                 </p>
 
-                {/* Mobile Filter Button */}
                 <div className="lg:hidden">
                   <Sheet>
                     <SheetTrigger asChild={true}>
-                      <Button variant="outline" size="sm">
-                        <Filter className="h-4 w-4 mr-2" />
+                      <Button variant="outline" size="sm" className="rounded-full">
+                        <Filter className="mr-2 h-4 w-4" />
                         {t("filtersText")}
                       </Button>
                     </SheetTrigger>
-                    <SheetContent side="left" className="w-80">
+                    <SheetContent side="left" className="w-[min(88vw,22rem)] overflow-y-auto">
                       <SheetHeader>
                         <SheetTitle>{t("filtersText")}</SheetTitle>
                       </SheetHeader>
-                      <div className="mt-6 space-y-6">
+                      <div className="mt-6">
                         <FilterContent
                           searchQuery={searchQuery}
                           setSearchQuery={setSearchQuery}
@@ -514,140 +536,68 @@ export function ProductsPageClient({ initialData }: ProductsPageClientProps) {
                           setPriceRange={setPriceRange}
                           inStockOnly={inStockOnly}
                           setInStockOnly={setInStockOnly}
-                          categories={categories}
+                          categoryOptions={categoryOptions}
                         />
                       </div>
                     </SheetContent>
                   </Sheet>
                 </div>
-
-                {/* Desktop Filter Button - Hidden on mobile */}
-                <div className="hidden lg:block">
-                  <Button variant="outline" size="sm" disabled={true}>
-                    <Filter className="h-4 w-4 mr-2" />
-                    {t("filtersText")}
-                  </Button>
-                </div>
               </div>
 
-              {/* Products Grid */}
               {products.length === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground">{t("noProducts")}</p>
+                <div className="rounded-[2rem] border border-border/60 bg-card p-10 text-center shadow-xl shadow-primary/10">
+                  <Package className="mx-auto mb-4 h-14 w-14 text-muted-foreground" />
+                  <h3 className="text-xl font-black text-foreground">{t("noProducts")}</h3>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {products.map((product) => (
-                    <Card
-                      key={product.id}
-                      className="group overflow-hidden hover:shadow-lg transition-shadow"
-                    >
-                      <CardHeader className="p-0">
-                        <Link
-                          href={`/products/${product.slug}`}
-                          className="block"
-                        >
-                          <div className="aspect-square relative overflow-hidden bg-muted">
-                            {product.images[0] ? (
-                              <Image
-                                src={product.images[0]}
-                                alt={product.name || t("unknownProduct")}
-                                fill={true}
-                                className="object-cover group-hover:scale-105 transition-transform"
-                              />
-                            ) : (
-                              <div className="w-full h-full bg-linear-to-br from-muted to-muted-foreground/10 flex items-center justify-center">
-                                <div className="text-6xl opacity-20">📦</div>
-                              </div>
-                            )}
-                            {!product.inStock && (
-                              <Badge className="absolute top-2 left-2 bg-destructive">
-                                {t("outOfStock")}
-                              </Badge>
-                            )}
-                            {product.discount_price && (
-                              <Badge className="absolute top-2 right-2 bg-green-600">
-                                {t("sale")}
-                              </Badge>
-                            )}
-                          </div>
-                        </Link>
-                      </CardHeader>
-
-                      <CardContent className="p-4">
-                        <div className="space-y-2">
-                          <p className="text-xs text-muted-foreground uppercase tracking-wide">
-                            {product.category?.name || t("uncategorized")}
-                          </p>
-                          <Link href={`/products/${product.slug}`}>
-                            <h3 className="font-semibold line-clamp-2 group-hover:style={{ color: 'rgb(59, 130, 246)' }} transition-colors cursor-pointer">
-                              {product.name || t("unknownProduct")}
-                            </h3>
-                          </Link>
-
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg font-bold">
-                              $
-                              {product.discount_price
-                                ? Number(product.discount_price).toFixed(2)
-                                : product.price.toFixed(2)}
-                            </span>
-                            {product.discount_price && (
-                              <span className="text-sm text-muted-foreground line-through">
-                                ${product.price.toFixed(2)}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </CardContent>
-
-                      <CardFooter className="p-4 pt-0">
-                        <Button
-                          className="w-full"
-                          disabled={!product.inStock}
-                          onClick={() => handleAddToCart(product)}
-                          data-testid="add-to-cart-btn"
-                        >
-                          {product.inStock ? t("addToCart") : t("outOfStock")}
-                        </Button>
-                      </CardFooter>
-                    </Card>
-                  ))}
-                </div>
+                <ProductGrid
+                  products={products.map(toProductCard)}
+                  onAddToCart={handleAddToCart}
+                  unknownProductLabel={t("unknownProduct")}
+                  outOfStockLabel={t("outOfStock")}
+                  saleLabel={t("sale")}
+                  addToCartLabel={t("addToCart")}
+                  uncategorizedLabel={t("uncategorized")}
+                  addTestId="add-to-cart-btn"
+                />
               )}
 
-              {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex justify-center mt-12">
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      disabled={currentPage === 1}
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                    >
-                      {t("previous")}
-                    </Button>
+                <div className="mt-12 flex justify-center gap-2">
+                  <Button
+                    variant="outline"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    className="rounded-full"
+                  >
+                    {t("previous")}
+                  </Button>
 
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                      (page) => (
-                        <Button
-                          key={page}
-                          variant={currentPage === page ? "default" : "outline"}
-                          onClick={() => setCurrentPage(page)}
-                        >
-                          {page}
-                        </Button>
-                      ),
-                    )}
+                  {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+                    (page) => (
+                      <Button
+                        key={page}
+                        variant={currentPage === page ? "default" : "outline"}
+                        onClick={() => setCurrentPage(page)}
+                        className={
+                          currentPage === page
+                            ? "rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
+                            : "rounded-full"
+                        }
+                      >
+                        {page}
+                      </Button>
+                    ),
+                  )}
 
-                    <Button
-                      variant="outline"
-                      disabled={currentPage === totalPages}
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                    >
-                      {t("next")}
-                    </Button>
-                  </div>
+                  <Button
+                    variant="outline"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    className="rounded-full"
+                  >
+                    {t("next")}
+                  </Button>
                 </div>
               )}
             </>

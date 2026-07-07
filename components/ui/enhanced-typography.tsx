@@ -131,10 +131,10 @@ const colorMap: Record<TypographyColor, string> = {
   secondary: "text-secondary-foreground",
   muted: "text-muted-foreground",
   accent: "text-accent-foreground",
-  success: "text-green-600 dark:text-green-400",
-  warning: "text-yellow-600 dark:text-yellow-400",
-  error: "text-red-600 dark:text-red-400",
-  info: "text-blue-600 dark:text-blue-400",
+  success: "text-success",
+  warning: "text-warning",
+  error: "text-destructive",
+  info: "text-primary",
 };
 
 const sizeMap = {

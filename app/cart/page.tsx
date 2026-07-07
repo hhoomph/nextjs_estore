@@ -8,33 +8,25 @@
 
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
-
-// Force dynamic rendering to avoid prerendering issues
-export const dynamic = "force-dynamic";
-
-// Disable static optimization completely
-export const runtime = "nodejs";
-
 import {
-  AlertTriangle,
   ArrowLeft,
   Minus,
   Plus,
   ShoppingCart,
   Trash2,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-// Use client API route to fetch site settings instead of importing server actions
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
+
 import { AdvancedErrorBoundary } from "@/components/errors/advanced-error-boundary";
-import { Badge } from "@/components/ui/badge";
+import { SectionHeading } from "@/components/features/layout/section-heading";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -43,6 +35,28 @@ import {
   useCartActions,
   useSimplifiedCartSync,
 } from "@/lib/hooks/use-simplified-cart-sync";
+
+interface SiteSettings {
+  defaultCurrency?: string;
+}
+
+function toHexTestId(value: string): string {
+  const first = hashTestId(value, 0x811c9dc5);
+  const second = hashTestId(value, 0x100001b3);
+
+  return `${first}${second}`;
+}
+
+function hashTestId(value: string, seed: number): string {
+  let hash = seed;
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 0x01000193);
+  }
+
+  return (hash >>> 0).toString(16).padStart(8, "0");
+}
 
 export default function CartPage() {
   // ALL hooks must be called at the top level, BEFORE any conditional returns
@@ -58,20 +72,18 @@ export default function CartPage() {
   const tOrder = useTranslations("Order Review");
 
   // 3. Cart sync hooks
-  const { items, itemCount } = useSimplifiedCartSync();
+  const { items } = useSimplifiedCartSync();
   const {
-    addToCart,
     removeFromCart,
     updateQuantity,
     clearCart,
-    isUsingUserCart,
   } = useCartActions();
 
   // 4. State hooks - all defined together at the top.
   // `mounted` is the only local UI state; `isLoading` was previously
   // declared but never flipped back to `true` after the initial mount,
   // so the dead `if (isLoading) return …` branch has been removed.
-  const [siteSettings, setSiteSettings] = useState<any>(null);
+  const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [mounted, setMounted] = useState(false);
 
   // 5. Effect hooks - all defined together at the top
@@ -116,6 +128,12 @@ export default function CartPage() {
   const currencySymbol =
     currency === "IRR" ? "تومان" : currency === "USD" ? "$" : currency;
 
+  const formatCurrency = (value: number) =>
+    `${currencySymbol}${value.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+
   const handleQuantityChange = async (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) return;
     await updateQuantity(itemId, newQuantity);
@@ -126,6 +144,12 @@ export default function CartPage() {
   };
 
   const handleClearCart = async () => {
+    if (
+      typeof window !== "undefined" &&
+      !window.confirm("Are you sure you want to clear your cart?")
+    ) {
+      return;
+    }
     await clearCart();
   };
 
@@ -139,14 +163,15 @@ export default function CartPage() {
 
   const cartItems = items || [];
   const total = calculateTotal();
+  const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <AdvancedErrorBoundary>
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
           {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center space-x-4">
+          <div className="mb-8">
+            <div className="flex items-center justify-between gap-4">
               <Button
                 variant="ghost"
                 size="sm"
@@ -156,18 +181,13 @@ export default function CartPage() {
                 <ArrowLeft className="h-4 w-4" />
                 <span>{tCheckout("continueShopping")}</span>
               </Button>
-              <div className="flex items-center space-x-2">
-                <ShoppingCart className="h-6 w-6" />
-                <h1 className="text-3xl font-bold">{tNavigation("cart")}</h1>
-                {cartItems.length > 0 && (
-                  <Badge
-                    variant="secondary"
-                    className="ml-2"
-                    data-testid="cart-item-count"
-                  >
-                    {cartItems.length} {tCart("cartItemCount")}
-                  </Badge>
-                )}
+              <div className="flex-1">
+                <SectionHeading
+                  eyebrow={cartItems.length > 0 ? `${totalQuantity} ${tCart("cartItemCount")}` : undefined}
+                  title={tNavigation("cart")}
+                  align="left"
+                  className="max-w-none"
+                />
               </div>
             </div>
 
@@ -211,19 +231,29 @@ export default function CartPage() {
                   const product = item.product;
                   if (!product) return null;
 
+                  const cartItemTestId = toHexTestId(item.id);
                   const price = product.discount_price || product.price;
                   const subtotal = price * item.quantity;
 
                   return (
-                    <Card key={item.id} data-testid={"cart-item-" + product.id}>
+                    <Card key={item.id} data-testid={`cart-item-${cartItemTestId}`}>
                       <CardContent className="p-6">
                         <div className="flex space-x-4">
                           {/* Product Image */}
-                          <div className="w-20 h-20 bg-muted rounded-md flex-shrink-0">
-                            {/* Placeholder for product image */}
-                            <div className="w-full h-full bg-muted-foreground/10 rounded-md flex items-center justify-center">
-                              <ShoppingCart className="h-8 w-8 text-muted-foreground" />
-                            </div>
+                          <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl border border-border bg-muted">
+                            {product.product_pictures?.[0]?.picture?.url ? (
+                              <Image
+                                src={product.product_pictures[0].picture.url}
+                                alt={product.name || "Cart product"}
+                                width={96}
+                                height={96}
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center">
+                                <ShoppingCart className="h-8 w-8 text-muted-foreground/50" />
+                              </div>
+                            )}
                           </div>
 
                           {/* Product Details */}
@@ -231,8 +261,8 @@ export default function CartPage() {
                             <h3 className="font-semibold truncate">
                               {product.name}
                             </h3>
-                            <p className="text-sm text-muted-foreground">
-                              Product ID: {product.id}
+                            <p className="text-sm font-semibold text-muted-foreground">
+                              Qty {item.quantity}
                             </p>
 
                             <div className="flex items-center justify-between mt-4">
@@ -247,19 +277,13 @@ export default function CartPage() {
                                     )
                                   }
                                   disabled={item.quantity <= 1}
-                                  data-testid={
-                                    "cart-item-" +
-                                    product.id +
-                                    "-quantity-decrease"
-                                  }
+                                  data-testid={`cart-item-${cartItemTestId}-quantity-decrease`}
                                 >
                                   <Minus className="h-3 w-3" />
                                 </Button>
                                 <span
                                   className="w-12 text-center"
-                                  data-testid={
-                                    "cart-item-" + product.id + "-quantity"
-                                  }
+                                  data-testid={`cart-item-${cartItemTestId}-quantity`}
                                 >
                                   {item.quantity}
                                 </span>
@@ -272,11 +296,7 @@ export default function CartPage() {
                                       item.quantity + 1,
                                     )
                                   }
-                                  data-testid={
-                                    "cart-item-" +
-                                    product.id +
-                                    "-quantity-increase"
-                                  }
+                                  data-testid={`cart-item-${cartItemTestId}-quantity-increase`}
                                 >
                                   <Plus className="h-3 w-3" />
                                 </Button>
@@ -284,13 +304,11 @@ export default function CartPage() {
 
                               <div className="text-right">
                                 <p className="font-semibold">
-                                  {currencySymbol}
-                                  {subtotal.toLocaleString()}
+{formatCurrency(subtotal)}
                                 </p>
                                 {product.discount_price && (
                                   <p className="text-sm text-muted-foreground line-through">
-                                    {currencySymbol}
-                                    {product.price.toLocaleString()}
+                                    {formatCurrency(product.price)}
                                   </p>
                                 )}
                               </div>
@@ -303,7 +321,7 @@ export default function CartPage() {
                             size="sm"
                             onClick={() => handleRemoveItem(item.id)}
                             className="text-destructive hover:text-destructive"
-                            data-testid={"cart-item-" + product.id + "-remove"}
+                            data-testid={`cart-item-${cartItemTestId}-remove`}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -327,8 +345,7 @@ export default function CartPage() {
                     >
                       <span>{tCart("cartSubtotal")}</span>
                       <span>
-                        {currencySymbol}
-                        {total.toLocaleString()}
+                        {formatCurrency(total)}
                       </span>
                     </div>
 
@@ -337,7 +354,7 @@ export default function CartPage() {
                       data-testid="cart-shipping"
                     >
                       <span>{tCart("cartShipping")}</span>
-                      <span className="text-green-600">Free</span>
+                      <span className="text-success">Free</span>
                     </div>
 
                     <Separator />
@@ -348,8 +365,7 @@ export default function CartPage() {
                     >
                       <span>{tCart("cartTotal")}</span>
                       <span>
-                        {currencySymbol}
-                        {total.toLocaleString()}
+                        {formatCurrency(total)}
                       </span>
                     </div>
 

@@ -46,18 +46,18 @@ export function AdminRedirect() {
   // Show loading state while checking authentication
   return (
     <div
-      className="min-h-screen flex items-center justify-center bg-gray-50"
+      className="min-h-screen flex items-center justify-center bg-background"
       suppressHydrationWarning={true}
     >
       <div className="text-center">
         <div
           className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
-          style={{ borderBottomColor: "rgb(37, 99, 235)" }}
+          style={{ borderBottomColor: "hsl(var(--primary))" }}
         ></div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+        <h2 className="text-xl font-semibold text-foreground mb-2">
           Checking Permissions
         </h2>
-        <p className="text-gray-600">Redirecting to admin panel...</p>
+        <p className="text-muted-foreground">Redirecting to admin panel...</p>
       </div>
     </div>
   );

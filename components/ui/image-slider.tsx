@@ -17,6 +17,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from "./dialog";
+import { PLACEHOLDER_IMAGE } from "@/lib/utils/image-utils";
 
 interface ImageSliderProps {
   images: string[];
@@ -33,12 +34,17 @@ export function ImageSlider({
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
+  const safeImages = images && images.length > 0 ? images : [PLACEHOLDER_IMAGE];
+
   if (!images || images.length === 0) {
     return (
-      <div
-        className={`aspect-square bg-muted rounded-lg flex items-center justify-center ${className}`}
-      >
-        <span className="text-muted-foreground">No image available</span>
+      <div className={`relative aspect-square overflow-hidden rounded-lg bg-muted ${className}`}>
+        <Image
+          src={PLACEHOLDER_IMAGE}
+          alt={alt}
+          fill
+          className="object-cover opacity-50"
+        />
       </div>
     );
   }
@@ -102,7 +108,7 @@ export function ImageSlider({
 
         {/* Image Counter */}
         {images.length > 1 && (
-          <div className="absolute bottom-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-sm">
+          <div className="absolute bottom-2 right-2 bg-background/80 text-foreground backdrop-blur-md px-2 py-1 rounded text-sm shadow-sm">
             {currentIndex + 1} / {images.length}
           </div>
         )}
@@ -116,7 +122,7 @@ export function ImageSlider({
                 onClick={() => setCurrentIndex(index)}
                 className={`shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
                   currentIndex === index
-                    ? "style={{ borderColor: 'rgb(59, 130, 246)' }}"
+                    ? "border-primary"
                     : "border-muted hover:border-muted-foreground"
                 }`}
               >
@@ -139,7 +145,7 @@ export function ImageSlider({
           <DialogDescription className="sr-only">
             View and navigate through product images in a lightbox gallery
           </DialogDescription>
-          <div className="relative w-full h-full flex items-center justify-center bg-black">
+          <div className="relative w-full h-full flex items-center justify-center bg-background">
             <Image
               src={images[lightboxIndex]}
               alt={`${alt} ${lightboxIndex + 1}`}
@@ -154,18 +160,18 @@ export function ImageSlider({
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="absolute left-4 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-black/50 hover:bg-black/70 border-0"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-background/80 hover:bg-background text-foreground backdrop-blur-md border-0"
                   onClick={prevLightboxImage}
                 >
-                  <ChevronLeft className="h-6 w-6 text-white" />
+                  <ChevronLeft className="h-6 w-6" />
                 </Button>
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="absolute right-4 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-black/50 hover:bg-black/70 border-0"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 h-10 w-10 p-0 bg-background/80 hover:bg-background text-foreground backdrop-blur-md border-0"
                   onClick={nextLightboxImage}
                 >
-                  <ChevronRight className="h-6 w-6 text-white" />
+                  <ChevronRight className="h-6 w-6" />
                 </Button>
               </>
             )}
@@ -174,14 +180,14 @@ export function ImageSlider({
             <Button
               variant="secondary"
               size="sm"
-              className="absolute top-4 right-4 h-8 w-8 p-0 bg-black/50 hover:bg-black/70 border-0"
+              className="absolute top-4 right-4 h-8 w-8 p-0 bg-background/80 hover:bg-background text-foreground backdrop-blur-md border-0"
               onClick={() => setLightboxOpen(false)}
             >
-              <X className="h-4 w-4 text-white" />
+              <X className="h-4 w-4" />
             </Button>
 
             {/* Lightbox Counter */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded">
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-background/80 text-foreground backdrop-blur-md px-3 py-1 rounded shadow-sm">
               {lightboxIndex + 1} / {images.length}
             </div>
 
@@ -193,8 +199,8 @@ export function ImageSlider({
                   onClick={() => setLightboxIndex(index)}
                   className={`shrink-0 w-12 h-12 rounded border-2 transition-all ${
                     lightboxIndex === index
-                      ? "border-white"
-                      : "border-white/50 hover:border-white"
+                      ? "border-background"
+                      : "border-background/60 hover:border-background"
                   }`}
                 >
                   <Image

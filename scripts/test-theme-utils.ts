@@ -19,15 +19,15 @@ console.log("🔍 Testing Theme Utilities...");
 
 try {
   // Test theme-aware styles
-  const lightStyles = { background: "bg-white", text: "text-black" };
-  const darkStyles = { background: "bg-black", text: "text-white" };
+    const lightStyles = { background: "bg-background", text: "text-foreground" };
+    const darkStyles = { background: "bg-card", text: "text-card-foreground" };
 
   const themeStyles = getThemeAwareStyles(lightStyles, darkStyles);
   console.log("✅ Theme-aware styles:", themeStyles);
 
   // Test theme-aware class names
-  const lightClass = "bg-white text-black";
-  const darkClass = "bg-black text-white";
+    const lightClass = "bg-background text-foreground";
+    const darkClass = "bg-card text-card-foreground";
 
   const themeClass = getThemeAwareClassName(lightClass, darkClass);
   console.log("✅ Theme-aware class name:", themeClass);

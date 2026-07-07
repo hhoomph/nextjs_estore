@@ -103,6 +103,16 @@ export async function GET(
       orderBy: { createdAt: "desc" },
     });
 
+    const productImages = product.productPictures.length > 0
+      ? product.productPictures.map((pp) => ({
+          id: pp.picture.id,
+          url: pp.picture.url,
+          alt: product.name || "Product image",
+        }))
+      : product.ogImage
+        ? [{ id: product.ogImage, url: product.ogImage, alt: product.name || "Product image" }]
+        : [];
+
     // Transform product for frontend
     const transformedProduct = {
       id: product.id,
@@ -115,11 +125,7 @@ export async function GET(
         : null,
       quantity: product.quantity,
       category: product.category,
-      images: product.productPictures.map((pp) => ({
-        id: pp.picture.id,
-        url: pp.picture.url,
-        alt: product.name || "Product image",
-      })),
+      images: productImages,
       inStock: product.quantity > 0,
       createdAt: product.createdAt,
       discountPercentage: product.discountPrice
@@ -130,7 +136,6 @@ export async function GET(
           )
         : 0,
     };
-
     // Transform related products
     const transformedRelated = relatedProducts.map((p) => ({
       id: p.id,
@@ -138,7 +143,11 @@ export async function GET(
       slug: p.slug,
       price: Number(p.price),
       discountPrice: p.discountPrice ? Number(p.discountPrice) : null,
-      images: p.productPictures.map((pp) => pp.picture.url),
+      images: p.productPictures.length > 0
+        ? p.productPictures.map((pp) => pp.picture.url)
+        : p.ogImage
+          ? [p.ogImage]
+          : [],
       inStock: p.quantity > 0,
     }));
 

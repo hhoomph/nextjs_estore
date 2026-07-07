@@ -118,7 +118,7 @@ export function NavbarFallback() {
         <Button
           variant="outline"
           size="icon"
-          className="border-2 hover:border-blue-600 transition-all"
+          className="border-border hover:border-primary transition-all bg-background hover:bg-accent"
           data-testid="theme-toggle"
         >
           <Sun className="h-4 w-4" />
@@ -131,7 +131,7 @@ export function NavbarFallback() {
         variant="outline"
         size="icon"
         onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-        className="border-2 hover:border-blue-600 transition-all"
+        className="border-border hover:border-primary transition-all bg-background hover:bg-accent"
         data-testid="theme-toggle"
       >
         <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
@@ -159,7 +159,7 @@ export function NavbarFallback() {
 
   return (
     <header
-      className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60"
+      className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/95 text-foreground shadow-sm"
       suppressHydrationWarning={true}
     >
       <div className="container flex h-16 items-center justify-between px-4">
@@ -168,8 +168,8 @@ export function NavbarFallback() {
           href="/"
           className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
         >
-          <Package className="h-6 w-6 text-blue-600" />
-          <span className="font-bold text-xl text-foreground hover:text-blue-600 transition-colors">
+          <Package className="h-6 w-6 text-primary" />
+          <span className="font-bold text-xl text-foreground hover:text-primary transition-colors">
             {siteTitle}
           </span>
         </Link>
@@ -178,19 +178,19 @@ export function NavbarFallback() {
         <nav className="hidden md:flex space-x-6">
           <Link
             href="/products"
-            className="text-sm font-medium hover:text-blue-600 transition-colors"
+            className="text-sm font-medium text-foreground/90 transition-colors hover:text-primary"
           >
             {translations.products}
           </Link>
           <Link
             href="/categories"
-            className="text-sm font-medium hover:text-blue-600 transition-colors"
+            className="text-sm font-medium text-foreground/90 transition-colors hover:text-primary"
           >
             {translations.categories}
           </Link>
           <Link
             href="/deals"
-            className="text-sm font-medium hover:text-blue-600 transition-colors"
+            className="text-sm font-medium text-foreground/90 transition-colors hover:text-primary"
           >
             {translations.deals}
           </Link>
@@ -226,7 +226,7 @@ export function NavbarFallback() {
             <Heart className="h-4 w-4" />
             {hydrated && wishlistCount > 0 && (
               <span
-                className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center"
                 suppressHydrationWarning={true}
               >
                 {wishlistCount > 99 ? "99+" : wishlistCount}
@@ -243,7 +243,7 @@ export function NavbarFallback() {
             <ShoppingCart className="h-4 w-4" />
             {hydrated && cartCount > 0 && (
               <span
-                className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center"
                 suppressHydrationWarning={true}
               >
                 {cartCount > 99 ? "99+" : cartCount}
@@ -264,7 +264,7 @@ export function NavbarFallback() {
                       src={user?.image || ""}
                       alt={user?.name || ""}
                     />
-                    <AvatarFallback className="bg-blue-600/10 text-blue-600">
+                    <AvatarFallback className="bg-primary/10 text-primary">
                       {user?.name?.charAt(0).toUpperCase() || "U"}
                     </AvatarFallback>
                   </Avatar>
@@ -304,7 +304,7 @@ export function NavbarFallback() {
                     <DropdownMenuItem asChild={true}>
                       <Link
                         href="/admin"
-                        className="flex items-center text-blue-600"
+                        className="flex items-center text-primary"
                       >
                         <Package className="mr-2 h-4 w-4" />
                         {translations.adminPanel}
@@ -362,7 +362,7 @@ export function NavbarFallback() {
                   <div className="flex items-center space-x-3 px-4 py-3 bg-accent/50 rounded-lg">
                     <Avatar className="h-10 w-10">
                       <AvatarImage src={user?.image || ""} alt={user?.name || ""} />
-                      <AvatarFallback className="bg-blue-600/10 text-blue-600">
+                      <AvatarFallback className="bg-primary/10 text-primary">
                         {user?.name?.charAt(0).toUpperCase() || "U"}
                       </AvatarFallback>
                     </Avatar>
@@ -426,7 +426,7 @@ export function NavbarFallback() {
                       {user?.role === "ADMIN" && (
                         <Link
                           href="/admin"
-                          className="flex items-center py-2 px-4 text-sm font-medium text-blue-600 hover:bg-accent rounded-md"
+                          className="flex items-center py-2 px-4 text-sm font-medium text-primary hover:bg-accent rounded-md"
                         >
                           <Package className="mr-2 h-4 w-4" />
                           {translations.adminPanel}

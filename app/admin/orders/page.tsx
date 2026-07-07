@@ -1,7 +1,6 @@
 "use client";
 
 export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
 
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +17,8 @@ import {
 } from "@/components/ui/table";
 import { Search, Eye, Package, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useAdminSettingsStore } from "@/lib/stores/admin-settings-store";
+import { formatAmount } from "@/lib/utils/currency";
 
 interface Order {
   id: string;
@@ -46,6 +47,8 @@ export default function AdminOrdersPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+
+  const defaultCurrency = useAdminSettingsStore((state) => state.defaultCurrency);
 
   const fetchOrders = useCallback(async () => {
     setLoading(true);
@@ -116,10 +119,10 @@ export default function AdminOrdersPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex h-64 items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto" />
-          <p className="mt-2 text-muted-foreground">Loading orders...</p>
+          <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
+          <p className="mt-2 text-sm text-muted-foreground">Loading orders...</p>
         </div>
       </div>
     );
@@ -127,29 +130,36 @@ export default function AdminOrdersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <section className="overflow-hidden rounded-[2rem] border border-border bg-card p-6 shadow-xl">
         <div>
-          <h1 className="text-3xl font-bold">Orders</h1>
-          <p className="text-muted-foreground">Manage customer orders</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+            Commerce workspace
+          </p>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground">
+            Orders
+          </h1>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Manage customer orders with Apex-style filters, cards, and tables.
+          </p>
         </div>
-      </div>
+      </section>
 
-      <Card>
+      <Card className="apex-stat-card">
         <CardContent className="pt-6">
-          <div className="flex gap-4">
+          <div className="flex flex-col gap-4 lg:flex-row">
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search orders..."
-                  className="pl-8"
+                  className="rounded-xl pl-8"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-48">
+              <SelectTrigger className="w-48 rounded-xl border-border bg-background">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
@@ -165,21 +175,23 @@ export default function AdminOrdersPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="apex-stat-card">
         <CardHeader>
-          <CardTitle>Orders ({orders.length})</CardTitle>
+          <CardTitle className="text-base font-semibold tracking-tight text-foreground">
+            Orders ({orders.length})
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {error && (
-            <div className="text-center py-4">
-              <p className="text-destructive">{error}</p>
+            <div className="rounded-2xl border border-border bg-destructive/10 p-4 text-center">
+              <p className="text-sm text-destructive">{error}</p>
             </div>
           )}
 
           {orders.length === 0 ? (
-            <div className="text-center py-12">
-              <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">No orders found</p>
+            <div className="py-12 text-center">
+              <Package className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">No orders found</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -214,7 +226,7 @@ export default function AdminOrdersPage() {
                         {(order.orderItems?.length ?? 0) !== 1 ? "s" : ""}
                       </TableCell>
                       <TableCell className="font-medium">
-                        ${Number(order.total).toFixed(2)}
+                        {formatAmount(Number(order.total), defaultCurrency)}
                       </TableCell>
                       <TableCell>
                         <Select
@@ -223,7 +235,7 @@ export default function AdminOrdersPage() {
                             updateOrderStatus(order.id, value)
                           }
                         >
-                          <SelectTrigger className="w-32">
+                          <SelectTrigger className="w-32 rounded-xl border-border bg-background">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -239,7 +251,7 @@ export default function AdminOrdersPage() {
                         {formatDate(order.createdAt)}
                       </TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="sm">
+                        <Button variant="ghost" size="sm" className="rounded-xl">
                           <Eye className="h-4 w-4" />
                         </Button>
                       </TableCell>
@@ -253,22 +265,24 @@ export default function AdminOrdersPage() {
       </Card>
 
       {totalPages > 1 && (
-        <div className="flex justify-center">
-          <div className="flex gap-2">
+        <div className="flex justify-center rounded-[1.5rem] border border-border bg-card p-4 shadow-lg">
+          <div className="flex flex-col gap-3 text-sm text-muted-foreground md:flex-row md:items-center">
             <Button
               variant="outline"
               disabled={currentPage === 1}
               onClick={() => setCurrentPage(currentPage - 1)}
+              className="rounded-xl"
             >
               Previous
             </Button>
-            <span className="flex items-center px-4">
+            <span className="flex items-center justify-center px-4">
               Page {currentPage} of {totalPages}
             </span>
             <Button
               variant="outline"
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage(currentPage + 1)}
+              className="rounded-xl"
             >
               Next
             </Button>
@@ -278,3 +292,4 @@ export default function AdminOrdersPage() {
     </div>
   );
 }
+

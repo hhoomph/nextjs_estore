@@ -1,9 +1,30 @@
 {
   "loading": "Loading...",
   "Navigation": {
+    "popular": "Popular",
     "products": "Products",
+    "shop": "Shop",
     "categories": "Categories",
+    "pages": {
+      "shopWithoutSidebar": "Shop without sidebar",
+      "checkout": "Checkout",
+      "cart": "Cart",
+      "wishlist": "Wishlist",
+      "signIn": "Sign In",
+      "signUp": "Sign Up",
+      "error": "Error",
+      "mailSuccess": "Mail Success",
+      "privacyPolicy": "Privacy Policy",
+      "termsConditions": "Terms & Conditions"
+    },
+    "blog": {
+      "grid": "Blog Grid",
+      "gridWithSidebar": "Blog Grid with Sidebar",
+      "detailsWithSidebar": "Blog Details with Sidebar",
+      "details": "Blog Details"
+    },
     "deals": "Deals",
+    "contact": "Contact",
     "search": "Search",
     "account": "Account",
     "orders": "Orders",
@@ -13,6 +34,7 @@
     "cart": "Cart",
     "profile": "Profile",
     "adminPanel": "Admin Panel",
+    "language": "Language",
     "signOut": "Sign Out"
   },
   "Authentication": {
@@ -53,7 +75,15 @@
     "lowStockThreshold": "Low Stock Threshold",
     "maintenanceMode": "Maintenance Mode",
     "allowRegistration": "Allow User Registration",
-    "saveSettings": "Save Settings"
+    "saveSettings": "Save Settings",
+    "appearance": "Appearance",
+    "theme": "Theme",
+    "chooseTheme": "Choose your preferred theme",
+    "languageRegion": "Language & Region",
+    "language": "Language",
+    "selectLanguage": "Select your preferred language",
+    "currency": "Currency",
+    "displayCurrency": "Display prices in your preferred currency"
   },
   "API Messages": {
     "loading": "Loading...",
@@ -123,7 +153,10 @@
     "back": "Back",
     "next": "Next",
     "previous": "Previous",
-    "submit": "Submit"
+    "submit": "Submit",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
   },
   "Placeholders": {
     "enterSiteName": "Enter site name",
@@ -135,14 +168,17 @@
     "enterQuantity": "Enter quantity"
   },
   "Currencies": {
-    "irr": "تومان (تومان)",
-    "toman": "تومان (تومان)",
-    "rial": "ریال (ریال)",
+    "irr": "Iranian Rial (ریال)",
+    "toman": "Iranian Toman (تومان)",
+    "rial": "Iranian Rial (ریال)",
     "usd": "US Dollar ($)",
     "eur": "Euro (€)",
     "gbp": "British Pound (£)",
     "cad": "Canadian Dollar (CA$)",
-    "aud": "Australian Dollar (A$)"
+    "aud": "Australian Dollar (A$)",
+    "jpy": "Japanese Yen (¥)",
+    "cny": "Chinese Yuan (¥)",
+    "inr": "Indian Rupee (₹)"
   },
   "Time Periods": {
     "last7Days": "Last 7 days",
@@ -362,15 +398,16 @@
   },
   "Order Review": {
     "orderReview": "Order Review",
+    "orderConfirmation": "Order Confirmed",
+    "orderConfirmationSent": "Your order confirmation has been sent",
     "orderSummary": "Order Summary",
+    "orderNumber": "Order Number",
+    "orderDate": "Order Date",
+    "orderStatus": "Order Status",
     "orderItems": "Order Items",
     "orderTotal": "Order Total",
     "placeOrder": "Place Order",
-    "confirmOrder": "Confirm Order",
-    "orderConfirmation": "Order Confirmation",
-    "orderNumber": "Order Number",
-    "orderDate": "Order Date",
-    "orderStatus": "Order Status"
+    "confirmOrder": "Confirm Order"
   },
   "Order Status": {
     "orderPending": "Order Pending",
@@ -863,22 +900,12 @@
       "phone": "Call Us"
     }
   },
-
   "Blog": {
     "title": "Blog",
     "readMore": "Read More",
     "description": "Latest news and articles from our team",
     "keywords": "blog, news, articles",
     "category": "Category",
-    "search": "Search",
-    "error": {
-      "title": "Error",
-      "description": "Something went wrong"
-    },
-    "categories": {
-      "title": "Categories",
-      "all": "All Categories"
-    },
     "search": {
       "title": "Search",
       "placeholder": "Search articles...",
@@ -890,6 +917,14 @@
         "content": "Search by article content",
         "tags": "Search by tags"
       }
+    },
+    "error": {
+      "title": "Error",
+      "description": "Something went wrong"
+    },
+    "categories": {
+      "title": "Categories",
+      "all": "All Categories"
     },
     "showingResults": "Showing {count} of {total} results",
     "noPosts": {
@@ -930,19 +965,6 @@
       "title": "Related Posts",
       "viewAll": "View All Posts"
     }
-  },
-  "Order Review": {
-    "orderReview": "Order Review",
-    "orderConfirmation": "Order Confirmed",
-    "orderConfirmationSent": "Your order confirmation has been sent",
-    "orderSummary": "Order Summary",
-    "orderNumber": "Order Number",
-    "orderDate": "Order Date",
-    "orderStatus": "Order Status",
-    "orderItems": "Order Items",
-    "orderTotal": "Order Total",
-    "placeOrder": "Place Order",
-    "confirmOrder": "Confirm Order"
   },
   "blog": "Blog"
 }

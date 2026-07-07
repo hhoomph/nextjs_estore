@@ -2,40 +2,50 @@
  * Cart Synchronization Hook - Optimized
  *
  * Fixed version that eliminates render loops and circular dependencies.
+ * Uses batched selectors with shallow comparison to minimize re-renders.
  *
  * @author hh.oomph@gmail.com
- * @version 1.1.0
+ * @version 2.0.0
  * @since 2025-01-01
  */
 
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { mergeGuestCartToUser } from "@/lib/actions/cart";
+import { shallow } from "zustand/shallow";
+import { CART_CONSTANTS } from "@/lib/constants/cart";
 import { useSession } from "@/lib/auth-client";
 import { toast } from "@/lib/hooks/use-toast";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { useGuestCartStore } from "@/lib/stores/guest-cart-store";
+import { fetchWithRetry } from "@/lib/utils/fetch-with-retry";
 import { SafeSessionStorage } from "@/lib/utils/storage-ssr";
 import type { EnhancedCartItem, UseCartSyncReturn } from "@/types/cart";
 
 export function useCartSync(): UseCartSyncReturn {
   const { data: session, isPending } = useSession();
 
-  // Use explicit per-field selectors instead of bare `useStore()` so the
-  // hook stays resilient when the store is partially hydrated (e.g. items
-  // is `undefined` on the very first render during SSR/rehydration).
-  const guestItems = useGuestCartStore((s) => s.items ?? []);
-  const guestIsOpen = useGuestCartStore((s) => s.isOpen);
-  const guestIsLoading = useGuestCartStore((s) => s.isLoading);
-  const guestError = useGuestCartStore((s) => s.error);
-  const guestPendingUpdates = useGuestCartStore((s) => s.pendingUpdates ?? []);
-  const guestId = useGuestCartStore((s) => s.guestId);
-  const guestIsGuest = useGuestCartStore((s) => s.isGuest);
+  // Batch selectors with shallow comparison to minimize re-renders
+  const guestState = useGuestCartStore(
+    (s) => ({
+      items: s.items ?? [],
+      isOpen: s.isOpen,
+      isLoading: s.isLoading,
+      error: s.error,
+      pendingUpdates: s.pendingUpdates ?? [],
+      guestId: s.guestId,
+      isGuest: s.isGuest,
+    }),
+    shallow,
+  );
 
-  const userItems = useCartStore((s) => s.items ?? []);
-  const userIsOpen = useCartStore((s) => s.isOpen);
-  const userIsLoading = false; // user cart has no loading flag
+  const userState = useCartStore(
+    (s) => ({
+      items: s.items ?? [],
+      isOpen: s.isOpen,
+    }),
+    shallow,
+  );
 
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSync, setLastSync] = useState<Date | null>(null);
@@ -47,9 +57,9 @@ export function useCartSync(): UseCartSyncReturn {
 
   // Memoized user and guest state to prevent unnecessary re-computations
   const userId = session?.user?.id || null;
-  const hasGuestItems = guestItems.length > 0;
+  const hasGuestItems = guestState.items.length > 0;
 
-  // Simple sync function without complex dependencies
+  // Sync function with retry and exponential backoff
   const syncCart = useCallback(async () => {
     if (syncInProgressRef.current || isSyncing) return;
 
@@ -57,27 +67,42 @@ export function useCartSync(): UseCartSyncReturn {
     setIsSyncing(true);
     setError(null);
 
-    try {
-      await useGuestCartStore.getState().syncWithServer();
-      setLastSync(new Date());
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to sync cart";
-      setError(errorMessage);
-      toast({
-        title: "Sync Failed",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setIsSyncing(false);
-      syncInProgressRef.current = false;
+    const maxRetries = CART_CONSTANTS.MAX_RETRIES;
+    let attempt = 0;
+
+    while (attempt <= maxRetries) {
+      try {
+        await useGuestCartStore.getState().syncWithServer();
+        setError(null); // Clear error on success
+        setLastSync(new Date());
+        break;
+      } catch (err) {
+        attempt++;
+        if (attempt > maxRetries) {
+          const errorMessage =
+            err instanceof Error ? err.message : "Failed to sync cart";
+          setError(errorMessage);
+          toast({
+            title: "Sync Failed",
+            description: `${errorMessage}. Will retry automatically.`,
+            variant: "destructive",
+          });
+        } else {
+          // Exponential backoff between retries
+          await new Promise((resolve) =>
+            setTimeout(resolve, CART_CONSTANTS.RETRY_BACKOFF_MS * attempt),
+          );
+        }
+      }
     }
-  }, [isSyncing]); // Only depends on isSyncing flag
+
+    setIsSyncing(false);
+    syncInProgressRef.current = false;
+  }, [isSyncing]);
 
   // Simplified merge function - moved outside useEffect
   const mergeGuestCartToUserCart = useCallback(async () => {
-    if (!userId || !guestId || !hasGuestItems || syncInProgressRef.current) {
+    if (!userId || !guestState.guestId || !hasGuestItems || syncInProgressRef.current) {
       return;
     }
 
@@ -124,17 +149,17 @@ export function useCartSync(): UseCartSyncReturn {
       setIsSyncing(false);
       syncInProgressRef.current = false;
     }
-  }, [userId, guestId, hasGuestItems]); // Simplified dependencies
+  }, [userId, guestState.guestId, hasGuestItems]);
 
   // Handle authentication changes - single, focused effect
   useEffect(() => {
     if (isPending) return;
 
     // User logged in with guest items - trigger merge
-    if (userId && guestId && hasGuestItems && !syncInProgressRef.current) {
+    if (userId && guestState.guestId && hasGuestItems && !syncInProgressRef.current) {
       mergeGuestCartToUserCart();
     }
-  }, [userId, isPending, guestId, hasGuestItems, mergeGuestCartToUserCart]); // Only check auth state changes
+  }, [userId, isPending, guestState.guestId, hasGuestItems, mergeGuestCartToUserCart]);
 
   // Auto-sync on visibility change - simplified
   useEffect(() => {
@@ -150,20 +175,20 @@ export function useCartSync(): UseCartSyncReturn {
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () =>
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-  }, [syncCart]); // Only depends on syncCart function
+  }, [syncCart]);
 
   // Periodic sync - simplified
   useEffect(() => {
-    if (!guestIsGuest) return;
+    if (!guestState.isGuest) return;
     const pending = useGuestCartStore.getState().pendingUpdates ?? [];
     if (pending.length === 0) return;
 
     const interval = setInterval(() => {
       syncCart();
-    }, 30000);
+    }, CART_CONSTANTS.SYNC_INTERVAL);
 
     return () => clearInterval(interval);
-  }, [syncCart, guestIsGuest, guestPendingUpdates.length]);
+  }, [syncCart, guestState.isGuest, guestState.pendingUpdates.length]);
 
   // Online/offline handling - simplified
   useEffect(() => {
@@ -176,7 +201,7 @@ export function useCartSync(): UseCartSyncReturn {
 
     window.addEventListener("online", handleOnline);
     return () => window.removeEventListener("online", handleOnline);
-  }, [syncCart, guestPendingUpdates.length]);
+  }, [syncCart]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -186,16 +211,6 @@ export function useCartSync(): UseCartSyncReturn {
       }
     };
   }, []);
-
-  // Suppress unused-variable warnings by reading these values so the
-  // selector subscriptions stay active and the re-render triggers fire.
-  void guestIsOpen;
-  void userIsOpen;
-  void guestIsLoading;
-  void userIsLoading;
-  void userItems;
-  void guestError;
-  void guestPendingUpdates;
 
   return {
     syncCart,
@@ -215,9 +230,6 @@ export function useCartSync(): UseCartSyncReturn {
  */
 export function useCheckoutSession() {
   const { data: session } = useSession();
-  // Per-field selector — subscribe only to the slice we actually use so
-  // re-renders stay narrow and the component does not depend on the
-  // entire store reference.
   const guestId = useGuestCartStore((s) => s.guestId);
 
   const createCheckoutSession = useCallback(
@@ -227,7 +239,7 @@ export function useCheckoutSession() {
         guestId,
         userId: session?.user?.id,
         items: cartItems,
-        expiresAt: new Date(Date.now() + 30 * 60 * 1000), // 30 minutes
+        expiresAt: new Date(Date.now() + CART_CONSTANTS.CHECKOUT_SESSION_DURATION),
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -304,8 +316,6 @@ export function useCartConflicts() {
   const handleResolveConflicts = useCallback(
     async (conflicts: any[]) => {
       try {
-        // Always read the latest action from the store so we never close
-        // over a stale reference if the store was swapped during HMR.
         await useGuestCartStore.getState().resolveConflicts(conflicts);
         toast({
           title: "Conflicts Resolved",

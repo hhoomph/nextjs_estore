@@ -186,7 +186,7 @@ const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
               (rightIcon || showPasswordToggle || (clearable && hasValue)) &&
                 "pr-10",
               error && "border-destructive focus-visible:ring-destructive",
-              success && "border-green-500 focus-visible:ring-green-500",
+              success && "border-success focus-visible:ring-success",
               loading && "cursor-wait opacity-70",
               fullWidth && "w-full",
               className,
@@ -289,7 +289,7 @@ const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
               exit={{ opacity: 0, scale: 0.8 }}
               className="absolute right-3 top-1/2 -translate-y-1/2"
             >
-              {success && <Check className="h-4 w-4 text-green-500" />}
+              {success && <Check className="h-4 w-4 text-success" />}
               {error && <AlertCircle className="h-4 w-4 text-destructive" />}
             </motion.div>
           )}

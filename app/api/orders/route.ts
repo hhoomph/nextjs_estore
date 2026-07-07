@@ -22,10 +22,11 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { shipping, payment, items, shippingMethod, totals } = body;
+    const { shippingAddress, shipping, payment, items, totals } = body;
+    const selectedShippingAddress = shippingAddress ?? shipping;
 
     // Validate required fields
-    if (!shipping || !payment || !items || !totals) {
+    if (!selectedShippingAddress || !payment || !items || !totals) {
       return NextResponse.json(
         { error: "Missing required order data" },
         { status: 400 },
