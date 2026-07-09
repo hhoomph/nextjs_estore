@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ProductPrice } from "@/components/ui/product-price";
+import { formatAmount } from "@/lib/utils/currency";
+import { useCurrencyStore } from "@/lib/stores/currency-store";
 import { cn } from "@/lib/utils";
 
 interface OrderSummaryItem {
@@ -24,10 +26,6 @@ interface OrderSummaryProps {
   footer?: ReactNode;
 }
 
-function formatCurrency(value: number) {
-  return `$${value.toFixed(2)}`;
-}
-
 export function OrderSummary({
   items,
   subtotal,
@@ -37,6 +35,7 @@ export function OrderSummary({
   className,
   footer,
 }: OrderSummaryProps) {
+  const { currency } = useCurrencyStore();
   const tax = subtotal * taxRate;
   const total = subtotal + shippingCost + tax;
 
@@ -85,22 +84,22 @@ export function OrderSummary({
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span>Subtotal</span>
-            <span>{formatCurrency(subtotal)}</span>
+            <span>{formatAmount(subtotal, currency)}</span>
           </div>
           <div className="flex justify-between">
             <span>Shipping</span>
-            <span>{formatCurrency(shippingCost)}</span>
+            <span>{formatAmount(shippingCost, currency)}</span>
           </div>
           {taxRate > 0 && (
             <div className="flex justify-between">
               <span>Tax</span>
-              <span>{formatCurrency(tax)}</span>
+              <span>{formatAmount(tax, currency)}</span>
             </div>
           )}
           <Separator />
           <div className="flex justify-between text-base font-semibold">
             <span>Total</span>
-            <span>{formatCurrency(total)}</span>
+            <span>{formatAmount(total, currency)}</span>
           </div>
         </div>
 

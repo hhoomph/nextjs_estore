@@ -52,7 +52,7 @@ export function AdminRedirect() {
       <div className="text-center">
         <div
           className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
-          style={{ borderBottomColor: "hsl(var(--primary))" }}
+          style={{ borderBottomColor: "var(--primary)" }}
         ></div>
         <h2 className="text-xl font-semibold text-foreground mb-2">
           Checking Permissions

@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -59,6 +59,10 @@ export default function AdminSEOSettingsPage() {
   useEffect(() => {
     fetchSettings();
   }, [fetchSettings]);
+
+  const defaultSeoTitle = useMemo(() => form.watch("defaultSeoTitle"), [form]);
+  const defaultSeoDescription = useMemo(() => form.watch("defaultSeoDescription"), [form]);
+  const defaultOgImage = useMemo(() => form.watch("defaultOgImage"), [form]);
 
   const onSubmit = async (data: SEOSettingsFormData) => {
     setSaving(true);
@@ -170,16 +174,16 @@ export default function AdminSEOSettingsPage() {
               </div>
               <div className="space-y-2 rounded-md border bg-background p-4">
                 <p className="font-semibold">
-                  {form.watch("defaultSeoTitle") || "Untitled page"}
+                  {defaultSeoTitle || "Untitled page"}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {form.watch("defaultSeoDescription") ||
+                  {defaultSeoDescription ||
                     "Add a concise description for search results."}
                 </p>
-                {form.watch("defaultOgImage") ? (
+                {defaultOgImage ? (
                   <div className="overflow-hidden rounded-md border">
                     <img
-                      src={form.watch("defaultOgImage")}
+                      src={defaultOgImage}
                       alt="Open graph preview"
                       className="h-32 w-full object-cover"
                     />

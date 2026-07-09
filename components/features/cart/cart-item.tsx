@@ -14,6 +14,8 @@ import Link from "next/link";
 import { memo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { formatAmount } from "@/lib/utils/currency";
+import { useCurrencyStore } from "@/lib/stores/currency-store";
 import type { EnhancedCartItem } from "@/types/cart";
 
 interface CartItemProps {
@@ -27,6 +29,9 @@ export const CartItem = memo(function CartItem({
   onUpdateQuantity,
   onRemoveItem,
 }: CartItemProps) {
+  const { currency } = useCurrencyStore();
+  const price = item.product.discount_price || item.product.price;
+
   return (
     <div
       data-testid="cart-item"
@@ -54,11 +59,11 @@ export const CartItem = memo(function CartItem({
         </h4>
         <div className="flex items-center gap-2 mt-1">
           <span className="text-sm font-medium text-primary">
-            {item.product.discount_price || item.product.price} تومان
+            {formatAmount(price, currency)}
           </span>
           {item.product.discount_price && (
             <span className="text-xs text-muted-foreground line-through">
-              ${item.product.price}
+              {formatAmount(item.product.price, currency)}
             </span>
           )}
           {item.options && (

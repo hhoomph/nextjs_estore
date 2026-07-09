@@ -59,22 +59,28 @@ export default function AdminThemeSettingsPage() {
     defaultValues: DEFAULT_THEME,
   });
 
+  const primaryColor = useMemo(() => form.watch("primaryColor"), [form]);
+  const secondaryColor = useMemo(() => form.watch("secondaryColor"), [form]);
+  const backgroundColor = useMemo(() => form.watch("backgroundColor"), [form]);
+  const foregroundColor = useMemo(() => form.watch("foregroundColor"), [form]);
+  const borderColor = useMemo(() => form.watch("borderColor"), [form]);
+
   const previewStyle = useMemo(
     () =>
       ({
-        "--primary": hexToHsl(form.watch("primaryColor")),
-        "--secondary": hexToHsl(form.watch("secondaryColor")),
-        "--background": hexToHsl(form.watch("backgroundColor")),
-        "--foreground": hexToHsl(form.watch("foregroundColor")),
-        "--border": hexToHsl(form.watch("borderColor")),
-        "--apex-primary": hexToHsl(form.watch("primaryColor")),
-        "--apex-secondary": hexToHsl(form.watch("secondaryColor")),
-        "--apex-bg": hexToHsl(form.watch("backgroundColor")),
-        "--apex-foreground": hexToHsl(form.watch("foregroundColor")),
-        "--apex-border": hexToHsl(form.watch("borderColor")),
-        "--apex-border-soft": hexToHsl(form.watch("borderColor")),
+        "--primary": hexToHsl(primaryColor),
+        "--secondary": hexToHsl(secondaryColor),
+        "--background": hexToHsl(backgroundColor),
+        "--foreground": hexToHsl(foregroundColor),
+        "--border": hexToHsl(borderColor),
+        "--apex-primary": hexToHsl(primaryColor),
+        "--apex-secondary": hexToHsl(secondaryColor),
+        "--apex-bg": hexToHsl(backgroundColor),
+        "--apex-foreground": hexToHsl(foregroundColor),
+        "--apex-border": hexToHsl(borderColor),
+        "--apex-border-soft": hexToHsl(borderColor),
       }) as React.CSSProperties,
-    [form],
+    [primaryColor, secondaryColor, backgroundColor, foregroundColor, borderColor],
   );
 
   useEffect(() => {

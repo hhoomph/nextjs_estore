@@ -966,5 +966,68 @@
       "viewAll": "View All Posts"
     }
   },
-  "blog": "Blog"
+  "blog": "Blog",
+  "Legal": {
+    "privacyPolicy": {
+      "title": "Privacy Policy",
+      "lastUpdated": "Last Updated",
+      "lastUpdatedText": "This Privacy Policy was last updated on July 9, 2026.",
+      "informationWeCollect": {
+        "title": "Information We Collect",
+        "description": "We collect information that you provide directly to us, including when you create an account, make a purchase, or contact us for support.",
+        "items": {
+          "personal": "Personal information such as name, email address, and phone number",
+          "usage": "Usage data including pages visited, time spent, and interactions",
+          "cookies": "Cookie data to enhance your browsing experience"
+        }
+      },
+      "howWeUse": {
+        "title": "How We Use Your Information",
+        "description": "We use your information to process orders, improve our services, and communicate with you about your account and purchases."
+      },
+      "dataProtection": {
+        "title": "Data Protection",
+        "description": "We implement appropriate technical and organizational measures to protect your personal data against unauthorized access, alteration, or disclosure."
+      },
+      "yourRights": {
+        "title": "Your Rights",
+        "description": "You have the right to access, correct, or delete your personal data. Contact us to exercise these rights."
+      },
+      "contact": {
+        "title": "Contact Us",
+        "description": "If you have questions about this Privacy Policy, please contact our support team."
+      }
+    },
+    "termsConditions": {
+      "title": "Terms & Conditions",
+      "acceptance": {
+        "title": "Acceptance of Terms",
+        "description": "By accessing and using our e-commerce platform, you agree to be bound by these Terms and Conditions."
+      },
+      "useLicense": {
+        "title": "Use License",
+        "description": "Permission is granted to temporarily use our platform for personal, non-commercial purposes only."
+      },
+      "orders": {
+        "title": "Orders and Payments",
+        "description": "All orders are subject to acceptance and availability. We reserve the right to refuse any order."
+      },
+      "pricing": {
+        "title": "Pricing and Payment",
+        "description": "Prices are subject to change without notice. Payment must be received before order processing."
+      },
+      "limitation": {
+        "title": "Limitation of Liability",
+        "description": "We shall not be liable for any indirect, incidental, or consequential damages arising from your use of our platform."
+      },
+      "governingLaw": {
+        "title": "Governing Law",
+        "description": "These terms shall be governed by and construed in accordance with applicable laws."
+      },
+      "contact": {
+        "title": "Contact Information",
+        "description": "For any questions regarding these terms, please reach out to our customer support."
+      }
+    }
+  }
 }

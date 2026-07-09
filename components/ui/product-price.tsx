@@ -1,4 +1,6 @@
 import { cn } from "@/lib/utils";
+import { formatAmount } from "@/lib/utils/currency";
+import { useCurrencyStore } from "@/lib/stores/currency-store";
 
 type PriceValue = number | string | null | undefined;
 
@@ -16,13 +18,6 @@ function toNumber(value: PriceValue) {
   return Number.isFinite(numeric) ? numeric : 0;
 }
 
-function formatCurrency(value: PriceValue) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(toNumber(value));
-}
-
 export function getProductCurrentPrice(price: PriceValue, discountPrice?: PriceValue) {
   const discounted = toNumber(discountPrice);
   const base = toNumber(price);
@@ -32,24 +27,26 @@ export function getProductCurrentPrice(price: PriceValue, discountPrice?: PriceV
 export function ProductPrice({
   price,
   discountPrice,
-  currency = "$",
+  currency: currencyOverride,
   className,
   amountClassName,
   originalClassName,
 }: ProductPriceProps) {
+  const { currency: storeCurrency } = useCurrencyStore();
   const currentPrice = getProductCurrentPrice(price, discountPrice);
   const originalPrice = toNumber(price);
   const discountedPrice = toNumber(discountPrice);
   const hasDiscount = discountedPrice > 0 && discountedPrice < originalPrice;
+  const activeCurrency = currencyOverride || storeCurrency;
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
       <span className={cn("font-black text-foreground", amountClassName)}>
-        {formatCurrency(currentPrice)}
+        {formatAmount(currentPrice, activeCurrency)}
       </span>
       {hasDiscount && (
         <span className={cn("text-sm text-muted-foreground line-through", originalClassName)}>
-          {formatCurrency(originalPrice)}
+          {formatAmount(originalPrice, activeCurrency)}
         </span>
       )}
     </div>

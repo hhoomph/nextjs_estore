@@ -41,7 +41,7 @@ export interface TranslatedToastOptions {
  * ```
  */
 export function useTranslatedToast(namespace = "cart") {
-  const t = useTranslations(namespace);
+  const t = useTranslations(namespace as Parameters<typeof useTranslations>[0]);
 
   return {
     /**

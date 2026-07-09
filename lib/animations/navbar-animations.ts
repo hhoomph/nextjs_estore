@@ -116,7 +116,7 @@ export const navbarAnimationVariants = {
   // Link hover animations
   linkHover: {
     scale: [1, 1.02],
-    color: ["hsl(var(--foreground))", "hsl(var(--primary))"],
+    color: ["var(--foreground)", "var(--primary)"],
     transition: {
       duration: navbarPerformanceUtils.getOptimalDuration(0.2),
       ease: "easeOut",
@@ -125,7 +125,7 @@ export const navbarAnimationVariants = {
 
   // Theme transition animations
   themeTransition: {
-    backgroundColor: ["hsl(var(--background))", "hsl(var(--background))"],
+    backgroundColor: ["var(--background)", "var(--background)"],
     transition: {
       duration: navbarPerformanceUtils.getOptimalDuration(0.3),
       ease: [0.4, 0, 0.2, 1] as const,

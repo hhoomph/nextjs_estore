@@ -9,14 +9,54 @@ import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/config";
 import { prisma } from "@/lib/database";
 
-// GET /api/reviews - Get reviews for a product
+// GET /api/reviews - Get reviews for a product or global approved reviews
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get("productId");
+    const global = searchParams.get("global");
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
     const skip = (page - 1) * limit;
+
+    if (global === "true") {
+      const [reviews, total] = await Promise.all([
+        prisma.review.findMany({
+          where: { status: "approved" },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
+          },
+          orderBy: { createdAt: "desc" },
+          skip,
+          take: limit,
+        }),
+        prisma.review.count({ where: { status: "approved" } }),
+      ]);
+
+      const transformedReviews = reviews.map((review) => ({
+        id: review.id,
+        rating: review.rating,
+        title: review.title,
+        comment: review.comment,
+        createdAt: review.createdAt,
+        user: {
+          id: review.user.id,
+          name: review.user.name || "Anonymous",
+          image: review.user.image,
+        },
+      }));
+
+      return NextResponse.json({
+        reviews: transformedReviews,
+        pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+      });
+    }
 
     if (!productId) {
       return NextResponse.json(

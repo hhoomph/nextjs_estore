@@ -280,7 +280,7 @@ function cnAdminNavItem(active: boolean) {
 
 function cnMetricIcon(accent: "primary" | "success" | "warning") {
   if (accent === "success") {
-    return "flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary";
+    return "flex h-11 w-11 items-center justify-center rounded-2xl bg-success/10 text-success";
   }
 
   if (accent === "warning") {

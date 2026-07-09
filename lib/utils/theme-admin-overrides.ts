@@ -181,17 +181,17 @@ export function getAdminThemeProviderData() {
 export function getAdminThemeCSSVariables() {
   return {
     // Admin-specific CSS variables
-    "--admin-bg-primary": "hsl(var(--background))",
-    "--admin-bg-secondary": "hsl(var(--secondary))",
-    "--admin-text-primary": "hsl(var(--foreground))",
-    "--admin-text-secondary": "hsl(var(--muted-foreground))",
-    "--admin-border": "hsl(var(--border))",
+    "--admin-bg-primary": "var(--background)",
+    "--admin-bg-secondary": "var(--secondary)",
+    "--admin-text-primary": "var(--foreground)",
+    "--admin-text-secondary": "var(--muted-foreground)",
+    "--admin-border": "var(--border)",
     // Dark mode overrides
-    "--admin-bg-primary-dark": "hsl(var(--background))",
-    "--admin-bg-secondary-dark": "hsl(var(--secondary))",
-    "--admin-text-primary-dark": "hsl(var(--foreground))",
-    "--admin-text-secondary-dark": "hsl(var(--muted-foreground))",
-    "--admin-border-dark": "hsl(var(--border))",
+    "--admin-bg-primary-dark": "var(--background)",
+    "--admin-bg-secondary-dark": "var(--secondary)",
+    "--admin-text-primary-dark": "var(--foreground)",
+    "--admin-text-secondary-dark": "var(--muted-foreground)",
+    "--admin-border-dark": "var(--border)",
   };
 }
 /**

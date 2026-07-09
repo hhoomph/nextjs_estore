@@ -137,6 +137,20 @@ const colorMap: Record<TypographyColor, string> = {
   info: "text-primary",
 };
 
+// Static background classes for highlighted text. Tailwind cannot see
+// dynamically built class names like `bg-${color}`, so we map them explicitly.
+const highlightBgMap: Record<TypographyColor, string> = {
+  default: "bg-foreground/10",
+  primary: "bg-primary/10",
+  secondary: "bg-secondary/10",
+  muted: "bg-muted/50",
+  accent: "bg-accent/10",
+  success: "bg-success/10",
+  warning: "bg-warning/10",
+  error: "bg-destructive/10",
+  info: "bg-primary/10",
+};
+
 const sizeMap = {
   xs: "text-xs",
   sm: "text-sm",
@@ -208,18 +222,35 @@ const EnhancedTypographyComponent = React.forwardRef<
       }
     }, [children, currentIndex, typewriter, typewriterSpeed]);
 
+    // Escape a string for safe use inside a RegExp (prevents regex injection / ReDoS
+    // from un-escaped user-provided highlight terms).
+    const escapeRegExp = (value: string) =>
+      value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+    // Escape HTML so user-provided text injected via dangerouslySetInnerHTML stays safe.
+    const escapeHtml = (value: string) =>
+      value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+
     // Highlight text function
     const highlightText = (text: string) => {
       if (!highlight.length) return text;
 
-      let highlightedText = text;
-      highlight.forEach((word) => {
-        const regex = new RegExp(`(${word})`, "gi");
+      // Escape HTML first so injected markup is safe; the regex runs on the escaped text.
+      let highlightedText = escapeHtml(text);
+      for (const word of highlight) {
+        const escapedWord = escapeRegExp(word);
+        if (!escapedWord) continue;
+        const regex = new RegExp(`(${escapedWord})`, "gi");
         highlightedText = highlightedText.replace(
           regex,
-          `<mark class="${colorMap[highlightColor]} bg-${highlightColor === "primary" ? "primary" : highlightColor === "secondary" ? "secondary" : highlightColor}/10 rounded px-1">$1</mark>`,
+          `<mark class="${colorMap[highlightColor]} ${highlightBgMap[highlightColor]} rounded px-1">$1</mark>`,
         );
-      });
+      }
 
       return highlightedText;
     };

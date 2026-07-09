@@ -1,4 +1,4 @@
-﻿/* Modern Design System - Enhanced Font Loading with Local Fallbacks */
+/* Modern Design System - Enhanced Font Loading with Local Fallbacks */
 /* Google Fonts with display=swap for performance */
 /* @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap"); */
@@ -12,30 +12,10 @@
 @font-face {
   font-family: "Vazirmatn";
   src:
-    url("../public/fonts/Vazir.eot") format("eot"),
-    /* IE6–8 */
+    url("../public/fonts/Vazir.woff2") format("woff2"),
     url("../public/fonts/Vazir.woff") format("woff"),
-    /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
-    url("../public/fonts/Vazir.ttf") format("truetype");
-  /* Saf3—5, Chrome4+, FF3.5, Opera 10+ */
-}
-
-@font-face {
-  font-family: "Shabnam";
-  src:
-    url("../public/fonts/Shabnam-FD.eot") format("eot"),
-    /* IE6–8 */
-    url("../public/fonts/Shabnam-FD.woff") format("woff"),
-    /* FF3.6+, IE9, Chrome6+, Saf5.1+*/
-    url("../public/fonts/Shabnam-FD.ttf") format("truetype");
-  /* Saf3—5, Chrome4+, FF3.5, Opera 10+ */
-}
-
-/* Font loading error handling and fallbacks */
-@font-face {
-  font-family: "Vazirmatn";
-  src:
-    local("Vazirmatn"), local("Vazir"), local("system-ui"), local("sans-serif");
+    url("../public/fonts/Vazir.ttf") format("truetype"),
+    local("Vazirmatn"), local("Vazir"), local("system-ui");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -44,8 +24,10 @@
 @font-face {
   font-family: "Shabnam";
   src:
-    local("Shabnam"), local("Shabnam-FD"), local("system-ui"),
-    local("sans-serif");
+    url("../public/fonts/Shabnam-FD.woff2") format("woff2"),
+    url("../public/fonts/Shabnam-FD.woff") format("woff"),
+    url("../public/fonts/Shabnam-FD.ttf") format("truetype"),
+    local("Shabnam"), local("Shabnam-FD"), local("system-ui");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -57,8 +39,45 @@
 /* Third-party styles */
 @import "leaflet/dist/leaflet.css";
 
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --font-sans: var(--font-family-sans);
+  --font-mono: var(--font-family-mono);
+}
+
+
 /* Modern Design System Variables */
 :root {
+  color-scheme: light dark;
   /* Core Brand Colors - Cozy Orange Palette */
   --color-primary-50: #fff7ed;
   --color-primary-100: #ffedd5;
@@ -438,6 +457,21 @@
   --border: var(--apex-border-soft);
   --input: var(--apex-surface);
   --ring: var(--apex-primary);
+  --success: var(--apex-success);
+  --success-foreground: var(--apex-success-soft);
+  --warning: var(--apex-warning);
+  --warning-foreground: var(--apex-warning-soft);
+  --info: var(--apex-cyan);
+  --info-foreground: var(--apex-bg-subtle);
+  --primary-hover: color-mix(in oklch, var(--apex-primary) 85%, black);
+  --primary-active: color-mix(in oklch, var(--apex-primary) 75%, black);
+  --secondary-hover: var(--apex-bg-subtle);
+  --muted-hover: var(--apex-border-soft);
+  --accent-hover: var(--apex-bg-subtle);
+  --border-hover: var(--apex-border);
+  --border-focus: var(--apex-primary);
+  --input-hover: var(--apex-surface);
+  --ring-offset: var(--apex-surface);
   --chart-1: var(--apex-primary);
   --chart-2: var(--apex-cyan);
   --chart-3: var(--apex-success);
@@ -464,6 +498,36 @@
   --apex-card-shadow: 0 18px 45px rgb(0 0 0 / 0.28);
   --apex-card-shadow-soft: 0 10px 28px rgb(0 0 0 / 0.22);
   --apex-sidebar-shadow: 0 24px 70px rgb(0 0 0 / 0.34);
+
+  /* Apex color tokens (dark-adapted) */
+  --apex-primary: #3b82f6;
+  --apex-primary-soft: #1e3a8a;
+  --apex-success: #22c55e;
+  --apex-success-soft: #052e16;
+  --apex-warning: #f59e0b;
+  --apex-warning-soft: #451a03;
+  --apex-danger: #ef4444;
+  --apex-danger-soft: #450a0a;
+  --apex-cyan: #22d3ee;
+  --apex-violet: #a78bfa;
+  --apex-muted: #94a3b8;
+
+  /* Semantic status mapping (dark) */
+  --success: var(--apex-success);
+  --success-foreground: var(--apex-success-soft);
+  --warning: var(--apex-warning);
+  --warning-foreground: var(--apex-warning-soft);
+  --info: var(--apex-cyan);
+  --info-foreground: var(--apex-bg-subtle);
+  --primary-hover: color-mix(in oklch, var(--apex-primary) 85%, black);
+  --primary-active: color-mix(in oklch, var(--apex-primary) 75%, black);
+  --secondary-hover: var(--apex-bg-subtle);
+  --muted-hover: var(--apex-border-soft);
+  --accent-hover: var(--apex-bg-subtle);
+  --border-hover: var(--apex-border);
+  --border-focus: var(--apex-primary);
+  --input-hover: var(--apex-surface);
+  --ring-offset: var(--apex-surface);
 
   --background: var(--apex-bg);
   --foreground: var(--apex-foreground);
@@ -538,12 +602,13 @@
 
 /* Base styles */
 * {
-  border-color: hsl(var(--border));
+  border-color: var(--border);
 }
 
 body {
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-family-sans);
   font-feature-settings:
     "rlig" 1,
     "calt" 1;
@@ -564,7 +629,7 @@ body::-webkit-scrollbar {
 }
 
 body::-webkit-scrollbar-track {
-  background: hsl(var(--background));
+  background: var(--background);
 }
 
 body::-webkit-scrollbar-thumb {

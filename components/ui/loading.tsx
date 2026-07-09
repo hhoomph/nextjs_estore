@@ -11,6 +11,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Heart, Loader2, Package, ShoppingBag } from "lucide-react";
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const loadingVariants = cva("animate-spin text-muted-foreground", {
   variants: {
@@ -66,7 +67,7 @@ export const Loading = React.forwardRef<HTMLDivElement, LoadingProps>(
             {variant === "gradient" && (
               <div
                 className="absolute inset-0 rounded-full border-2 animate-ping"
-                style={{ borderColor: "hsl(var(--primary) / 0.2)" }}
+                style={{ borderColor: "color-mix(in oklch, var(--primary) 20%, transparent)" }}
               />
             )}
           </div>
@@ -114,13 +115,13 @@ export function LoadingPage({ text = "Loading..." }: { text?: string }) {
           <div
             className="w-16 h-16 border-4 rounded-full animate-spin mx-auto"
             style={{
-              borderColor: "hsl(var(--muted))",
-              borderTopColor: "hsl(var(--primary))",
+              borderColor: "var(--muted)",
+              borderTopColor: "var(--primary)",
             }}
           />
           <div
             className="absolute inset-0 w-16 h-16 border-4 border-transparent rounded-full animate-spin mx-auto animate-reverse"
-            style={{ borderRightColor: "hsl(var(--primary) / 0.4)" }}
+            style={{ borderRightColor: "color-mix(in oklch, var(--primary) 40%, transparent)" }}
           />
         </div>
         <p className="text-muted-foreground animate-pulse">{text}</p>
@@ -193,17 +194,8 @@ export function LoadingButton({
 }
 
 // Skeleton loading components
-export function Skeleton({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div
-      className={cn("animate-pulse rounded-md bg-muted", className)}
-      {...props}
-    />
-  );
-}
+// Re-use the canonical Skeleton from @/components/ui/skeleton to avoid duplication.
+export { Skeleton };
 
 export function SkeletonText({
   lines = 3,

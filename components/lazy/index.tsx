@@ -13,22 +13,6 @@ import dynamic from "next/dynamic";
 import type { ComponentType } from "react";
 
 /**
- * Lazy-loaded map component.
- * Only loads when the component is rendered (e.g., on contact/location pages).
- */
-export const LazyMap = dynamic(
-  () => import("@/components/features/map").then((mod) => mod.Map || mod.default || mod),
-  {
-    loading: () => (
-      <div className="flex items-center justify-center h-64 bg-muted rounded-lg animate-pulse">
-        <span className="text-muted-foreground">Loading map...</span>
-      </div>
-    ),
-    ssr: false,
-  },
-);
-
-/**
  * Generic factory for creating lazy-loaded components with consistent loading states.
  *
  * @param importFn - Dynamic import function

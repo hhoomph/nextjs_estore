@@ -12,7 +12,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { shallow } from "zustand/shallow";
+import { useShallow } from "zustand/react/shallow";
 import { CART_CONSTANTS } from "@/lib/constants/cart";
 import { useSession } from "@/lib/auth-client";
 import { toast } from "@/lib/hooks/use-toast";
@@ -27,7 +27,7 @@ export function useCartSync(): UseCartSyncReturn {
 
   // Batch selectors with shallow comparison to minimize re-renders
   const guestState = useGuestCartStore(
-    (s) => ({
+    useShallow((s) => ({
       items: s.items ?? [],
       isOpen: s.isOpen,
       isLoading: s.isLoading,
@@ -35,16 +35,14 @@ export function useCartSync(): UseCartSyncReturn {
       pendingUpdates: s.pendingUpdates ?? [],
       guestId: s.guestId,
       isGuest: s.isGuest,
-    }),
-    shallow,
+    })),
   );
 
   const userState = useCartStore(
-    (s) => ({
+    useShallow((s) => ({
       items: s.items ?? [],
       isOpen: s.isOpen,
-    }),
-    shallow,
+    })),
   );
 
   const [isSyncing, setIsSyncing] = useState(false);

@@ -267,7 +267,7 @@ export class AdvancedErrorBoundary extends Component<
               </div>
 
               {/* Error details (only in development or when explicitly enabled) */}
-              {showErrorDetails && error && (
+              {showErrorDetails && error && process.env.NODE_ENV !== "production" && (
                 <Collapsible
                   open={isExpanded}
                   onOpenChange={this.toggleExpanded}

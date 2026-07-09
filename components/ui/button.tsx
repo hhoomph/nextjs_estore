@@ -118,20 +118,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       return icon;
     };
 
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        if (!isDisabled && onClick) {
-          // Most onClick handlers can work with keyboard events too
-          onClick(event as unknown as React.MouseEvent<HTMLButtonElement>);
-        }
-      }
-      if (props.onKeyDown) {
-        props.onKeyDown(event);
-      }
-    };
-
-    // Determine accessibility attributes
     const accessibilityProps = {
       "aria-label": ariaLabel,
       "aria-describedby": loading ? loadingId : ariaDescribedBy,
@@ -180,7 +166,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           )}
           disabled={isDisabled}
           onClick={onClick}
-          onKeyDown={handleKeyDown}
+          onKeyDown={(event) => {
+            if (isDisabled) return;
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              onClick?.(event as unknown as React.MouseEvent<HTMLButtonElement>);
+            }
+          }}
           {...accessibilityProps}
           {...props}
         >

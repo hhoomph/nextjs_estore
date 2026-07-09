@@ -32,13 +32,22 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { formatAmount } from "@/lib/utils/currency";
+import { useCurrencyStore } from "@/lib/stores/currency-store";
 import { signOut, useSession } from "@/lib/auth-client";
 
 export default function AccountPage() {
   const { data: session, isPending, refetch } = useSession();
+  const { currency } = useCurrencyStore();
   const [activeTab, setActiveTab] = useState("overview");
   const [browserSession, setBrowserSession] = useState<any>(null);
   const [isClient, setIsClient] = useState(false);
+  const [stats, setStats] = useState<{
+    totalOrders: number;
+    totalWishlist: number;
+    totalSpent: number;
+  } | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
 
   useEffect(() => {
     setIsClient(true);
@@ -57,6 +66,38 @@ export default function AccountPage() {
 
     return () => window.clearTimeout(timeoutId);
   }, [session, isPending, refetch]);
+
+  useEffect(() => {
+    const effectiveUser = isClient && (session?.user || browserSession?.user);
+    if (!effectiveUser?.id) return;
+
+    let cancelled = false;
+    const loadStats = async () => {
+      try {
+        const res = await fetch("/api/account/stats", {
+          credentials: "include",
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled) {
+          setStats({
+            totalOrders: data.totalOrders ?? 0,
+            totalWishlist: data.totalWishlist ?? 0,
+            totalSpent: Number(data.totalSpent || 0),
+          });
+        }
+      } catch {
+        // Keep placeholder stats on failure
+      } finally {
+        if (!cancelled) setStatsLoading(false);
+      }
+    };
+
+    void loadStats();
+    return () => {
+      cancelled = true;
+    };
+  }, [session?.user?.id, browserSession?.user?.id, isClient]);
 
   useEffect(() => {
     if (session?.user) {
@@ -221,9 +262,11 @@ export default function AccountPage() {
                     <ShoppingBag className="h-4 w-4 text-muted-foreground ml-auto" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">12</div>
+                    <div className="text-2xl font-bold">
+                      {statsLoading ? "…" : stats?.totalOrders ?? "—"}
+                    </div>
                     <p className="text-xs text-muted-foreground">
-                      +2 from last month
+                      {stats?.totalOrders ? "Lifetime orders" : "No orders yet"}
                     </p>
                   </CardContent>
                 </Card>
@@ -236,9 +279,11 @@ export default function AccountPage() {
                     <Heart className="h-4 w-4 text-muted-foreground ml-auto" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">8</div>
+                    <div className="text-2xl font-bold">
+                      {statsLoading ? "…" : stats?.totalWishlist ?? "—"}
+                    </div>
                     <p className="text-xs text-muted-foreground">
-                      +3 from last week
+                      {stats?.totalWishlist ? "Saved for later" : "Wishlist is empty"}
                     </p>
                   </CardContent>
                 </Card>
@@ -251,9 +296,11 @@ export default function AccountPage() {
                     <CreditCard className="h-4 w-4 text-muted-foreground ml-auto" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">$1,234</div>
+                    <div className="text-2xl font-bold">
+                      {statsLoading ? "…" : formatAmount(stats?.totalSpent ?? 0, currency)}
+                    </div>
                     <p className="text-xs text-muted-foreground">
-                      +$456 from last month
+                      {stats?.totalSpent ? "Lifetime purchases" : "No purchases yet"}
                     </p>
                   </CardContent>
                 </Card>

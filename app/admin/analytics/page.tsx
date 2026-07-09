@@ -47,7 +47,7 @@ interface AnalyticsData {
   };
 }
 
-const COLORS = ["hsl(var(--primary))", "hsl(var(--success))", "hsl(var(--warning))", "hsl(var(--destructive))", "hsl(var(--secondary))"];
+const COLORS = ["var(--primary)", "var(--success)", "var(--warning)", "var(--destructive)", "var(--secondary)"];
 
 const EMPTY_STATS: AnalyticsData["totalStats"] = {
   totalRevenue: 0,
@@ -181,10 +181,10 @@ export default function AdminAnalyticsPage() {
         <ChartCard title="Sales Trend">
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={salesData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis
                 dataKey="date"
-                tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
                 tickFormatter={(value) =>
                   new Date(value).toLocaleDateString("en-US", {
                     month: "short",
@@ -192,17 +192,17 @@ export default function AdminAnalyticsPage() {
                   })
                 }
               />
-              <YAxis yAxisId="revenue" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
+              <YAxis yAxisId="revenue" tick={{ fill: "var(--muted-foreground)", fontSize: 12 }} />
               <YAxis
                 yAxisId="orders"
                 orientation="right"
-                tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
               />
               <Tooltip
                 contentStyle={{
                   borderRadius: 16,
-                  border: "1px solid hsl(var(--border))",
-                  boxShadow: "0 18px 45px hsl(var(--foreground) / 0.08)",
+                  border: "1px solid var(--border)",
+                  boxShadow: "0 18px 45px color-mix(in oklch, var(--foreground) 8%, transparent)",
                 }}
                 labelFormatter={(value) =>
                   new Date(value as string).toLocaleDateString()
@@ -216,7 +216,7 @@ export default function AdminAnalyticsPage() {
                 yAxisId="revenue"
                 type="monotone"
                 dataKey="revenue"
-                  stroke="hsl(var(--primary))"
+                  stroke="var(--primary)"
                 strokeWidth={2}
                 dot={{ r: 4 }}
               />
@@ -224,7 +224,7 @@ export default function AdminAnalyticsPage() {
                 yAxisId="orders"
                 type="monotone"
                 dataKey="orders"
-                  stroke="hsl(var(--success))"
+                  stroke="var(--success)"
                 strokeWidth={2}
                 dot={{ r: 4 }}
               />
@@ -235,10 +235,10 @@ export default function AdminAnalyticsPage() {
         <ChartCard title="User Growth">
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={userGrowth}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
               <XAxis
                 dataKey="date"
-                tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
                 tickFormatter={(value) =>
                   new Date(value).toLocaleDateString("en-US", {
                     month: "short",
@@ -246,19 +246,19 @@ export default function AdminAnalyticsPage() {
                   })
                 }
               />
-              <YAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
+              <YAxis tick={{ fill: "var(--muted-foreground)", fontSize: 12 }} />
               <Tooltip
                 contentStyle={{
                   borderRadius: 16,
-                  border: "1px solid hsl(var(--border))",
-                  boxShadow: "0 18px 45px hsl(var(--foreground) / 0.08)",
+                  border: "1px solid var(--border)",
+                  boxShadow: "0 18px 45px color-mix(in oklch, var(--foreground) 8%, transparent)",
                 }}
                 labelFormatter={(value) =>
                   new Date(value as string).toLocaleDateString()
                 }
                 formatter={(value) => [value, "New Users"]}
               />
-                  <Bar dataKey="users" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="users" fill="var(--primary)" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>
@@ -328,7 +328,7 @@ export default function AdminAnalyticsPage() {
                     cy="50%"
                     labelLine={false}
                     outerRadius={80}
-                    fill="hsl(var(--primary))"
+                    fill="var(--primary)"
                     dataKey="revenue"
                   >
                     {categoryPerformance.slice(0, 5).map((entry, index) => (
@@ -345,8 +345,8 @@ export default function AdminAnalyticsPage() {
                     ]}
                     contentStyle={{
                       borderRadius: 16,
-                  border: "1px solid hsl(var(--border))",
-                  boxShadow: "0 18px 45px hsl(var(--foreground) / 0.08)",
+                  border: "1px solid var(--border)",
+                  boxShadow: "0 18px 45px color-mix(in oklch, var(--foreground) 8%, transparent)",
                     }}
                   />
                 </PieChart>

@@ -19,11 +19,11 @@ import {
   Palette,
   Search,
   Globe,
+  Menu,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { AdminRedirect } from "@/components/admin-redirect";
 import { AdvancedErrorBoundary } from "@/components/errors/advanced-error-boundary";
 import { ApiErrorBoundary } from "@/components/errors/api-error-boundary";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -38,9 +38,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { signOut, useSession } from "@/lib/auth-client";
 import { useAdminTheme } from "@/lib/utils/theme-admin-overrides";
+import { useIsMobile } from "@/lib/hooks/use-mobile";
 // Admin sidebar navigation item definition
 interface AdminNavItem {
   href: string;
@@ -124,6 +125,8 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const sidebarTheme = useAdminTheme();
   const navbarClasses = sidebarTheme.getAdminNavbarClasses();
   const sidebarClasses = sidebarTheme.getAdminSidebarClasses();
+  const isMobile = useIsMobile();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   // Skip auth check on sign-in page
   const isSignInPage = pathname === "/admin/signin";
   // Track whether session has been fetched at least once
@@ -229,10 +232,20 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
       enableReporting={true}
     >
       <div className="min-h-screen overflow-hidden bg-background text-foreground">
+        {/* Mobile backdrop */}
+        {isMobile && sidebarOpen && (
+          <div
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
         {/* Sidebar */}
         <div
           className={cn(
-            "fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-border",
+            "fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-border transition-transform duration-300 ease-in-out",
+            isMobile && !sidebarOpen && "-translate-x-full",
+            isMobile && sidebarOpen && "translate-x-0",
+            !isMobile && "translate-x-0",
             sidebarClasses.background,
           )}
         >
@@ -275,6 +288,9 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                         <Link
                           key={item.href}
                           href={item.href}
+                          onClick={() => {
+                            if (isMobile) setSidebarOpen(false);
+                          }}
                           className={cn(
                             "mb-1 flex items-center rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
                             active
@@ -282,7 +298,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                               : sidebarClasses.menu.item,
                           )}
                         >
-                          <Icon className="mr-3 h-5 w-5 shrink-0" />
+                          <Icon className="mr-3 h-5 w-5 shrink-0 rtl:ml-3 rtl:mr-0" />
                           <span suppressHydrationWarning={true}>
                             {item.label}
                           </span>
@@ -303,23 +319,35 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                   sidebarClasses.menu.item,
                 )}
               >
-                <LogOut className="mr-3 h-5 w-5 shrink-0" />
+                <LogOut className="mr-3 h-5 w-5 shrink-0 rtl:ml-3 rtl:mr-0" />
                 <span suppressHydrationWarning={true}>{t("signOut")}</span>
               </Button>
             </div>
           </nav>
         </div>
         {/* Main Content */}
-        <div className="pl-72">
+        <div className="apex-admin-shell pl-0 md:pl-72">
           {/* Top Bar */}
           <div className={cn("sticky top-0 z-40", navbarClasses.background)}>
             <div className="flex items-center justify-between px-6 py-4">
-              <h1
-                className={cn("text-xl font-bold tracking-tight", navbarClasses.text)}
-                suppressHydrationWarning={true}
-              >
-                {t("adminPanel")}
-              </h1>
+              <div className="flex items-center gap-3">
+                {isMobile && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="md:hidden"
+                    onClick={() => setSidebarOpen((prev) => !prev)}
+                  >
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                )}
+                <h1
+                  className={cn("text-xl font-bold tracking-tight", navbarClasses.text)}
+                  suppressHydrationWarning={true}
+                >
+                  {t("adminPanel")}
+                </h1>
+              </div>
               <div className="flex items-center space-x-4">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild={true}>

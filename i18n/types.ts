@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Centralized TypeScript type definitions for next-intl internationalization
  *
  * Provides comprehensive type safety for all message namespaces, locales, and ICU message arguments
@@ -561,6 +561,38 @@ export interface HelpMessages {
   };
 }
 
+export interface PrivacyPolicySectionMessages {
+  title: string;
+  description: string;
+  items?: Record<string, string>;
+}
+
+export interface PrivacyPolicyMessages {
+  title: string;
+  lastUpdated: string;
+  lastUpdatedText: string;
+  informationWeCollect: PrivacyPolicySectionMessages;
+  howWeUse: PrivacyPolicySectionMessages;
+  dataProtection: PrivacyPolicySectionMessages;
+  yourRights: PrivacyPolicySectionMessages;
+  contact: PrivacyPolicySectionMessages;
+}
+
+export interface TermsConditionsMessages {
+  title: string;
+  acceptance: PrivacyPolicySectionMessages;
+  useLicense: PrivacyPolicySectionMessages;
+  orders: PrivacyPolicySectionMessages;
+  pricing: PrivacyPolicySectionMessages;
+  limitation: PrivacyPolicySectionMessages;
+  governingLaw: PrivacyPolicySectionMessages;
+  contact: PrivacyPolicySectionMessages;
+}
+
+export interface LegalMessages {
+  privacyPolicy: PrivacyPolicyMessages;
+  termsConditions: TermsConditionsMessages;
+}
 // Complete messages structure type
 export interface AppMessages {
   loading: string;
@@ -622,6 +654,7 @@ export interface AppMessages {
     keywords: string;
   };
   Blog: BlogMessages;
+  Legal: LegalMessages;
   Help: HelpMessages;
 }
 

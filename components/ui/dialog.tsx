@@ -10,7 +10,6 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import * as React from "react";
-import { FocusTrap } from "@/components/ui/enhanced-accessibility";
 
 import { cn } from "@/lib/utils";
 
@@ -40,7 +39,6 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 interface EnhancedDialogContentProps
   extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
   showCloseButton?: boolean;
-  enableFocusTrap?: boolean;
   closeButtonLabel?: string;
 }
 
@@ -53,7 +51,6 @@ const DialogContent = React.forwardRef<
       className,
       children,
       showCloseButton = true,
-      enableFocusTrap = true,
       closeButtonLabel = "Close dialog",
       ["aria-label"]: ariaLabel,
       ["aria-labelledby"]: ariaLabelledBy,
@@ -68,7 +65,7 @@ const DialogContent = React.forwardRef<
     const hasAccessibleName = hasAriaLabel || hasAriaLabelledBy;
     const shouldRenderFallbackTitle = !hasAccessibleName;
 
-    const content = (
+    return (
       <DialogPortal>
         <DialogOverlay />
         <DialogPrimitive.Content
@@ -104,18 +101,6 @@ const DialogContent = React.forwardRef<
           {children}
         </DialogPrimitive.Content>
       </DialogPortal>
-    );
-
-    return enableFocusTrap ? (
-      <FocusTrap
-        onEscape={() => {
-          // Close dialog on escape - Radix handles this automatically
-        }}
-      >
-        {content}
-      </FocusTrap>
-    ) : (
-      content
     );
   },
 );

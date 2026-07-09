@@ -112,6 +112,12 @@ export function EnhancedNavbarIcon({
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onClick={handleClick}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          handleClick();
+        }
+      }}
       whileHover={effectiveAnimationEnabled ? { scale: 1.05 } : {}}
       whileTap={effectiveAnimationEnabled ? { scale: 0.95 } : {}}
       animate={
