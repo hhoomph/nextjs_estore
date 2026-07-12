@@ -1,10 +1,8 @@
-"use client";
-
+﻿"use client";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Lock, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
-
 interface ProductActionButtonProps {
   inStock: boolean;
   onClick: () => void;
@@ -14,7 +12,6 @@ interface ProductActionButtonProps {
   disabled?: boolean;
   testId?: string;
 }
-
 export function ProductActionButton({
   inStock,
   onClick,
@@ -25,13 +22,10 @@ export function ProductActionButton({
   testId,
 }: ProductActionButtonProps) {
   const [isHydrated, setIsHydrated] = useState(false);
-
   useEffect(() => {
     setIsHydrated(true);
   }, []);
-
   const isDisabled = disabled || !isHydrated;
-
   return (
     <Button
       className={cn(
@@ -45,12 +39,12 @@ export function ProductActionButton({
     >
       {inStock ? (
         <>
-          <ShoppingCart className="mr-2 h-4 w-4" />
+          <ShoppingCart className="mr-2 ml-2 h-4 w-4" />
           {label}
         </>
       ) : (
         <>
-          <Lock className="mr-2 h-4 w-4" />
+          <Lock className="mr-2 ml-2 h-4 w-4" />
           {outOfStockLabel}
         </>
       )}

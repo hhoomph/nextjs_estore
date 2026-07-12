@@ -11,7 +11,6 @@
  * @since 2025-01-01
  */
 "use client";
-
 import {
   Heart,
   LogOut,
@@ -47,24 +46,20 @@ import { signOut } from "@/lib/auth-client";
 import { useSimplifiedCartSync } from "@/lib/hooks/use-simplified-cart-sync";
 import { useSimplifiedSessionSync } from "@/lib/hooks/use-simplified-session-sync";
 import { useWishlistStore } from "@/lib/stores/wishlist-store";
+import { HydrationSafe } from "@/components/hydration-safe";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
-
 // Route exclusion logic has been moved to ConditionalNavbar component
 // This navbar component now always renders when called
-
 interface CategoryItem {
   id: string;
   name: string;
   productCount: number;
 }
-
 export function UnifiedNavbar() {
   // ALL HOOKS MUST BE CALLED IN EXACT SAME ORDER EVERY TIME
-
   // Core hooks - must be called first, always
   const router = useRouter();
   const { actualTheme, setTheme, mounted } = useTheme();
-
   // State hooks - must be called in same order
   const [searchQuery, setSearchQuery] = useState("");
   const [siteTitle, setSiteTitle] = useState("E-Store");
@@ -72,21 +67,17 @@ export function UnifiedNavbar() {
   const [messagesOpen, setMessagesOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [categories, setCategories] = useState<CategoryItem[]>([]);
-
   // ALWAYS call hooks at top level - never conditionally
   const { user, isAuthenticated, isLoading } = useSimplifiedSessionSync();
   const { itemCount: cartCount } = useSimplifiedCartSync();
   const { getItemCount: getWishlistCount } = useWishlistStore();
-
   // Use translations directly from next-intl
   const t = useTranslations("Navigation");
   const tPages = useTranslations("Navigation.pages");
   const tBlog = useTranslations("Navigation.blog");
   const blogLabel = tBlog("grid").split(" ")[0];
-
   // Locale is handled via cookies in this project (localePrefix: "never")
   // No need to extract locale from pathname for URL generation
-
   // Effects - must be called after all state hooks
   useEffect(() => {
     const controller = new AbortController();
@@ -106,11 +97,9 @@ export function UnifiedNavbar() {
     void fetchCategories();
     return () => controller.abort();
   }, []);
-
   useEffect(() => {
     setHydrated(true);
   }, []);
-
   useEffect(() => {
     const controller = new AbortController();
     const fetchSiteSettings = async () => {
@@ -125,22 +114,18 @@ export function UnifiedNavbar() {
         console.error("Failed to fetch site settings:", error);
       }
     };
-
     void fetchSiteSettings();
     return () => controller.abort();
   }, []);
-
   // Computed values - no hooks here
   const showAuthenticatedUser = isAuthenticated && !isLoading;
   const wishlistCount = getWishlistCount();
-
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
     }
   };
-
   const handleSignOut = async () => {
     await signOut({
       fetchOptions: {
@@ -150,7 +135,6 @@ export function UnifiedNavbar() {
       },
     });
   };
-
   // Only Render theme toggle when mounted to avoid hydration mismatch
   const ThemeToggle = () => {
     if (!mounted) {
@@ -158,34 +142,30 @@ export function UnifiedNavbar() {
         <Button
           variant="outline"
           size="icon"
-          className="border-border/60 bg-background/85 text-foreground transition-all hover:bg-accent hover:text-accent-foreground dark:bg-background/90"
+          className="border-border/60 bg-background/85 text-foreground transition-all hover:bg-accent hover:text-accent-foreground dark:bg-background/90 cursor-pointer"
           data-testid="theme-toggle"
         >
           <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
           <Moon className="absolute inset-0 h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">Toggle theme</span>
+          <span className="sr-only cursor-pointer">Toggle theme</span>
         </Button>
       );
     }
-
     // Toggle explicit light/dark mode so the button always changes the visible theme.
     const getNextTheme = (current: "light" | "dark"): "light" | "dark" => {
       return current === "dark" ? "light" : "dark";
     };
-
     const getThemeIcon = (current: "light" | "dark") => {
       if (current === "light") return <Sun className="h-4 w-4" />;
       return <Moon className="h-4 w-4" />;
     };
-
     const nextTheme = getNextTheme(actualTheme);
-
     return (
       <Button
         variant="outline"
         size="icon"
         onClick={() => setTheme(nextTheme)}
-        className="border-border/60 bg-background/85 text-foreground transition-all hover:bg-accent hover:text-accent-foreground dark:bg-background/90"
+        className="border-border/60 bg-background/85 text-foreground transition-all hover:bg-accent hover:text-accent-foreground dark:bg-background/90 cursor-pointer"
         data-testid="theme-toggle"
         aria-label={`Current theme: ${actualTheme}. Click to switch to ${nextTheme}`}
         aria-pressed={actualTheme === "dark"}
@@ -195,7 +175,6 @@ export function UnifiedNavbar() {
       </Button>
     );
   };
-
   const mobileNavItems = [
     { href: "/popular", label: t("popular") },
     { href: "/products", label: t("shop") },
@@ -204,7 +183,6 @@ export function UnifiedNavbar() {
     { href: "/blog", label: blogLabel },
     { href: "/contact", label: t("contact") },
   ];
-
   // Ensure consistent rendering by always rendering the same structure
   return (
     <header
@@ -222,14 +200,13 @@ export function UnifiedNavbar() {
             {siteTitle}
           </span>
         </Link>
-
         {/* Desktop Menu (hidden on mobile) */}
         <div className="hidden md:flex flex-1 items-center justify-center space-x-6">
           {/* Popular */}
-                <Link
-                  href="/popular"
-                    className="text-sm font-bold text-foreground/90 transition-colors hover:text-primary"
-                >
+          <Link
+            href="/popular"
+            className="text-sm font-bold text-foreground/90 transition-colors hover:text-primary"
+          >
             {t("popular")}
           </Link>
           {/* Shop */}
@@ -241,11 +218,11 @@ export function UnifiedNavbar() {
           </Link>
           {/* Pages Dropdown */}
           <DropdownMenu>
-              <DropdownMenuTrigger asChild={true}>
-                <Button variant="ghost" className="text-sm font-bold text-foreground/90 transition-colors hover:text-primary">
-                  Pages
-                </Button>
-              </DropdownMenuTrigger>
+            <DropdownMenuTrigger asChild={true}>
+              <Button variant="ghost" className="text-sm font-bold text-foreground/90 transition-colors hover:text-primary">
+                Pages
+              </Button>
+            </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end">
               <DropdownMenuItem asChild={true}>
                 <Link href="/products" className="flex items-center w-full">
@@ -301,11 +278,11 @@ export function UnifiedNavbar() {
           </DropdownMenu>
           {/* Blog Dropdown */}
           <DropdownMenu>
-              <DropdownMenuTrigger asChild={true}>
-                <Button variant="ghost" className="text-sm font-bold text-foreground/90 transition-colors hover:text-primary">
-                  {blogLabel}
-                </Button>
-              </DropdownMenuTrigger>
+            <DropdownMenuTrigger asChild={true}>
+              <Button variant="ghost" className="text-sm font-bold text-foreground/90 transition-colors hover:text-primary">
+                {blogLabel}
+              </Button>
+            </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end">
               <DropdownMenuItem asChild={true}>
                 <Link href="/blog" className="flex items-center w-full">
@@ -337,7 +314,6 @@ export function UnifiedNavbar() {
             {t("contact")}
           </Link>
         </div>
-
         {/* Desktop Search Bar and User Actions (hidden on mobile) */}
         <div className="hidden md:flex flex-row items-center space-x-4">
           <ThemeToggle />
@@ -464,7 +440,6 @@ export function UnifiedNavbar() {
             </div>
           )}
         </div>
-
         {/* Mobile Menu Button */}
         <div className="md:hidden">
           <Sheet>
@@ -529,7 +504,7 @@ export function UnifiedNavbar() {
                       <Button asChild={true} variant="outline">
                         <Link href="/auth/signin">{tPages("signIn")}</Link>
                       </Button>
-                        <Button asChild={true} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+                      <Button asChild={true} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
                         <Link href="/auth/signup">{tPages("signUp")}</Link>
                       </Button>
                     </div>
@@ -549,10 +524,9 @@ export function UnifiedNavbar() {
           </Sheet>
         </div>
       </div>
-
-       {/* Sidebars */}
-       <MessageSidebar open={messagesOpen} onOpenChange={setMessagesOpen} />
-       <NotificationSidebar open={notificationsOpen} onOpenChange={setNotificationsOpen} />
-     </header>
-   );
- }
+      {/* Sidebars */}
+      <MessageSidebar open={messagesOpen} onOpenChange={setMessagesOpen} />
+      <NotificationSidebar open={notificationsOpen} onOpenChange={setNotificationsOpen} />
+    </header>
+  );
+}

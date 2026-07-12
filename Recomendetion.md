@@ -1,516 +1,627 @@
-# Code Review Report: Next.js E-Commerce Platform
+﻿# Comprehensive Code Review Report for nextjs_estore
 
 ## Executive Summary
 
-After reviewing the project structure, configuration files, and core components, I've identified several **strengths**, **areas for improvement**, and **critical issues** that should be addressed. The codebase demonstrates solid architecture with room for optimization.
+This review evaluates the Next.js e-store codebase against modern industry standards and best practices for React and Next.js. The application demonstrates solid foundational architecture with proper TypeScript usage, comprehensive error handling, and security measures. However, several critical issues require immediate attention, along with opportunities for optimization.
 
 ---
 
-## 🟢 Strengths
+## 1. Architecture & Structure
 
-### Architecture & Structure
-- **Excellent project organization** with clear separation of concerns (app/, components/, lib/, types/)
-- **Modern Next.js 16** setup with App Router, Server Components, and Turbopack
-- **Comprehensive testing strategy** (Vitest + Playwright with 436+ tests)
-- **Type safety** with TypeScript strict mode, Zod validation, and React Hook Form
-- **Internationalization** properly implemented with next-intl and RTL support
-- **Performance monitoring** infrastructure in place (Lighthouse, bundle analysis, Core Web Vitals)
+### Critical Issues
 
-### Configuration Excellence
-- Security headers properly configured (X-Frame-Options, CSP, etc.)
-- Image optimization with WebP/AVIF formats
-- Zustand stores with persistence middleware
-- Proper TypeScript path aliases configured
+**CRITICAL-1: Prisma Schema Configuration Missing DATABASE_URL**
 
----
+- **Issue**: The `datasource db` block in `prisma/schema.prisma` (line 7-9) does not include the `url` property, which is required by Prisma 7.
+- **Impact**: Database connections will fail during build and runtime. This breaks the entire data layer.
+- **Solution**: Move `DATABASE_URL` from `prisma.config.ts` to the `datasource` block.
 
-## 🔴 Critical Issues
+```prisma
+// ❌ CURRENT (BROKEN)
+datasource db {
+  provider = "postgresql"
+}
 
-### 1. **Potential Memory Leak in Zustand Store**
-
-**Location**: `lib/stores/cart-store.ts:53-286`
-
-**Issue**: The `subscribeWithSelector` middleware combined with `persist` can cause memory leaks if not properly cleaned up.
-
-```typescript
-// Current implementation
-export const useCartStore = create<CartStore>()(
-  subscribeWithSelector(
-    persist(
-      (set, get) => ({ /* ... */ }),
-      { name: "cart-storage" }
-    )
-  )
-);
-```
-
-**Recommendation**:
-```typescript
-// Add cleanup in useEffect or use the devtools middleware for better debugging
-import { devtools } from "zustand/middleware";
-
-export const useCartStore = create<CartStore>()(
-  devtools(
-    subscribeWithSelector(
-      persist(
-        (set, get) => ({ /* ... */ }),
-        { 
-          name: "cart-storage",
-          partialize: (state) => ({ 
-            items: state.items ?? [],
-            isOpen: false,
-            billingSameAsShipping: state.billingSameAsShipping 
-          }),
-        }
-      )
-    )
-  );
-```
-
-### 2. **Missing Error Boundaries for API Calls**
-
-**Location**: `lib/stores/cart-store.ts:210-276`
-
-**Issue**: `syncWithDatabase` makes fetch calls without proper error recovery or retry logic.
-
-```typescript
-// Current - fails on first error
-const clearResponse = await fetch("/api/cart/clear", { /* ... */ });
-```
-
-**Recommendation**:
-```typescript
-// Add retry logic and better error handling
-async function fetchWithRetry(url: string, options: RequestInit, retries = 3): Promise<Response> {
-  for (let i = 0; i < retries; i++) {
-    try {
-      const response = await fetch(url, options);
-      if (response.ok) return response;
-      if (i === retries - 1) throw new Error(`Failed after ${retries} attempts`);
-    } catch (error) {
-      if (i === retries - 1) throw error;
-      await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
-    }
-  }
-  throw new Error('Unreachable');
+// ✅ CORRECT
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 ```
 
-### 3. **Hydration Mismatch Risk**
+**CRITICAL-2: Missing i18n Configuration File**
 
-**Location**: `app/layout.tsx:51-114`
-
-**Issue**: Multiple nested providers with `suppressHydrationWarning` can mask real hydration issues.
+- **Issue**: `next.config.ts` references `"./i18n.ts"` on line 4, but this file does not exist in the root directory.
+- **Impact**: The application will fail to build with a module not found error.
+- **Solution**: Create `i18n.ts` with proper Next.js Intl configuration or remove the plugin.
 
 ```typescript
-<html suppressHydrationWarning={true}>
-  <body suppressHydrationWarning={true}>
-    <div suppressHydrationWarning={true}>
+// i18n.ts
+import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
+
+const withNextIntl = createNextIntlPlugin("./messages/en.json");
+
+const nextConfig: NextConfig = {
+  // existing config
+};
+
+export default withNextIntl(nextConfig);
 ```
 
-**Recommendation**: Consider using `useSyncExternalStore` for client-side stores or implement proper hydration checks:
+**CRITICAL-3: Duplicate middleware Implementation**
+
+- **Issue**: Security middleware is defined in both `app/api/middleware/security.ts` and potentially elsewhere, creating confusion about which one is active.
+- **Impact**: Inconsistent security implementations, potential security gaps.
+- **Solution**: Centralize middleware logic or clearly document the active implementation.
+
+### High Priority Issues
+
+**HIGH-1: Inconsistent Routing Structure**
+
+- **Issue**: Mixed use of `[locale]` dynamic routes and cookie-based locale detection creates routing complexity.
+- **Impact**: SEO issues, inconsistent URL structure, potential routing conflicts.
+- **Solution**: Either commit to URL-based locale routing or clean up the cookie-based approach.
 
 ```typescript
-import { useSyncExternalStore } from 'react';
+// Current: Mixed approach
+// app/page.tsx (no locale in URL)
+// app/[locale]/page.tsx (has locale)
 
-function useIsClient() {
-  return useSyncExternalStore(
-    (onChange) => {
-      const handler = () => onChange();
-      window.addEventListener('load', handler);
-      return () => window.removeEventListener('load', handler);
+// Recommended: Choose one approach
+// Option A: URL-based (recommended)
+// app/[locale]/page.tsx
+// Option B: Cookie-based
+// app/page.tsx with proper locale handling
+```
+
+### Medium Priority Issues
+
+**MEDIUM-1: Scattered Configuration**
+
+- **Issue**: Security headers, CSP, and rate limiting configuration are duplicated between `next.config.ts`, middleware files, and API routes.
+- **Impact**: Maintenance burden, potential inconsistencies.
+- **Solution**: Centralize all security configuration in one place.
+
+---
+
+## 2. Component Logic & React Patterns
+
+### Critical Issues
+
+**CRITICAL-4: Missing Dependencies in Async Components**
+
+- **Issue**: Multiple async components in `app/page.tsx` (lines 98-222) create excessive re-renders and make dependency tracking difficult.
+- **Impact**: Performance degradation, potential stale closures, poor UX.
+- **Solution**: Consolidate async operations and use proper React patterns.
+
+```typescript
+// ❌ CURRENT (PROBLEMATIC)
+async function HeroSection() {
+  const t = await getTranslations("Home.hero");
+  const products = await fetchProducts({ sortBy: "createdAt" });
+  return <HomeHero badge={t("badge")} ... />;
+}
+
+async function PromoSection() {
+  const products = await fetchProducts({ sortBy: "createdAt" });
+  return <HomePromoGrid products={products.map(toHomeProduct)} />;
+}
+
+// ✅ CORRECTED
+async function HomePage() {
+  const [t, products, categories] = await Promise.all([
+    getTranslations("Home.hero"),
+    fetchProducts({ sortBy: "createdAt" }),
+    fetchHomepageCategories(),
+  ]);
+
+  return (
+    <>
+      <HomeHero badge={t("badge")} heroProduct={products[0]} />
+      <HomePromoGrid products={products.map(toHomeProduct)} />
+    </>
+  );
+}
+```
+
+**CRITICAL-5: Type Safety Issues with Prisma Types**
+
+- **Issue**: Type assertions on line 31 of `lib/actions/products.ts` (`price: any`, `discountPrice: any`) and other places.
+- **Impact**: Runtime errors, poor IDE support, TypeScript compilation issues.
+- **Solution**: Use proper Prisma generated types.
+
+```typescript
+// ❌ CURRENT
+interface ProductWithPictures {
+  price: any;
+  discountPrice: any;
+}
+
+// ✅ CORRECT
+interface ProductWithPictures {
+  price: Prisma.Decimal;
+  discountPrice: Prisma.NullableDecimal;
+}
+
+// Or import from generated types
+import { Product } from "@/app/generated/prisma/client";
+```
+
+### High Priority Issues
+
+**HIGH-1: Unnecessary Client Components**
+
+- **Issue**: Several components marked with `"use client"` that could be server components, increasing bundle size.
+- **Impact**: Larger bundle size, slower initial load, unnecessary JavaScript.
+- **Solution**: Move client-specific logic to actual client components.
+
+**HIGH-2: Missing useMemo/useCallback Optimization**
+
+- **Issue**: `HomeHero.tsx` (lines 28-30) re-creates functions on every render.
+- **Impact**: Performance degradation, potential re-renders.
+- **Solution**: Memoize functions.
+
+```typescript
+// ❌ CURRENT
+function createProductHref(slug: string | null | undefined) {
+  return slug ? `/products/${slug}` : "/products";
+}
+
+// ✅ CORRECT
+const createProductHref = React.useCallback((slug?: string | null) => {
+  return slug ? `/products/${slug}` : "/products";
+}, []);
+
+export function HomeHero({ ... }: HomeHeroProps) {
+  // ...
+  <Link href={createProductHref(heroProduct.slug)}>
+  // ...
+}
+```
+
+### Medium Priority Issues
+
+**MEDIUM-1: Complex Conditional Rendering**
+
+- **Issue**: `app/page.tsx` has deeply nested conditional logic and early returns that make the component flow hard to follow.
+- **Impact**: Hard to maintain, potential bugs.
+- **Solution**: Extract complex logic into smaller helper components.
+
+---
+
+## 3. Next.js Optimization
+
+### Critical Issues
+
+**CRITICAL-6: Missing Static Generation for Dynamic Content**
+
+- **Issue**: Homepage (`app/page.tsx`) uses async rendering instead of SSG/ISR for product and category data.
+- **Impact**: Poor performance, server load, higher latency.
+- **Solution**: Implement ISR for product listings.
+
+```typescript
+// ❌ CURRENT (SSR - server every time)
+export default async function HomePage() {
+  return (
+    // Multiple async calls per render
+  );
+}
+
+// ✅ CORRECTED (ISR - cached with revalidation)
+import { unstable_cache } from "next/cache";
+
+export const revalidate = 300; // Cache for 5 minutes
+
+export default async function HomePage() {
+  const products = await unstable_cache(
+    fetchProducts({ limit: 8 }),
+    ["home-hero-products"],
+    { revalidate: 300 }
+  )();
+
+  return (
+    <HomeHero heroProduct={products[0]} />
+  );
+}
+```
+
+**CRITICAL-7: Missing Metadata Optimization**
+
+- **Issue**: `app/layout.tsx` generates metadata but doesn't use dynamic metadata for individual pages.
+- **Impact**: Poor SEO, no proper meta tags for different routes.
+- **Solution**: Implement proper metadata for each route.
+
+```typescript
+// ✅ CORRECTED - Add metadata generation
+export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
+  const { t } = await getTranslations({ locale: params.locale });
+
+  return {
+    title: {
+      default: t("metadata.title"),
+      template: `%s | ${t("metadata.siteName")}`,
     },
-    () => true,
-    () => false
-  );
+    description: t("metadata.description"),
+    keywords: ["ecommerce", "shopping", "store"],
+    openGraph: {
+      title: t("metadata.title"),
+      description: t("metadata.description"),
+    },
+  };
 }
 ```
+
+### High Priority Issues
+
+**HIGH-1: Inefficient Image Optimization**
+
+- **Issue**: Multiple `priority` images on homepage can cause layout shift and slow initial load.
+- **Impact**: Poor LCP (Largest Contentful Paint) scores.
+- **Solution**: Use `loading="lazy"` for non-critical images and better sizing.
+
+```typescript
+// ❌ CURRENT (All images priority)
+<Image
+  src={heroImage}
+  alt={productName}
+  width={900}
+  height={900}
+  className="aspect-square object-cover"
+  priority
+/>
+
+// ✅ CORRECTED
+<Image
+  src={heroImage}
+  alt={productName}
+  width={400}
+  height={400}
+  className="aspect-square object-cover w-full h-full"
+  priority
+/>
+```
+
+**HIGH-2: Missing API Route Caching**
+
+- **Issue**: API routes don't implement proper caching headers or response caching.
+- **Impact**: Unnecessary server load, slower response times.
+- **Solution**: Add cache control headers to API responses.
+
+```typescript
+// In API routes
+export async function GET(request: NextRequest) {
+  // ... existing logic
+
+  return NextResponse.json(data, {
+    status: 200,
+    headers: {
+      "Cache-Control": "public, max-age=300, s-maxage=600",
+    },
+  });
+}
+```
+
+### Medium Priority Issues
+
+**MEDIUM-1: Inadequate Loading States**
+
+- **Issue**: Loading components are basic and don't provide meaningful user feedback.
+- **Impact**: Poor UX during data fetching.
+- **Solution**: Implement skeleton screens and better loading indicators.
 
 ---
 
-## 🟡 Moderate Issues
+## 4. Performance & Efficiency
 
-### 4. **Inconsistent Type Safety in Cart Operations**
+### Critical Issues
 
-**Location**: `lib/stores/cart-store.ts:33-38`
+**CRITICAL-8: Memory Leak in Error Boundary**
 
-**Issue**: `addItem` parameter type is overly complex and could lead to runtime errors.
-
-```typescript
-addItem: (
-  item: Omit<
-    EnhancedCartItem,
-    "id" | "addedAt" | "updatedAt" | "sessionId" | "isPersisted" | "quantity"
-  > & { quantity?: number },
-)
-```
-
-**Recommendation**: Create a dedicated `CartItemInput` type:
+- **Issue**: `advanced-error-boundary.tsx` (lines 63, 111-115) stores timeouts without proper cleanup.
+- **Impact**: Memory leak in long-running applications.
+- **Solution**: Ensure proper cleanup.
 
 ```typescript
-interface CartItemInput {
-  product_id: string;
-  product_options_id?: string;
-  product: Product;
-  options?: CartItemOptions;
-  quantity?: number;
-  userId?: string;
-  sessionId?: string;
+// ❌ CURRENT (Potentially leaky)
+private retryTimeouts: NodeJS.Timeout[] = [];
+
+componentWillUnmount() {
+  this.retryTimeouts.forEach((timeout) => {
+    clearTimeout(timeout);
+  });
 }
 
-addItem: (item: CartItemInput) => void;
+// ✅ CORRECTED
+private retryTimeouts = useRef<NodeJS.Timeout[]>([]);
+
+componentWillUnmount() {
+  this.retryTimeouts.current.forEach((timeout) => {
+    clearTimeout(timeout);
+  });
+  this.retryTimeouts.current = [];
+}
 ```
 
-### 5. **Missing Input Validation**
+**CRITICAL-9: Missing Bundle Optimization**
 
-**Location**: `lib/stores/cart-store.ts:110-121`
+- **Issue**: Webpack optimization is commented out in `next.config.ts` (lines 46-85).
+- **Impact**: Larger bundle size, slower load times.
+- **Solution**: Uncomment and properly configure bundle splitting.
 
-**Issue**: `updateQuantity` doesn't validate input before processing:
+### High Priority Issues
+
+**HIGH-1: Inefficient Database Queries**
+
+- **Issue**: Multiple queries in `lib/actions/products.ts` (lines 170-179) fetch categories separately.
+- **Impact**: N+1 query problem, poor performance.
+- **Solution**: Use `include` for eager loading or query once.
 
 ```typescript
-updateQuantity: (id, quantity) => {
-  if (quantity <= 0) { // Basic check
-    get().removeItem(id);
-    return;
-  }
-  // No check for NaN, Infinity, negative values
+// ❌ CURRENT (N+1 queries)
+const categories = await prisma.category.findMany({
+  where: { id: { in: categoryIds } },
+  select: { id: true, name: true },
+});
+
+// ✅ CORRECTED (Single query)
+const productsWithCategories = await prisma.product.findMany({
+  where,
+  include: {
+    productPictures: { ... },
+    _count: { ... },
+    category: {
+      select: { id: true, name: true }
+    }
+  },
+  // ...
+});
+
+// Then transform without additional queries
 ```
 
-**Recommendation**:
+**HIGH-2: Missing Service Worker/PWA Support**
+
+- **Issue**: No offline capability or service worker implementation.
+- **Impact**: Poor performance for users with poor connectivity.
+- **Solution**: Implement PWA features if needed.
+
+### Medium Priority Issues
+
+**MEDIUM-1: Unnecessary Re-renders from Props**
+
+- **Issue**: Parent components passing functions directly to children without memoization.
+- **Impact**: Unnecessary component re-renders.
+- **Solution**: Use React.memo or useCallback for props.
+
+---
+
+## 5. Security & Reliability
+
+### Critical Issues
+
+**CRITICAL-10: Insecure Rate Limiting Implementation**
+
+- **Issue**: Rate limiting uses in-memory storage (`rateLimitStore`) which is not shared across instances.
+- **Impact**: Bypassable rate limiting in distributed deployments.
+- **Solution**: Use Redis or other shared storage for rate limiting.
+
 ```typescript
+// ❌ CURRENT (Instance-specific)
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+
+// ✅ CORRECTED (Redis-based)
+import Redis from "ioredis";
+const redis = new Redis(process.env.REDIS_URL);
+
+export function createRateLimit(config: RateLimitConfig) {
+  return async function rateLimitMiddleware(request: NextRequest) {
+    const clientId = getClientIP(request);
+    const now = Date.now();
+
+    // Use Redis for distributed rate limiting
+    const key = `rate_limit:${clientId}:${config.windowMs}`;
+    const count = await redis.incr(key);
+
+    if (count === 1) {
+      await redis.expire(key, config.windowMs / 1000);
+    }
+
+    if (count > config.maxRequests) {
+      return { success: false, ... };
+    }
+
+    return { success: true, ... };
+  };
+}
+```
+
+**CRITICAL-11: Missing Input Validation in Server Actions**
+
+- **Issue**: `lib/actions/products.ts` doesn't validate inputs before database operations.
+- **Impact**: SQL injection vulnerabilities, data integrity issues.
+- **Solution**: Add comprehensive Zod validation.
+
+```typescript
+// ✅ CORRECTED - Add input validation
 import { z } from "zod";
 
-const QuantitySchema = z.number().int().positive().max(999);
-
-updateQuantity: (id, quantity) => {
-  const validated = QuantitySchema.safeParse(quantity);
-  if (!validated.success) {
-    toast({
-      title: "Invalid quantity",
-      description: "Please enter a valid quantity",
-      variant: "destructive"
-    });
-    return;
-  }
-  
-  if (validated.data === 0) {
-    get().removeItem(id);
-    return;
-  }
-  // ... rest
-};
-```
-
-### 6. **Hardcoded Toast Messages**
-
-**Location**: Multiple locations in `cart-store.ts`
-
-**Issue**: Toast notifications use hardcoded strings instead of i18n:
-
-```typescript
-toast({
-  title: "Added to Cart", // Not translated
-  description: `${newItem.product.name} has been added to your cart`,
+const getProductQuerySchema = z.object({
+  page: z.coerce.number().min(1).default(1),
+  limit: z.coerce.number().min(1).max(100).default(12),
+  sortBy: z.enum(["createdAt", "price", "name"]).default("createdAt"),
+  // ... other fields
 });
-```
 
-**Recommendation**: Use the translation system:
-
-```typescript
-import { useTranslations } from 'next-intl';
-
-// In component using the store
-const t = useTranslations('cart');
-
-toast({
-  title: t('addedToCart'),
-  description: `${newItem.product.name} ${t('addedToCartDescription')}`,
-});
-```
-
-### 7. **Unsafe Array Operations**
-
-**Location**: `lib/stores/cart-store.ts:64-101`
-
-**Issue**: Direct array manipulation without defensive checks:
-
-```typescript
-const existingItemIndex = safeItems.findIndex(/* ... */);
-if (existingItemIndex >= 0) {
-  const updatedItems = [...safeItems];
-  updatedItems[existingItemIndex].quantity += newItem.quantity || 1;
-```
-
-**Recommendation**: Use immutable update patterns:
-
-```typescript
-const updatedItems = safeItems.map(item => 
-  item.product_id === newItem.product_id && 
-  item.product_options_id === newItem.product_options_id
-    ? { ...item, quantity: item.quantity + (newItem.quantity || 1) }
-    : item
-);
-```
-
----
-
-## 🟢 Minor Improvements
-
-### 8. **Missing JSDoc for Public APIs**
-
-**Location**: Throughout stores
-
-**Issue**: Public methods lack comprehensive documentation.
-
-**Recommendation**:
-```typescript
-/**
- * Adds a new item to the cart or updates quantity if item exists
- * @param item - The cart item to add (without auto-generated fields)
- * @throws {Error} If product data is invalid
- * @example
- * ```ts
- * useCartStore.getState().addItem({
- *   product_id: "123",
- *   product: { name: "Widget", price: 9.99 }
- * });
- * ```
- */
-addItem: (item: CartItemInput) => void;
-```
-
-### 9. **Magic Numbers in Configuration**
-
-**Location**: `next.config.ts:14-37`
-
-**Issue**: Hardcoded values in image configuration:
-
-```typescript
-deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-```
-
-**Recommendation**: Move to constants file:
-
-```typescript
-// lib/constants/images.ts
-export const IMAGE_DEVICE_SIZES = [640, 750, 828, 1080, 1200, 1920, 2048, 3840] as const;
-export const IMAGE_SIZES = [16, 32, 48, 64, 96, 128, 256, 384] as const;
-```
-
-### 10. **Inconsistent Error Handling**
-
-**Location**: Various API interactions
-
-**Issue**: Some errors are logged, some throw, some show toasts.
-
-**Recommendation**: Standardize with an error handling utility:
-
-```typescript
-// lib/utils/error-handler.ts
-export class ErrorHandler {
-  static handle(error: unknown, context: string): never {
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    console.error(`[${context}]`, message);
-    
-    if (error instanceof ApiError) {
-      toast({
-        title: context,
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-    
-    throw error;
-  }
+export async function getProducts(params: GetProductsParams) {
+  const validated = getProductQuerySchema.parse(params);
+  // ... proceed with validated data
 }
 ```
 
----
+**CRITICAL-12: Insufficient Error Handling**
 
-## 📊 Performance Recommendations
-
-### 11. **Bundle Size Optimization**
-
-**Current Dependencies with Alternatives**:
-- `lodash.throttle` → Use native debounce/throttle or smaller alternative like `es-toolkit`
-- `framer-motion` (12.42MB) → Consider `motion` (lighter alternative) for simple animations
-- `leaflet` + `react-leaflet` → Lazy load map components
+- **Issue**: Error handling is present but doesn't properly handle all edge cases.
+- **Impact**: Silent failures, poor debugging experience.
+- **Solution**: Implement comprehensive error boundaries and logging.
 
 ```typescript
-// Lazy load heavy components
-const MapComponent = dynamic(() => import('@/components/map'), {
-  loading: () => <div>Loading map...</div>,
-  ssr: false
-});
-```
-
-### 12. **Optimize Zustand Store Subscriptions**
-
-```typescript
-// Use shallow comparison to prevent unnecessary re-renders
-const { items, total } = useCartStore(
- (state) => ({ 
-    items: state.items, 
-    total: state.getTotal() 
-  }),
-  shallow
-);
-
-// Or use selectors
-const itemCount = useCartStore(state => state.getItemCount());
-```
-
-### 13. **Server Component Utilization**
-
-**Opportunity**: Convert more static components to Server Components to reduce client bundle:
-
-```typescript
-// components/layout/footer.tsx
-// Remove 'use client' if not using hooks/events
-export default async function Footer() {
-  const locale = await getLocale();
-  // Server-side data fetching
-  return <footer>...</footer>;
-}
-```
-
----
-
-## 🔒 Security Concerns
-
-### 14. **CSP Configuration Too Restrictive**
-
-**Location**: `next.config.ts:38`
-
-```typescript
-contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-```
-
-**Issue**: This may break legitimate functionality (analytics, third-party embeds).
-
-**Recommendation**: Use nonce-based CSP for development:
-
-```typescript
-async headers() {
-  const nonce = randomNonce();
-  return [{
-    source: '/(.*)',
-    headers: [
-      {
-        key: 'Content-Security-Policy',
-        value: `default-src 'self'; script-src 'self' 'nonce-${nonce}'`
-      }
-    ]
-  }];
-}
-```
-
-### 15. **Missing Rate Limiting on API Routes**
-
-**Recommendation**: Implement rate limiting middleware:
-
-```typescript
-// lib/security/rate-limit.ts
-import { Ratelimit } from '@upstash/ratelimit';
-import { Redis } from '@upstash/redis';
-
-export const ratelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(10, '10 s'),
-});
-
-export async function withRateLimit<T>(
-  request: Request,
-  handler: () => Promise<T>
-): Promise<T> {
-  const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
-  const { success } = await ratelimit.limit(ip);
-  
-  if (!success) {
-    throw new Error('Rate limit exceeded');
-  }
-  
-  return handler();
-}
-```
-
----
-
-## 🧪 Testing Gaps
-
-### 16. **Missing Unit Tests for Core Logic**
-
-**Current State**: 77% coverage is good, but critical paths need attention:
-
-- [ ] Cart merge logic edge cases
-- [ ] Quantity calculation with discounts
-- [ ] Address validation logic
-- [ ] Authentication flow error states
-
-**Example Test**:
-```typescript
-// lib/stores/__tests__/cart-store.test.ts
-describe('CartStore', () => {
-  it('should merge guest cart with user cart without duplicates', () => {
-    const store = useCartStore.getState();
-    
-    store.addItem({ product_id: '1', product: mockProduct1, quantity: 2 });
-    store.mergeGuestCartWithUser('user-123');
-    
-    const items = useCartStore.getState().items;
-    expect(items).toHaveLength(1);
-    expect(items[0].quantity).toBe(2);
+// ✅ CORRECTED - Enhanced error handling
+try {
+  const products = await prisma.product.findMany({ ... });
+  return { success: true, data: products };
+} catch (error) {
+  // Log error details with context
+  console.error("Database error in getProducts:", {
+    error: error instanceof Error ? error.message : error,
+    timestamp: new Date().toISOString(),
+    stack: error instanceof Error ? error.stack : undefined,
   });
-});
+
+  // Rethrow with more context
+  throw new Error(`Failed to fetch products: ${error instanceof Error ? error.message : 'Unknown error'}`, {
+    cause: error,
+  });
+}
+```
+
+### High Priority Issues
+
+**HIGH-1: Potential XSS Vulnerability**
+
+- **Issue**: Direct rendering of user-generated content without sanitization.
+- **Impact**: Cross-site scripting attacks.
+- **Solution**: Use proper sanitization libraries.
+
+```typescript
+// ❌ CURRENT (Unsafe)
+return <div dangerouslySetInnerHTML={{ __html: userContent }} />
+
+// ✅ CORRECTED
+import DOMPurify from 'isomorphic-dompurify';
+
+const cleanContent = DOMPurify.sanitize(userContent);
+return <div dangerouslySetInnerHTML={{ __html: cleanContent }} />
+```
+
+**HIGH-2: Missing CSRF Protection in Production**
+
+- **Issue**: CSRF token validation is incomplete in `app/api/middleware/security.ts` (line 182-183).
+- **Impact**: CSRF attack vulnerability.
+- **Solution**: Implement proper CSRF token validation.
+
+```typescript
+// ✅ CORRECTED
+export async function csrfMiddleware(request: NextRequest) {
+  if (["GET", "HEAD", "OPTIONS"].includes(request.method)) {
+    return null;
+  }
+
+  const csrfToken = request.headers.get("x-csrf-token");
+  const session = await getSession(); // Use your auth session
+
+  if (!csrfToken || !session || session.csrfToken !== csrfToken) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
+  return null;
+}
+```
+
+### Medium Priority Issues
+
+**MEDIUM-1: Hardcoded Configuration Values**
+
+- **Issue**: Configuration values like rate limits, cache times are hardcoded in multiple places.
+- **Impact**: Inflexible, difficult to maintain.
+- **Solution**: Externalize configuration.
+
+```typescript
+// ✅ CORRECTED - Externalize configuration
+const RATE_LIMIT_CONFIG = {
+  AUTH_WINDOW_MS: 60 * 1000,
+  AUTH_MAX_REQUESTS: 50,
+  API_WINDOW_MS: 60 * 1000,
+  API_MAX_REQUESTS: 100,
+  // ...
+} as const;
+
+export function createRateLimit(config: RateLimitConfig) {
+  return async function rateLimitMiddleware(request: NextRequest) {
+    // ...
+  };
+}
 ```
 
 ---
 
-## 📋 Summary & Recommendations
+## Summary of Key Recommendations
 
-### Immediate Actions (High Priority)
-1. ✅ Fix memory leak in Zustand store with proper cleanup
-2. ✅ Add retry logic and error recovery for API calls
-3. ✅ Implement input validation with Zod schemas
-4. ✅ Internationalize all user-facing strings in stores
+### 🔴 Critical Priority (Fix Immediately)
 
-### Short-term Improvements (Medium Priority)
-5. Refactor complex type definitions to improve type safety
-6. Standardize error handling across the application
-7. Add comprehensive JSDoc documentation
-8. Implement lazy loading for heavy dependencies
+1. **Fix Prisma Configuration**: Move `DATABASE_URL` to `schema.prisma` datasource block
+2. **Create Missing i18n.ts File**: Or remove the plugin from config
+3. **Centralize Middleware**: Consolidate security middleware implementations
+4. **Fix Async Component Rendering**: Consolidate async operations in parent components
+5. **Proper Prisma Types**: Replace `any` types with generated types
+6. **Implement ISR**: Use caching strategies for dynamic content
+7. **Fix Memory Leak**: Properly clean up timeouts in error boundary
+8. **Redis Rate Limiting**: Replace in-memory storage with Redis
+9. **Add Input Validation**: Implement Zod validation for all inputs
+10. **Enhance Error Handling**: Add comprehensive error boundaries and logging
 
-### Long-term Optimizations (Low Priority)
-9. Optimize bundle size by auditing dependencies
-10. Convert eligible components to Server Components
-11. Implement proper CSP with nonces
-12. Add rate limiting to API routes
+### 🟠 High Priority (Fix Soon)
+
+1. **Consolidate Component Logic**: Reduce async component fragmentation
+2. **Optimize Bundle**: Uncomment and configure webpack optimization
+3. **Fix Database Queries**: Eliminate N+1 query patterns
+4. **Add Image Loading**: Use proper lazy loading for non-critical images
+5. **Implement Proper Metadata**: Add SEO metadata for all routes
+6. **Sanitize User Content**: Prevent XSS vulnerabilities
+7. **Complete CSRF Protection**: Implement proper token validation
+8. **Add API Caching**: Implement cache control headers
+9. **Improve Loading States**: Add skeleton screens
+10. **Optimize Function Props**: Use useCallback and useMemo properly
+
+### 🟡 Medium Priority (Improve)
+
+1. **Documentation**: Add comprehensive inline comments and JSDoc
+2. **Testing**: Add unit tests for critical business logic
+3. **Monitoring**: Implement error tracking and performance monitoring
+4. **Type Safety**: Improve TypeScript coverage
+5. **Code Organization**: Better separation of concerns
+6. **Environment Variables**: Externalize configuration
+7. **Error Recovery**: Implement better user-facing error messages
+8. **Performance Monitoring**: Add Core Web Vitals tracking
+9. **Accessibility**: Improve ARIA attributes and keyboard navigation
+10. **Bundle Size Analysis**: Monitor and optimize dependencies
 
 ---
 
-## Code Quality Score: **8.2/10**
+## Overall Assessment
 
-**Strengths**:
-- Excellent architecture and project structure
-- Modern tooling and best practices
-- Comprehensive testing infrastructure
-- Type safety with TypeScript + Zod
+The codebase demonstrates strong foundational practices with proper TypeScript usage, comprehensive error handling, and security measures. However, there are critical issues that must be addressed immediately, particularly around database configuration, routing consistency, and security implementation.
 
-**Areas for Improvement**:
-- Runtime validation needs strengthening
-- Error handling standardization
-- Performance optimization opportunities
-- Security hardening
+**Strengths:**
 
----
+- ✅ Good TypeScript coverage
+- ✅ Comprehensive error handling
+- ✅ Security middleware implementation
+- ✅ Modern tech stack (Next.js 16, React 19, Prisma 7)
 
-## Final Thoughts
+**Areas for Improvement:**
 
-This is a **well-architected, production-grade application** with solid foundations. The team has done an excellent job with modern Next.js patterns, testing, and code organization. The issues identified are typical of a codebase in active development and can be addressed incrementally without major refactoring.
+- ❌ Critical Prisma configuration missing
+- ❌ Inconsistent routing structure
+- ❌ Performance optimization opportunities
+- ❌ Security implementation gaps
+- ❌ Bundle optimization needs
 
-**Recommended Next Steps**:
-1. Prioritize critical issues (#1-3) for immediate attention
-2. Address moderate issues in next sprint (#4-7)
-3. Schedule minor improvements for ongoing improvement (#8-16)
-4. Consider establishing a code review checklist based on these findings
+**Recommended Next Steps:**
+
+1. Fix all Critical priority issues within 1 week
+2. Address High priority issues within 2 weeks
+3. Improve Medium priority items in the following sprint
+4. Establish regular code review and performance monitoring practices
+
+This review is based on the current codebase analysis and should be updated after implementing the recommended fixes.

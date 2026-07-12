@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Loader2, Search, X } from "lucide-react";
 import Link from "next/link";
@@ -53,7 +54,7 @@ function toProductCard(product: Product): ProductCardProduct {
   };
 }
 
-function SearchContent() {
+function SearchBoard() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("products");
@@ -203,145 +204,143 @@ function SearchContent() {
               Home
             </Link>
             <span>/</span>
-            <span className="font-bold text-foreground">Search</span>
+            <span className="font-semibold text-foreground">Search</span>
           </nav>
         </div>
       </div>
 
-      <div className="container px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
-        <div className="mx-auto max-w-4xl">
-          <SectionHeading
-            eyebrow="Product Search"
-            title="Find exactly what you need"
-            description="Search products, brands, categories, and descriptions."
-            className="mb-8"
-          />
+      <div className="container px-4 py-8">
+        <SectionHeading
+          eyebrow="Search"
+          title="Find Products"
+          description="Search for products by name, category, or description."
+          className="mb-8"
+        />
 
-          <div className="mb-10">
-            <form onSubmit={handleSubmit} className="relative mx-auto max-w-2xl">
-              <div className="relative">
-                <Search className="absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder={t("search")}
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  className="rounded-full pl-14 pr-14 py-6 text-lg"
-                  autoFocus={true}
-                />
-                {query && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleClear}
-                    className="absolute right-3 top-1/2 h-9 w-9 -translate-y-1/2 rounded-full"
-                  >
-                    <X className="h-4 w-4" />
-                    <span className="sr-only">Clear search</span>
-                  </Button>
-                )}
-              </div>
-
-              {suggestions.length > 0 && (
-                <div className="absolute left-0 right-0 top-full z-50 mx-auto max-w-2xl overflow-hidden rounded-b-3xl border border-border bg-background/98 backdrop-blur-xl shadow-2xl shadow-primary/10">
-                  {suggestionNodes}
-                </div>
-              )}
-            </form>
-          </div>
-
-          {loading && (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="mr-3 h-8 w-8 animate-spin text-primary" />
-              <span className="font-semibold text-muted-foreground">Searching...</span>
-            </div>
-          )}
-
-          {error && (
-            <div className="rounded-[2rem] border border-border/60 bg-card p-10 text-center shadow-xl shadow-primary/10">
-              <p className="mb-5 font-bold text-destructive">{error}</p>
-              <Button onClick={() => void handleSearch(query)} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
-                Try Again
-              </Button>
-            </div>
-          )}
-
-          {!loading && !error && !query && results.length === 0 && (
-            <div className="rounded-[2.5rem] border border-border/60 bg-card p-10 text-center shadow-xl shadow-primary/10">
-              <Search className="mx-auto mb-5 h-16 w-16 text-primary/60" />
-              <h2 className="mb-3 text-2xl font-black text-foreground">
-                Start Your Search
-              </h2>
-              <p className="mx-auto mb-8 max-w-xl text-muted-foreground">
-                Enter a product name, category, or brand to find what you are
-                looking for.
-              </p>
-
-              <div>
-                <h3 className="mb-4 text-lg font-black text-foreground">
-                  Popular Searches
-                </h3>
-                <div className="flex flex-wrap justify-center gap-2">
-                  {popularSearches.slice(0, 10).map((term) => (
-                    <Button
-                      key={term}
-                      variant="outline"
-                      onClick={() => handleSuggestionClick(term)}
-                      className="rounded-full"
-                    >
-                      {term}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {!loading && !error && query && (
-            <div>
-              <div className="mb-6 flex items-center justify-between gap-4">
-                <h2 className="text-2xl font-black text-foreground">
-                  Search Results for "{query}"
-                </h2>
-                <Badge className="rounded-full bg-primary/10 text-primary">
-                  {results.length} {results.length === 1 ? "result" : "results"}
-                </Badge>
-              </div>
-
-              {results.length === 0 ? (
-                <div className="rounded-[2rem] border border-border/60 bg-card p-10 text-center shadow-xl shadow-primary/10">
-                  <Search className="mx-auto mb-4 h-14 w-14 text-muted-foreground" />
-                  <h3 className="mb-2 text-2xl font-black text-foreground">
-                    No results found
-                  </h3>
-                  <p className="mb-6 text-muted-foreground">
-                    We could not find any products matching "{query}". Try
-                    different keywords or check your spelling.
-                  </p>
-                  <div className="flex justify-center gap-3">
-                    <Button onClick={handleClear} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
-                      Clear Search
-                    </Button>
-                    <Button variant="outline" asChild={true} className="rounded-full">
-                      <Link href="/products">Browse All Products</Link>
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <ProductGrid
-                  products={results.map(toProductCard)}
-                  onAddToCart={handleAddToCart}
-                  unknownProductLabel={t("unknownProduct")}
-                  outOfStockLabel={t("outOfStock")}
-                  saleLabel={t("sale")}
-                  addToCartLabel={t("addToCart")}
-                  uncategorizedLabel={t("uncategorized")}
-                />
+        <div className="mb-10">
+          <form onSubmit={handleSubmit} className="relative mx-auto max-w-2xl">
+            <div className="relative">
+              <Search className="absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder={t("search")}
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                className="rounded-full pl-14 pr-14 py-6 text-lg"
+                autoFocus={true}
+              />
+              {query && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleClear}
+                  className="absolute right-3 top-1/2 h-9 w-9 -translate-y-1/2 rounded-full"
+                >
+                  <X className="h-4 w-4" />
+                  <span className="sr-only">Clear search</span>
+                </Button>
               )}
             </div>
-          )}
+
+            {suggestions.length > 0 && (
+              <div className="absolute left-0 right-0 top-full z-50 mx-auto max-w-2xl overflow-hidden rounded-b-3xl border border-border bg-background/98 backdrop-blur-xl shadow-2xl shadow-primary/10">
+                {suggestionNodes}
+              </div>
+            )}
+          </form>
         </div>
+
+        {loading && (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="mr-3 h-8 w-8 animate-spin text-primary" />
+            <span className="font-semibold text-muted-foreground">Searching...</span>
+          </div>
+        )}
+
+        {error && (
+          <div className="rounded-[2rem] border border-border/60 bg-card p-10 text-center shadow-xl shadow-primary/10">
+            <p className="mb-5 font-bold text-destructive">{error}</p>
+            <Button onClick={() => void handleSearch(query)} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+              Try Again
+            </Button>
+          </div>
+        )}
+
+        {!loading && !error && !query && results.length === 0 && (
+          <div className="rounded-[2.5rem] border border-border/60 bg-card p-10 text-center shadow-xl shadow-primary/10">
+            <Search className="mx-auto mb-5 h-16 w-16 text-primary/60" />
+            <h2 className="mb-3 text-2xl font-black text-foreground">
+              Start Your Search
+            </h2>
+            <p className="mx-auto mb-8 max-w-xl text-muted-foreground">
+              Enter a product name, category, or brand to find what you are
+              looking for.
+            </p>
+
+            <div>
+              <h3 className="mb-4 text-lg font-black text-foreground">
+                Popular Searches
+              </h3>
+              <div className="flex flex-wrap justify-center gap-2">
+                {popularSearches.slice(0, 10).map((term) => (
+                  <Button
+                    key={term}
+                    variant="outline"
+                    onClick={() => handleSuggestionClick(term)}
+                    className="rounded-full"
+                  >
+                    {term}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {!loading && !error && query && (
+          <div>
+            <div className="mb-6 flex items-center justify-between gap-4">
+              <h2 className="text-2xl font-black text-foreground">
+                Search Results for "{query}"
+              </h2>
+              <Badge className="rounded-full bg-primary/10 text-primary">
+                {results.length} {results.length === 1 ? "result" : "results"}
+              </Badge>
+            </div>
+
+            {results.length === 0 ? (
+              <div className="rounded-[2rem] border border-border/60 bg-card p-10 text-center shadow-xl shadow-primary/10">
+                <Search className="mx-auto mb-4 h-14 w-14 text-muted-foreground" />
+                <h3 className="mb-2 text-2xl font-black text-foreground">
+                  No results found
+                </h3>
+                <p className="mb-6 text-muted-foreground">
+                  We could not find any products matching "{query}". Try
+                  different keywords or check your spelling.
+                </p>
+                <div className="flex justify-center gap-3">
+                  <Button onClick={handleClear} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+                    Clear Search
+                  </Button>
+                  <Button variant="outline" asChild={true} className="rounded-full">
+                    <Link href="/products">Browse All Products</Link>
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <ProductGrid
+                products={results.map(toProductCard)}
+                onAddToCart={handleAddToCart}
+                unknownProductLabel={t("unknownProduct")}
+                outOfStockLabel={t("outOfStock")}
+                saleLabel={t("sale")}
+                addToCartLabel={t("addToCart")}
+                uncategorizedLabel={t("uncategorized")}
+              />
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -349,6 +348,8 @@ function SearchContent() {
 
 export default function SearchPage() {
   return (
-    <SearchContent />
+    <Suspense fallback={<div className="flex items-center justify-center py-12"><Loader2 className="mr-3 h-8 w-8 animate-spin text-primary" /><span className="font-semibold text-muted-foreground">Loading search...</span></div>}>
+      <SearchBoard />
+    </Suspense>
   );
 }

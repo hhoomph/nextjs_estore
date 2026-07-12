@@ -19,6 +19,7 @@ import { CartSidebar } from "@/components/features/cart/cart-sidebar";
 import { ConditionalNavbar } from "@/components/layout/conditional-navbar";
 import { Footer } from "@/components/layout/footer";
 import { BetterAuthProvider } from "@/components/providers/better-auth-provider";
+import { CurrencyProvider } from "@/components/providers/currency-provider";
 import { HTMLAttributesProvider } from "@/components/providers/html-attributes-provider";
 import { LocaleProvider } from "@/components/providers/locale-provider";
 import { OverlayProvider } from "@/components/providers/overlay-provider";
@@ -59,19 +60,21 @@ export default async function RootLayout({
           locale={locale as CookieLocale}
         >
           <LocaleProvider initialLocale={locale as CookieLocale}>
-            {/* Client-side fallback that updates attributes after hydration */}
-            <HTMLAttributesProvider />
+            {/* Currency provider for conditional currency display */}
+            <CurrencyProvider initialLocale={locale as CookieLocale}>
+              {/* Client-side fallback that updates attributes after hydration */}
+              <HTMLAttributesProvider />
 
-            <EnhancedErrorBoundary>
-              <PerformanceProvider>
-                <ThemeProvider
-                  attribute="class"
-                  defaultTheme="system"
-                  enableSystem={true}
-                  disableTransitionOnChange={true}
-                >
-                  <BetterAuthProvider>
-                    <OverlayProvider>
+              <EnhancedErrorBoundary>
+                <PerformanceProvider>
+                  <ThemeProvider
+                    attribute="class"
+                    defaultTheme="system"
+                    enableSystem={true}
+                    disableTransitionOnChange={true}
+                  >
+                    <BetterAuthProvider>
+                      <OverlayProvider>
                       <div
                         className="min-h-screen flex flex-col"
                         suppressHydrationWarning={true}
@@ -107,8 +110,9 @@ export default async function RootLayout({
                 </ThemeProvider>
               </PerformanceProvider>
             </EnhancedErrorBoundary>
-          </LocaleProvider>
-        </NextIntlClientProvider>
+          </CurrencyProvider>
+        </LocaleProvider>
+      </NextIntlClientProvider>
       </body>
     </html>
   );

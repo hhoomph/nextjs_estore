@@ -1,7 +1,7 @@
 ﻿import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
-const withNextIntl = createNextIntlPlugin("./i18n.ts");
+const withNextIntl = createNextIntlPlugin("./i18n/request.tsx");
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["localhost", "127.0.0.1"],
@@ -40,7 +40,7 @@ const nextConfig: NextConfig = {
 
   compress: true,
   turbopack: {
-    debugIds: process.env.NODE_ENV !== "production",
+    debugIds: process.env.NODE_ENV !== "development",
   },
   // Bundle analysis and optimization
   // webpack: (config, { dev, isServer }) => {

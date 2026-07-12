@@ -19,7 +19,7 @@ export interface CategoryWithCount {
   id: string;
   parentId?: string | null;
   level?: number | null;
-  name?: string | null;
+  name: string | null;
   productCount: number;
   createdAt: Date;
   modifiedAt: Date;

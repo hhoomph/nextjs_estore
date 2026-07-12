@@ -40,40 +40,60 @@ function toHomeProduct(product: ProductListItem): HomeHeroProduct {
   };
 }
 
-async function fetchProducts(options: {
-  sortBy?: "createdAt" | "wishlistCount";
-}): Promise<ProductListItem[]> {
+async function fetchHomepageData(): Promise<{
+  featuredProducts: ProductListItem[];
+  bestSellers: ProductListItem[];
+  categories: { id: string; name: string | null; productCount: number }[];
+}> {
   try {
-    const result = await getProducts({
-      page: 1,
-      limit: 8,
-      sortBy: options.sortBy,
-      sortOrder: "desc",
-    });
+    // Fetch all homepage data in parallel
+    const [featuredResult, bestSellersResult, categoriesResult] = await Promise.all([
+      getProducts({
+        page: 1,
+        limit: 8,
+        sortBy: "createdAt",
+        sortOrder: "desc",
+      }),
+      getProducts({
+        page: 1,
+        limit: 8,
+        sortBy: "wishlistCount",
+        sortOrder: "desc",
+      }),
+      getCategories({ limit: 8, sortBy: "name" }),
+    ]);
 
-    return result.data.map((product) => ({
-      id: product.id,
-      name: product.name,
-      slug: product.slug,
-      price: product.price,
-      discount_price: product.discount_price,
-      category: product.category,
-      images: product.images,
-      inStock: product.inStock,
-    }));
+    return {
+      featuredProducts: featuredResult.data.map((product) => ({
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        price: product.price,
+        discount_price: product.discount_price,
+        category: product.category,
+        images: product.images,
+        inStock: product.inStock,
+      })),
+      bestSellers: bestSellersResult.data.map((product) => ({
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        price: product.price,
+        discount_price: product.discount_price,
+        category: product.category,
+        images: product.images,
+        inStock: product.inStock,
+      })),
+      categories: categoriesResult.data,
+    };
   } catch (error) {
-    console.warn("Failed to load homepage products:", error);
-    return [];
-  }
-}
-
-async function fetchHomepageCategories() {
-  try {
-    const result = await getCategories({ limit: 8, sortBy: "name" });
-    return result.data;
-  } catch (error) {
-    console.warn("Failed to load homepage categories:", error);
-    return [];
+    console.error("Failed to load homepage data:", error);
+    // Return empty data on error
+    return {
+      featuredProducts: [],
+      bestSellers: [],
+      categories: [],
+    };
   }
 }
 
@@ -95,15 +115,13 @@ function LoadingSection() {
   );
 }
 
-async function HeroSection() {
+async function HeroSection({ products }: { products: ProductListItem[] }) {
   const t = await getTranslations("Home.hero");
-  const products = await fetchProducts({ sortBy: "createdAt" });
 
   return <HomeHero badge={t("badge")} title={t("title")} subtitle={t("subtitle")} shopNow={t("shopNow")} browseCategories={t("browseCategories")} heroProduct={products[0]} />;
 }
 
-async function PromoSection() {
-  const products = await fetchProducts({ sortBy: "createdAt" });
+async function PromoSection({ products }: { products: ProductListItem[] }) {
   return <HomePromoGrid products={products.map(toHomeProduct)} />;
 }
 
@@ -134,9 +152,8 @@ async function BenefitsSection() {
   );
 }
 
-async function FeaturedProductsSection() {
+async function FeaturedProductsSection({ products }: { products: ProductListItem[] }) {
   const tHome = await getTranslations("Home");
-  const products = await fetchProducts({ sortBy: "createdAt" });
 
   if (products.length === 0) {
     return null;
@@ -171,9 +188,8 @@ async function FeaturedProductsSection() {
   );
 }
 
-async function BestSellersSection() {
+async function BestSellersSection({ products }: { products: ProductListItem[] }) {
   const tHome = await getTranslations("Home");
-  const products = await fetchProducts({ sortBy: "wishlistCount" });
 
   if (products.length === 0) {
     return null;
@@ -208,9 +224,8 @@ async function BestSellersSection() {
   );
 }
 
-async function CategoriesSection() {
+async function CategoriesSection({ categories }: { categories: { id: string; name: string | null; productCount: number }[] }) {
   const t = await getTranslations("Home.categories");
-  const categories = await fetchHomepageCategories();
 
   return (
     <HomeCategoryGrid
@@ -222,25 +237,27 @@ async function CategoriesSection() {
 }
 
 export default async function HomePage() {
+  const data = await fetchHomepageData();
+
   return (
     <div className="min-h-screen bg-background">
       <Suspense fallback={<LoadingPage text="Loading hero..." />}>
-        <HeroSection />
+        <HeroSection products={data.featuredProducts} />
       </Suspense>
       <Suspense fallback={<LoadingSection />}>
-        <PromoSection />
+        <PromoSection products={data.featuredProducts} />
       </Suspense>
       <Suspense fallback={<LoadingSection />}>
         <BenefitsSection />
       </Suspense>
       <Suspense fallback={<LoadingSection />}>
-        <FeaturedProductsSection />
+        <FeaturedProductsSection products={data.featuredProducts} />
       </Suspense>
       <Suspense fallback={<LoadingSection />}>
-        <BestSellersSection />
+        <BestSellersSection products={data.bestSellers} />
       </Suspense>
       <Suspense fallback={<LoadingSection />}>
-        <CategoriesSection />
+        <CategoriesSection categories={data.categories} />
       </Suspense>
       <HomeTestimonialsSection />
       <HomeNewsletterSection />

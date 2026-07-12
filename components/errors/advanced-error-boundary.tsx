@@ -60,7 +60,7 @@ export class AdvancedErrorBoundary extends Component<
   ErrorBoundaryProps,
   ErrorBoundaryState
 > {
-  private retryTimeouts: NodeJS.Timeout[] = [];
+  private retryTimeoutsRef: NodeJS.Timeout[] = [];
 
   constructor(props: ErrorBoundaryProps) {
     super(props);
@@ -109,10 +109,11 @@ export class AdvancedErrorBoundary extends Component<
   }
 
   componentWillUnmount() {
-    // Clear any pending retry timeouts
-    this.retryTimeouts.forEach((timeout) => {
-      clearTimeout(timeout);
-    });
+    // Clear all pending retry timeouts to prevent memory leaks
+      this.retryTimeoutsRef.forEach((timeout) => {
+        clearTimeout(timeout);
+      });
+      this.retryTimeoutsRef = [];
   }
 
   private reportError = async (error: Error, errorInfo: ErrorInfo) => {
@@ -163,11 +164,30 @@ export class AdvancedErrorBoundary extends Component<
         errorInfo: null,
         errorId: null,
       });
+
+      // Create a timeout to reset retry count after 2 minutes
+      const timeoutId = setTimeout(() => {
+        this.setState((prevState) => {
+          if (prevState.retryCount > 0) {
+            return { retryCount: 0 };
+          }
+          return null;
+        });
+      }, 2 * 60 * 1000); // 2 minutes
+
+      // Store timeout ID in ref to track and cleanup
+      this.retryTimeoutsRef.push(timeoutId);
     }
   };
 
   private handleReset = () => {
     const { onReset } = this.props;
+
+    // Clear all pending timeouts
+    this.retryTimeoutsRef.forEach((timeout) => {
+      clearTimeout(timeout);
+    });
+    this.retryTimeoutsRef = [];
 
     // Reset all state
     this.setState({
@@ -214,7 +234,7 @@ export class AdvancedErrorBoundary extends Component<
 
       // Default error UI
       return (
-        <div className="min-h-100 flex items-center justify-center p-4">
+        <div className="min-h-screen flex items-center justify-center p-4">
           <Card className="w-full max-w-2xl">
             <CardHeader className="text-center">
               <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">

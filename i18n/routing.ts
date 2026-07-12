@@ -1,4 +1,5 @@
 import { defineRouting } from "next-intl/routing";
+import { getCookieLocale } from "@/lib/i18n/cookie-locale";
 
 /**
  * Routing configuration for cookie-based i18n (no locale prefix)
@@ -55,3 +56,22 @@ export const routing = defineRouting({
     "/orders/[id]": "/orders/[id]",
   },
 });
+
+/**
+ * Helper function to extract locale from cookie header string
+ */
+function getCookieLocaleFromHeader(cookieHeader: string): "en" | "fa" {
+  try {
+    const cookies = cookieHeader.split("; ");
+    const localeCookie = cookies.find((cookie) => cookie.startsWith("app-locale="));
+    const localeValue = localeCookie?.split("=")[1];
+
+    if (localeValue === "en" || localeValue === "fa") {
+      return localeValue;
+    }
+  } catch (error) {
+    console.error("[i18n] Error parsing locale cookie:", error);
+  }
+
+  return "fa";
+}

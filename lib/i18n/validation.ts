@@ -9,7 +9,9 @@
  * @since 2025-01-01
  */
 
-import { type Locale, locales } from "../../i18n";
+import { type AppLocale as Locale } from "../../i18n/types";
+
+const locales = ["en", "fa"] as const;
 
 /**
  * Validate if a locale string is supported

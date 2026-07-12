@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Module for button
  *
  * @author hh.oomph@gmail.com
@@ -6,15 +6,12 @@
  * @since 2025-01-01
  */
 "use client";
-
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import type { LucideIcon } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import * as React from "react";
-
 import { cn } from "@/lib/utils";
-
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-all duration-200 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive relative overflow-hidden",
   {
@@ -54,17 +51,15 @@ const buttonVariants = cva(
     },
   },
 );
-
 interface ButtonProps
   extends React.ComponentProps<"button">,
-    VariantProps<typeof buttonVariants> {
+  VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   loading?: boolean;
   leftIcon?: LucideIcon | React.ReactNode;
   rightIcon?: LucideIcon | React.ReactNode;
   fullWidth?: boolean;
 }
-
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
@@ -87,11 +82,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const Comp = asChild ? Slot : "button";
     const isDisabled = disabled || loading;
-
     // Generate unique IDs for accessibility
     const buttonId = React.useId();
     const loadingId = React.useId();
-
     const renderIcon = (icon: LucideIcon | React.ReactNode) => {
       if (React.isValidElement(icon)) {
         const element = icon as React.ReactElement<{
@@ -117,7 +110,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       }
       return icon;
     };
-
     const accessibilityProps = {
       "aria-label": ariaLabel,
       "aria-describedby": loading ? loadingId : ariaDescribedBy,
@@ -126,7 +118,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       role: props.role || (asChild ? undefined : "button"),
       tabIndex: isDisabled ? -1 : props.tabIndex,
     };
-
     if (asChild) {
       // When asChild is true, we can't modify the child structure
       // Icons should be handled by the parent component or not used with asChild
@@ -151,7 +142,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </Slot>
       );
     }
-
     return (
       <>
         <button
@@ -183,9 +173,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
               aria-hidden="true"
             />
           )}
-
           {/* Content */}
-          <div className="relative flex items-center gap-2">
+          <div className="relative flex items-center gap-2 cursor-pointer">
             {loading && (
               <Loader2
                 className="animate-spin"
@@ -197,21 +186,19 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             <span
               className={cn(
                 loading && "opacity-70",
-                "transition-opacity duration-200",
+                "transition-opacity duration-200 flex",
               )}
             >
               {children}
             </span>
             {!loading && rightIcon && renderIcon(rightIcon)}
           </div>
-
           {/* Hover ripple effect */}
           <div
             className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-1000 bg-linear-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full"
             aria-hidden="true"
           />
         </button>
-
         {/* Hidden loading announcement for screen readers */}
         {loading && (
           <div
@@ -227,8 +214,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     );
   },
 );
-
 Button.displayName = "Button";
-
 export { Button, buttonVariants };
 export type { ButtonProps };

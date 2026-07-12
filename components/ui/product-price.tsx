@@ -1,3 +1,4 @@
+"use client";
 import { cn } from "@/lib/utils";
 import { formatAmount } from "@/lib/utils/currency";
 import { useCurrencyStore } from "@/lib/stores/currency-store";

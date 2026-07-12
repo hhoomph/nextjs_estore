@@ -1,8 +1,8 @@
 /**
- * Module for layout
+ * Module for admin layout
  *
  * @author hh.oomph@gmail.com
- * @version 2.0.0
+ * @version 3.0.0
  * @since 2025-01-01
  */
 "use client";
@@ -38,10 +38,36 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { signOut, useSession } from "@/lib/auth-client";
 import { useAdminTheme } from "@/lib/utils/theme-admin-overrides";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
+
+// Type definitions
+interface BetterAuthSession {
+  user?: {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+    role?: string;
+  };
+  session?: {
+    user?: {
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+      role?: string;
+    };
+  };
+}
+
+interface User {
+  name: string;
+  email: string;
+  image: string;
+  role: string;
+}
+
 // Admin sidebar navigation item definition
 interface AdminNavItem {
   href: string;
@@ -49,72 +75,77 @@ interface AdminNavItem {
   icon: React.ComponentType<{ className?: string }>;
   group: "dashboard" | "commerce" | "content" | "users" | "settings";
 }
-// All admin sidebar navigation items organized by group
-const adminNavItems: AdminNavItem[] = [
-  { href: "/", label: "Main Page", icon: Globe, group: "dashboard" },
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard, group: "dashboard" },
+
+// Admin navigation groups
+const ADMIN_NAV_ITEMS: AdminNavItem[] = [
+  { href: "/", label: "Main Page", icon: Globe, group: "dashboard" as const },
+  { href: "/admin", label: "Dashboard", icon: LayoutDashboard, group: "dashboard" as const },
   // Commerce
-  { href: "/admin/products", label: "Products", icon: Package, group: "commerce" },
-  { href: "/admin/categories", label: "Categories", icon: FolderTree, group: "commerce" },
-  { href: "/admin/collections", label: "Collections", icon: Package, group: "commerce" },
-  { href: "/admin/orders", label: "Orders", icon: ShoppingCart, group: "commerce" },
+  { href: "/admin/products", label: "Products", icon: Package, group: "commerce" as const },
+  { href: "/admin/categories", label: "Categories", icon: FolderTree, group: "commerce" as const },
+  { href: "/admin/collections", label: "Collections", icon: Package, group: "commerce" as const },
+  { href: "/admin/orders", label: "Orders", icon: ShoppingCart, group: "commerce" as const },
   // Content
-  { href: "/admin/analytics", label: "Analytics", icon: BarChart3, group: "content" },
+  { href: "/admin/analytics", label: "Analytics", icon: BarChart3, group: "content" as const },
   // Users
-  { href: "/admin/users", label: "Users", icon: Users, group: "users" },
+  { href: "/admin/users", label: "Users", icon: Users, group: "users" as const },
   // Settings
-  { href: "/admin/settings", label: "Settings", icon: Settings, group: "settings" },
-  { href: "/admin/settings/seo", label: "SEO", icon: Search, group: "settings" },
-  { href: "/admin/settings/site", label: "Site", icon: Globe, group: "settings" },
-  { href: "/admin/settings/theme", label: "Theme", icon: Palette, group: "settings" },
+  { href: "/admin/settings", label: "Settings", icon: Settings, group: "settings" as const },
+  { href: "/admin/settings/seo", label: "SEO", icon: Search, group: "settings" as const },
+  { href: "/admin/settings/site", label: "Site", icon: Globe, group: "settings" as const },
+  { href: "/admin/settings/theme", label: "Theme", icon: Palette, group: "settings" as const },
 ];
+
 // Group metadata for sidebar section headers
-const navGroups: Record<string, { label: string }> = {
+const NAV_GROUPS: Record<string, { label: string }> = {
   dashboard: { label: "Overview" },
   commerce: { label: "Commerce" },
   content: { label: "Content" },
   users: { label: "Users" },
   settings: { label: "Settings" },
 };
-const groupOrder = ["dashboard", "commerce", "content", "users", "settings"];
 
-function applyAdminVisualIdentity() {
-  const root = document.documentElement;
-  const previousTheme = root.dataset.adminTheme ?? "";
-
-  root.dataset.adminTheme = "apex";
-
-  return () => {
-    if (previousTheme) {
-      root.dataset.adminTheme = previousTheme;
-      return;
-    }
-
-    delete root.dataset.adminTheme;
-  };
-}
+const GROUP_ORDER: Readonly<Array<keyof typeof NAV_GROUPS>> = [
+  "dashboard",
+  "commerce",
+  "content",
+  "users",
+  "settings",
+];
 
 /**
  * Normalize the Better Auth session shape into a single user record.
- *
- * Better Auth's client returns a flat `{ user, session }` shape, but
- * older SSR helpers can still wrap it as `{ session: { user } }`. This
- * helper accepts either and always returns a flat object so the rest of
- * the admin layout can read `user.name`, `user.email`, `user.role`, etc.
- * without re-implementing the fallback chain at every call site.
  */
-function getSessionUser(
-  session: any,
-): { name: string; email: string; image: string; role: string } | null {
+function getSessionUser(session: BetterAuthSession | null): User | null {
   if (!session) return null;
   const user = session.user ?? session.session?.user ?? null;
   if (!user) return null;
   return {
     name: user.name ?? "",
     email: user.email ?? "",
-    image: user.image ?? "",
+    image: user.image ?? undefined,
     role: user.role ?? "",
-  };
+  } as User;
+}
+
+/**
+ * Reset admin visual identity when component unmounts
+ */
+function useAdminThemeReset() {
+  useEffect(() => {
+    const root = document.documentElement;
+    const previousTheme = root.dataset.adminTheme ?? "";
+
+    root.dataset.adminTheme = "apex";
+
+    return () => {
+      if (previousTheme) {
+        root.dataset.adminTheme = previousTheme;
+        return;
+      }
+      delete root.dataset.adminTheme;
+    };
+  }, []);
 }
 
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
@@ -127,20 +158,39 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const sidebarClasses = sidebarTheme.getAdminSidebarClasses();
   const isMobile = useIsMobile();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const hasFetchedSession = useRef(false);
+
+  useAdminThemeReset();
+
   // Skip auth check on sign-in page
   const isSignInPage = pathname === "/admin/signin";
-  // Track whether session has been fetched at least once
-  const hasFetchedSession = useRef(false);
-  useEffect(() => applyAdminVisualIdentity(), []);
-  useEffect(() => {
-    if (!isPending && !hasFetchedSession.current) {
-      hasFetchedSession.current = true;
+
+  // Handle navigation with mobile sidebar close
+  const handleNavigation = useCallback((href: string) => {
+    if (isMobile) {
+      setSidebarOpen(false);
+      // Small delay to allow transition to complete
+      setTimeout(() => router.push(href), 300);
+    } else {
+      router.push(href);
     }
-  }, [isPending]);
-  // Handle redirects via useEffect — only AFTER session has been fetched
+  }, [isMobile, router]);
+
+  // Check if a nav item is active (matches current pathname)
+  const isActive = useCallback((href: string) => {
+    if (href === "/admin") {
+      return pathname === "/admin" || pathname === "/admin/";
+    }
+    return pathname.startsWith(href);
+  }, [pathname]);
+
+  // Redirect handling
   useEffect(() => {
-    if (!hasFetchedSession.current || isPending || isSignInPage) return;
-    const userObj = getSessionUser(session);
+    if (hasFetchedSession.current || isPending || isSignInPage) return;
+
+    hasFetchedSession.current = true;
+
+    const userObj = getSessionUser(session as BetterAuthSession | null);
     if (!userObj) {
       router.push("/admin/signin");
       return;
@@ -150,13 +200,24 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
       return;
     }
   }, [session, isPending, router, isSignInPage]);
-  // Allow access to sign-in page without authentication
+
+  // Handle sign out
+  const handleSignOut = async () => {
+    await signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/admin/signin");
+        },
+      },
+    });
+  };
+
   if (isSignInPage) {
     if (isPending) {
       return (
         <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
           <div className="text-center">
-            <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-primary"></div>
+            <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-primary" />
             <h2 className="mb-2 text-xl font-semibold text-foreground">
               Loading...
             </h2>
@@ -175,34 +236,32 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
       </AdvancedErrorBoundary>
     );
   }
-  // While session is loading, show a spinner (do NOT redirect yet)
+
+  // While session is loading, show a spinner
   if (isPending) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
         <div className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-primary"></div>
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-primary" />
           <h2 className="mb-2 text-xl font-semibold text-foreground">
             Checking Permissions
           </h2>
-          <p className="text-muted-foreground">Redirecting to admin panel...</p>
+          <p className="text-sm text-muted-foreground">Redirecting to admin panel...</p>
         </div>
       </div>
     );
   }
-  // Extract user from session — uses the helper above so the
-  // `user` / `session.user` / `session.session.user` fallback chain
-  // lives in exactly one place.
-  const userObj = getSessionUser(session);
+
+  // Extract user from session
+  const userObj = getSessionUser(session as BetterAuthSession | null);
   const isAdmin = userObj?.role === "ADMIN";
-  // `getUser` is retained for any future use; `userObj` is a
-  // guaranteed-shape object now, so direct property access is safe.
-  void userObj;
+
   // Show loading while redirect is in progress
   if (!userObj || !isAdmin) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
         <div className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-primary"></div>
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-primary" />
           <h2 className="mb-2 text-xl font-semibold text-foreground">
             Redirecting...
           </h2>
@@ -210,22 +269,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-  const handleSignOut = async () => {
-    await signOut({
-      fetchOptions: {
-        onSuccess: () => {
-          router.push("/admin/signin");
-        },
-      },
-    });
-  };
-  // Check if a nav item is active (matches current pathname)
-  const isActive = (href: string) => {
-    if (href === "/admin") {
-      return pathname === "/admin" || pathname === "/admin/";
-    }
-    return pathname.startsWith(href);
-  };
+
   return (
     <AdvancedErrorBoundary
       showErrorDetails={process.env.NODE_ENV === "development"}
@@ -235,10 +279,12 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
         {/* Mobile backdrop */}
         {isMobile && sidebarOpen && (
           <div
-            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-300"
             onClick={() => setSidebarOpen(false)}
+            aria-hidden="true"
           />
         )}
+
         {/* Sidebar */}
         <div
           className={cn(
@@ -251,50 +297,50 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
         >
           {/* Logo area */}
           <div className={cn("flex h-16 items-center border-b border-border px-5", sidebarClasses.background)}>
-            <Link href="/admin" className="flex items-center gap-3">
-              <div className="apex-gradient-icon flex h-9 w-9 items-center justify-center rounded-2xl">
+            <Link href="/admin" className="flex items-center gap-3" onClick={(e) => e.preventDefault()}>
+              <div className="apex-gradient-icon flex h-9 w-9 items-center justify-center rounded-2xl shrink-0">
                 <LayoutDashboard className="h-5 w-5" />
               </div>
               <span
-                className={cn("text-base font-bold tracking-tight", sidebarClasses.text)}
+                className={cn("text-base font-semibold tracking-tight", sidebarClasses.text)}
                 suppressHydrationWarning={true}
               >
                 {t("adminPanel")}
               </span>
             </Link>
           </div>
+
           {/* Navigation */}
           <nav className="mt-6 flex-1 space-y-6 overflow-y-auto px-4 pb-5">
-            {groupOrder.map((groupKey) => {
-              const groupItems = adminNavItems.filter((item) => item.group === groupKey);
+            {GROUP_ORDER.map((groupKey) => {
+              const groupItems = ADMIN_NAV_ITEMS.filter((item) => item.group === groupKey);
               if (groupItems.length === 0) return null;
+
               return (
                 <div key={groupKey} className="mb-6">
                   {/* Group section title */}
                   <p
                     className={cn(
-                      "mb-2 px-3 text-xs font-semibold uppercase tracking-[0.14em]",
+                      "mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground",
                       sidebarClasses.section.title,
                     )}
                   >
-                    {navGroups[groupKey].label}
+                    {NAV_GROUPS[groupKey].label}
                   </p>
+
                   {/* Group items */}
                   <div className="space-y-1">
                     {groupItems.map((item) => {
                       const active = isActive(item.href);
                       const Icon = item.icon;
                       return (
-                        <Link
+                        <button
                           key={item.href}
-                          href={item.href}
-                          onClick={() => {
-                            if (isMobile) setSidebarOpen(false);
-                          }}
+                          onClick={() => handleNavigation(item.href)}
                           className={cn(
-                            "mb-1 flex items-center rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                            "mb-1 flex w-full items-center rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 text-left",
                             active
-                              ? cn("text-primary", sidebarClasses.menu.active)
+                              ? cn("bg-primary/10 text-primary", sidebarClasses.menu.active)
                               : sidebarClasses.menu.item,
                           )}
                         >
@@ -302,20 +348,21 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                           <span suppressHydrationWarning={true}>
                             {item.label}
                           </span>
-                        </Link>
+                        </button>
                       );
                     })}
                   </div>
                 </div>
               );
             })}
+
             {/* Sign Out at bottom */}
             <div className="mt-auto border-t border-border px-2 pt-4">
               <Button
-                onClick={() => handleSignOut()}
+                onClick={handleSignOut}
                 variant="ghost"
                 className={cn(
-                  "mb-1 justify-start rounded-xl px-3 py-2.5 text-sm font-medium",
+                  "mb-1 w-full justify-start rounded-xl px-3 py-2.5 text-sm font-medium",
                   sidebarClasses.menu.item,
                 )}
               >
@@ -325,6 +372,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
             </div>
           </nav>
         </div>
+
         {/* Main Content */}
         <div className="apex-admin-shell pl-0 md:pl-72">
           {/* Top Bar */}
@@ -342,7 +390,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                   </Button>
                 )}
                 <h1
-                  className={cn("text-xl font-bold tracking-tight", navbarClasses.text)}
+                  className={cn("text-xl font-semibold tracking-tight", navbarClasses.text)}
                   suppressHydrationWarning={true}
                 >
                   {t("adminPanel")}
@@ -357,7 +405,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                         "relative h-10 w-10 rounded-2xl border border-border",
                         navbarClasses.avatar.background,
                         "transition-colors",
-                        )}
+                      )}
                     >
                       <Avatar className="h-8 w-8">
                         <AvatarImage
@@ -400,7 +448,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                         href="/admin"
                         className="flex items-center rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                       >
-                        <LayoutDashboard className="mr-3 h-4 w-4 text-muted-foreground transition-colors group-hover:text-foreground" />
+                        <LayoutDashboard className="mr-3 h-4 w-4 text-muted-foreground" />
                         <span
                           className="font-medium text-foreground"
                           suppressHydrationWarning={true}
@@ -414,7 +462,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                         href="/account"
                         className="flex items-center rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                       >
-                        <User className="mr-3 h-4 w-4 text-muted-foreground transition-colors group-hover:text-foreground" />
+                        <User className="mr-3 h-4 w-4 text-muted-foreground" />
                         <span
                           className="font-medium text-foreground"
                           suppressHydrationWarning={true}
@@ -425,7 +473,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-border" />
                     <DropdownMenuItem
-                      onClick={() => handleSignOut()}
+                      onClick={handleSignOut}
                       className="rounded-xl text-destructive focus:text-destructive hover:bg-destructive/10"
                     >
                       <LogOut className="mr-2 h-4 w-4" />
@@ -438,6 +486,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
               </div>
             </div>
           </div>
+
           {/* Page Content */}
           <ApiErrorBoundary showNetworkStatus={true}>
             <main className="space-y-6 p-6">{children}</main>
@@ -447,6 +496,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     </AdvancedErrorBoundary>
   );
 }
+
 export default function AdminLayout({
   children,
 }: {
