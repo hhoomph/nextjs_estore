@@ -45,7 +45,7 @@ export function LocaleProvider({
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  // Sync locale with cookie on mount
+  // Sync locale with cookie on mount only
   useEffect(() => {
     const controller = new AbortController();
     const syncLocale = async () => {
@@ -66,10 +66,10 @@ export function LocaleProvider({
 
     void syncLocale();
     return () => controller.abort();
-  }, [locale]);
+  }, []);
 
   /**
-   * Set locale via API and refresh the page
+   * Set locale via API and reload the page to apply new locale
    */
   const setLocale = useCallback(
     async (newLocale: CookieLocale) => {
@@ -87,18 +87,18 @@ export function LocaleProvider({
 
         if (response.ok) {
           setLocaleState(newLocale);
-          // Refresh to apply new locale (re-renders Server Components)
-          router.refresh();
+          // Hard reload to apply new locale (re-renders Server Components with correct messages)
+          window.location.reload();
         } else {
           console.error("Failed to set locale");
+          setIsLoading(false);
         }
       } catch (error) {
         console.error("Error setting locale:", error);
-      } finally {
         setIsLoading(false);
       }
     },
-    [locale, router],
+    [locale],
   );
 
   return (

@@ -41,17 +41,24 @@ export default function proxy(request: NextRequest) {
   // Create response
   const response = NextResponse.next();
 
-  // Set locale cookie if not present
+  // Set locale cookies if not present
   const existingCookie = request.cookies.get(LOCALE_COOKIE_NAME)?.value;
   if (!existingCookie) {
-    response.cookies.set({
+    const cookieOptions = {
       name: LOCALE_COOKIE_NAME,
       value: DEFAULT_LOCALE,
       maxAge: 365 * 24 * 60 * 60, // 1 year
       path: "/",
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: "lax" as const,
+    };
+
+    response.cookies.set(cookieOptions);
+    // Also set NEXT_LOCALE for next-intl server-side detection
+    response.cookies.set({
+      ...cookieOptions,
+      name: "NEXT_LOCALE",
     });
   }
 
