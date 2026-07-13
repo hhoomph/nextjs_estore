@@ -40,8 +40,8 @@ export default function AdminSignInPage() {
   const form = useForm<AdminSignInForm>({
     resolver: zodResolver(adminSignInSchema),
     defaultValues: {
-      email: "admin@example.com",
-      password: "admin123456",
+      email: "",
+      password: "",
     },
   });
 

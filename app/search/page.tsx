@@ -13,6 +13,7 @@ import { SectionHeading } from "@/components/features/layout/section-heading";
 import { type ProductCardProduct } from "@/components/features/products/product-card";
 import { Input } from "@/components/ui/input";
 import { useCartActions } from "@/lib/hooks/use-simplified-cart-sync";
+import { useDebounce } from "@/lib/hooks/use-debounce";
 
 interface Product {
   id: string;
@@ -69,6 +70,9 @@ function SearchBoard() {
 
   const { addToCart } = useCartActions();
 
+  // Debounce search query for real-time results
+  const debouncedQuery = useDebounce(query, 300);
+
   const handleSearch = useCallback(
     async (searchQuery: string) => {
       searchAbortRef.current?.abort();
@@ -120,11 +124,17 @@ function SearchBoard() {
     [router],
   );
 
+  // Trigger search when debounced query changes
+  useEffect(() => {
+    void handleSearch(debouncedQuery);
+  }, [debouncedQuery, handleSearch]);
+
+  // Initialize search from URL query param
   useEffect(() => {
     if (initialQuery) {
-      void handleSearch(initialQuery);
+      setQuery(initialQuery);
     }
-  }, [handleSearch, initialQuery]);
+  }, [initialQuery]);
 
   useEffect(() => {
     if (query.length > 0) {

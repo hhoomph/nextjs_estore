@@ -42,14 +42,14 @@ export function BlogPostList({
             ? t("noSearchResults.title")
             : category
               ? t("noCategoryPosts.title")
-              : t("noPostsFound.title")}
+              : t("noPosts.title")}
         </h3>
         <p className="text-muted-foreground">
           {searchQuery
             ? t("noSearchResults.description")
             : category
               ? t("noCategoryPosts.description")
-              : t("noPostsFound.description")}
+              : t("noPosts.description")}
         </p>
       </div>
     );

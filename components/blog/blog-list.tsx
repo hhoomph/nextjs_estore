@@ -71,7 +71,7 @@ export function BlogList({
   totalPosts,
   locale,
 }: BlogListProps) {
-  const t = (useTranslations as any)("blog");
+  const t = useTranslations("Blog");
 
   if (posts.length === 0) {
     return (
@@ -129,7 +129,7 @@ interface BlogCardProps {
 }
 
 function BlogCard({ post, locale }: BlogCardProps) {
-  const t = (useTranslations as any)("blog");
+  const t = (useTranslations as any)("Blog");
 
   return (
     <Card className="group overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
@@ -273,7 +273,7 @@ function BlogPagination({
   totalPosts,
   locale,
 }: BlogPaginationProps) {
-  const t = (useTranslations as any)("blog");
+  const t = (useTranslations as any)("Blog");
 
   const getPageUrl = (page: number) => {
     const params = new URLSearchParams();

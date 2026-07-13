@@ -343,6 +343,7 @@
   --sidebar-ring: var(--color-primary-500);
 }
 
+
 :root {
   --radius: 0.75rem;
   --background: oklch(0.985 0.015 75);
@@ -548,6 +549,23 @@
   --border: var(--apex-border-soft);
   --input: var(--apex-surface);
   --ring: var(--apex-primary);
+}
+
+/* Density classes - persisted in localStorage as apex-density */
+.density-compact {
+  --radius: 0.5rem;
+  --spacing-card: 1rem;
+  --spacing-section: 1.25rem;
+}
+.density-comfortable {
+  --radius: 0.75rem;
+  --spacing-card: 1.5rem;
+  --spacing-section: 1.75rem;
+}
+.density-spacious {
+  --radius: 1rem;
+  --spacing-card: 2rem;
+  --spacing-section: 2.5rem;
 }
 
 .apex-admin-shell {

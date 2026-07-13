@@ -14,6 +14,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { CookieLocale } from "@/lib/i18n/cookie-locale";
+import { hydrateCurrencyStore } from "@/lib/stores/currency-store";
 
 interface CurrencyContextType {
   locale: CookieLocale;
@@ -37,16 +38,18 @@ interface CurrencyProviderProps {
 /**
  * Currency configuration per locale
  */
-const localeCurrencyConfig: Record<string, { symbol: string; prefix: string; format: string }> = {
+const localeCurrencyConfig: Record<string, { symbol: string; prefix: string; format: string; locale: string }> = {
   fa: {
     symbol: "تومان",
     prefix: "",
     format: "{symbol} {amount}",
+    locale: "fa-IR",
   },
   en: {
     symbol: "$",
     prefix: "",
     format: "${amount}",
+    locale: "en-US",
   },
 };
 
@@ -97,10 +100,12 @@ export function CurrencyProvider({
 
   // Load locale from cookie on mount
   useEffect(() => {
+    const controller = new AbortController();
     const loadLocale = async () => {
       try {
         const response = await fetch("/api/locale", {
           method: "GET",
+          signal: controller.signal,
         });
 
         if (response.ok) {
@@ -111,11 +116,22 @@ export function CurrencyProvider({
           }
         }
       } catch (error) {
+        if (
+          error instanceof Error &&
+          (error.name === "AbortError" || error.message === "Failed to fetch")
+        ) {
+          return;
+        }
         console.error("Failed to load locale:", error);
       }
     };
 
+    // Hydrate currency store from localStorage after mount
+    // to avoid SSR hydration mismatches
+    hydrateCurrencyStore();
+
     void loadLocale();
+    return () => controller.abort();
   }, []);
 
   // Update currency config when locale changes

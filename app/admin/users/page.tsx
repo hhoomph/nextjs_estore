@@ -3,6 +3,8 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect, useCallback } from "react";
+import { useDebounce } from "@/lib/hooks/use-debounce";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -49,6 +51,7 @@ interface User {
 }
 
 export default function AdminUsersPage() {
+  const t = useTranslations("Admin Users");
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -60,6 +63,7 @@ export default function AdminUsersPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   const form = useForm<UserFormData>({
     resolver: zodResolver(userSchema),
@@ -72,7 +76,7 @@ export default function AdminUsersPage() {
     },
   });
 
-  const fetchUsers = useCallback(async () => {
+  const fetchUsers = useCallback(async (overrideQuery?: string) => {
     setLoading(true);
     setError("");
 
@@ -82,7 +86,8 @@ export default function AdminUsersPage() {
         limit: "20",
       });
 
-      if (searchTerm) params.set("search", searchTerm);
+      const query = overrideQuery ?? debouncedSearchTerm;
+      if (query) params.set("search", query);
       if (roleFilter !== "all") params.set("role", roleFilter);
       if (statusFilter !== "all") params.set("active", statusFilter);
 
@@ -100,7 +105,15 @@ export default function AdminUsersPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, searchTerm, roleFilter, statusFilter]);
+  }, [currentPage, debouncedSearchTerm, roleFilter, statusFilter]);
+
+  const handleSearchSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      void fetchUsers(searchTerm);
+    },
+    [fetchUsers, searchTerm],
+  );
 
   useEffect(() => {
     fetchUsers();
@@ -121,8 +134,8 @@ export default function AdminUsersPage() {
         throw new Error(data.error || "Failed to update user role");
       }
 
-      toast.success("User role updated");
-      fetchUsers();
+      toast.success(t("userRoleUpdated"));
+      fetchUsers(searchTerm);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to update user");
     }
@@ -146,8 +159,8 @@ export default function AdminUsersPage() {
         throw new Error(data.error || "Failed to update user status");
       }
 
-      toast.success("User status updated");
-      fetchUsers();
+      toast.success(t("userStatusUpdated"));
+      fetchUsers(searchTerm);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to update user");
     }
@@ -168,11 +181,11 @@ export default function AdminUsersPage() {
       });
 
       if (response.ok) {
-        toast.success(editingUser ? "User updated" : "User created");
+        toast.success(t(editingUser ? "userUpdated" : "userCreated"));
         setDialogOpen(false);
         form.reset();
         setEditingUser(null);
-        fetchUsers();
+        fetchUsers(searchTerm);
       } else {
         const errorData = await response.json();
         toast.error(errorData.error || "Failed to save user");
@@ -199,7 +212,7 @@ export default function AdminUsersPage() {
 
   const handleDelete = async (userId: string) => {
     if (
-      !confirm("Are you sure you want to delete this user? This action cannot be undone.")
+      !confirm(t("confirmDeleteUser"))
     )
       return;
 
@@ -209,8 +222,8 @@ export default function AdminUsersPage() {
       });
 
       if (response.ok) {
-        toast.success("User deleted");
-        fetchUsers();
+        toast.success(t("userDeleted"));
+        fetchUsers(searchTerm);
       } else {
         const errorData = await response.json();
         toast.error(errorData.error || "Failed to delete user");
@@ -234,7 +247,7 @@ export default function AdminUsersPage() {
       <div className="flex h-64 items-center justify-center">
         <div className="text-center">
           <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
-          <p className="mt-2 text-sm text-muted-foreground">Loading users...</p>
+          <p className="mt-2 text-sm text-muted-foreground">{t("loading")}</p>
         </div>
       </div>
     );
@@ -245,25 +258,25 @@ export default function AdminUsersPage() {
       <section className="overflow-hidden rounded-[2rem] border border-border bg-card p-6 shadow-xl">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            User administration
+            {t("userAdministration")}
           </p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground">
-            Users
+            {t("users")}
           </h1>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            Manage user accounts and roles with Apex-style filters and tables.
+            {t("usersDescription")}
           </p>
         </div>
       </section>
 
       <Card className="apex-stat-card">
         <CardContent className="pt-6">
-          <div className="flex gap-4">
+          <form onSubmit={handleSearchSubmit} className="flex gap-4">
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search users..."
+                  placeholder={t("searchUsers")}
                   className="rounded-xl pl-8"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -272,32 +285,32 @@ export default function AdminUsersPage() {
             </div>
             <Select value={roleFilter} onValueChange={setRoleFilter}>
               <SelectTrigger className="w-32 rounded-xl border-border bg-background">
-                <SelectValue placeholder="Role" />
+                <SelectValue placeholder={t("role")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Roles</SelectItem>
-                <SelectItem value="USER">User</SelectItem>
-                <SelectItem value="ADMIN">Admin</SelectItem>
+                <SelectItem value="all">{t("allRoles")}</SelectItem>
+                <SelectItem value="USER">{t("userRole")}</SelectItem>
+                <SelectItem value="ADMIN">{t("adminRole")}</SelectItem>
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-32 rounded-xl border-border bg-background">
-                <SelectValue placeholder="Status" />
+                <SelectValue placeholder={t("status")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="true">Active</SelectItem>
-                <SelectItem value="false">Inactive</SelectItem>
+                <SelectItem value="all">{t("allStatus")}</SelectItem>
+                <SelectItem value="true">{t("active")}</SelectItem>
+                <SelectItem value="false">{t("inactive")}</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </form>
         </CardContent>
       </Card>
 
       <Card className="apex-stat-card">
         <CardHeader>
           <CardTitle className="text-base font-semibold tracking-tight text-foreground">
-            Users ({users.length})
+            {t("usersCount", { count: users.length })}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
@@ -310,20 +323,20 @@ export default function AdminUsersPage() {
           {users.length === 0 ? (
             <div className="py-12 text-center">
               <UserCheck className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">No users found</p>
+              <p className="text-sm text-muted-foreground">{t("noUsersFound")}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>User</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Orders</TableHead>
-                    <TableHead>Joined</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead>{t("table.user")}</TableHead>
+                    <TableHead>{t("table.email")}</TableHead>
+                    <TableHead>{t("table.role")}</TableHead>
+                    <TableHead>{t("table.status")}</TableHead>
+                    <TableHead>{t("table.orders")}</TableHead>
+                    <TableHead>{t("table.joined")}</TableHead>
+                    <TableHead>{t("table.actions")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -337,7 +350,7 @@ export default function AdminUsersPage() {
                             </span>
                           </div>
                           <div>
-                            <p className="font-medium">{user.name || "No name"}</p>
+                            <p className="font-medium">{user.name || t("noName")}</p>
                           </div>
                         </div>
                       </TableCell>
@@ -351,8 +364,8 @@ export default function AdminUsersPage() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="USER">User</SelectItem>
-                            <SelectItem value="ADMIN">Admin</SelectItem>
+                            <SelectItem value="USER">{t("userRole")}</SelectItem>
+                            <SelectItem value="ADMIN">{t("adminRole")}</SelectItem>
                           </SelectContent>
                         </Select>
                       </TableCell>
@@ -365,7 +378,7 @@ export default function AdminUsersPage() {
                               : "border-transparent bg-destructive/10 text-destructive"
                           }
                         >
-                          {user.active ? "Active" : "Inactive"}
+                          {user.active ? t("active") : t("inactive")}
                         </Badge>
                       </TableCell>
                       <TableCell>{user._count?.orders || 0}</TableCell>
@@ -422,10 +435,10 @@ export default function AdminUsersPage() {
               onClick={() => setCurrentPage(currentPage - 1)}
               className="rounded-xl"
             >
-              Previous
+              {t("previous")}
             </Button>
             <span className="flex items-center justify-center px-4">
-              Page {currentPage} of {totalPages}
+              {t("pageXOfY", { current: currentPage, total: totalPages })}
             </span>
             <Button
               variant="outline"
@@ -433,7 +446,7 @@ export default function AdminUsersPage() {
               onClick={() => setCurrentPage(currentPage + 1)}
               className="rounded-xl"
             >
-              Next
+              {t("next")}
             </Button>
           </div>
         </div>

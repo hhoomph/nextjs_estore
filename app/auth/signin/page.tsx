@@ -1,5 +1,8 @@
 "use client";
 
+// Force dynamic rendering to avoid prerendering issues
+export const dynamic = "force-dynamic";
+
 /**
  * User sign-in page
  *
@@ -20,10 +23,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { AlertCircle, ArrowRight } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
+import { useTranslations } from "next-intl";
 
 const signInSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  email: z.string().email(),
+  password: z.string().min(6),
 });
 
 type SignInForm = z.infer<typeof signInSchema>;
@@ -34,6 +38,7 @@ export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const t = useTranslations("auth.signin");
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -42,7 +47,7 @@ export default function SignInPage() {
 
     const parsed = signInSchema.safeParse({ email, password });
     if (!parsed.success) {
-      setError(parsed.error.issues[0]?.message || "Please enter a valid email and password.");
+      setError(parsed.error.issues[0]?.message || t("errors.unexpectedError"));
       setIsLoading(false);
       return;
     }
@@ -63,7 +68,7 @@ export default function SignInPage() {
       } | null;
 
       if (!response.ok) {
-        setError(result?.error?.message || "Sign in failed. Please check your credentials.");
+        setError(result?.error?.message || t("errors.signInFailed"));
         return;
       }
 
@@ -77,7 +82,7 @@ export default function SignInPage() {
         router.push("/account");
       }
     } catch {
-      setError("An unexpected error occurred. Please try again.");
+      setError(t("errors.unexpectedError"));
     } finally {
       setIsLoading(false);
     }
@@ -92,17 +97,17 @@ export default function SignInPage() {
           className="flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
-          Back to home
+          {t("backToHome", { fallback: "Back to home" })}
         </Link>
       </div>
 
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-2xl font-bold">
-            Welcome Back
+            {t("title")}
           </CardTitle>
           <CardDescription>
-            Sign in to your account to continue
+            {t("subtitle")}
           </CardDescription>
         </CardHeader>
 
@@ -116,43 +121,43 @@ export default function SignInPage() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("email.label")}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="your@email.com"
+                placeholder={t("email.placeholder")}
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 className="focus:ring-primary"
               />
               {error.includes("email") && (
                 <p className="text-sm text-destructive">
-                  Email is required.
+                  {t("errors.invalidEmail", { fallback: "Email is required." })}
                 </p>
               )}
             </div>
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t("password.label")}</Label>
                 <Link
                   href="/auth/forgot-password"
                   className="text-sm text-primary hover:underline"
                 >
-                  Forgot password?
+                  {t("forgotPassword")}
                 </Link>
               </div>
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter your password"
+                placeholder={t("password.placeholder")}
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 className="focus:ring-primary"
               />
               {error.includes("Password") && (
                 <p className="text-sm text-destructive">
-                  Password must be at least 6 characters.
+                  {t("errors.invalidPassword", { fallback: "Password must be at least 6 characters." })}
                 </p>
               )}
             </div>
@@ -162,15 +167,15 @@ export default function SignInPage() {
               disabled={isLoading}
               className="inline-flex h-10 w-full items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"
             >
-              {isLoading ? "Signing in..." : "Sign In"}
+              {isLoading ? t("loading") : t("submit")}
             </button>
           </form>
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
             <p>
-              Don't have an account?{" "}
+              {t("noAccount")}{" "}
               <Link href="/auth/signup" className="text-primary hover:underline font-medium">
-                Sign up
+                {t("signUp")}
               </Link>
             </p>
           </div>
@@ -180,11 +185,11 @@ export default function SignInPage() {
           <div className="text-center text-xs text-muted-foreground">
             <p>
               <Link href="/help" className="hover:underline">
-                Need help?
+                {t("needHelp", { fallback: "Need help?" })}
               </Link>
               {" "}·{" "}
               <Link href="/contact" className="hover:underline">
-                Contact us
+                {t("contactUs", { fallback: "Contact us" })}
               </Link>
             </p>
           </div>

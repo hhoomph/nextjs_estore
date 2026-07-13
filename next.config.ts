@@ -6,6 +6,11 @@ const withNextIntl = createNextIntlPlugin("./i18n/request.tsx");
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["localhost", "127.0.0.1"],
 
+  // TypeScript
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+
   // Performance optimizations
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",

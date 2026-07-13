@@ -852,7 +852,7 @@ async function createProductMedia(
   products: SeedProduct[],
   progress: SeedProgress,
 ) {
-  const imagesPerProduct = 2;
+  const imagesPerProduct = 4;
 
   for (const product of products) {
     await prisma.product.update({

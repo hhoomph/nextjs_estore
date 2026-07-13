@@ -35,8 +35,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatAmount } from "@/lib/utils/currency";
 import { useCurrencyStore } from "@/lib/stores/currency-store";
 import { signOut, useSession } from "@/lib/auth-client";
+import { useTranslations } from "next-intl";
 
 export default function AccountPage() {
+  const t = useTranslations("Account");
   const { data: session, isPending, refetch } = useSession();
   const { currency } = useCurrencyStore();
   const [activeTab, setActiveTab] = useState("overview");
@@ -143,16 +145,16 @@ export default function AccountPage() {
       <div className="container px-4 py-16 text-center">
         <div className="max-w-md mx-auto">
           <User className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-          <h1 className="text-2xl font-bold mb-4">Please Sign In</h1>
+          <h1 className="text-2xl font-bold mb-4">{t("pleaseSignIn")}</h1>
           <p className="text-muted-foreground mb-6">
-            You need to be signed in to access your account.
+            {t("signInRequired")}
           </p>
           <div className="space-x-4">
             <Button asChild={true}>
-              <Link href="/auth/signin?redirect=/account">Sign In</Link>
+              <Link href="/auth/signin?redirect=/account">{t("signIn")}</Link>
             </Button>
             <Button variant="outline" asChild={true}>
-              <Link href="/auth/signup?redirect=/account">Sign Up</Link>
+              <Link href="/auth/signup?redirect=/account">{t("signUp")}</Link>
             </Button>
           </div>
         </div>
@@ -177,10 +179,10 @@ export default function AccountPage() {
         <div className="container px-4 py-3">
           <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
             <Link href="/" className="hover:text-foreground">
-              Home
+              {t("home")}
             </Link>
             <span>/</span>
-            <span className="text-foreground">Account</span>
+            <span className="text-foreground">{t("account")}</span>
           </nav>
         </div>
       </div>
@@ -200,41 +202,41 @@ export default function AccountPage() {
             </Avatar>
 
             <div className="flex-1">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                  <h1 className="text-3xl font-bold">
-                    {effectiveSession.user.name || "User"}
-                  </h1>
-                  <p className="text-muted-foreground">
-                    {effectiveSession.user.email}
-                  </p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <Badge variant="secondary">
-                      {effectiveSession.user.role === "ADMIN"
-                        ? "Administrator"
-                        : "Customer"}
-                    </Badge>
-                    <Badge variant="outline">Verified</Badge>
-                  </div>
-                </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div>
+                      <h1 className="text-3xl font-bold">
+                        {effectiveSession.user.name || t("user")}
+                      </h1>
+                      <p className="text-muted-foreground">
+                        {effectiveSession.user.email}
+                      </p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <Badge variant="secondary">
+                          {effectiveSession.user.role === "ADMIN"
+                            ? t("administrator")
+                            : t("customer")}
+                        </Badge>
+                        <Badge variant="outline">{t("verified")}</Badge>
+                      </div>
+                    </div>
 
-                <div className="flex gap-3">
-                  <Link href="/settings">
-                    <Button variant="outline" size="sm">
-                      <Settings className="h-4 w-4 mr-2" />
-                      Settings
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleSignOut()}
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Sign Out
-                  </Button>
-                </div>
-              </div>
+                    <div className="flex gap-3">
+                      <Link href="/settings">
+                        <Button variant="outline" size="sm">
+                          <Settings className="h-4 w-4 mr-2" />
+                          {t("settings")}
+                        </Button>
+                      </Link>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleSignOut()}
+                      >
+                        <LogOut className="h-4 w-4 mr-2" />
+                        {t("signOut")}
+                      </Button>
+                    </div>
+                  </div>
             </div>
           </div>
 
@@ -244,12 +246,12 @@ export default function AccountPage() {
             onValueChange={setActiveTab}
             className="w-full"
           >
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="orders">Orders</TabsTrigger>
-              <TabsTrigger value="wishlist">Wishlist</TabsTrigger>
-              <TabsTrigger value="addresses">Addresses</TabsTrigger>
-            </TabsList>
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
+            <TabsTrigger value="overview">{t("overview")}</TabsTrigger>
+            <TabsTrigger value="orders">{t("orders")}</TabsTrigger>
+            <TabsTrigger value="wishlist">{t("wishlist")}</TabsTrigger>
+            <TabsTrigger value="addresses">{t("addresses")}</TabsTrigger>
+          </TabsList>
 
             {/* Overview Tab */}
             <TabsContent value="overview" className="mt-6">
@@ -257,7 +259,7 @@ export default function AccountPage() {
                 <Card>
                   <CardHeader className="flex flex-row items-center space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                      Total Orders
+                      {t("totalOrders")}
                     </CardTitle>
                     <ShoppingBag className="h-4 w-4 text-muted-foreground ml-auto" />
                   </CardHeader>
@@ -266,7 +268,7 @@ export default function AccountPage() {
                       {statsLoading ? "…" : stats?.totalOrders ?? "—"}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {stats?.totalOrders ? "Lifetime orders" : "No orders yet"}
+                      {stats?.totalOrders ? t("lifetimeOrders") : t("noOrdersYet")}
                     </p>
                   </CardContent>
                 </Card>
@@ -274,7 +276,7 @@ export default function AccountPage() {
                 <Card>
                   <CardHeader className="flex flex-row items-center space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                      Wishlist Items
+                      {t("wishlistItems")}
                     </CardTitle>
                     <Heart className="h-4 w-4 text-muted-foreground ml-auto" />
                   </CardHeader>
@@ -283,7 +285,7 @@ export default function AccountPage() {
                       {statsLoading ? "…" : stats?.totalWishlist ?? "—"}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {stats?.totalWishlist ? "Saved for later" : "Wishlist is empty"}
+                      {stats?.totalWishlist ? t("savedForLater") : t("wishlistEmpty")}
                     </p>
                   </CardContent>
                 </Card>
@@ -291,7 +293,7 @@ export default function AccountPage() {
                 <Card>
                   <CardHeader className="flex flex-row items-center space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">
-                      Total Spent
+                      {t("totalSpent")}
                     </CardTitle>
                     <CreditCard className="h-4 w-4 text-muted-foreground ml-auto" />
                   </CardHeader>
@@ -300,7 +302,7 @@ export default function AccountPage() {
                       {statsLoading ? "…" : formatAmount(stats?.totalSpent ?? 0, currency)}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {stats?.totalSpent ? "Lifetime purchases" : "No purchases yet"}
+                      {stats?.totalSpent ? t("lifetimePurchases") : t("noPurchasesYet")}
                     </p>
                   </CardContent>
                 </Card>
@@ -309,7 +311,7 @@ export default function AccountPage() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Recent Orders</CardTitle>
+                    <CardTitle>{t("recentOrders")}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
@@ -338,14 +340,14 @@ export default function AccountPage() {
                       className="w-full mt-4"
                       asChild={true}
                     >
-                      <Link href="/orders">View All Orders</Link>
+                      <Link href="/orders">{t("viewAllOrders")}</Link>
                     </Button>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Account Actions</CardTitle>
+                    <CardTitle>{t("accountActions")}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <Button
@@ -355,7 +357,7 @@ export default function AccountPage() {
                     >
                       <Link href="/settings">
                         <Settings className="h-4 w-4 mr-2" />
-                        Account Settings
+                        {t("accountSettings")}
                       </Link>
                     </Button>
                     <Button
@@ -365,7 +367,7 @@ export default function AccountPage() {
                     >
                       <Link href="/orders">
                         <Package className="h-4 w-4 mr-2" />
-                        Order History
+                        {t("orderHistoryLink")}
                       </Link>
                     </Button>
                     <Button
@@ -375,12 +377,12 @@ export default function AccountPage() {
                     >
                       <Link href="/wishlist">
                         <Heart className="h-4 w-4 mr-2" />
-                        My Wishlist
+                        {t("myWishlistLink")}
                       </Link>
                     </Button>
                     <Button variant="outline" className="w-full justify-start">
                       <Bell className="h-4 w-4 mr-2" />
-                      Notifications
+                      {t("notifications")}
                     </Button>
                   </CardContent>
                 </Card>
@@ -391,19 +393,19 @@ export default function AccountPage() {
             <TabsContent value="orders" className="mt-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Order History</CardTitle>
+                  <CardTitle>{t("orderHistory")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-center py-12">
                     <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                     <h3 className="text-lg font-semibold mb-2">
-                      No orders yet
+                      {t("noOrdersYet")}
                     </h3>
                     <p className="text-muted-foreground mb-6">
-                      When you place your first order, it will appear here.
+                      {t("noOrdersYetDescription")}
                     </p>
                     <Button asChild={true}>
-                      <Link href="/products">Start Shopping</Link>
+                      <Link href="/products">{t("startShopping")}</Link>
                     </Button>
                   </div>
                 </CardContent>
@@ -414,19 +416,19 @@ export default function AccountPage() {
             <TabsContent value="wishlist" className="mt-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>My Wishlist</CardTitle>
+                  <CardTitle>{t("myWishlist")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-center py-12">
                     <Heart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                     <h3 className="text-lg font-semibold mb-2">
-                      Your wishlist is empty
+                      {t("wishlistEmpty")}
                     </h3>
                     <p className="text-muted-foreground mb-6">
-                      Save items you love for later by clicking the heart icon.
+                      {t("wishlistEmptyDescription")}
                     </p>
                     <Button asChild={true}>
-                      <Link href="/products">Browse Products</Link>
+                      <Link href="/products">{t("browseProducts")}</Link>
                     </Button>
                   </div>
                 </CardContent>
@@ -437,20 +439,20 @@ export default function AccountPage() {
             <TabsContent value="addresses" className="mt-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Saved Addresses</CardTitle>
+                  <CardTitle>{t("savedAddresses")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-center py-12">
                     <MapPin className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                     <h3 className="text-lg font-semibold mb-2">
-                      No addresses saved
+                      {t("noAddressesSaved")}
                     </h3>
                     <p className="text-muted-foreground mb-6">
-                      Add delivery addresses to speed up your checkout process.
+                      {t("addressesDescription")}
                     </p>
                     <Button>
                       <Edit className="h-4 w-4 mr-2" />
-                      Add Address
+                      {t("addAddress")}
                     </Button>
                   </div>
                 </CardContent>

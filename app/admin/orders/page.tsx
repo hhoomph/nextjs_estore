@@ -3,6 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +41,7 @@ interface Order {
 }
 
 export default function AdminOrdersPage() {
+  const t = useTranslations("Admin Orders");
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -98,7 +100,7 @@ export default function AdminOrdersPage() {
         throw new Error(data.error || "Failed to update order status");
       }
 
-      toast.success("Order status updated");
+      toast.success(t("orderStatusUpdated"));
       fetchOrders();
     } catch (err) {
       toast.error(
@@ -122,7 +124,7 @@ export default function AdminOrdersPage() {
       <div className="flex h-64 items-center justify-center">
         <div className="text-center">
           <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
-          <p className="mt-2 text-sm text-muted-foreground">Loading orders...</p>
+          <p className="mt-2 text-sm text-muted-foreground">{t("loading")}</p>
         </div>
       </div>
     );
@@ -133,13 +135,13 @@ export default function AdminOrdersPage() {
       <section className="overflow-hidden rounded-[2rem] border border-border bg-card p-6 shadow-xl">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            Commerce workspace
+            {t("commerceWorkspace")}
           </p>
           <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground">
-            Orders
+            {t("orders")}
           </h1>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            Manage customer orders with Apex-style filters, cards, and tables.
+            {t("ordersDescription")}
           </p>
         </div>
       </section>
@@ -151,7 +153,7 @@ export default function AdminOrdersPage() {
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search orders..."
+                  placeholder={t("searchOrders")}
                   className="rounded-xl pl-8"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -160,15 +162,15 @@ export default function AdminOrdersPage() {
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-48 rounded-xl border-border bg-background">
-                <SelectValue placeholder="Filter by status" />
+                <SelectValue placeholder={t("filterByStatus")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="processing">Processing</SelectItem>
-                <SelectItem value="shipped">Shipped</SelectItem>
-                <SelectItem value="delivered">Delivered</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
+                <SelectItem value="all">{t("allStatus")}</SelectItem>
+                <SelectItem value="pending">{t("pending")}</SelectItem>
+                <SelectItem value="processing">{t("processing")}</SelectItem>
+                <SelectItem value="shipped">{t("shipped")}</SelectItem>
+                <SelectItem value="delivered">{t("delivered")}</SelectItem>
+                <SelectItem value="cancelled">{t("cancelled")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -178,7 +180,7 @@ export default function AdminOrdersPage() {
       <Card className="apex-stat-card">
         <CardHeader>
           <CardTitle className="text-base font-semibold tracking-tight text-foreground">
-            Orders ({orders.length})
+            {t("ordersCount", { count: orders.length })}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
@@ -191,20 +193,20 @@ export default function AdminOrdersPage() {
           {orders.length === 0 ? (
             <div className="py-12 text-center">
               <Package className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">No orders found</p>
+              <p className="text-sm text-muted-foreground">{t("noOrdersFound")}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Order ID</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Items</TableHead>
-                    <TableHead>Total</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead>{t("table.orderId")}</TableHead>
+                    <TableHead>{t("table.customer")}</TableHead>
+                    <TableHead>{t("table.items")}</TableHead>
+                    <TableHead>{t("table.total")}</TableHead>
+                    <TableHead>{t("table.status")}</TableHead>
+                    <TableHead>{t("table.date")}</TableHead>
+                    <TableHead>{t("table.actions")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -215,15 +217,14 @@ export default function AdminOrdersPage() {
                       </TableCell>
                       <TableCell>
                         <div>
-                          <p className="font-medium">{order.user?.name ?? "Guest"}</p>
+                          <p className="font-medium">{order.user?.name ?? t("guest")}</p>
                           <p className="text-sm text-muted-foreground">
                             {order.user?.email ?? "-"}
                           </p>
                         </div>
                       </TableCell>
                       <TableCell>
-                        {order.orderItems?.length ?? 0} item
-                        {(order.orderItems?.length ?? 0) !== 1 ? "s" : ""}
+                        {order.orderItems?.length ?? 0} {t("item")}
                       </TableCell>
                       <TableCell className="font-medium">
                         {formatAmount(Number(order.total), defaultCurrency)}
@@ -239,11 +240,11 @@ export default function AdminOrdersPage() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="pending">Pending</SelectItem>
-                            <SelectItem value="processing">Processing</SelectItem>
-                            <SelectItem value="shipped">Shipped</SelectItem>
-                            <SelectItem value="delivered">Delivered</SelectItem>
-                            <SelectItem value="cancelled">Cancelled</SelectItem>
+                            <SelectItem value="pending">{t("pending")}</SelectItem>
+                            <SelectItem value="processing">{t("processing")}</SelectItem>
+                            <SelectItem value="shipped">{t("shipped")}</SelectItem>
+                            <SelectItem value="delivered">{t("delivered")}</SelectItem>
+                            <SelectItem value="cancelled">{t("cancelled")}</SelectItem>
                           </SelectContent>
                         </Select>
                       </TableCell>
@@ -273,10 +274,10 @@ export default function AdminOrdersPage() {
               onClick={() => setCurrentPage(currentPage - 1)}
               className="rounded-xl"
             >
-              Previous
+              {t("previous")}
             </Button>
             <span className="flex items-center justify-center px-4">
-              Page {currentPage} of {totalPages}
+              {t("pageXOfY", { current: currentPage, total: totalPages })}
             </span>
             <Button
               variant="outline"
@@ -284,7 +285,7 @@ export default function AdminOrdersPage() {
               onClick={() => setCurrentPage(currentPage + 1)}
               className="rounded-xl"
             >
-              Next
+              {t("next")}
             </Button>
           </div>
         </div>

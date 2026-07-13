@@ -70,7 +70,7 @@ export function BlogFilters({
   searchQuery,
   locale,
 }: BlogFiltersProps) {
-  const t = (useTranslations as any)("blog");
+  const t = useTranslations("Blog");
   const router = useRouter();
   const pathname = usePathname();
   const [searchValue, setSearchValue] = useState(searchQuery || "");
@@ -175,7 +175,7 @@ export function BlogFilters({
           disabled={!searchValue.trim()}
         >
           <Search className="w-4 h-4 mr-2" />
-          {t("search")}
+          {t("search.title")}
         </Button>
 
         {/* Clear Filters */}
@@ -283,7 +283,7 @@ export function BlogFilters({
                     className="flex-1"
                   >
                     <Search className="w-4 h-4 mr-2" />
-                    {t("search")}
+                    {t("search.title")}
                   </Button>
 
                   {hasActiveFilters && (
@@ -337,7 +337,7 @@ export function BlogFilters({
 
           {searchQuery && (
             <Badge variant="secondary" className="flex items-center gap-1">
-              {t("search")}: "{searchQuery}"
+              {t("search.title")}: "{searchQuery}"
               <button
                 onClick={() => {
                   setSearchValue("");

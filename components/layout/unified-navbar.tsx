@@ -290,17 +290,17 @@ export function UnifiedNavbar() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild={true}>
-                <Link href="/blog/blog-grid-with-sidebar" className="flex items-center w-full">
+                <Link href="/blog" className="flex items-center w-full">
                   {tBlog("gridWithSidebar")}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild={true}>
-                <Link href="/blog/blog-details-with-sidebar" className="flex items-center w-full">
+                <Link href="/blog" className="flex items-center w-full">
                   {tBlog("detailsWithSidebar")}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild={true}>
-                <Link href="/blog/blog-details" className="flex items-center w-full">
+                <Link href="/blog" className="flex items-center w-full">
                   {tBlog("details")}
                 </Link>
               </DropdownMenuItem>
@@ -319,7 +319,7 @@ export function UnifiedNavbar() {
           <ThemeToggle />
           <LanguageSwitcher />
           {/* Search Bar */}
-          <div className="relative w-64">
+          <form onSubmit={handleSearch} className="relative w-64">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
@@ -328,7 +328,7 @@ export function UnifiedNavbar() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-8"
             />
-          </div>
+          </form>
           {/* Wishlist */}
           <Link
             href="/wishlist"

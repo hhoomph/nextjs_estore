@@ -70,7 +70,7 @@ export function getFallbackLocale(requestedLocale: string): Locale {
  * @returns True if it's the default locale
  */
 export function isDefaultLocale(locale: string): boolean {
-  return locale === "en";
+  return locale === "fa";
 }
 
 /**

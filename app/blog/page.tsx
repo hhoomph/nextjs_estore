@@ -30,7 +30,7 @@ export async function generateMetadata({
   if (category) {
     title = `${t("category")}: ${category} - ${t("title")}`;
   } else if (search) {
-    title = `${t("search")}: ${search} - ${t("title")}`;
+    title = `${t("search.title")}: ${search} - ${t("title")}`;
   }
 
   return {

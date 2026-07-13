@@ -20,11 +20,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { AlertCircle, ArrowRight, CheckCircle2 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
+import { useTranslations } from "next-intl";
 
 const signUpSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  name: z.string().min(2),
+  email: z.string().email(),
+  password: z.string().min(6),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
@@ -38,6 +39,7 @@ export default function SignUpPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const router = useRouter();
+  const t = useTranslations("auth.signup");
 
   const form = useForm<SignUpForm>({
     resolver: zodResolver(signUpSchema),
@@ -61,7 +63,7 @@ export default function SignUpPage() {
       });
 
       if (result.error) {
-        setError(result.error.message || "Sign up failed. Please try again.");
+        setError(result.error.message || t("errors.unexpectedError"));
       } else {
         setSuccess(true);
         // Redirect to sign-in after a short delay
@@ -70,7 +72,7 @@ export default function SignUpPage() {
         }, 2000);
       }
     } catch {
-      setError("An unexpected error occurred. Please try again.");
+      setError(t("errors.unexpectedError"));
     } finally {
       setIsLoading(false);
     }
@@ -84,12 +86,12 @@ export default function SignUpPage() {
             <div className="flex justify-center mb-4">
               <CheckCircle2 className="h-16 w-16 text-success" />
             </div>
-            <h2 className="text-2xl font-bold mb-2">Account Created!</h2>
+            <h2 className="text-2xl font-bold mb-2">{t("successTitle", { fallback: "Account Created!" })}</h2>
             <p className="text-muted-foreground mb-4">
-              Your account has been created successfully. Redirecting to sign in...
+              {t("successMessage", { fallback: "Your account has been created successfully. Redirecting to sign in..." })}
             </p>
             <Link href="/auth/signin" className="text-primary hover:underline">
-              Click here if you're not redirected
+              {t("successLink", { fallback: "Click here if you're not redirected" })}
             </Link>
           </CardContent>
         </Card>
@@ -106,17 +108,17 @@ export default function SignUpPage() {
           className="flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowRight className="w-4 h-4 mr-2 rotate-180" />
-          Back to home
+          {t("backToHome", { fallback: "Back to home" })}
         </Link>
       </div>
 
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-2xl font-bold">
-            Create Account
+            {t("title")}
           </CardTitle>
           <CardDescription>
-            Sign up to start shopping
+            {t("subtitle")}
           </CardDescription>
         </CardHeader>
 
@@ -130,11 +132,11 @@ export default function SignUpPage() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">{t("name.label")}</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="John Doe"
+                placeholder={t("name.placeholder")}
                 {...form.register("name")}
                 className="focus:ring-primary"
               />
@@ -146,11 +148,11 @@ export default function SignUpPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("email.label")}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="your@email.com"
+                placeholder={t("email.placeholder")}
                 {...form.register("email")}
                 className="focus:ring-primary"
               />
@@ -162,11 +164,11 @@ export default function SignUpPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t("password.label")}</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Create a password"
+                placeholder={t("password.placeholder")}
                 {...form.register("password")}
                 className="focus:ring-primary"
               />
@@ -178,11 +180,11 @@ export default function SignUpPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">{t("confirmPassword.label")}</Label>
               <Input
                 id="confirmPassword"
                 type="password"
-                placeholder="Confirm your password"
+                placeholder={t("confirmPassword.placeholder")}
                 {...form.register("confirmPassword")}
                 className="focus:ring-primary"
               />
@@ -194,15 +196,15 @@ export default function SignUpPage() {
             </div>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Creating account..." : "Create Account"}
+              {isLoading ? t("loading") : t("submit")}
             </Button>
           </form>
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
             <p>
-              Already have an account?{" "}
+              {t("hasAccount")}{" "}
               <Link href="/auth/signin" className="text-primary hover:underline font-medium">
-                Sign in
+                {t("signIn")}
               </Link>
             </p>
           </div>
@@ -211,10 +213,14 @@ export default function SignUpPage() {
 
           <div className="text-center text-xs text-muted-foreground">
             <p>
-              By signing up, you agree to our{" "}
-              <Link href="/terms" className="hover:underline">Terms</Link>
-              {" "}and{" "}
-              <Link href="/privacy" className="hover:underline">Privacy Policy</Link>
+              {t("termsAgreement", { fallback: "By signing up, you agree to our" })}{" "}
+              <Link href="/terms-condition" className="hover:underline">
+                {t("terms", { fallback: "Terms" })}
+              </Link>
+              {" "}{t("and", { fallback: "and" })}{" "}
+              <Link href="/privacy-policy" className="hover:underline">
+                {t("privacy", { fallback: "Privacy Policy" })}
+              </Link>
             </p>
           </div>
         </CardContent>

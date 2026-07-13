@@ -434,20 +434,10 @@ export interface ContactMessages {
 export interface BlogMessages {
   title: string;
   readMore: string;
-  noPosts: string;
   description: string;
   keywords: string;
   category: string;
-  search: string;
-  error: {
-    title: string;
-    description: string;
-  };
-  categories: {
-    title: string;
-    all: string;
-  };
-  searchConfig: {
+  search: {
     title: string;
     placeholder: string;
     button: string;
@@ -459,8 +449,16 @@ export interface BlogMessages {
       tags: string;
     };
   };
+  error: {
+    title: string;
+    description: string;
+  };
+  categories: {
+    title: string;
+    all: string;
+  };
   showingResults: string;
-  noPostsFound: {
+  noPosts: {
     title: string;
     description: string;
   };
@@ -498,6 +496,19 @@ export interface BlogMessages {
     title: string;
     viewAll: string;
   };
+  noPostsFound: string;
+  noPostsDescription: string;
+  draft: string;
+  previous: string;
+  next: string;
+  searchPlaceholder: string;
+  allTags: string;
+  allCategories: string;
+  clearFilters: string;
+  filters: string;
+  filterDescription: string;
+  tag: string;
+  activeFilters: string;
 }
 
 export interface HelpMessages {
@@ -589,6 +600,413 @@ export interface TermsConditionsMessages {
   contact: PrivacyPolicySectionMessages;
 }
 
+export interface AdminDashboardMessages {
+  loading: string;
+  tryAgain: string;
+  welcomeBack: string;
+  dashboard: string;
+  dashboardDescription: string;
+  apexWorkspaceTheme: string;
+  stats: {
+    totalProducts: string;
+    totalOrders: string;
+    totalUsers: string;
+    totalRevenue: string;
+    fromLastMonth: string;
+  };
+  activeUsers: string;
+  currentlyEngaged: string;
+  allTime: string;
+  products: string;
+  activeListings: string;
+  recentOrders: string;
+  noRecentOrders: string;
+  lowStockAlert: string;
+  allProductsWellStocked: string;
+  remaining: string;
+  quickActions: string;
+  addNewProduct: string;
+  createNewProductListing: string;
+  manageUsers: string;
+  viewManageUserAccounts: string;
+  settings: string;
+  configureStorePreferences: string;
+  goToPage: string;
+  orderPrefix: string;
+  guest: string;
+  lowStock: string;
+  viewAnalytics: string;
+  checkSalesPerformance: string;
+}
+
+export interface AdminThemeSettingsMessages {
+  workspaceStyling: string;
+  themeSettings: string;
+  themeSettingsDescription: string;
+  themeMode: string;
+  activeMode: string;
+  currentTheme: string;
+  colorTokens: string;
+  presets: string;
+  primary: string;
+  primaryDescription: string;
+  secondary: string;
+  secondaryDescription: string;
+  background: string;
+  backgroundDescription: string;
+  foreground: string;
+  foregroundDescription: string;
+  border: string;
+  borderDescription: string;
+  livePreview: string;
+  primaryAction: string;
+  secondarySurface: string;
+  previewText: string;
+  saving: string;
+  saveTheme: string;
+  reset: string;
+  themeSettingsSaved: string;
+  themeSettingsReset: string;
+  light: string;
+  dark: string;
+  system: string;
+}
+
+export interface AdminProductsMessages {
+  loading: string;
+  commerceWorkspace: string;
+  productManagement: string;
+  productManagementDescription: string;
+  addProduct: string;
+  editProduct: string;
+  addNewProduct: string;
+  productName: string;
+  category: string;
+  selectCategory: string;
+  description: string;
+  quantity: string;
+  price: string;
+  discountPrice: string;
+  status: string;
+  seoSettings: string;
+  seoTitle: string;
+  seoTitlePlaceholder: string;
+  seoDescription: string;
+  seoDescriptionPlaceholder: string;
+  seoKeywords: string;
+  seoKeywordsPlaceholder: string;
+  productImages: string;
+  uploading: string;
+  uploadImages: string;
+  uploadHint: string;
+  saving: string;
+  updateProduct: string;
+  createProduct: string;
+  cancel: string;
+  searchProducts: string;
+  searching: string;
+  filterByStatus: string;
+  allStatus: string;
+  active: string;
+  inactive: string;
+  productsCount: string;
+  table: {
+    product: string;
+    category: string;
+    price: string;
+    stock: string;
+    status: string;
+    actions: string;
+  };
+  noProductsFound: string;
+  tryAdjustingFilters: string;
+  getStarted: string;
+  atLeastOneImageRequired: string;
+  productUpdated: string;
+  productCreated: string;
+  productDeleted: string;
+  failedToFetchProducts: string;
+  failedToFetchCategories: string;
+  failedToSaveProduct: string;
+  failedToLoadProduct: string;
+  failedToDeleteProduct: string;
+  maxImagesAllowed: string;
+  maxImagesReached: string;
+  invalidFileType: string;
+  imageUploadFailed: string;
+  areYouSureDelete: string;
+  productNotFound: string;
+}
+
+export interface CheckoutMessages {
+  loading: string;
+  cartEmpty: string;
+  cartEmptyMessage: string;
+  continueShopping: string;
+  home: string;
+  cart: string;
+  checkout: string;
+  guestCheckout: string;
+  secureCheckout: string;
+  guestCheckoutDescription: string;
+  authenticatedDescription: string;
+  alreadyHaveAccount: string;
+  signInForFasterCheckout: string;
+  shipping: string;
+  payment: string;
+  review: string;
+  selectShippingAddress: string;
+  chooseAddress: string;
+  continueToPayment: string;
+  addNewAddress: string;
+  addAddressDescription: string;
+  paymentInformation: string;
+  cardNumber: string;
+  cardNumberPlaceholder: string;
+  expiryDate: string;
+  expiryPlaceholder: string;
+  cvv: string;
+  cvvPlaceholder: string;
+  cardholderName: string;
+  cardholderPlaceholder: string;
+  backToShipping: string;
+  processing: string;
+  reviewOrder: string;
+  orderReview: string;
+  shippingAddress: string;
+  paymentMethod: string;
+  backToPayment: string;
+  processingPayment: string;
+  payAmount: string;
+  failedToCreateOrder: string;
+  checkoutError: string;
+}
+
+export interface AccountMessages {
+  pleaseSignIn: string;
+  signInRequired: string;
+  signIn: string;
+  signUp: string;
+  home: string;
+  account: string;
+  user: string;
+  administrator: string;
+  customer: string;
+  verified: string;
+  settings: string;
+  signOut: string;
+  overview: string;
+  orders: string;
+  wishlist: string;
+  addresses: string;
+  totalOrders: string;
+  lifetimeOrders: string;
+  noOrdersYet: string;
+  wishlistItems: string;
+  savedForLater: string;
+  wishlistEmpty: string;
+  totalSpent: string;
+  lifetimePurchases: string;
+  noPurchasesYet: string;
+  recentOrders: string;
+  orderHistory: string;
+  noOrdersYetDescription: string;
+  startShopping: string;
+  myWishlist: string;
+  wishlistEmptyDescription: string;
+  browseProducts: string;
+  savedAddresses: string;
+  noAddressesSaved: string;
+  addressesDescription: string;
+  addAddress: string;
+  viewAllOrders: string;
+  accountActions: string;
+  accountSettings: string;
+  orderHistoryLink: string;
+  myWishlistLink: string;
+  notifications: string;
+}
+
+export interface AdminOrdersMessages {
+  loading: string;
+  commerceWorkspace: string;
+  orders: string;
+  ordersDescription: string;
+  searchOrders: string;
+  filterByStatus: string;
+  allStatus: string;
+  pending: string;
+  processing: string;
+  shipped: string;
+  delivered: string;
+  cancelled: string;
+  ordersCount: string;
+  table: {
+    orderId: string;
+    customer: string;
+    items: string;
+    total: string;
+    status: string;
+    date: string;
+    actions: string;
+  };
+  noOrdersFound: string;
+  item: string;
+  items: string;
+  previous: string;
+  pageXOfY: string;
+  next: string;
+  tryAgain: string;
+  orderStatusUpdated: string;
+  guest: string;
+}
+
+export interface AdminUsersMessages {
+  loading: string;
+  userAdministration: string;
+  users: string;
+  usersDescription: string;
+  searchUsers: string;
+  role: string;
+  allRoles: string;
+  userRole: string;
+  adminRole: string;
+  status: string;
+  allStatus: string;
+  active: string;
+  inactive: string;
+  usersCount: string;
+  noUsersFound: string;
+  table: {
+    user: string;
+    email: string;
+    role: string;
+    status: string;
+    orders: string;
+    joined: string;
+    actions: string;
+  };
+  noName: string;
+  previous: string;
+  pageXOfY: string;
+  next: string;
+  confirmDeleteUser: string;
+  userRoleUpdated: string;
+  userStatusUpdated: string;
+  userUpdated: string;
+  userCreated: string;
+  userDeleted: string;
+}
+
+export interface AdminAnalyticsMessages {
+  loading: string;
+  tryAgain: string;
+  analyticsWorkspace: string;
+  analytics: string;
+  analyticsDescription: string;
+  selectPeriod: string;
+  last7Days: string;
+  last30Days: string;
+  last90Days: string;
+  lastYear: string;
+  stats: {
+    totalRevenue: string;
+    totalOrders: string;
+    totalCustomers: string;
+    averageOrderValue: string;
+  };
+  forTheSelectedPeriod: string;
+  uniqueBuyers: string;
+  perOrder: string;
+  revenue: string;
+  orders: string;
+  newUsers: string;
+  topProducts: string;
+  noSalesDataAvailable: string;
+  sold: string;
+  categoryPerformance: string;
+  noCategoryDataAvailable: string;
+  salesTrend: string;
+  userGrowth: string;
+}
+
+export interface AdminSettingsMessages {
+  loading: string;
+  settings: string;
+  settingsDescription: string;
+  lastSaved: string;
+  generalSettings: string;
+  siteName: string;
+  siteNamePlaceholder: string;
+  contactEmail: string;
+  contactEmailPlaceholder: string;
+  siteDescription: string;
+  siteDescriptionPlaceholder: string;
+  storeSettings: string;
+  defaultCurrency: string;
+  selectCurrency: string;
+  lowStockThreshold: string;
+  lowStockPlaceholder: string;
+  maintenanceMode: string;
+  maintenanceDescription: string;
+  allowRegistration: string;
+  registrationDescription: string;
+  multilingualSettings: string;
+  siteTitleFa: string;
+  siteTitleFaPlaceholder: string;
+  phoneFa: string;
+  phoneFaPlaceholder: string;
+  descriptionFa: string;
+  descriptionFaPlaceholder: string;
+  seoSettings: string;
+  defaultSeoTitle: string;
+  seoTitlePlaceholder: string;
+  defaultSeoDescription: string;
+  seoDescriptionPlaceholder: string;
+  defaultOgImage: string;
+  ogImagePlaceholder: string;
+  analytics: string;
+  googleAnalyticsId: string;
+  gaPlaceholder: string;
+  analyticsDescription: string;
+  saving: string;
+  saveSettings: string;
+  themeCustomization: string;
+  customizeThemeColors: string;
+  themeCustomizationDescription: string;
+  goToThemeSettings: string;
+}
+
+export interface DashboardMessages {
+  loading: string;
+  couldntLoad: string;
+  tryAgain: string;
+  welcomeBack: string;
+  dashboardDescription: string;
+  stats: {
+    totalOrders: string;
+    revenue: string;
+    products: string;
+  };
+  inTheLastPeriod: string;
+  lifetimeRevenue: string;
+  lowOnStock: string;
+  recentOrders: string;
+  yourLastXOrders: string;
+  noOrdersYet: string;
+  startShopping: string;
+  orderX: string;
+  viewAllOrders: string;
+  browseProducts: string;
+  freshFromCatalog: string;
+  noProductsAvailable: string;
+  viewAllProducts: string;
+  myWishlist: string;
+  orderHistory: string;
+  accountSettings: string;
+  item: string;
+}
+
 export interface LegalMessages {
   privacyPolicy: PrivacyPolicyMessages;
   termsConditions: TermsConditionsMessages;
@@ -631,12 +1049,21 @@ export interface AppMessages {
   "User Actions": Record<string, string>;
   "Status and Messages": Record<string, string>;
   "Admin Specific": Record<string, string>;
-  "Admin Dashboard": Record<string, any>;
+  "Admin Dashboard": AdminDashboardMessages;
+  "Admin Theme Settings": AdminThemeSettingsMessages;
+  "Admin Products": AdminProductsMessages;
+  "Admin Orders": AdminOrdersMessages;
+  "Admin Users": AdminUsersMessages;
+  "Admin Analytics": AdminAnalyticsMessages;
+  "Admin Settings": AdminSettingsMessages;
   "Language Settings": Record<string, any>;
   "Product Suggestions": Record<string, any>;
   "Site Settings": Record<string, any>;
   "Multilingual Tips": Record<string, any>;
   "Product Comparison": Record<string, any>;
+  Dashboard: DashboardMessages;
+  Checkout: CheckoutMessages;
+  Account: AccountMessages;
   "Recently Viewed": Record<string, string>;
   "Social Sharing": Record<string, string>;
   Home: HomeMessages;

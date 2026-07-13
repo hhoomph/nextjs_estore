@@ -26,19 +26,24 @@ type CurrencyStore = {
 
 const STORAGE_KEY = "storefront-currency";
 
-const loadStoredCurrency = (): CurrencyCode => {
-  if (typeof window === "undefined") return "IRR";
+/**
+ * Hydrates the currency store from localStorage after client mount.
+ * Must be called inside a useEffect on the client to avoid SSR hydration mismatches.
+ */
+export const hydrateCurrencyStore = () => {
+  if (typeof window === "undefined") return;
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored && stored in CURRENCIES) return stored as CurrencyCode;
+    if (stored && stored in CURRENCIES) {
+      useCurrencyStore.setState({ currency: stored as CurrencyCode });
+    }
   } catch {
     // localStorage unavailable
   }
-  return "IRR";
 };
 
 export const useCurrencyStore = create<CurrencyStore>((set) => ({
-  currency: loadStoredCurrency(),
+  currency: "IRR",
   currencies: CURRENCIES,
   setCurrency: (code: CurrencyCode) => {
     try {

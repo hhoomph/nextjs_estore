@@ -1,5 +1,8 @@
 {
   "signin": {
+    "backToHome": "Back to home",
+    "needHelp": "Need help?",
+    "contactUs": "Contact us",
     "title": "Sign in to your account",
     "subtitle": "Enter your credentials to access your account",
     "email": {
@@ -23,10 +26,19 @@
     "errors": {
       "signInFailed": "Sign in failed",
       "socialSignInFailed": "Social sign in failed",
-      "unexpectedError": "An unexpected error occurred"
+      "unexpectedError": "An unexpected error occurred",
+      "invalidEmail": "Email is required.",
+      "invalidPassword": "Password must be at least 6 characters."
     }
   },
   "signup": {
+    "successTitle": "Account Created!",
+    "successMessage": "Your account has been created successfully. Redirecting to sign in...",
+    "successLink": "Click here if you're not redirected",
+    "termsAgreement": "By signing up, you agree to our",
+    "terms": "Terms",
+    "and": "and",
+    "privacy": "Privacy Policy",
     "title": "Create your account",
     "subtitle": "Enter your information to create your account",
     "name": {

@@ -44,6 +44,7 @@ import { SHIPPING_COST, TAX_RATE } from "@/lib/constants/checkout";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { useGuestCartStore } from "@/lib/stores/guest-cart-store";
 import type { EnhancedCartItem } from "@/types/cart";
+import { useTranslations } from "next-intl";
 
 const paymentSchema = z.object({
   cardNumber: z.string().min(16, "Card number must be 16 digits"),
@@ -57,6 +58,7 @@ const paymentSchema = z.object({
 type PaymentFormData = z.infer<typeof paymentSchema>;
 
 export default function CheckoutPage() {
+  const t = useTranslations("Checkout");
   const router = useRouter();
   const { data: session, isPending } = useSession();
   const userCartStore = useCartStore();
@@ -94,7 +96,7 @@ export default function CheckoutPage() {
     return (
       <div className="flex justify-center items-center py-20">
         <Loader2 className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Loading...</span>
+        <span className="ml-2">{t("loading")}</span>
       </div>
     );
   }
@@ -105,14 +107,14 @@ export default function CheckoutPage() {
       <div className="container px-4 py-20">
         <div className="text-center">
           <ShoppingBag className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-          <h1 className="text-2xl font-bold mb-4">Your cart is empty</h1>
+          <h1 className="text-2xl font-bold mb-4">{t("cartEmpty")}</h1>
           <p className="text-muted-foreground mb-8">
-            Add some items to your cart before checking out.
+            {t("cartEmptyMessage")}
           </p>
           <Link href="/products">
             <Button>
               <ChevronLeft className="h-4 w-4 mr-2" />
-              Continue Shopping
+              {t("continueShopping")}
             </Button>
           </Link>
         </div>
@@ -128,14 +130,14 @@ export default function CheckoutPage() {
           <div className="container px-4 py-3">
             <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
               <Link href="/" className="hover:text-foreground">
-                Home
+                {t("home")}
               </Link>
               <span>/</span>
               <Link href="/cart" className="hover:text-foreground">
-                Cart
+                {t("cart")}
               </Link>
               <span>/</span>
-              <span className="text-foreground">Checkout</span>
+              <span className="text-foreground">{t("checkout")}</span>
             </nav>
           </div>
         </div>
@@ -143,12 +145,12 @@ export default function CheckoutPage() {
         <div className="container px-4 py-8">
           {/* Checkout Header */}
           <SectionHeading
-            eyebrow={isGuest ? "Guest Checkout" : "Secure Checkout"}
-            title="Checkout"
+            eyebrow={isGuest ? t("guestCheckout") : t("secureCheckout")}
+            title={t("checkout")}
             description={
               isGuest
-                ? "Complete your order as a guest or sign in to access your account features."
-                : "Review your order details and complete your purchase."
+                ? t("guestCheckoutDescription")
+                : t("authenticatedDescription")
             }
             className="mb-8"
           />
@@ -208,13 +210,13 @@ export default function CheckoutPage() {
           {isGuest && (
             <div className="mt-8 text-center border-t pt-8">
               <p className="text-sm text-muted-foreground mb-4">
-                Already have an account?
+                {t("alreadyHaveAccount")}
               </p>
               <Link
                 href="/auth/signin"
                 className="text-primary hover:underline"
               >
-                Sign in for faster checkout and order history
+                {t("signInForFasterCheckout")}
               </Link>
             </div>
           )}
@@ -239,6 +241,7 @@ function AuthenticatedCheckoutFlow({
   onSuccess: (orderId: string) => void;
   onError: (error: string) => void;
 }) {
+  const t = useTranslations("Checkout");
   const { selectedShippingAddress, setShippingAddress } = useCartStore();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -299,7 +302,7 @@ function AuthenticatedCheckoutFlow({
             >
               {currentStep > 1 ? <Check className="h-4 w-4" /> : "1"}
             </div>
-            <span className="hidden sm:inline">Shipping</span>
+            <span className="hidden sm:inline">{t("shipping")}</span>
           </div>
           <div
             className={`w-8 h-0.5 ${currentStep >= 2 ? "bg-primary" : "bg-muted"}`}
@@ -312,7 +315,7 @@ function AuthenticatedCheckoutFlow({
             >
               {currentStep > 2 ? <Check className="h-4 w-4" /> : "2"}
             </div>
-            <span className="hidden sm:inline">Payment</span>
+            <span className="hidden sm:inline">{t("payment")}</span>
           </div>
           <div
             className={`w-8 h-0.5 ${currentStep >= 3 ? "bg-primary" : "bg-muted"}`}
@@ -325,7 +328,7 @@ function AuthenticatedCheckoutFlow({
             >
               3
             </div>
-            <span className="hidden sm:inline">Review</span>
+            <span className="hidden sm:inline">{t("review")}</span>
           </div>
         </div>
       </div>
@@ -339,8 +342,8 @@ function AuthenticatedCheckoutFlow({
               setShippingAddress(address || undefined)
             }
             onAddNew={() => setAddressDialogOpen(true)}
-            title="Select Shipping Address"
-            description="Choose the address where you want your order delivered"
+            title={t("selectShippingAddress")}
+            description={t("chooseAddress")}
           />
 
           <div className="flex justify-end">
@@ -348,18 +351,18 @@ function AuthenticatedCheckoutFlow({
               onClick={() => selectedShippingAddress && setCurrentStep(2)}
               disabled={!selectedShippingAddress}
             >
-              Continue to Payment
+              {t("continueToPayment")}
             </Button>
           </div>
 
           <Dialog open={addressDialogOpen} onOpenChange={setAddressDialogOpen}>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Add New Address</DialogTitle>
-                <DialogDescription>
-                  Add a new shipping address for your order delivery.
-                </DialogDescription>
-              </DialogHeader>
+            <DialogHeader>
+              <DialogTitle>{t("addNewAddress")}</DialogTitle>
+              <DialogDescription>
+                {t("addAddressDescription")}
+              </DialogDescription>
+            </DialogHeader>
               <AddressForm
                 onSuccess={() => setAddressDialogOpen(false)}
                 onCancel={() => setAddressDialogOpen(false)}
@@ -374,16 +377,16 @@ function AuthenticatedCheckoutFlow({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CreditCard className="h-5 w-5" />
-              Payment Information
+              {t("paymentInformation")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handlePaymentSubmit} className="space-y-6">
               <div>
-                <Label htmlFor="cardNumber">Card Number</Label>
+                <Label htmlFor="cardNumber">{t("cardNumber")}</Label>
                 <Input
                   id="cardNumber"
-                  placeholder="1234 5678 9012 3456"
+                  placeholder={t("cardNumberPlaceholder")}
                   {...paymentForm.register("cardNumber")}
                 />
                 {paymentForm.formState.errors.cardNumber && (
@@ -395,10 +398,10 @@ function AuthenticatedCheckoutFlow({
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="expiryDate">Expiry Date</Label>
+                  <Label htmlFor="expiryDate">{t("expiryDate")}</Label>
                   <Input
                     id="expiryDate"
-                    placeholder="MM/YY"
+                    placeholder={t("expiryPlaceholder")}
                     {...paymentForm.register("expiryDate")}
                   />
                   {paymentForm.formState.errors.expiryDate && (
@@ -408,10 +411,10 @@ function AuthenticatedCheckoutFlow({
                   )}
                 </div>
                 <div>
-                  <Label htmlFor="cvv">CVV</Label>
+                  <Label htmlFor="cvv">{t("cvv")}</Label>
                   <Input
                     id="cvv"
-                    placeholder="123"
+                    placeholder={t("cvvPlaceholder")}
                     {...paymentForm.register("cvv")}
                   />
                   {paymentForm.formState.errors.cvv && (
@@ -423,10 +426,10 @@ function AuthenticatedCheckoutFlow({
               </div>
 
               <div>
-                <Label htmlFor="cardName">Cardholder Name</Label>
+                <Label htmlFor="cardName">{t("cardholderName")}</Label>
                 <Input
                   id="cardName"
-                  placeholder="John Doe"
+                  placeholder={t("cardholderPlaceholder")}
                   {...paymentForm.register("cardName")}
                 />
                 {paymentForm.formState.errors.cardName && (
@@ -442,16 +445,16 @@ function AuthenticatedCheckoutFlow({
                   variant="outline"
                   onClick={() => setCurrentStep(1)}
                 >
-                  Back to Shipping
+                  {t("backToShipping")}
                 </Button>
                 <Button type="submit" disabled={loading}>
                   {loading ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Processing...
+                      {t("processing")}
                     </>
                   ) : (
-                    "Review Order"
+                    t("reviewOrder")
                   )}
                 </Button>
               </div>
@@ -463,11 +466,11 @@ function AuthenticatedCheckoutFlow({
       {currentStep === 3 && (
         <Card>
           <CardHeader>
-            <CardTitle>Order Review</CardTitle>
+            <CardTitle>{t("orderReview")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <h3 className="font-semibold mb-2">Shipping Address</h3>
+              <h3 className="font-semibold mb-2">{t("shippingAddress")}</h3>
               <div className="text-sm text-muted-foreground">
                 <p>{selectedShippingAddress?.addressLine1}</p>
                 {selectedShippingAddress?.addressLine2 && (
@@ -482,7 +485,7 @@ function AuthenticatedCheckoutFlow({
             </div>
 
             <div>
-              <h3 className="font-semibold mb-2">Payment Method</h3>
+              <h3 className="font-semibold mb-2">{t("paymentMethod")}</h3>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <CreditCard className="h-4 w-4" />
                 <span>
@@ -498,13 +501,13 @@ function AuthenticatedCheckoutFlow({
                 variant="outline"
                 onClick={() => setCurrentStep(2)}
               >
-                Back to Payment
+                {t("backToPayment")}
               </Button>
               <Button onClick={() => handlePaymentSubmit()} disabled={loading}>
                 {loading ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Processing Payment...
+                    {t("processingPayment")}
                   </>
                 ) : (
                   `Pay $${total.toFixed(2)}`

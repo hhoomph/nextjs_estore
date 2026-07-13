@@ -14,7 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { ProductPrice } from "@/components/ui/product-price";
 import { StockBadge } from "@/components/ui/stock-badge";
 import { AddToCartSection } from "@/components/features/add-to-cart-section";
-import { ImageSlider } from "@/components/ui/image-slider";
+import { ProductImageGallery } from "@/components/features/products/product-image-gallery";
 import Link from "next/link";
 import { Star, ChevronLeft } from "lucide-react";
 import { PLACEHOLDER_IMAGE } from "@/lib/utils/image-utils";
@@ -105,7 +105,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Product Images */}
             <div className="space-y-4">
-              <ImageSlider
+              <ProductImageGallery
                 images={productImages}
                 alt={product.name || "Product"}
                 className="rounded-[2rem] border border-border/60 bg-card p-3 shadow-xl shadow-primary/10"

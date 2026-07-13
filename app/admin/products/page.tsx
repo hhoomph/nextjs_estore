@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState, type ChangeEvent } from "reac
 import Image from "next/image";
 import { useSession, type Session } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -157,6 +158,7 @@ async function uploadImageFile(file: File) {
 }
 
 export default function AdminProductsPage() {
+  const t = useTranslations("Admin Products");
   const { data: session, isPending } = useSession();
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
@@ -196,11 +198,11 @@ export default function AdminProductsPage() {
       setProducts(data.products || []);
     } catch (error) {
       console.error("Failed to fetch products:", error);
-      toast.error("Failed to fetch products");
+      toast.error(t("failedToFetchProducts"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   const fetchCategories = useCallback(async () => {
     setCategoriesLoading(true);
@@ -215,11 +217,11 @@ export default function AdminProductsPage() {
     } catch (error) {
       console.error("Failed to fetch categories:", error);
       setCategories([]);
-      toast.error("Failed to fetch categories");
+      toast.error(t("failedToFetchCategories"));
     } finally {
       setCategoriesLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (isPending) return;
@@ -244,7 +246,7 @@ export default function AdminProductsPage() {
 
   const handleSubmit = async (data: ProductFormData) => {
     if (productImages.length === 0) {
-      toast.error("At least one product image is required");
+      toast.error(t("atLeastOneImageRequired"));
       return;
     }
 
@@ -267,7 +269,7 @@ export default function AdminProductsPage() {
       });
 
       if (response.ok) {
-        toast.success(editingProduct ? "Product updated" : "Product created");
+        toast.success(editingProduct ? t("productUpdated") : t("productCreated"));
         setDialogOpen(false);
         form.reset();
         setEditingProduct(null);
@@ -275,11 +277,11 @@ export default function AdminProductsPage() {
         await fetchProducts();
       } else {
         const errorData = await response.json().catch(() => ({}));
-        toast.error(errorData?.error || "Failed to save product");
+        toast.error(errorData?.error || t("failedToSaveProduct"));
       }
     } catch (error) {
       console.error("Failed to save product:", error);
-      toast.error("Failed to save product. Please try again.");
+      toast.error(t("failedToSaveProduct"));
     } finally {
       setSubmitting(false);
     }
@@ -314,12 +316,12 @@ export default function AdminProductsPage() {
       setDialogOpen(true);
     } catch (error) {
       console.error("Failed to load product:", error);
-      toast.error("Failed to load product details");
+      toast.error(t("failedToLoadProduct"));
     }
   };
 
   const handleDelete = async (productId: string) => {
-    if (!confirm("Are you sure you want to delete this product?")) return;
+    if (!confirm(t("areYouSureDelete"))) return;
 
     try {
       const response = await fetch(`/api/admin/products/${productId}`, {
@@ -327,15 +329,15 @@ export default function AdminProductsPage() {
       });
 
       if (response.ok) {
-        toast.success("Product deleted");
+        toast.success(t("productDeleted"));
         await fetchProducts();
       } else {
         const errorData = await response.json().catch(() => ({}));
-        toast.error(errorData?.error || "Failed to delete product");
+        toast.error(errorData?.error || t("failedToDeleteProduct"));
       }
     } catch (error) {
       console.error("Failed to delete product:", error);
-      toast.error("Failed to delete product. Please try again.");
+      toast.error(t("failedToDeleteProduct"));
     }
   };
 
@@ -349,8 +351,8 @@ export default function AdminProductsPage() {
       const canAdd = MAX_IMAGES - productImages.length;
       toast.error(
         canAdd <= 0
-          ? `Maximum ${MAX_IMAGES} images allowed. Remove some before adding more.`
-          : `Maximum ${MAX_IMAGES} images allowed. You can only add ${canAdd} more.`,
+          ? t("maxImagesReached")
+          : t("maxImagesAllowed", { count: MAX_IMAGES, remaining: canAdd }),
       );
       event.target.value = "";
       return;
@@ -362,7 +364,7 @@ export default function AdminProductsPage() {
     );
 
     if (invalidFiles.length > 0) {
-      toast.error("Use JPEG, PNG, or WebP images under 5MB each");
+      toast.error(t("invalidFileType"));
       event.target.value = "";
       return;
     }
@@ -391,11 +393,11 @@ export default function AdminProductsPage() {
       }
 
       if (failedUploads.length > 0) {
-        toast.error(`${failedUploads.length} image upload failed`);
+        toast.error(t("imageUploadFailed", { count: failedUploads.length }));
       }
     } catch (error) {
       console.error("Failed to upload images:", error);
-      toast.error("Failed to upload images. Please try again.");
+      toast.error(t("failedToSaveProduct"));
     } finally {
       setUploadingImage(false);
       event.target.value = "";
@@ -411,7 +413,7 @@ export default function AdminProductsPage() {
       <div className="flex h-64 items-center justify-center">
         <div className="text-center">
           <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
-          <p className="mt-2 text-sm text-muted-foreground">Loading products...</p>
+          <p className="mt-2 text-sm text-muted-foreground">{t("loading")}</p>
         </div>
       </div>
     );
@@ -427,336 +429,336 @@ export default function AdminProductsPage() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-              Commerce workspace
+              {t("commerceWorkspace")}
             </p>
             <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground">
-              Product Management
+              {t("productManagement")}
             </h1>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Manage your store&apos;s products with Apex-style cards and tables.
+              {t("productManagementDescription")}
             </p>
           </div>
 
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-            <Button
-              onClick={() => {
-                setEditingProduct(null);
-                form.reset({
-                  name: "",
-                  desc: "",
-                  categoryId: "",
-                  quantity: 0,
-                  price: 0,
-                  discountPrice: undefined,
-                  status: 1,
-                });
-                setProductImages([]);
-              }}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Product
-            </Button>
+              <Button
+                onClick={() => {
+                  setEditingProduct(null);
+                  form.reset({
+                    name: "",
+                    desc: "",
+                    categoryId: "",
+                    quantity: 0,
+                    price: 0,
+                    discountPrice: undefined,
+                    status: 1,
+                  });
+                  setProductImages([]);
+                }}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                {t("addProduct")}
+              </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>
-                {editingProduct ? "Edit Product" : "Add New Product"}
-              </DialogTitle>
-            </DialogHeader>
+              <DialogHeader>
+                <DialogTitle>
+                  {editingProduct ? t("editProduct") : t("addNewProduct")}
+                </DialogTitle>
+              </DialogHeader>
 
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(handleSubmit)}
-                className="space-y-4"
-              >
-                <div className="grid grid-cols-2 gap-4">
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(handleSubmit)}
+                  className="space-y-4"
+                >
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t("productName")}</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="categoryId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t("category")}</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder={t("selectCategory")} />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {categories.map((category) => (
+                                <SelectItem key={category.id} value={category.id}>
+                                  {category.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
                   <FormField
                     control={form.control}
-                    name="name"
+                    name="desc"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Product Name</FormLabel>
+                        <FormLabel>{t("description")}</FormLabel>
                         <FormControl>
-                          <Input {...field} />
+                          <Textarea rows={3} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
 
+                  <div className="grid grid-cols-3 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="quantity"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t("quantity")}</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              value={field.value ?? 0}
+                              onChange={(e) =>
+                                field.onChange(parseInt(e.target.value) || 0)
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="price"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t("price")}</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              value={field.value ?? 0}
+                              onChange={(e) =>
+                                field.onChange(parseFloat(e.target.value) || 0)
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="discountPrice"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t("discountPrice")}</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              value={(field.value ?? "") as number | string}
+                              onChange={(e) =>
+                                field.onChange(
+                                  e.target.value
+                                    ? parseFloat(e.target.value)
+                                    : undefined,
+                                )
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
                   <FormField
                     control={form.control}
-                    name="categoryId"
+                    name="status"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Category</FormLabel>
+                        <FormLabel>{t("status")}</FormLabel>
                         <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
+                          onValueChange={(value) => field.onChange(parseInt(value))}
+                          value={(field.value ?? 1).toString()}
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select category" />
+                              <SelectValue />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {categories.map((category) => (
-                              <SelectItem key={category.id} value={category.id}>
-                                {category.name}
-                              </SelectItem>
-                            ))}
+                            <SelectItem value="1">{t("active")}</SelectItem>
+                            <SelectItem value="0">{t("inactive")}</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                </div>
 
-                <FormField
-                  control={form.control}
-                  name="desc"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Description</FormLabel>
-                      <FormControl>
-                        <Textarea rows={3} {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <details className="rounded-2xl border border-border p-4">
+                    <summary className="cursor-pointer text-sm font-semibold text-muted-foreground hover:text-foreground">
+                      {t("seoSettings")}
+                    </summary>
+                    <div className="mt-4 space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="seoTitle"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t("seoTitle")}</FormLabel>
+                            <FormControl>
+                              <Input {...field} value={field.value ?? ""} placeholder={t("seoTitlePlaceholder")} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="seoDescription"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t("seoDescription")}</FormLabel>
+                            <FormControl>
+                              <Textarea rows={2} {...field} value={field.value ?? ""} placeholder={t("seoDescriptionPlaceholder")} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="seoKeywords"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t("seoKeywords")}</FormLabel>
+                            <FormControl>
+                              <Input {...field} value={field.value ?? ""} placeholder={t("seoKeywordsPlaceholder")} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </details>
 
-                <div className="grid grid-cols-3 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="quantity"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Quantity</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            value={field.value ?? 0}
-                            onChange={(e) =>
-                              field.onChange(parseInt(e.target.value) || 0)
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="price"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Price ($)</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            value={field.value ?? 0}
-                            onChange={(e) =>
-                              field.onChange(parseFloat(e.target.value) || 0)
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="discountPrice"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Discount Price ($)</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            value={(field.value ?? "") as number | string}
-                            onChange={(e) =>
-                              field.onChange(
-                                e.target.value
-                                  ? parseFloat(e.target.value)
-                                  : undefined,
-                              )
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="status"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Status</FormLabel>
-                      <Select
-                        onValueChange={(value) => field.onChange(parseInt(value))}
-                        value={(field.value ?? 1).toString()}
+                  <div>
+                    <FormLabel>{t("productImages", { count: productImages.length, max: MAX_IMAGES })}</FormLabel>
+                    <div className="mt-2">
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        disabled={uploadingImage}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploadingImage}
+                        className="w-full"
                       >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="1">Active</SelectItem>
-                          <SelectItem value="0">Inactive</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                        {uploadingImage ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            {t("uploading")}
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="h-4 w-4 mr-2" />
+                            {t("uploadImages")}
+                          </>
+                        )}
+                      </Button>
+                      <p className="mt-1 text-sm text-muted-foreground line-clamp-1">
+                        {t("uploadHint")}
+                      </p>
+                    </div>
 
-                <details className="rounded-2xl border border-border p-4">
-                  <summary className="cursor-pointer text-sm font-semibold text-muted-foreground hover:text-foreground">
-                    SEO Settings
-                  </summary>
-                  <div className="mt-4 space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="seoTitle"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>SEO Title</FormLabel>
-                          <FormControl>
-                            <Input {...field} value={field.value ?? ""} placeholder="Leave blank to use product name" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="seoDescription"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>SEO Description</FormLabel>
-                          <FormControl>
-                            <Textarea rows={2} {...field} value={field.value ?? ""} placeholder="Meta description for search engines" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="seoKeywords"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>SEO Keywords</FormLabel>
-                          <FormControl>
-                            <Input {...field} value={field.value ?? ""} placeholder="Comma-separated keywords" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    {productImages.length > 0 && (
+                      <div className="mt-4 grid grid-cols-3 gap-4">
+                        {productImages.map((imageUrl, index) => (
+                          <div key={`${imageUrl}-${index}`} className="relative group">
+                              <div className="aspect-square overflow-hidden rounded-2xl bg-muted">
+                              <Image
+                                src={imageUrl}
+                                alt={`Product image ${index + 1}`}
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="destructive"
+                              className="absolute top-2 right-2 h-6 w-6 p-0 opacity-100 bg-destructive/90 shadow-sm transition-opacity hover:bg-destructive focus-visible:ring-2 focus-visible:ring-offset-2"
+                              onClick={() => removeImage(index)}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                </details>
 
-                <div>
-                  <FormLabel>Product Images ({productImages.length}/{MAX_IMAGES})</FormLabel>
-                  <div className="mt-2">
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                      disabled={uploadingImage}
-                    />
+                  <div className="flex gap-2 pt-4">
+                    <Button type="submit" disabled={submitting}>
+                      {submitting ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          {t("saving")}
+                        </>
+                      ) : editingProduct ? (
+                        t("updateProduct")
+                      ) : (
+                        t("createProduct")
+                      )}
+                    </Button>
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={uploadingImage}
-                      className="w-full"
+                      onClick={() => setDialogOpen(false)}
                     >
-                      {uploadingImage ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Uploading...
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="h-4 w-4 mr-2" />
-                          Upload Images
-                        </>
-                      )}
+                      {t("cancel")}
                     </Button>
-                    <p className="mt-1 text-sm text-muted-foreground line-clamp-1">
-                      You can upload multiple images (JPEG, PNG, WebP, max 5MB each)
-                    </p>
                   </div>
-
-                  {productImages.length > 0 && (
-                    <div className="mt-4 grid grid-cols-3 gap-4">
-                      {productImages.map((imageUrl, index) => (
-                        <div key={`${imageUrl}-${index}`} className="relative group">
-                            <div className="aspect-square overflow-hidden rounded-2xl bg-muted">
-                            <Image
-                              src={imageUrl}
-                              alt={`Product image ${index + 1}`}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="destructive"
-                            className="absolute top-2 right-2 h-6 w-6 p-0 opacity-100 bg-destructive/90 shadow-sm transition-opacity hover:bg-destructive focus-visible:ring-2 focus-visible:ring-offset-2"
-                            onClick={() => removeImage(index)}
-                          >
-                            <X className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex gap-2 pt-4">
-                  <Button type="submit" disabled={submitting}>
-                    {submitting ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Saving...
-                      </>
-                    ) : editingProduct ? (
-                      "Update Product"
-                    ) : (
-                      "Create Product"
-                    )}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setDialogOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
-      </div>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
+        </div>
 
       <Card className="apex-stat-card">
         <CardContent className="pt-6">
@@ -764,7 +766,7 @@ export default function AdminProductsPage() {
             <div className="relative flex-1">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search products..."
+                placeholder={t("searchProducts")}
                 className="rounded-xl pl-8"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -772,12 +774,12 @@ export default function AdminProductsPage() {
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-48 rounded-xl border-border bg-background">
-                <SelectValue placeholder="Filter by status" />
+                <SelectValue placeholder={t("filterByStatus")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="1">Active</SelectItem>
-                <SelectItem value="0">Inactive</SelectItem>
+                <SelectItem value="all">{t("allStatus")}</SelectItem>
+                <SelectItem value="1">{t("active")}</SelectItem>
+                <SelectItem value="0">{t("inactive")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -787,19 +789,19 @@ export default function AdminProductsPage() {
       <Card className="apex-stat-card">
         <CardHeader>
           <CardTitle className="text-base font-semibold tracking-tight text-foreground">
-            Products ({filteredProducts.length})
+            {t("productsCount", { count: filteredProducts.length })}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Product</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Stock</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>{t("table.product")}</TableHead>
+                <TableHead>{t("table.category")}</TableHead>
+                <TableHead>{t("table.price")}</TableHead>
+                <TableHead>{t("table.stock")}</TableHead>
+                <TableHead>{t("table.status")}</TableHead>
+                <TableHead>{t("table.actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -843,7 +845,7 @@ export default function AdminProductsPage() {
                         (product.status ?? 1) === 1 ? "default" : "destructive"
                       }
                     >
-                      {(product.status ?? 1) === 1 ? "Active" : "Inactive"}
+                      {(product.status ?? 1) === 1 ? t("active") : t("inactive")}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -881,11 +883,11 @@ export default function AdminProductsPage() {
           {filteredProducts.length === 0 && (
             <div className="py-12 text-center">
               <Package className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-              <h3 className="mb-2 text-lg font-semibold text-foreground">No products found</h3>
+              <h3 className="mb-2 text-lg font-semibold text-foreground">{t("noProductsFound")}</h3>
               <p className="text-sm text-muted-foreground">
                 {searchQuery || statusFilter !== "all"
-                  ? "Try adjusting your filters."
-                  : "Get started by adding your first product."}
+                  ? t("tryAdjustingFilters")
+                  : t("getStarted")}
               </p>
             </div>
           )}

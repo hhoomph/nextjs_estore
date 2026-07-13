@@ -93,6 +93,11 @@ export function Navbar() {
     }
   };
 
+  const handlePersianSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    void handlePersianSearch(searchQuery);
+  };
+
   // Fetch site settings for dynamic title
   useEffect(() => {
     const fetchSiteSettings = async () => {
@@ -190,13 +195,13 @@ export function Navbar() {
             </NavigationMenu>
 
             {/* Persian Search Bar */}
-            <div className="hidden md:flex flex-1 max-w-sm mx-4">
+            <form onSubmit={handlePersianSearchSubmit} className="hidden md:flex flex-1 max-w-sm mx-4">
               <PersianSearchInput
                 placeholder="Search products..."
                 onSearch={handlePersianSearch}
                 className="w-full"
               />
-            </div>
+            </form>
 
             {/* Right Side Actions */}
             <div className="flex items-center space-x-2">

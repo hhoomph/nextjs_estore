@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useBrowserSession } from "@/lib/hooks/use-browser-session";
+import { useTranslations } from "next-intl";
 
 // Force dynamic rendering to avoid prerendering issues
 export const dynamic = "force-dynamic";
@@ -118,18 +119,20 @@ const orderStatusVariant = (status: string) => {
 };
 
 function DashboardSkeleton() {
+  const t = useTranslations("Dashboard");
   return (
     <div
       className="flex justify-center items-center py-20"
       data-testid="dashboard-skeleton"
     >
       <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      <span className="ml-2">Loading dashboard...</span>
+      <span className="ml-2">{t("loading")}</span>
     </div>
   );
 }
 
 function DashboardError({ message, onRetry }: { message: string; onRetry: () => void }) {
+  const t = useTranslations("Dashboard");
   return (
     <div
       className="container mx-auto px-4 py-12"
@@ -139,14 +142,14 @@ function DashboardError({ message, onRetry }: { message: string; onRetry: () => 
         <CardHeader>
           <div className="flex items-center space-x-2 text-destructive">
             <AlertCircle className="h-5 w-5" />
-            <CardTitle>Couldn&rsquo;t load your dashboard</CardTitle>
+            <CardTitle>{t("couldntLoad")}</CardTitle>
           </div>
           <CardDescription>{message}</CardDescription>
         </CardHeader>
         <CardContent>
           <Button onClick={onRetry} variant="outline">
             <RefreshCw className="h-4 w-4 mr-2" />
-            Try Again
+            {t("tryAgain")}
           </Button>
         </CardContent>
       </Card>
@@ -155,6 +158,7 @@ function DashboardError({ message, onRetry }: { message: string; onRetry: () => 
 }
 
 function DashboardContent() {
+  const t = useTranslations("Dashboard");
   const { session: browserSession, isLoading: isSessionLoading } =
     useBrowserSession();
   const router = useRouter();
@@ -259,10 +263,10 @@ function DashboardContent() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold">
-          Welcome back{user.name ? `, ${user.name}` : ""}
+          {t("welcomeBack", { name: user.name || "" })}
         </h1>
         <p className="text-muted-foreground mt-1">
-          Here&rsquo;s a snapshot of your store activity.
+          {t("dashboardDescription")}
         </p>
       </div>
 
@@ -273,7 +277,7 @@ function DashboardContent() {
       >
         <Card>
           <CardHeader className="flex flex-row items-center space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("stats.totalOrders")}</CardTitle>
             <ShoppingBag className="h-4 w-4 text-muted-foreground ml-auto" />
           </CardHeader>
           <CardContent>
@@ -281,27 +285,27 @@ function DashboardContent() {
               {stats?.totalOrders ?? 0}
             </div>
             <p className="text-xs text-muted-foreground">
-              {getOrderItemCount(stats?.recentOrders)} in the last period
+              {getOrderItemCount(stats?.recentOrders)} {t("inTheLastPeriod")}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Revenue</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("stats.revenue")}</CardTitle>
             <CreditCard className="h-4 w-4 text-muted-foreground ml-auto" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold" data-testid="stat-revenue">
               {formatCurrency(stats?.totalRevenue ?? 0)}
             </div>
-            <p className="text-xs text-muted-foreground">Lifetime revenue</p>
+            <p className="text-xs text-muted-foreground">{t("lifetimeRevenue")}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Products</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("stats.products")}</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground ml-auto" />
           </CardHeader>
           <CardContent>
@@ -309,7 +313,7 @@ function DashboardContent() {
               {stats?.totalProducts ?? 0}
             </div>
             <p className="text-xs text-muted-foreground">
-              {Array.isArray(stats?.lowStockProducts) ? stats.lowStockProducts.length : 0} low on stock
+              {Array.isArray(stats?.lowStockProducts) ? stats.lowStockProducts.length : 0} {t("lowOnStock")}
             </p>
           </CardContent>
         </Card>
@@ -320,16 +324,16 @@ function DashboardContent() {
         {/* Recent orders */}
         <Card data-testid="dashboard-recent-orders">
           <CardHeader>
-            <CardTitle>Recent Orders</CardTitle>
-            <CardDescription>Your last {orders.length} orders</CardDescription>
+            <CardTitle>{t("recentOrders")}</CardTitle>
+            <CardDescription>{t("yourLastXOrders", { count: orders.length })}</CardDescription>
           </CardHeader>
           <CardContent>
             {orders.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <ShoppingBag className="h-10 w-10 mx-auto mb-2 opacity-40" />
-                <p>No orders yet.</p>
+                <p>{t("noOrdersYet")}</p>
                 <Button asChild={true} variant="outline" className="mt-4">
-                  <Link href="/products">Start shopping</Link>
+                  <Link href="/products">{t("startShopping")}</Link>
                 </Button>
               </div>
             ) : (
@@ -340,12 +344,11 @@ function DashboardContent() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-medium">
-                          Order #{order.id.slice(-6).toUpperCase()}
+                          {t("orderX")}
                         </p>
                         <p className="text-sm text-muted-foreground">
                           {formatDate(order.created_at)} ·{" "}
-                          {getOrderItemCount(order.items)} item
-                          {getOrderItemCount(order.items) === 1 ? "" : "s"}
+                          {getOrderItemCount(order.items)} {t("item")}
                         </p>
                       </div>
                       <div className="text-right">
@@ -363,7 +366,7 @@ function DashboardContent() {
                   </div>
                 ))}
                 <Button asChild={true} variant="outline" className="w-full">
-                  <Link href="/orders">View all orders</Link>
+                  <Link href="/orders">{t("viewAllOrders")}</Link>
                 </Button>
               </div>
             )}
@@ -373,14 +376,14 @@ function DashboardContent() {
         {/* Recent products */}
         <Card data-testid="dashboard-recent-products">
           <CardHeader>
-            <CardTitle>Browse Products</CardTitle>
-            <CardDescription>Fresh from the catalog</CardDescription>
+            <CardTitle>{t("browseProducts")}</CardTitle>
+            <CardDescription>{t("freshFromCatalog")}</CardDescription>
           </CardHeader>
           <CardContent>
             {products.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <Package className="h-10 w-10 mx-auto mb-2 opacity-40" />
-                <p>No products available right now.</p>
+                <p>{t("noProductsAvailable")}</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -408,7 +411,7 @@ function DashboardContent() {
                   </div>
                 ))}
                 <Button asChild={true} variant="outline" className="w-full">
-                  <Link href="/products">View all products</Link>
+                  <Link href="/products">{t("viewAllProducts")}</Link>
                 </Button>
               </div>
             )}
@@ -421,19 +424,19 @@ function DashboardContent() {
         <Button asChild={true} variant="outline" className="w-full">
           <Link href="/wishlist">
             <Heart className="h-4 w-4 mr-2" />
-            My wishlist
+            {t("myWishlist")}
           </Link>
         </Button>
         <Button asChild={true} variant="outline" className="w-full">
           <Link href="/orders">
             <Package className="h-4 w-4 mr-2" />
-            Order history
+            {t("orderHistory")}
           </Link>
         </Button>
         <Button asChild={true} variant="outline" className="w-full">
           <Link href="/settings">
             <CreditCard className="h-4 w-4 mr-2" />
-            Account settings
+            {t("accountSettings")}
           </Link>
         </Button>
       </div>

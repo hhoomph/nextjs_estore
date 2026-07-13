@@ -40,6 +40,7 @@ import { type ProductCardProduct } from "@/components/features/products/product-
 import { ProductGrid } from "@/components/features/products/product-grid";
 import { SectionHeading } from "@/components/features/layout/section-heading";
 import { useCartActions } from "@/lib/hooks/use-simplified-cart-sync";
+import { useDebounce } from "@/lib/hooks/use-debounce";
 
 interface Product {
   id: string;
@@ -251,17 +252,6 @@ function FilterContent({
       </div>
     </div>
   );
-}
-
-function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const handler = window.setTimeout(() => setDebouncedValue(value), delay);
-    return () => window.clearTimeout(handler);
-  }, [delay, value]);
-
-  return debouncedValue;
 }
 
 function toProductCard(product: Product): ProductCardProduct {

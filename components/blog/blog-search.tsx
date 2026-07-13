@@ -39,14 +39,14 @@ export function BlogSearch() {
 
   return (
     <div className="space-y-4">
-      <h3 className="font-semibold text-lg">{t("searchConfig.title")}</h3>
+      <h3 className="font-semibold text-lg">{t("search.title")}</h3>
 
       <form onSubmit={handleSearch} className="space-y-3">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
             type="text"
-            placeholder={t("searchConfig.placeholder")}
+            placeholder={t("search.placeholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 pr-10"
@@ -60,25 +60,25 @@ export function BlogSearch() {
               onClick={clearSearch}
             >
               <X className="h-3 w-3" />
-              <span className="sr-only">{t("searchConfig.clear")}</span>
+              <span className="sr-only">{t("search.clear")}</span>
             </Button>
           )}
         </div>
 
         <Button type="submit" className="w-full" disabled={!searchQuery.trim()}>
           <Search className="mr-2 h-4 w-4" />
-          {t("searchConfig.button")}
+          {t("search.button")}
         </Button>
       </form>
 
       {/* Search Tips */}
       <div className="text-xs text-muted-foreground space-y-1">
-        <p className="font-medium">{t("searchConfig.tips.title")}</p>
+        <p className="font-medium">{t("search.tips.title")}</p>
         <ul className="space-y-1 pl-4">
-          <li>• {t("searchConfig.tips.title")}</li>
-          <li>• {t("searchConfig.tips.excerpt")}</li>
-          <li>• {t("searchConfig.tips.content")}</li>
-          <li>• {t("searchConfig.tips.tags")}</li>
+          <li>• {t("search.tips.title")}</li>
+          <li>• {t("search.tips.excerpt")}</li>
+          <li>• {t("search.tips.content")}</li>
+          <li>• {t("search.tips.tags")}</li>
         </ul>
       </div>
     </div>

@@ -69,14 +69,22 @@ export function formatPrice(
  */
 export function formatAmount(
   amount: number,
-  currency: "toman" | "usd" | "toman-symbol" | "toman-fa" | "IRR" | "USD" = "toman"
+  currency: string = "toman"
 ): string {
   // Map currency codes to locales
   const localeMap: Record<string, "fa" | "en"> = {
+    // Admin / legacy codes
     toman: "fa",
     "toman-symbol": "fa",
     "toman-fa": "fa",
+    IRR: "fa",
+    // English / international codes
     usd: "en",
+    USD: "en",
+    EUR: "en",
+    GBP: "en",
+    AED: "en",
+    TRY: "en",
   };
 
   const locale = localeMap[currency] || "fa";

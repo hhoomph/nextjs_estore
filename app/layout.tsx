@@ -74,7 +74,7 @@ export default async function RootLayout({
                     disableTransitionOnChange={true}
                   >
                     <BetterAuthProvider>
-                      <OverlayProvider>
+                    <OverlayProvider>
                       <div
                         className="min-h-screen flex flex-col"
                         suppressHydrationWarning={true}

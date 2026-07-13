@@ -5,6 +5,10 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+// Skip static generation to avoid Turbopack build invariant
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default function GlobalError({
   error,
   reset,
@@ -13,7 +17,6 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service
     console.error("Global error:", error);
   }, [error]);
 

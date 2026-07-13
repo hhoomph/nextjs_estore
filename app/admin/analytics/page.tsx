@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type * as React from "react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -57,6 +58,7 @@ const EMPTY_STATS: AnalyticsData["totalStats"] = {
 };
 
 export default function AdminAnalyticsPage() {
+  const t = useTranslations("Admin Analytics");
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -93,7 +95,7 @@ export default function AdminAnalyticsPage() {
       <div className="flex h-64 items-center justify-center">
         <div className="text-center">
           <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
-          <p className="mt-2 text-sm text-muted-foreground">Loading analytics...</p>
+          <p className="mt-2 text-sm text-muted-foreground">{t("loading")}</p>
         </div>
       </div>
     );
@@ -107,7 +109,7 @@ export default function AdminAnalyticsPage() {
           onClick={() => void fetchAnalytics()}
           className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
         >
-          Try Again
+          {t("tryAgain")}
         </Button>
       </div>
     );
@@ -125,26 +127,25 @@ export default function AdminAnalyticsPage() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-              Analytics workspace
+              {t("analyticsWorkspace")}
             </p>
             <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground">
-              Analytics
+              {t("analytics")}
             </h1>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Sales performance, customer growth, and category insights in a clean
-              Apex-inspired layout.
+              {t("analyticsDescription")}
             </p>
           </div>
 
           <Select value={period} onValueChange={setPeriod}>
             <SelectTrigger className="w-48 rounded-xl border-border bg-background">
-              <SelectValue placeholder="Select period" />
+              <SelectValue placeholder={t("selectPeriod")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="7">Last 7 days</SelectItem>
-              <SelectItem value="30">Last 30 days</SelectItem>
-              <SelectItem value="90">Last 90 days</SelectItem>
-              <SelectItem value="365">Last year</SelectItem>
+              <SelectItem value="7">{t("last7Days")}</SelectItem>
+              <SelectItem value="30">{t("last30Days")}</SelectItem>
+              <SelectItem value="90">{t("last90Days")}</SelectItem>
+              <SelectItem value="365">{t("lastYear")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -152,33 +153,33 @@ export default function AdminAnalyticsPage() {
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard
-          title="Total Revenue"
+          title={t("stats.totalRevenue")}
           value={formatAmount(Number(totalStats.totalRevenue || 0), defaultCurrency)}
-          description="for the selected period"
+          description={t("forTheSelectedPeriod")}
           icon={DollarSign}
         />
         <MetricCard
-          title="Total Orders"
+          title={t("stats.totalOrders")}
           value={String(totalStats.totalOrders ?? 0)}
-          description="for the selected period"
+          description={t("forTheSelectedPeriod")}
           icon={ShoppingCart}
         />
         <MetricCard
-          title="Total Customers"
+          title={t("stats.totalCustomers")}
           value={String(totalStats.totalCustomers ?? 0)}
-          description="unique buyers"
+          description={t("uniqueBuyers")}
           icon={Users}
         />
         <MetricCard
-          title="Average Order Value"
+          title={t("stats.averageOrderValue")}
           value={formatAmount(Number(totalStats.averageOrderValue || 0), defaultCurrency)}
-          description="per order"
+          description={t("perOrder")}
           icon={TrendingUp}
         />
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <ChartCard title="Sales Trend">
+        <ChartCard title={t("salesTrend")}>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={salesData}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
@@ -209,7 +210,7 @@ export default function AdminAnalyticsPage() {
                 }
                 formatter={(value, name) => [
                   name === "revenue" ? `$${Number(value).toFixed(2)}` : value,
-                  name === "revenue" ? "Revenue" : "Orders",
+                  name === "revenue" ? t("revenue") : t("orders"),
                 ]}
               />
               <Line
@@ -232,7 +233,7 @@ export default function AdminAnalyticsPage() {
           </ResponsiveContainer>
         </ChartCard>
 
-        <ChartCard title="User Growth">
+        <ChartCard title={t("userGrowth")}>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={userGrowth}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
@@ -256,7 +257,7 @@ export default function AdminAnalyticsPage() {
                 labelFormatter={(value) =>
                   new Date(value as string).toLocaleDateString()
                 }
-                formatter={(value) => [value, "New Users"]}
+                formatter={(value) => [value, t("newUsers")]}
               />
                   <Bar dataKey="users" fill="var(--primary)" radius={[6, 6, 0, 0]} />
             </BarChart>
@@ -268,14 +269,14 @@ export default function AdminAnalyticsPage() {
         <Card className="apex-stat-card">
           <CardHeader>
             <CardTitle className="text-base font-semibold tracking-tight text-foreground">
-              Top Products
+              {t("topProducts")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {topProducts.length === 0 ? (
                 <p className="text-center py-12 text-sm text-muted-foreground">
-                  No sales data available
+                  {t("noSalesDataAvailable")}
                 </p>
               ) : (
                 topProducts.slice(0, 5).map((product, index) => (
@@ -292,7 +293,7 @@ export default function AdminAnalyticsPage() {
                           {product.name}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          {product.sales} sold
+                          {product.sales} {t("sold")}
                         </p>
                       </div>
                     </div>
@@ -311,13 +312,13 @@ export default function AdminAnalyticsPage() {
         <Card className="apex-stat-card">
           <CardHeader>
             <CardTitle className="text-base font-semibold tracking-tight text-foreground">
-              Category Performance
+              {t("categoryPerformance")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             {categoryPerformance.length === 0 ? (
               <p className="py-12 text-center text-sm text-muted-foreground">
-                No category data available
+                {t("noCategoryDataAvailable")}
               </p>
             ) : (
               <ResponsiveContainer width="100%" height={250}>
@@ -341,7 +342,7 @@ export default function AdminAnalyticsPage() {
                   <Tooltip
                     formatter={(value) => [
                       formatAmount(Number(value), defaultCurrency),
-                      "Revenue",
+                      t("revenue"),
                     ]}
                     contentStyle={{
                       borderRadius: 16,

@@ -11,6 +11,7 @@ export const dynamic = "force-dynamic";
 
 import { useEffect } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,6 +44,7 @@ const CURRENCIES = [
 ];
 
 export default function AdminSettingsPage() {
+  const t = useTranslations("Admin Settings");
   const {
     siteName,
     siteDescription,
@@ -107,7 +109,7 @@ export default function AdminSettingsPage() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto" />
-          <p className="mt-2 text-muted-foreground">Loading settings...</p>
+          <p className="mt-2 text-muted-foreground">{t("loading")}</p>
         </div>
       </div>
     );
@@ -117,11 +119,11 @@ export default function AdminSettingsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Settings</h1>
-          <p className="text-muted-foreground">Configure your store settings and preferences</p>
+          <h1 className="text-3xl font-bold">{t("settings")}</h1>
+          <p className="text-muted-foreground">{t("settingsDescription")}</p>
         </div>
         {lastSavedAt && (
-          <p className="text-xs text-muted-foreground">Last saved {new Date(lastSavedAt).toLocaleString()}</p>
+          <p className="text-xs text-muted-foreground">{t("lastSaved", { date: new Date(lastSavedAt).toLocaleString() })}</p>
         )}
       </div>
 
@@ -137,35 +139,35 @@ export default function AdminSettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <SettingsIcon className="h-5 w-5" />
-              General Settings
+              {t("generalSettings")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="siteName">Site Name</Label>
-                <Input id="siteName" value={siteName ?? ""} onChange={updateStringField("siteName")} placeholder="My E-commerce Store" />
+                <Label htmlFor="siteName">{t("siteName")}</Label>
+                <Input id="siteName" value={siteName ?? ""} onChange={updateStringField("siteName")} placeholder={t("siteNamePlaceholder")} />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="contactEmail">Contact Email</Label>
+                <Label htmlFor="contactEmail">{t("contactEmail")}</Label>
                 <Input
                   id="contactEmail"
                   type="email"
                   value={contactEmail ?? ""}
                   onChange={updateStringField("contactEmail")}
-                  placeholder="contact@example.com"
+                  placeholder={t("contactEmailPlaceholder")}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="siteDescription">Site Description</Label>
+              <Label htmlFor="siteDescription">{t("siteDescription")}</Label>
               <Textarea
                 id="siteDescription"
                 value={siteDescription ?? ""}
                 onChange={updateStringField("siteDescription")}
-                placeholder="A modern e-commerce platform"
+                placeholder={t("siteDescriptionPlaceholder")}
                 rows={3}
               />
             </div>
@@ -174,15 +176,15 @@ export default function AdminSettingsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Store Settings</CardTitle>
+            <CardTitle>{t("storeSettings")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="defaultCurrency">Default Currency</Label>
+                <Label htmlFor="defaultCurrency">{t("defaultCurrency")}</Label>
                 <Select value={defaultCurrency ?? "IRR"} onValueChange={(value) => updateSettings({ defaultCurrency: value })}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select currency" />
+                    <SelectValue placeholder={t("selectCurrency")} />
                   </SelectTrigger>
                   <SelectContent>
                     {CURRENCIES.map((currency) => (
@@ -195,13 +197,13 @@ export default function AdminSettingsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="lowStockThreshold">Low Stock Threshold</Label>
+                <Label htmlFor="lowStockThreshold">{t("lowStockThreshold")}</Label>
                 <Input
                   id="lowStockThreshold"
                   type="number"
                   value={lowStockThreshold ?? 0}
                   onChange={updateNumberField("lowStockThreshold")}
-                  placeholder="10"
+                  placeholder={t("lowStockPlaceholder")}
                   min="0"
                 />
               </div>
@@ -209,9 +211,9 @@ export default function AdminSettingsPage() {
 
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="maintenanceMode">Maintenance Mode</Label>
+                <Label htmlFor="maintenanceMode">{t("maintenanceMode")}</Label>
                 <p className="text-sm text-muted-foreground">
-                  Put the site in maintenance mode (customers cannot access the store)
+                  {t("maintenanceDescription")}
                 </p>
               </div>
               <Switch id="maintenanceMode" checked={maintenanceMode ?? false} onCheckedChange={(checked) => updateSettings({ maintenanceMode: checked })} />
@@ -219,9 +221,9 @@ export default function AdminSettingsPage() {
 
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label htmlFor="allowRegistration">Allow User Registration</Label>
+                <Label htmlFor="allowRegistration">{t("allowRegistration")}</Label>
                 <p className="text-sm text-muted-foreground">
-                  Allow new customers to create accounts on your store
+                  {t("registrationDescription")}
                 </p>
               </div>
               <Switch id="allowRegistration" checked={allowRegistration ?? true} onCheckedChange={(checked) => updateSettings({ allowRegistration: checked })} />
@@ -233,27 +235,27 @@ export default function AdminSettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Globe className="h-5 w-5" />
-              Multilingual Settings
+              {t("multilingualSettings")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="siteTitleFa">Site Title (Persian/Farsi)</Label>
-              <Input id="siteTitleFa" value={siteTitleFa ?? ""} onChange={updateStringField("siteTitleFa")} placeholder="فروشگاه آنلاین من" />
+              <Label htmlFor="siteTitleFa">{t("siteTitleFa")}</Label>
+              <Input id="siteTitleFa" value={siteTitleFa ?? ""} onChange={updateStringField("siteTitleFa")} placeholder={t("siteTitleFaPlaceholder")} />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="phoneFa">Phone (Persian/Farsi)</Label>
-              <Input id="phoneFa" value={phoneFa ?? ""} onChange={updateStringField("phoneFa")} placeholder="021-12345678" />
+              <Label htmlFor="phoneFa">{t("phoneFa")}</Label>
+              <Input id="phoneFa" value={phoneFa ?? ""} onChange={updateStringField("phoneFa")} placeholder={t("phoneFaPlaceholder")} />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="descriptionFa">Description (Persian/Farsi)</Label>
+              <Label htmlFor="descriptionFa">{t("descriptionFa")}</Label>
               <Textarea
                 id="descriptionFa"
                 value={descriptionFa ?? ""}
                 onChange={updateStringField("descriptionFa")}
-                placeholder="پلتفرم فروش آنلاین مدرن"
+                placeholder={t("descriptionFaPlaceholder")}
                 rows={3}
               />
             </div>
@@ -264,48 +266,48 @@ export default function AdminSettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Search className="h-5 w-5" />
-              SEO Settings
+              {t("seoSettings")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="defaultSeoTitle">Default SEO Title</Label>
+              <Label htmlFor="defaultSeoTitle">{t("defaultSeoTitle")}</Label>
               <Input
                 id="defaultSeoTitle"
                 value={defaultSeoTitle ?? ""}
                 onChange={updateStringField("defaultSeoTitle")}
-                placeholder="My E-commerce Store - Online Shopping"
+                placeholder={t("seoTitlePlaceholder")}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="defaultSeoDescription">Default SEO Description</Label>
+              <Label htmlFor="defaultSeoDescription">{t("defaultSeoDescription")}</Label>
               <Textarea
                 id="defaultSeoDescription"
                 value={defaultSeoDescription ?? ""}
                 onChange={updateStringField("defaultSeoDescription")}
-                placeholder="Shop the best products online with fast shipping and great prices."
+                placeholder={t("seoDescriptionPlaceholder")}
                 rows={3}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="defaultOgImage">Default OG Image URL</Label>
+              <Label htmlFor="defaultOgImage">{t("defaultOgImage")}</Label>
               <Input
                 id="defaultOgImage"
                 value={defaultOgImage ?? ""}
                 onChange={updateStringField("defaultOgImage")}
-                placeholder="https://example.com/images/og-default.jpg"
+                placeholder={t("ogImagePlaceholder")}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="googleAnalyticsId">Google Analytics ID</Label>
+              <Label htmlFor="googleAnalyticsId">{t("googleAnalyticsId")}</Label>
               <Input
                 id="googleAnalyticsId"
                 value={googleAnalyticsId ?? ""}
                 onChange={updateStringField("googleAnalyticsId")}
-                placeholder="GA-XXXXXXXXXX"
+                placeholder={t("gaPlaceholder")}
               />
             </div>
           </CardContent>
@@ -316,12 +318,12 @@ export default function AdminSettingsPage() {
             {saving ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Saving...
+                {t("saving")}
               </>
             ) : (
               <>
                 <Save className="h-4 w-4 mr-2" />
-                Save Settings
+                {t("saveSettings")}
               </>
             )}
           </Button>
@@ -329,18 +331,18 @@ export default function AdminSettingsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Theme Customization</CardTitle>
+            <CardTitle>{t("themeCustomization")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-medium">Customize Theme Colors</h3>
+                <h3 className="font-medium">{t("customizeThemeColors")}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Configure light/dark mode colors, primary/secondary colors, and more
+                  {t("themeCustomizationDescription")}
                 </p>
               </div>
               <Button variant="outline" asChild>
-                <Link href="/admin/settings/theme">Go to Theme Settings</Link>
+                <Link href="/admin/settings/theme">{t("goToThemeSettings")}</Link>
               </Button>
             </div>
           </CardContent>
