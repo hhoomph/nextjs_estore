@@ -42,7 +42,7 @@ export const defaultSEOConfig = {
   defaultImage: "/og-default.jpg",
   twitterHandle: "@ecommerce_store",
   locale: "en_US",
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
 };
 
 // Generate comprehensive metadata for pages

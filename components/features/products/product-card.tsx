@@ -68,6 +68,7 @@ export function ProductCard({
 
   return (
     <Card
+      data-testid="product-card"
       className={cn(
         "group/card overflow-hidden rounded-[2rem] border border-border/60 bg-card/95 text-card-foreground shadow-sm transition duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl",
         className,
@@ -114,12 +115,12 @@ export function ProductCard({
           {categoryName}
         </p>
         <Link href={productHref}>
-          <h3 className="line-clamp-2 cursor-pointer font-black leading-6 text-foreground transition group-hover:text-primary">
+          <h3 data-testid="product-title" className="line-clamp-2 cursor-pointer font-black leading-6 text-foreground transition group-hover:text-primary">
             {productName}
           </h3>
         </Link>
         <ProductPrice
-          price={product.price}
+          data-testid="product-price"
           discountPrice={product.discount_price}
           amountClassName="text-xl font-black text-foreground"
           originalClassName="text-xs text-muted-foreground"

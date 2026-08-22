@@ -122,7 +122,7 @@ export default function SignInPage() {
 
             <div className="space-y-2">
               <Label htmlFor="email">{t("email.label")}</Label>
-              <Input
+              <Input data-testid="admin-email"
                 id="email"
                 type="email"
                 placeholder={t("email.placeholder")}
@@ -147,7 +147,7 @@ export default function SignInPage() {
                   {t("forgotPassword")}
                 </Link>
               </div>
-              <Input
+              <Input data-testid="admin-password"
                 id="password"
                 type="password"
                 placeholder={t("password.placeholder")}
@@ -162,7 +162,7 @@ export default function SignInPage() {
               )}
             </div>
 
-            <button
+            <button data-testid="signin-btn"
               type="submit"
               disabled={isLoading}
               className="inline-flex h-10 w-full items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 disabled:pointer-events-none disabled:opacity-50"

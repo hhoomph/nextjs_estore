@@ -62,7 +62,7 @@ export default function ContactPage() {
   if (isSuccess) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-2xl">
-        <Card>
+         <Card data-testid="contact-success">
           <CardContent className="pt-6 text-center">
             <div className="flex justify-center mb-4">
               <CheckCircle2 className="h-16 w-16 text-success" />
@@ -163,7 +163,7 @@ export default function ContactPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="name">Name</Label>
-                <Input
+                 <Input data-testid="contact-name"
                   id="name"
                   placeholder="Your name"
                   {...form.register("name")}
@@ -177,7 +177,7 @@ export default function ContactPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input
+                 <Input data-testid="contact-email"
                   id="email"
                   type="email"
                   placeholder="your@email.com"
@@ -206,7 +206,7 @@ export default function ContactPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="message">Message</Label>
-                <Textarea
+                 <Textarea data-testid="contact-message"
                   placeholder="Tell us more about your inquiry..."
                   rows={5}
                   {...form.register("message")}
@@ -218,7 +218,7 @@ export default function ContactPage() {
                 )}
               </div>
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
+               <Button type="submit" className="w-full" disabled={isLoading} data-testid="submit-contact">
                 {isLoading ? "Sending..." : "Send Message"}
               </Button>
             </form>

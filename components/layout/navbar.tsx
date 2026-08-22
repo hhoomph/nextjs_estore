@@ -206,7 +206,7 @@ export function Navbar() {
             {/* Right Side Actions */}
             <div className="flex items-center space-x-2">
               {/* Language Switcher */}
-              <LanguageSwitcher />
+              <LanguageSwitcher data-testid="language-selector" />
 
               {/* Theme Toggle - Only render after hydration */}
               {mounted && (
@@ -234,7 +234,7 @@ export function Navbar() {
 
               {/* Cart */}
               <EnhancedNavbarIcon
-                icon={<ShoppingCart className="h-4 w-4" />}
+                data-testid="cart-icon"
                 count={cartCount}
                 onClick={toggleCart}
                 label="Shopping cart"

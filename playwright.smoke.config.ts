@@ -27,7 +27,7 @@ export default defineConfig({
   reporter: process.env.CI ? "github" : "list",
   timeout: 45_000,
   use: {
-    baseURL: process.env.SMOKE_BASE_URL ?? "http://localhost:3000",
+    baseURL: process.env.SMOKE_BASE_URL ?? "http://127.0.0.1:3000",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
@@ -45,7 +45,11 @@ export default defineConfig({
       },
     },
   ],
-  // No webServer block — the dev server is expected to be running
-  // externally (e.g. `bun run dev` in another terminal). This keeps
-  // test runs fast and avoids interfering with other dev tooling.
+  webServer: {
+    command: "next dev -p 3000",
+    url: "http://127.0.0.1:3000",
+    reuseExistingServer: false,
+    timeout: 300000,
+    cwd: process.cwd(),
+  },
 });

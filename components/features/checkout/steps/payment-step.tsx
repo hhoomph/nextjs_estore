@@ -44,7 +44,7 @@ export function PaymentStep({ form, onNext, onPrevious }: PaymentStepProps) {
 
           <div>
             <Label htmlFor="payment.cardNumber">Card Number</Label>
-            <Input
+            <Input data-testid="card-number"
               id="payment.cardNumber"
               placeholder="1234 5678 9012 3456"
               maxLength={19}
@@ -63,7 +63,7 @@ export function PaymentStep({ form, onNext, onPrevious }: PaymentStepProps) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="payment.expiryDate">Expiry Date</Label>
-              <Input
+              <Input data-testid="card-expiry"
                 id="payment.expiryDate"
                 placeholder="MM/YY"
                 maxLength={5}
@@ -82,7 +82,7 @@ export function PaymentStep({ form, onNext, onPrevious }: PaymentStepProps) {
             </div>
             <div>
               <Label htmlFor="payment.cvv">CVV</Label>
-              <Input
+              <Input data-testid="card-cvv"
                 id="payment.cvv"
                 placeholder="123"
                 maxLength={4}
@@ -99,7 +99,7 @@ export function PaymentStep({ form, onNext, onPrevious }: PaymentStepProps) {
 
           <div>
             <Label htmlFor="payment.cardName">Cardholder Name</Label>
-            <Input
+            <Input data-testid="card-name"
               id="payment.cardName"
               placeholder="John Doe"
               {...form.register("payment.cardName")}

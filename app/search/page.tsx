@@ -228,11 +228,11 @@ function SearchBoard() {
         />
 
         <div className="mb-10">
-          <form onSubmit={handleSubmit} className="relative mx-auto max-w-2xl">
+          <form data-testid="search-submit" onSubmit={handleSubmit} className="relative mx-auto max-w-2xl">
             <div className="relative">
               <Search className="absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                type="search"
+               <Input
+                 data-testid="search-input"
                 placeholder={t("search")}
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}

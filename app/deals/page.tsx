@@ -106,6 +106,7 @@ export default function DealsPage() {
   };
 
   const featuredDeal = deals[0];
+  const featuredDealHref = featuredDeal?.slug ? `/products/${featuredDeal.slug}` : "/products";
 
   return (
     <main className="min-h-screen bg-background">
@@ -177,7 +178,7 @@ export default function DealsPage() {
                     </div>
                     <div className="mt-8 flex flex-wrap gap-3">
                       <Button asChild={true} size="lg" className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
-                        <Link href={`/products/${featuredDeal.slug}`}>
+                        <Link href={featuredDealHref}>
                           Shop This Deal
                           <ArrowRight className="ml-2 h-4 w-4" />
                         </Link>

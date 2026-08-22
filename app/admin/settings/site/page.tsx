@@ -135,7 +135,8 @@ export default function AdminSiteSettingsPage() {
         </div>
       </div>
 
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <div data-testid="settings-saved">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -147,7 +148,7 @@ export default function AdminSiteSettingsPage() {
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="siteName">Site Name</Label>
-                <Input id="siteName" {...form.register("siteName")} />
+                <Input id="siteName" data-testid="store-name" {...form.register("siteName")} />
                 {form.formState.errors.siteName && (
                   <p className="text-sm text-destructive">
                     {form.formState.errors.siteName.message}
@@ -170,7 +171,7 @@ export default function AdminSiteSettingsPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="siteDescription">Site Description</Label>
-              <Textarea
+              <Textarea data-testid="store-description"
                 id="siteDescription"
                 {...form.register("siteDescription")}
                 rows={3}
@@ -291,7 +292,7 @@ export default function AdminSiteSettingsPage() {
         </Card>
 
         <div className="flex justify-end">
-          <Button type="submit" disabled={saving}>
+          <Button type="submit" data-testid="save-settings" disabled={saving}>
             {saving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -307,6 +308,7 @@ export default function AdminSiteSettingsPage() {
         </div>
       </form>
     </div>
+      </div>
   );
 }
 

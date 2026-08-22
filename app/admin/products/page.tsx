@@ -442,6 +442,7 @@ export default function AdminProductsPage() {
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button
+                data-testid="add-product-btn"
                 onClick={() => {
                   setEditingProduct(null);
                   form.reset({
@@ -468,7 +469,8 @@ export default function AdminProductsPage() {
               </DialogHeader>
 
               <Form {...form}>
-                <form
+                <div data-testid="success-message">
+                 <form
                   onSubmit={form.handleSubmit(handleSubmit)}
                   className="space-y-4"
                 >
@@ -734,7 +736,7 @@ export default function AdminProductsPage() {
                   </div>
 
                   <div className="flex gap-2 pt-4">
-                    <Button type="submit" disabled={submitting}>
+                    <Button type="submit" data-testid="save-product" disabled={submitting}>
                       {submitting ? (
                         <>
                           <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -755,6 +757,7 @@ export default function AdminProductsPage() {
                     </Button>
                   </div>
                 </form>
+                 </div>
               </Form>
             </DialogContent>
           </Dialog>

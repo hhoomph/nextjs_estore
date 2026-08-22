@@ -31,7 +31,7 @@ export function ReviewStep({
   const total = cartTotal + shippingCost + tax;
 
   return (
-    <Card className="rounded-[2rem] border border-primary/20 shadow-xl shadow-primary/10">
+    <Card data-testid="order-summary" className="rounded-[2rem] border border-primary/20 shadow-xl shadow-primary/10">
       <CardHeader>
         <CardTitle className="text-xl font-black text-foreground">
           Order Review
@@ -110,7 +110,7 @@ export function ReviewStep({
             >
               Back to Payment
             </Button>
-            <Button
+            <Button data-testid="place-order-btn"
               type="submit"
               disabled={isSubmitting}
               className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"

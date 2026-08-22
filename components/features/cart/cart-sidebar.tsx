@@ -136,7 +136,7 @@ export function CartSidebar({}: CartSidebarProps = {}) {
                 </span>
                 {itemCount > 0 && (
                   <Badge
-                    variant="secondary"
+                    data-testid="cart-count"
                     className="ml-2"
                     aria-label={`${itemCount} ${t("itemsCount")}`}
                   >

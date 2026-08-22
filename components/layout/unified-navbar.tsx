@@ -317,7 +317,7 @@ export function UnifiedNavbar() {
         {/* Desktop Search Bar and User Actions (hidden on mobile) */}
         <div className="hidden md:flex flex-row items-center space-x-4">
           <ThemeToggle />
-          <LanguageSwitcher />
+          <LanguageSwitcher data-testid="language-selector" />
           {/* Search Bar */}
           <form onSubmit={handleSearch} className="relative w-64">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -347,6 +347,7 @@ export function UnifiedNavbar() {
           </Link>
           {/* Cart */}
           <Link
+            data-testid="cart-icon"
             href="/cart"
             className="relative p-2 hover:bg-accent rounded-md transition-colors"
             suppressHydrationWarning={true}
@@ -456,7 +457,7 @@ export function UnifiedNavbar() {
               <div className="mt-6 space-y-5">
                 <div className="flex items-center justify-between">
                   <ThemeToggle />
-                  <LanguageSwitcher />
+                  <LanguageSwitcher data-testid="language-selector" />
                 </div>
                 <form onSubmit={handleSearch} className="relative">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

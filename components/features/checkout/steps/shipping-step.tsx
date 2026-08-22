@@ -58,7 +58,7 @@ export function ShippingStep({
         <form>
           <div>
             <Label htmlFor="shippingAddress.address_line1">Address Line 1</Label>
-            <Input
+            <Input data-testid="shipping-address-line1"
               id="shippingAddress.address_line1"
               {...form.register("shippingAddress.address_line1")}
               className={
@@ -87,7 +87,7 @@ export function ShippingStep({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="shippingAddress.city">City</Label>
-              <Input
+              <Input data-testid="shipping-city"
                 id="shippingAddress.city"
                 {...form.register("shippingAddress.city")}
                 className={
@@ -104,7 +104,7 @@ export function ShippingStep({
             </div>
             <div>
               <Label htmlFor="shippingAddress.state">State/Province</Label>
-              <Input
+              <Input data-testid="shipping-state"
                 id="shippingAddress.state"
                 {...form.register("shippingAddress.state")}
                 className={
@@ -124,7 +124,7 @@ export function ShippingStep({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="shippingAddress.postal_code">Postal Code</Label>
-              <Input
+              <Input data-testid="shipping-postal-code"
                 id="shippingAddress.postal_code"
                 {...form.register("shippingAddress.postal_code")}
                 className={
@@ -141,7 +141,7 @@ export function ShippingStep({
             </div>
             <div>
               <Label htmlFor="shippingAddress.country">Country</Label>
-              <Input
+              <Input data-testid="shipping-country"
                 id="shippingAddress.country"
                 {...form.register("shippingAddress.country")}
                 className={

@@ -75,13 +75,19 @@ export async function GET(request: NextRequest) {
 
 // Enhanced OPTIONS handler with security headers
 export async function OPTIONS(request: NextRequest) {
+  const origin = request.headers.get("origin") || "";
+  const allowedDevOrigins = ["http://localhost:3000", "http://127.0.0.1:3000"];
+  const isAllowedDevOrigin = allowedDevOrigins.includes(origin);
+  
   const response = new Response(null, {
     status: 200,
     headers: {
       "Access-Control-Allow-Origin":
         process.env.NODE_ENV === "production"
           ? process.env.ALLOWED_ORIGINS || "https://yourdomain.com"
-          : "http://localhost:3000",
+          : isAllowedDevOrigin
+            ? origin
+            : "http://localhost:3000",
       "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
       "Access-Control-Allow-Headers":
         "Content-Type, Authorization, X-CSRF-Token",

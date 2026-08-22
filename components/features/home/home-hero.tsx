@@ -42,7 +42,7 @@ export function HomeHero({
   const categoryName = heroProduct?.category?.name || "Curated collection";
 
   return (
-    <section className="relative overflow-hidden bg-background">
+    <section data-testid="hero-section" className="relative overflow-hidden bg-background">
       <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-primary/20 blur-3xl" />
       <div className="absolute -bottom-28 left-8 h-80 w-80 rounded-full bg-secondary/30 blur-3xl" />
       <div className="container relative mx-auto px-4 py-12 sm:px-6 lg:px-8 lg:py-20">
@@ -52,7 +52,7 @@ export function HomeHero({
               <Sparkles className="mr-2 h-4 w-4" />
               {badge}
             </Badge>
-            <h1 className="max-w-4xl text-balance text-4xl font-black tracking-tight text-foreground sm:text-5xl lg:text-7xl">
+            <h1 data-testid="hero-title" className="max-w-4xl text-balance text-4xl font-black tracking-tight text-foreground sm:text-5xl lg:text-7xl">
               {title}
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">

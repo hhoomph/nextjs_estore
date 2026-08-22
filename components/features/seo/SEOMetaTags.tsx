@@ -47,7 +47,7 @@ export function SEOMetaTags({
   url,
   type = "website",
   siteSettings,
-  baseUrl = "http://localhost:3000",
+  baseUrl = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000",
   noindex = false,
 }: SEOMetaTagsProps) {
   // Generate final SEO values

@@ -197,7 +197,7 @@ export default function AdminOrdersPage() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <Table>
+              <Table data-testid="orders-table">
                 <TableHeader>
                   <TableRow>
                     <TableHead>{t("table.orderId")}</TableHead>
@@ -211,7 +211,7 @@ export default function AdminOrdersPage() {
                 </TableHeader>
                 <TableBody>
                   {orders.map((order) => (
-                    <TableRow key={order.id}>
+                    <TableRow key={order.id} data-testid="order-row">
                       <TableCell className="font-medium">
                         #{order.id.slice(-8)}
                       </TableCell>
@@ -229,25 +229,29 @@ export default function AdminOrdersPage() {
                       <TableCell className="font-medium">
                         {formatAmount(Number(order.total), defaultCurrency)}
                       </TableCell>
-                      <TableCell>
-                        <Select
-                          value={order.status}
-                          onValueChange={(value) =>
-                            updateOrderStatus(order.id, value)
-                          }
-                        >
-                          <SelectTrigger className="w-32 rounded-xl border-border bg-background">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="pending">{t("pending")}</SelectItem>
-                            <SelectItem value="processing">{t("processing")}</SelectItem>
-                            <SelectItem value="shipped">{t("shipped")}</SelectItem>
-                            <SelectItem value="delivered">{t("delivered")}</SelectItem>
-                            <SelectItem value="cancelled">{t("cancelled")}</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
+                       <TableCell>
+                         <div data-testid="status-updated">
+                           <div data-testid="update-status">
+                           <Select data-testid="order-status"
+                             value={order.status}
+                             onValueChange={(value) =>
+                               updateOrderStatus(order.id, value)
+                             }
+                           >
+                             <SelectTrigger className="w-32 rounded-xl border-border bg-background">
+                               <SelectValue />
+                             </SelectTrigger>
+                             <SelectContent>
+                               <SelectItem value="pending">{t("pending")}</SelectItem>
+                               <SelectItem value="processing">{t("processing")}</SelectItem>
+                               <SelectItem value="shipped">{t("shipped")}</SelectItem>
+                               <SelectItem value="delivered">{t("delivered")}</SelectItem>
+                               <SelectItem value="cancelled">{t("cancelled")}</SelectItem>
+                             </SelectContent>
+                           </Select>
+                           </div>
+                         </div>
+                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {formatDate(order.createdAt)}
                       </TableCell>

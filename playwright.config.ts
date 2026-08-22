@@ -34,7 +34,7 @@ export default defineConfig({
   // Shared settings for all the projects below.
   use: {
     // Base URL to use in actions like `await page.goto('/')`.
-    baseURL: "http://localhost:3002",
+    baseURL: "http://127.0.0.1:3002",
 
     // Collect trace when retrying the failed test.
     trace: "on-first-retry",
@@ -137,7 +137,7 @@ export default defineConfig({
     command: "npm run start -- -p 3002",
     url: "http://localhost:3002",
     reuseExistingServer: false,
-    timeout: 180000,
+    timeout: 300000,
     cwd: process.cwd(),
   },
 

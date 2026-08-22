@@ -373,7 +373,7 @@ export default function CartPage() {
                       className="w-full"
                       size="lg"
                       asChild={true}
-                      data-testid="checkout-button"
+                      data-testid="checkout-btn"
                     >
                       <Link href="/checkout">
                         {tCheckout("proceedToCheckout")}

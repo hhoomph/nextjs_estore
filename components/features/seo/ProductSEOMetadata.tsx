@@ -37,7 +37,7 @@ interface ProductSEOMetadataProps {
 
 export function ProductSEOMetadata({
   product,
-  baseUrl = "http://localhost:3000",
+  baseUrl = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000",
 }: ProductSEOMetadataProps) {
   const productUrl = `${baseUrl}/products/${product.slug}`;
   const productImage = product.og_image || product.images?.[0]?.url;

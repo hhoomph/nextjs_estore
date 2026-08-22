@@ -275,7 +275,7 @@ export default function AdminUsersPage() {
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
+                <Input data-testid="user-search"
                   placeholder={t("searchUsers")}
                   className="rounded-xl pl-8"
                   value={searchTerm}
@@ -341,7 +341,7 @@ export default function AdminUsersPage() {
                 </TableHeader>
                 <TableBody>
                   {users.map((user) => (
-                    <TableRow key={user.id}>
+                    <TableRow key={user.id} data-testid="user-row">
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary text-sm font-bold text-primary-foreground">

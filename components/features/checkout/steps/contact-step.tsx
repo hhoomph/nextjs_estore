@@ -84,7 +84,7 @@ export function ContactStep({ form, onNext }: ContactStepProps) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="firstName">First Name</Label>
-              <Input
+              <Input data-testid="first-name"
                 id="firstName"
                 {...form.register("firstName")}
                 className={
@@ -99,7 +99,7 @@ export function ContactStep({ form, onNext }: ContactStepProps) {
             </div>
             <div>
               <Label htmlFor="lastName">Last Name</Label>
-              <Input
+              <Input data-testid="last-name"
                 id="lastName"
                 {...form.register("lastName")}
                 className={
@@ -116,7 +116,7 @@ export function ContactStep({ form, onNext }: ContactStepProps) {
 
           <div>
             <Label htmlFor="email">Email Address</Label>
-            <Input
+            <Input data-testid="email"
               id="email"
               type="email"
               {...form.register("email")}
@@ -131,7 +131,7 @@ export function ContactStep({ form, onNext }: ContactStepProps) {
 
           <div>
             <Label htmlFor="phone">Phone Number</Label>
-            <Input
+            <Input data-testid="phone"
               id="phone"
               type="tel"
               {...form.register("phone")}
@@ -145,7 +145,7 @@ export function ContactStep({ form, onNext }: ContactStepProps) {
           </div>
 
           <div className="flex items-center space-x-2">
-            <Checkbox
+            <Checkbox data-testid="create-account-checkbox"
               id="createAccount"
               checked={watchedCreateAccount}
               onCheckedChange={(checked) =>
@@ -161,7 +161,7 @@ export function ContactStep({ form, onNext }: ContactStepProps) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="password">Password</Label>
-                <Input
+                <Input data-testid="password"
                   id="password"
                   type="password"
                   {...form.register("password")}
@@ -177,7 +177,7 @@ export function ContactStep({ form, onNext }: ContactStepProps) {
               </div>
               <div>
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <Input
+                <Input data-testid="confirm-password"
                   id="confirmPassword"
                   type="password"
                   {...form.register("confirmPassword")}

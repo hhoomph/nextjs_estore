@@ -70,10 +70,10 @@ exports[`component snapshots > matches the card layout snapshot 1`] = `
       role="button"
     >
       <div
-        class="relative flex items-center gap-2"
+        class="relative flex items-center gap-2 cursor-pointer"
       >
         <span
-          class="transition-opacity duration-200"
+          class="transition-opacity duration-200 flex"
         >
           View details
         </span>
@@ -97,7 +97,7 @@ exports[`component snapshots > matches the default button snapshot 1`] = `
   role="button"
 >
   <div
-    class="relative flex items-center gap-2"
+    class="relative flex items-center gap-2 cursor-pointer"
   >
     <span
       aria-hidden="true"
@@ -105,7 +105,7 @@ exports[`component snapshots > matches the default button snapshot 1`] = `
       icon
     </span>
     <span
-      class="transition-opacity duration-200"
+      class="transition-opacity duration-200 flex"
     >
       Add to cart
     </span>
@@ -155,7 +155,7 @@ exports[`component snapshots > matches the loading button snapshot 1`] = `
     class="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent animate-pulse"
   />
   <div
-    class="relative flex items-center gap-2"
+    class="relative flex items-center gap-2 cursor-pointer"
   >
     <svg
       aria-hidden="true"
@@ -176,7 +176,7 @@ exports[`component snapshots > matches the loading button snapshot 1`] = `
       />
     </svg>
     <span
-      class="opacity-70 transition-opacity duration-200"
+      class="opacity-70 transition-opacity duration-200 flex"
     >
       Saving
     </span>

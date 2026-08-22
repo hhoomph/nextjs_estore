@@ -13,7 +13,9 @@ export const authClient = createAuthClient({
   baseURL:
     process.env.NODE_ENV === "production"
       ? process.env.BETTER_AUTH_URL
-      : "http://localhost:3000",
+      : typeof window !== "undefined"
+        ? window.location.origin
+        : "http://localhost:3000",
   plugins: [adminClient(), phoneNumberClient()],
 });
 export const { signIn, signUp, signOut, useSession } = authClient;

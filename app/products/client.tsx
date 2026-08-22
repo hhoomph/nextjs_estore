@@ -159,7 +159,7 @@ function FilterContent({
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder={t("search")}
+            data-testid="search-input"
             className="rounded-full pl-10"
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
@@ -438,7 +438,7 @@ export function ProductsPageClient({ initialData }: ProductsPageClientProps) {
             />
 
             <div className="flex flex-wrap items-center gap-3">
-              <Select value={sortBy} onValueChange={setSortBy}>
+              <Select data-testid="sort-select" value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-48 rounded-full">
                   <SelectValue placeholder={t("sortBy")} />
                 </SelectTrigger>
