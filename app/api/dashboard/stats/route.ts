@@ -7,10 +7,19 @@
  * @since 2026-06-26
  */
 
+import { auth } from "@/lib/auth/config";
 import { type NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
+  const session = await auth.api.getSession({ headers: request.headers });
+  if (!session?.user?.id || (session.user.role !== "ADMIN" && session.user.role !== "USER")) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 },
+    );
+  }
+
   console.log("[dashboard/stats] GET", request.url);
   try {
     const [

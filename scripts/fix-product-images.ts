@@ -9,7 +9,7 @@
  * @since 2025-01-01
  */
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../app/generated/prisma/client";
+import { PrismaClient } from "../lib/generated/prisma/client";
 import "dotenv/config";
 import {
   PLACEHOLDER_IMAGE,

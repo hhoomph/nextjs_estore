@@ -78,6 +78,7 @@ export const CartItem = memo(function CartItem({
 
         <div className="flex items-center gap-2 mt-3">
           <Button
+            data-testid="quantity-decrease"
             variant="outline"
             size="icon"
             className="h-8 w-8 border-border hover:bg-accent hover:text-accent-foreground"
@@ -86,10 +87,11 @@ export const CartItem = memo(function CartItem({
           >
             <Minus className="h-3 w-3" />
           </Button>
-          <span className="text-sm font-medium w-8 text-center bg-muted rounded px-2 py-1 text-muted-foreground">
+          <span data-testid="cart-item-quantity" className="text-sm font-medium w-8 text-center bg-muted rounded px-2 py-1 text-muted-foreground">
             {item.quantity}
           </span>
           <Button
+            data-testid="quantity-increase"
             variant="outline"
             size="icon"
             className="h-8 w-8 border-border hover:bg-accent hover:text-accent-foreground"
@@ -98,6 +100,7 @@ export const CartItem = memo(function CartItem({
             <Plus className="h-3 w-3" />
           </Button>
           <Button
+            data-testid="remove-item-btn"
             variant="ghost"
             size="icon"
             className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 ml-auto"

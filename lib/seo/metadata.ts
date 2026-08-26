@@ -14,6 +14,7 @@ import type { Metadata } from "next";
  * Site-wide metadata
  */
 export const siteMetadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === "production" ? "https://yourdomain.com" : "http://localhost:3000")),
   title: "NextJS E-Store",
   titleTemplate: "%s | NextJS E-Store",
   description:
@@ -401,7 +402,10 @@ export function generateSEOMetadata(
 
   const siteTitle = locale === "fa" ? "فروشگاه آنلاین" : "NextJS E-Store";
 
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === "production" ? "https://yourdomain.com" : "http://localhost:3000");
+
   return {
+    metadataBase: new URL(baseUrl),
     title: {
       default: siteTitle,
       template: `%s | ${siteTitle}`,

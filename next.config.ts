@@ -91,14 +91,7 @@ const nextConfig: NextConfig = {
 
   // Experimental features for better performance
   experimental: {
-    // Disable filesystem caching for `next dev` in development
-    turbopackFileSystemCacheForDev: process.env.NODE_ENV !== "development",
-    // Enable filesystem caching for `next build`
-    turbopackFileSystemCacheForBuild: true,
-    optimizePackageImports: ["@radix-ui/react-icons"],
-    optimizeCss: true,
-    scrollRestoration: true,
-    externalDir: true,
+    useTypeScriptCli: true,
   },
   poweredByHeader: false,
 

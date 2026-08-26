@@ -124,6 +124,7 @@ export function PaymentStep({ form, onNext, onPrevious }: PaymentStepProps) {
               Back to Shipping
             </Button>
             <Button
+              data-testid="review-order-btn"
               type="button"
               onClick={handleNext}
               className="rounded-full"

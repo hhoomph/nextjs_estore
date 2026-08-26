@@ -87,22 +87,23 @@ interface AdminNavItem {
   label: string;
   icon: LucideIcon;
   group: "dashboard" | "commerce" | "content" | "users" | "settings";
+  testId?: string;
 }
 // Admin navigation groups
 const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   { href: "/", label: "Main Page", icon: Globe, group: "dashboard" as const },
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard, group: "dashboard" as const },
   // Commerce
-  { href: "/admin/products", label: "Products", icon: Package, group: "commerce" as const },
+  { href: "/admin/products", label: "Products", icon: Package, group: "commerce" as const, testId: "nav-products" },
   { href: "/admin/categories", label: "Categories", icon: FolderTree, group: "commerce" as const },
   { href: "/admin/collections", label: "Collections", icon: Package, group: "commerce" as const },
-  { href: "/admin/orders", label: "Orders", icon: ShoppingCart, group: "commerce" as const },
+  { href: "/admin/orders", label: "Orders", icon: ShoppingCart, group: "commerce" as const, testId: "nav-orders" },
   // Content
-  { href: "/admin/analytics", label: "Analytics", icon: BarChart3, group: "content" as const },
+  { href: "/admin/analytics", label: "Analytics", icon: BarChart3, group: "content" as const, testId: "nav-analytics" },
   // Users
-  { href: "/admin/users", label: "Users", icon: Users, group: "users" as const },
+  { href: "/admin/users", label: "Users", icon: Users, group: "users" as const, testId: "nav-users" },
   // Settings
-  { href: "/admin/settings", label: "Settings", icon: Settings, group: "settings" as const },
+  { href: "/admin/settings", label: "Settings", icon: Settings, group: "settings" as const, testId: "nav-settings" },
   { href: "/admin/settings/seo", label: "SEO", icon: Search, group: "settings" as const },
   { href: "/admin/settings/site", label: "Site", icon: Globe, group: "settings" as const },
   { href: "/admin/settings/theme", label: "Theme", icon: Palette, group: "settings" as const },
@@ -219,7 +220,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
           body: JSON.stringify({ locale: newLocale }),
         });
         if (response.ok) {
-          window.location.reload();
+          router.refresh();
         }
       } catch {
         // ignore language switch errors
@@ -379,6 +380,8 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                     {groupItems.map((item) => {
                       const active = isActive(item.href);
                       const Icon = item.icon;
+                      const navTestProps: Record<string, string> = {};
+                      if (item.testId) navTestProps["data-testid"] = item.testId;
                       return (
                         <button
                           key={item.href}
@@ -387,6 +390,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                             "mb-1 flex w-full items-center rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 text-left",
                             active ? cn("bg-primary/10 text-primary", sidebarClasses.menu.active) : sidebarClasses.menu.item,
                           )}
+                          {...navTestProps}
                         >
                           <Icon className="mr-3 h-5 w-5 shrink-0 rtl:ml-3 rtl:mr-0" />
                           <span suppressHydrationWarning={true}>{item.label}</span>
@@ -442,7 +446,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                 {/* Density / Customize */}
                 <DropdownMenu open={customizeOpen} onOpenChange={setCustomizeOpen}>
                   <DropdownMenuTrigger asChild={true}>
-                    <Button variant="ghost" size="icon" className={cn("rounded-xl border border-border", navbarClasses.avatar.background)}>
+                    <Button variant="ghost" size="icon" className={cn("rounded-xl border border-border", navbarClasses.avatar.background)} data-testid="customize-dropdown-trigger">
                       <Palette className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>

@@ -7,6 +7,7 @@
  */
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import type * as React from "react";
 import { Badge } from "@/components/ui/badge";
@@ -228,13 +229,13 @@ export function UserManagement() {
                 {loading ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-10 text-center text-muted-foreground">
-                      Loading users...
+                      {t("loadingUsers")}
                     </td>
                   </tr>
                 ) : users.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-10 text-center text-muted-foreground">
-                      No users found
+                      {t("noUsersFound")}
                     </td>
                   </tr>
                 ) : (

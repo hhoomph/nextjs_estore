@@ -8,6 +8,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/config";
 import { prisma } from "@/lib/database";
+import { Prisma } from "@/lib/generated/prisma/client";
 
 // GET /api/reviews - Get reviews for a product or global approved reviews
 export async function GET(request: NextRequest) {
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest) {
     if (global === "true") {
       const [reviews, total] = await Promise.all([
         prisma.review.findMany({
-          where: { status: "approved" },
+          where: { status: "APPROVED" },
           include: {
             user: {
               select: {
@@ -35,8 +36,10 @@ export async function GET(request: NextRequest) {
           orderBy: { createdAt: "desc" },
           skip,
           take: limit,
-        }),
-        prisma.review.count({ where: { status: "approved" } }),
+        }) as unknown as Prisma.ReviewGetPayload<{
+          include: { user: { select: { id: true; name: true; image: true } } }
+        }>[],
+        prisma.review.count({ where: { status: "APPROVED" } }),
       ]);
 
       const transformedReviews = reviews.map((review) => ({
@@ -89,7 +92,9 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: "desc" },
         skip,
         take: limit,
-      }),
+      }) as unknown as Prisma.ReviewGetPayload<{
+        include: { user: { select: { id: true; name: true; image: true } } }
+      }>[],
       prisma.review.count({
         where: { productId: productId },
       }),

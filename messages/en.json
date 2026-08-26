@@ -35,7 +35,9 @@
     "profile": "Profile",
     "adminPanel": "Admin Panel",
     "language": "Language",
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "loadingCategories": "Loading categories...",
+    "noCategoriesAvailable": "No categories available"
   },
   "Authentication": {
     "signIn": "Sign In",
@@ -83,7 +85,9 @@
     "language": "Language",
     "selectLanguage": "Select your preferred language",
     "currency": "Currency",
-    "displayCurrency": "Display prices in your preferred currency"
+    "displayCurrency": "Display prices in your preferred currency",
+    "pleaseSignIn": "Please Sign In",
+    "signInRequired": "You need to be signed in to access your settings."
   },
   "Admin Theme Settings": {
     "workspaceStyling": "Workspace styling",
@@ -223,7 +227,10 @@
     "processingPayment": "Processing Payment...",
     "payAmount": "Pay {amount}",
     "failedToCreateOrder": "Failed to create order",
-    "checkoutError": "Checkout error"
+    "checkoutError": "Checkout error",
+    "loadingOrderDetails": "Loading order details...",
+    "orderNotFound": "Order Not Found",
+    "backToHome": "Back to Home"
   },
   "Account": {
     "pleaseSignIn": "Please Sign In",
@@ -640,7 +647,8 @@
         "signUpFailed": "Sign up failed",
         "socialSignUpFailed": "Social sign up failed",
         "unexpectedError": "An unexpected error occurred"
-      }
+      },
+      "backToHome": "Back to home"
     }
   },
   "Footer & Additional UI": {
@@ -899,7 +907,9 @@
     "guest": "Guest",
     "lowStock": "Low Stock",
     "viewAnalytics": "View Analytics",
-    "checkSalesPerformance": "Check sales and performance data"
+    "checkSalesPerformance": "Check sales and performance data",
+    "loadingUsers": "Loading users...",
+    "noUsersFound": "No users found"
   },
   "Language Settings": {
     "languageSettings": "Language Settings",
@@ -1371,7 +1381,6 @@
     "clearFilters": "Clear Filters",
     "filters": "Filters",
     "filterDescription": "Filter blog posts by category, tag, or search",
-    "category": "Category",
     "tag": "Tag",
     "activeFilters": "Active Filters"
   },
@@ -1438,5 +1447,52 @@
         "description": "For any questions regarding these terms, please reach out to our customer support."
       }
     }
-  }
+  },
+  "Addresses": {
+    "loading": "Loading addresses...",
+    "noAddressesFound": "No addresses found",
+    "addNew": "Add New Address",
+    "deliveryAddress": "Delivery Address",
+    "pleaseSelect": "Please select an address",
+    "addressSelected": "Address selected"
+  },
+  "Orders": {
+    "orders": "Orders",
+    "loading": "Loading your orders...",
+    "pleaseSignIn": "Please Sign In",
+    "signInRequired": "You need to be signed in to view your orders.",
+    "noOrdersYet": "No orders yet",
+    "ordersDescription": "Orders you place will appear here.",
+    "browseProducts": "Browse Products"
+  },
+  "Admin Signin": {
+    "title": "Admin Access",
+    "subtitle": "Sign in to access the admin panel",
+    "restricted": "Admin access is restricted to authorized personnel only.",
+    "notAdmin": "Not an admin?",
+    "signInAsUser": "Sign in as user",
+    "needHelp": "Need help with admin access?",
+    "contactAdmin": "Contact your system administrator",
+    "backToSite": "Back to site"
+  },
+  "Deals": {
+    "loading": "Loading deals...",
+    "errorTitle": "Error Loading Deals",
+    "fetchFailed": "Failed to load deals. Please try again.",
+    "tryAgain": "Try Again",
+    "noActiveDeals": "No active deals",
+    "checkBackSoon": "Check back soon for new offers.",
+    "limitedTimeOffers": "Limited Time Offers",
+    "title": "Special Deals & Offers",
+    "description": "Save big on discounted products before these offers expire.",
+    "hotDeal": "Hot Deal",
+    "featuredDiscount": "Featured discount from our current product catalog.",
+    "limitedStock": "Limited stock",
+    "saveToday": "Save today",
+    "shopThisDeal": "Shop This Deal",
+    "addToCart": "Add to Cart",
+    "allCurrentDeals": "All Current Deals",
+    "viewAllDeals": "View All Deals"
+  },
+  "loadingOrderDetails": "Loading order details..."
 }

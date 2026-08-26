@@ -106,9 +106,7 @@ export function getEnhancedBackdropClasses(
   return clsx(
     "fixed inset-0 z-50",
     isDark ? "bg-background/70 backdrop-blur-xl" : "bg-background/60 backdrop-blur-xl",
-    "animate-in fade-in-0 duration-200",
-    "animate-out fade-out-0 duration-150",
-  );
+);
 }
 
 /**
@@ -211,3 +209,4 @@ export function getOverlayAnimationClasses(
 
   return type === "enter" ? enterClasses : exitClasses;
 }
+

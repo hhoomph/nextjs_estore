@@ -235,6 +235,7 @@ export function Navbar() {
               {/* Cart */}
               <EnhancedNavbarIcon
                 data-testid="cart-icon"
+                icon={<ShoppingCart className="h-4 w-4" />}
                 count={cartCount}
                 onClick={toggleCart}
                 label="Shopping cart"
@@ -338,7 +339,7 @@ export function Navbar() {
                         className="text-destructive focus:text-destructive cursor-pointer hover:bg-destructive/10 focus:bg-destructive/10"
                       >
                         <LogOut className="mr-3 h-4 w-4" />
-                        <span className="font-medium">Sign Out</span>
+                        <span className="font-medium">{t("signOut")}</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

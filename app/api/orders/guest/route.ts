@@ -274,7 +274,7 @@ async function createGuestOrder(orderData: GuestOrderData) {
         userId: null, // Guest order
         sessionId: sessionId,
         total: totals.total,
-        status: "pending",
+        status: "PENDING",
         deliverDate: null,
         discountId: null,
         paymentId: null,
@@ -328,7 +328,7 @@ async function createGuestOrder(orderData: GuestOrderData) {
       where: { id: orderId },
       data: {
         paymentId: payment.id,
-        status: "confirmed",
+        status: "CONFIRMED",
       },
     });
 
@@ -345,4 +345,5 @@ async function createGuestOrder(orderData: GuestOrderData) {
     return orderId;
   });
 }
+
 

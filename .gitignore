@@ -1,4 +1,4 @@
-﻿# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # Dependencies
 /node_modules
@@ -43,6 +43,7 @@ next-env.d.ts
 
 # Generated files
 /generated/prisma
+/lib/generated/
 
 # Project specific files
 /.clinerules
@@ -106,7 +107,6 @@ dev-server.log
 /.kilo*
 .kilo/*
 .kilo/agent-manager.json.9580.1781057729360.tmp
-memory-bank/raw_reflection_log.md
 memory-bank/raw_reflection_log.md
 memory-bank/consolidated_learnings.md
 

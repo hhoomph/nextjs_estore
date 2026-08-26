@@ -225,7 +225,8 @@ export function GuestCheckoutFlow({
   );
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div data-testid="guest-checkout-flow" className="mx-auto max-w-2xl space-y-6">
+      <div data-testid="guest-checkout-indicator" className="sr-only">Guest Checkout</div>
       <CheckoutProgress currentStep={currentStep} />
 
       <Suspense fallback={<LoadingStep />}>

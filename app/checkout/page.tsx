@@ -67,7 +67,7 @@ export default function CheckoutPage() {
   const isGuest = !session?.user;
   const cartStore = isGuest ? guestCartStore : userCartStore;
 
-  const { items: cartItems, getTotal, clearCart } = cartStore;
+  const { items: cartItems, clearCart } = cartStore;
 
   useEffect(() => {
     let mounted = true;
@@ -89,7 +89,7 @@ export default function CheckoutPage() {
     };
   }, []);
 
-  const cartTotal = getTotal();
+  const cartTotal = (cartStore.getTotal ?? (() => 0))();
 
   // Loading state while checking authentication
   if (isPending || !cartReady) {

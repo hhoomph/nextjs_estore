@@ -44,7 +44,6 @@ export async function POST(request: NextRequest) {
     // to keep Set-Cookie headers (session cookies) from better-auth
     return await originalPOST(request);
   } catch (error) {
-    console.error("Auth POST error:", error);
     return createSecureResponse(
       { error: "Authentication failed" },
       { status: 500 },
@@ -65,7 +64,6 @@ export async function GET(request: NextRequest) {
     // to keep Set-Cookie headers (session cookies) from better-auth
     return await originalGET(request);
   } catch (error) {
-    console.error("Auth GET error:", error);
     return createSecureResponse(
       { error: "Authentication failed" },
       { status: 500 },

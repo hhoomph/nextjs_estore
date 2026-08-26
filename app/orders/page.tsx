@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSession } from "@/lib/auth-client";
+import { useTranslations } from "next-intl";
 
 interface OrderItem {
   id: string;
@@ -43,6 +44,7 @@ interface OrdersResponse {
 
 export default function OrdersPage() {
   const { data: session, isPending } = useSession();
+  const t = useTranslations("Orders");
   const [isClient, setIsClient] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
@@ -83,8 +85,8 @@ export default function OrdersPage() {
     return (
       <div className="container px-4 py-16 text-center">
         <ShoppingBag className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-        <h1 className="text-2xl font-bold mb-4">Orders</h1>
-        <p className="text-muted-foreground">Loading your orders...</p>
+        <h1 className="text-2xl font-bold mb-4">{t("orders")}</h1>
+        <p className="text-muted-foreground">{t("loading")}</p>
       </div>
     );
   }
@@ -94,10 +96,10 @@ export default function OrdersPage() {
       <div className="container px-4 py-16 text-center">
         <div className="max-w-md mx-auto">
           <ShoppingBag className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-          <h1 className="text-2xl font-bold mb-4">Please Sign In</h1>
-          <p className="text-muted-foreground mb-6">You need to be signed in to view your orders.</p>
+          <h1 className="text-2xl font-bold mb-4">{t("pleaseSignIn")}</h1>
+          <p className="text-muted-foreground mb-6">{t("signInRequired")}</p>
           <Button asChild={true}>
-            <Link href="/auth/signin?redirect=/orders">Sign In</Link>
+            <Link href="/auth/signin?redirect=/orders">{t("signIn")}</Link>
           </Button>
         </div>
       </div>
@@ -137,12 +139,12 @@ export default function OrdersPage() {
           <Card>
             <CardHeader>
               <Package className="h-12 w-12 text-muted-foreground mb-3" />
-              <CardTitle>No orders yet</CardTitle>
-              <CardDescription>Orders you place will appear here.</CardDescription>
+              <CardTitle>{t("noOrdersYet")}</CardTitle>
+              <CardDescription>{t("ordersDescription")}</CardDescription>
             </CardHeader>
             <CardContent>
               <Button asChild={true}>
-                <Link href="/products">Browse Products</Link>
+                <Link href="/products">{t("browseProducts")}</Link>
               </Button>
             </CardContent>
           </Card>

@@ -1,13 +1,38 @@
 
 generator client {
-  provider = "prisma-client"
-  output   = "../app/generated/prisma"
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+  }
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
 }
 
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum BlogPostStatus {
+  draft
+  published
+  archived
+}
+
+enum BlogCommentStatus {
+  pending
+  approved
+  rejected
+}
 model Authenticator {
   credentialID         String  @unique
   userId               String
@@ -48,6 +73,7 @@ model Account {
   accountId             String
   userId                String
   providerId            String
+  issuer                String
   accessToken           String?
   refreshToken          String?
   idToken               String?
@@ -67,6 +93,7 @@ model Account {
 model Address {
   id           String   @id @default(cuid())
   userId       String
+  deletedAt DateTime?
   addressLine1 String?
   addressLine2 String?
   city         String?  @db.VarChar(100)
@@ -108,6 +135,7 @@ model CartItem {
 model Category {
   id         String    @id
   parentId   String?
+  deletedAt DateTime?
   level      Int?      @db.SmallInt
   name       String?   @db.VarChar(255)
   createdAt  DateTime  @default(now())
@@ -141,6 +169,8 @@ model OptionGroup {
   id             String          @id
   name           String?         @db.VarChar(255)
   type           String?         @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   options        Option[]
   productOptions ProductOption[]
 
@@ -151,6 +181,8 @@ model Option {
   id             String          @id
   name           String?         @db.VarChar(255)
   value          String?         @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   optionGroupId  String
   optionGroup    OptionGroup     @relation(fields: [optionGroupId], references: [id], onDelete: Restrict, onUpdate: Cascade)
   productOptions ProductOption[]
@@ -161,9 +193,10 @@ model Option {
 model Order {
   id          String      @id
   userId      String?
+  deletedAt DateTime?
   sessionId   String?
   total       Decimal     @db.Decimal
-  status      String      @default("pending") @db.VarChar(50)
+  status      OrderStatus  @default(PENDING)
   deliverDate DateTime?   @db.Timestamptz(6)
   discountId  String?
   paymentId   String?
@@ -228,6 +261,7 @@ model Picture {
 model Product {
   id              String           @id
   name            String?          @db.VarChar(255)
+  deletedAt DateTime?
   desc            String?
   slug            String?          @db.VarChar(255)
   categoryId      String
@@ -270,6 +304,8 @@ model ProductOption {
   id             String       @id
   optionsId      String
   productId      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   optionGroupId  String?
   priceIncrement Decimal?     @db.Decimal
   quantity       Int          @default(0)
@@ -298,7 +334,7 @@ model Review {
   rating    Int      @db.SmallInt
   title     String?  @db.VarChar(255)
   comment   String?
-  status    String   @default("PENDING") @db.VarChar(20)
+  status    ReviewStatus @default(PENDING)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   product   Product  @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -364,8 +400,6 @@ model User {
   recentlyVieweds     RecentlyViewed[]
   blogPosts           BlogPost[]
   blogComments        BlogComment[]
-
-  phone_number String?
 
   @@map("user")
 }
@@ -484,11 +518,12 @@ model BlogTag {
 model BlogPost {
   id            String         @id @default(cuid())
   title         String         @db.VarChar(255)
+  deletedAt DateTime?
   slug          String         @unique @db.VarChar(255)
   excerpt       String?        @db.Text
   content       String         @db.Text
   featuredImage String?
-  status        String         @default("draft") @db.VarChar(20)
+  status        BlogPostStatus @default(draft)
   publishedAt   DateTime?
   authorId      String
   categoryId    String
@@ -536,7 +571,7 @@ model BlogComment {
   authorId  String
   postId    String
   parentId  String?
-  status    String     @default("pending") @db.VarChar(20)
+  status    BlogCommentStatus @default(pending)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
@@ -594,3 +629,4 @@ model CollectionProduct {
   @@index([collectionId, displayOrder])
   @@map("collection_product")
 }
+

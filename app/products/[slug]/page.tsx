@@ -104,7 +104,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         <div className="container px-4 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Product Images */}
-            <div className="space-y-4">
+            <div className="space-y-4" data-testid="product-image">
               <ProductImageGallery
                 images={productImages}
                 alt={product.name || "Product"}
@@ -155,7 +155,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               />
 
               {/* Description */}
-              <div>
+              <div data-testid="product-description">
                 <h2 className="font-semibold mb-2">Description</h2>
                 <p className="text-muted-foreground whitespace-pre-wrap">
                   {product.desc || "No description available."}

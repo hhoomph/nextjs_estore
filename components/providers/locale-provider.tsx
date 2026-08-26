@@ -87,8 +87,8 @@ export function LocaleProvider({
 
         if (response.ok) {
           setLocaleState(newLocale);
-          // Hard reload to apply new locale (re-renders Server Components with correct messages)
-          window.location.reload();
+          // Refresh client components and re-render server components with the new locale
+          router.refresh();
         } else {
           console.error("Failed to set locale");
           setIsLoading(false);

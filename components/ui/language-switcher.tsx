@@ -23,7 +23,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./dropdown-menu";
-export function LanguageSwitcher() {
+export function LanguageSwitcher(props: { "data-testid"?: string } = {}) {
+  const triggerTestId = props["data-testid"];
+  const triggerProps: Record<string, string> = {};
+  if (triggerTestId) triggerProps["data-testid"] = triggerTestId;
   const locale = useLocale();
   const t = useTranslations("Navigation");
   const router = useRouter();
@@ -49,8 +52,8 @@ export function LanguageSwitcher() {
       }
       // Small delay to ensure cookies are committed
       await new Promise((resolve) => setTimeout(resolve, 50));
-      // Reload page to apply new locale to server components
-      window.location.reload();
+      // Refresh client components and re-render server components with the new locale
+      router.refresh();
     } catch (error) {
       console.error("Error switching language:", error);
       setIsLoading(false);
@@ -66,6 +69,7 @@ export function LanguageSwitcher() {
             className="relative cursor-pointer"
             disabled={isLoading}
             aria-label={locale === "fa" ? "زبان و واحد پول - Language & Currency" : "Language & Currency"}
+            {...triggerProps}
           >
             <Languages className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
             <span className="sr-only">{t("language")}</span>
@@ -75,6 +79,8 @@ export function LanguageSwitcher() {
           {languages.map((lang) => (
             <DropdownMenuItem
               key={lang.code}
+              data-locale={lang.code}
+              data-testid={`lang-${lang.code}`}
               onClick={() => switchLanguage(lang.code)}
               disabled={isLoading}
               className={`flex items-center gap-2 ${

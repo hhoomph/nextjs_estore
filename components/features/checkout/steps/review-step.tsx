@@ -45,7 +45,7 @@ export function ReviewStep({
               {cartItems.map((item) => {
                 const image = item.product.product_pictures?.[0]?.picture?.url;
                 return (
-                  <div key={item.id} className="flex items-center justify-between gap-4">
+                  <div key={item.id} data-testid="order-items" className="flex items-center justify-between gap-4">
                     <div className="flex min-w-0 items-center gap-3">
                       {image ? (
                         <Image

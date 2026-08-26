@@ -58,8 +58,8 @@ export function BlogComments({
         throw new Error(errorData.error || "Failed to submit comment");
       }
 
-      // Refresh the page to show the new comment (after moderation)
-      window.location.reload();
+      // Refresh to show the new comment (after moderation)
+      router.refresh();
     } catch (error) {
       console.error("Error submitting comment:", error);
       // TODO: Show error toast to user
@@ -89,8 +89,8 @@ export function BlogComments({
         throw new Error(errorData.error || "Failed to submit reply");
       }
 
-      // Refresh the page to show the new reply (after moderation)
-      window.location.reload();
+      // Refresh to show the new reply (after moderation)
+      router.refresh();
     } catch (error) {
       console.error("Error submitting reply:", error);
       // TODO: Show error toast to user

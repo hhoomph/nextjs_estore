@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowRight, Grid3X3, Package, Search } from "lucide-react";
 import { SectionHeading } from "@/components/features/layout/section-heading";
 import { Badge } from "@/components/ui/badge";
@@ -75,43 +75,47 @@ export default function CategoriesPage() {
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
+  const controllerRef = { current: null as AbortController | null };
+
+  const fetchCategories = useCallback(async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/categories", {
+        signal: controllerRef.current?.signal,
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || t("error.fetchFailed"));
+      }
+
+      setCategories(data.categories || []);
+    } catch (err) {
+      if (
+        err instanceof Error &&
+        (err.name === "AbortError" || err.message === "Failed to fetch")
+      ) {
+        return;
+      }
+      setError(err instanceof Error ? err.message : t("error.fetchFailed"));
+    } finally {
+      if (!controllerRef.current?.signal.aborted) {
+        setLoading(false);
+      }
+    }
+  }, [t]);
+
   useEffect(() => {
     const controller = new AbortController();
-
-    const fetchCategories = async () => {
-      setLoading(true);
-      setError("");
-
-      try {
-        const response = await fetch("/api/categories", {
-          signal: controller.signal,
-        });
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error || t("error.fetchFailed"));
-        }
-
-        setCategories(data.categories || []);
-      } catch (err) {
-        if (
-          err instanceof Error &&
-          (err.name === "AbortError" || err.message === "Failed to fetch")
-        ) {
-          return;
-        }
-        setError(err instanceof Error ? err.message : t("error.fetchFailed"));
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
-      }
-    };
-
+    controllerRef.current = controller;
     void fetchCategories();
-
-    return () => controller.abort();
-  }, [t]);
+    return () => {
+      controller.abort();
+      controllerRef.current = null;
+    };
+  }, [fetchCategories]);
 
   const filteredCategories = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -150,7 +154,7 @@ export default function CategoriesPage() {
             </h1>
             <p className="mb-6 text-muted-foreground">{error}</p>
             <Button
-              onClick={() => window.location.reload()}
+              onClick={() => fetchCategories()}
               className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {t("error.tryAgain")}

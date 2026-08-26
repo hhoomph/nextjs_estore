@@ -28,6 +28,7 @@ import { Separator } from "@/components/ui/separator";
 import { getUserAddresses } from "@/lib/actions/addresses";
 import { useSession } from "@/lib/auth-client";
 import { useToast } from "@/lib/hooks/use-toast";
+import { useTranslations } from "next-intl";
 import type { Address } from "@/types/address";
 
 interface AddressSelectorProps {
@@ -49,6 +50,7 @@ export function AddressSelector({
 }: AddressSelectorProps) {
   const { data: session } = useSession();
   const { toast } = useToast();
+  const t = useTranslations("Addresses");
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(
@@ -120,7 +122,7 @@ export function AddressSelector({
       <Card>
         <CardContent className="flex items-center justify-center py-8">
           <Loader2 className="h-6 w-6 animate-spin mr-2" />
-          <span>Loading addresses...</span>
+          <span>{t("loading")}</span>
         </CardContent>
       </Card>
     );
@@ -139,14 +141,14 @@ export function AddressSelector({
         <CardContent>
           <div className="text-center py-8">
             <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No addresses found</h3>
+            <h3 className="text-lg font-semibold mb-2">{t("noAddressesFound")}</h3>
             <p className="text-muted-foreground mb-6">
-              Add a delivery address to continue with your order.
+              {t("addressesDescription")}
             </p>
             {onAddNew && (
               <Button onClick={onAddNew}>
                 <Plus className="h-4 w-4 mr-2" />
-                Add New Address
+                {t("addNew")}
               </Button>
             )}
           </div>
@@ -182,7 +184,7 @@ export function AddressSelector({
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <Home className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium">Delivery Address</span>
+                      <span className="font-medium">{t("deliveryAddress")}</span>
                       {address.isDefault && (
                         <Badge variant="default" className="text-xs">
                           Default
@@ -227,12 +229,12 @@ export function AddressSelector({
             {selectedId ? (
               <span className="flex items-center gap-2 text-success">
                 <CheckCircle className="h-4 w-4" />
-                Address selected
+                {t("addressSelected")}
               </span>
             ) : (
               <span className="flex items-center gap-2 text-warning">
                 <AlertTriangle className="h-4 w-4" />
-                Please select an address
+                {t("pleaseSelect")}
               </span>
             )}
           </div>
@@ -240,7 +242,7 @@ export function AddressSelector({
           {onAddNew && (
             <Button variant="outline" onClick={onAddNew}>
               <Plus className="h-4 w-4 mr-2" />
-              Add New Address
+              {t("addNew")}
             </Button>
           )}
         </div>

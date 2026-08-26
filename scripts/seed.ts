@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../app/generated/prisma/client";
+import { PrismaClient } from "../lib/generated/prisma/client";
 import "dotenv/config";
 
 const connectionString = `${process.env.DATABASE_URL}`;
@@ -47,16 +47,16 @@ type SeedCategory = {
 };
 
 const sampleProductImages = [
-  "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400",
-  "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400",
-  "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400",
-  "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400",
-  "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400",
-  "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400",
-  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
-  "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400",
-  "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400",
-  "https://images.unsplash.com/photo-1526178417617-24d1387740a9?w=400",
+  "/placeholder-product.svg",
+  "/placeholder-product.svg",
+  "/placeholder-product.svg",
+  "/placeholder-product.svg",
+  "/placeholder-product.svg",
+  "/placeholder-product.svg",
+  "/placeholder-product.svg",
+  "/placeholder-product.svg",
+  "/placeholder-product.svg",
+  "/placeholder-product.svg",
 ];
 
 function getDeterministicImageIndex(value: string, offset = 0): number {
@@ -939,6 +939,25 @@ async function createUsers(progress: SeedProgress, rollback: SeedRollback) {
   users.push(adminUser);
   progress.increment();
 
+  const hashedAdminPassword = await bcrypt.hash("admin123456", 12);
+  await prisma.account.upsert({
+    where: {
+      providerId_accountId: {
+        providerId: "credential",
+        accountId: adminUser.id,
+      },
+    },
+    update: { password: hashedAdminPassword },
+    create: {
+      id: randomUUID(),
+      accountId: adminUser.id,
+      userId: adminUser.id,
+      providerId: "credential",
+      issuer: "local:credential",
+      password: hashedAdminPassword,
+    },
+  });
+
   // Create test user
   const testUser = await prisma.user.upsert({
     where: { email: "test@example.com" },
@@ -962,12 +981,13 @@ async function createUsers(progress: SeedProgress, rollback: SeedRollback) {
         accountId: testUser.id,
       },
     },
-    update: {},
+    update: { password: hashedPassword },
     create: {
       id: randomUUID(),
       accountId: testUser.id,
       userId: testUser.id,
       providerId: "credential",
+      issuer: "local:credential",
       password: hashedPassword,
     },
   });
@@ -1119,3 +1139,5 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+
+

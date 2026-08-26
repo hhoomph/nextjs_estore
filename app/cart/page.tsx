@@ -209,7 +209,7 @@ export default function CartPage() {
             <Card className="text-center py-16" data-testid="cart-empty">
               <CardContent>
                 <ShoppingCart className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                <h2 className="text-2xl font-semibold mb-2">
+                <h2 data-testid="empty-cart-message" className="text-2xl font-semibold mb-2">
                   {tCart("cartEmpty")}
                 </h2>
                 <p className="text-muted-foreground mb-6">

@@ -7,6 +7,7 @@
  */
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import type * as React from "react";
 import { Badge } from "@/components/ui/badge";
@@ -105,7 +106,7 @@ export function Analytics() {
       <div className="flex h-64 items-center justify-center">
         <div className="text-center">
           <div className="mx-auto mb-3 h-12 w-12 animate-spin rounded-full border-b-2 border-primary" />
-          <p className="text-sm text-muted-foreground">Loading analytics...</p>
+          <p className="text-sm text-muted-foreground">{t("loading")}</p>
         </div>
       </div>
     );

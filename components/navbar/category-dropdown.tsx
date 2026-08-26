@@ -71,11 +71,11 @@ export function CategoryDropdown() {
             <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
               {isLoading ? (
                 <li className="col-span-full text-sm text-muted-foreground text-center py-4">
-                  Loading categories...
+                  {t("loadingCategories")}
                 </li>
               ) : categories.length === 0 ? (
                 <li className="col-span-full text-sm text-muted-foreground text-center py-4">
-                  No categories available
+                  {t("noCategoriesAvailable")}
                 </li>
               ) : (
                 categories.map((category) => (

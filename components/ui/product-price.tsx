@@ -12,6 +12,7 @@ interface ProductPriceProps {
   className?: string;
   amountClassName?: string;
   originalClassName?: string;
+  "data-testid"?: string;
 }
 
 function toNumber(value: PriceValue) {
@@ -32,7 +33,8 @@ export function ProductPrice({
   className,
   amountClassName,
   originalClassName,
-}: ProductPriceProps) {
+  ...rest
+}: ProductPriceProps & Record<string, unknown>) {
   const { currency: storeCurrency } = useCurrencyStore();
   const currentPrice = getProductCurrentPrice(price, discountPrice);
   const originalPrice = toNumber(price);
@@ -41,7 +43,7 @@ export function ProductPrice({
   const activeCurrency = currencyOverride || storeCurrency;
 
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn("flex items-center gap-2", className)} {...rest}>
       <span className={cn("font-black text-foreground", amountClassName)}>
         {formatAmount(currentPrice, activeCurrency)}
       </span>

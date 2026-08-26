@@ -30,11 +30,20 @@ import { generateSEOMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
-
-  return generateSEOMetadata({
+  const seoMetadata = await generateSEOMetadata({
     locale,
     keywords: ["فروشگاه", "خرید آنلاین", "محصولات", "e-commerce", "shopping"],
   });
+
+  return {
+    ...seoMetadata,
+    link: [
+      ...(seoMetadata.link || []),
+      { rel: "preload", href: "/fonts/iransansweb.woff2", as: "font", type: "font/woff2", crossOrigin: "anonymous" },
+      { rel: "preload", href: "/fonts/iransansweb_bold.woff2", as: "font", type: "font/woff2", crossOrigin: "anonymous" },
+      { rel: "preload", href: "/fonts/iransansweb_light.woff2", as: "font", type: "font/woff2", crossOrigin: "anonymous" },
+    ],
+  };
 }
 
 export default async function RootLayout({

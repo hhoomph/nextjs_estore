@@ -613,6 +613,15 @@ export const useGuestCartStore = create<GuestCartStore>()(
         }),
         {
           name: "guest-cart-storage",
+          partialize: (state) => ({
+            items: state.items,
+            guestId: state.guestId,
+            isGuest: state.isGuest,
+            lastSync: state.lastSync,
+            pendingUpdates: state.pendingUpdates,
+            isLoading: state.isLoading,
+            error: state.error,
+          }),
           storage: {
             getItem: (name) => {
               // Check if we're on the client side
@@ -696,6 +705,40 @@ if (typeof window !== "undefined") {
 
 // Server-side initialization is handled by the persist middleware
 
+// Initialize guest cart (call once from a client component)
+export function initializeGuestCart() {
+  if (typeof window === "undefined") return;
+  
+  // Initialize guest ID on first load
+  useGuestCartStore.setState((state) => ({
+    guestId: state.guestId || CartStorage.getGuestId(),
+  }));
+ 
+  // Auto-sync on visibility change (when user returns to tab)
+  const handleVisibilityChange = () => {
+    if (!document.hidden) {
+      const store = useGuestCartStore.getState();
+      if (store.pendingUpdates.length > 0) {
+        store.syncWithServer();
+      }
+    }
+  };
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+ 
+  // Periodic sync (every 30 seconds if there are pending updates)
+  const intervalId = setInterval(() => {
+    const store = useGuestCartStore.getState();
+    if (store.pendingUpdates.length > 0 && !store.isLoading) {
+      store.syncWithServer();
+    }
+  }, CART_CONSTANTS.SYNC_INTERVAL);
+ 
+  return () => {
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
+    clearInterval(intervalId);
+  };
+}
+ 
 // Export utilities
 export { CartStorage, CartValidator };
 

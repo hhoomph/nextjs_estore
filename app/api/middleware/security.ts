@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Security middleware for API routes
  *
  * Provides comprehensive security protections including:

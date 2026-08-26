@@ -177,7 +177,7 @@ export function ShippingStep({
             <Button type="button" variant="outline" onClick={onPrevious}>
               Back to Contact
             </Button>
-            <Button type="button" onClick={handleNext}>Continue to Payment</Button>
+            <Button data-testid="continue-to-payment" type="button" onClick={handleNext}>Continue to Payment</Button>
           </div>
         </form>
       </CardContent>

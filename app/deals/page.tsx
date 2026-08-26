@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+import { useCallback, useEffect, useState } from "react";
 import { ArrowRight, Clock, Percent, Tag } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -42,45 +43,53 @@ function toProductCard(product: Product): ProductCardProduct {
 }
 
 export default function DealsPage() {
+  const t = useTranslations("Deals");
   const [deals, setDeals] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const { addToCart } = useCartActions();
 
+  const controllerRef = { current: null as AbortController | null };
+
+  const fetchDeals = useCallback(async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/products?limit=12&onSale=true", {
+        signal: controllerRef.current?.signal,
+      });
+      const data: ProductResult = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || t("fetchFailed"));
+      }
+
+      setDeals(data.data);
+    } catch (err) {
+      if (
+        err instanceof Error &&
+        (err.name === "AbortError" || err.message === "Failed to fetch")
+      ) {
+        return;
+      }
+      setError(err instanceof Error ? err.message : t("fetchFailed"));
+    } finally {
+      if (!controllerRef.current?.signal.aborted) {
+        setLoading(false);
+      }
+    }
+  }, [t]);
+
   useEffect(() => {
     const controller = new AbortController();
-
-    const fetchDeals = async () => {
-      try {
-        const response = await fetch("/api/products?limit=12&onSale=true", {
-          signal: controller.signal,
-        });
-        const data: ProductResult = await response.json();
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch deals");
-        }
-
-        setDeals(data.data);
-      } catch (err) {
-        if (
-          err instanceof Error &&
-          (err.name === "AbortError" || err.message === "Failed to fetch")
-        ) {
-          return;
-        }
-        setError(err instanceof Error ? err.message : "Failed to fetch deals");
-      } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
-      }
-    };
-
+    controllerRef.current = controller;
     void fetchDeals();
-
-    return () => controller.abort();
-  }, []);
+    return () => {
+      controller.abort();
+      controllerRef.current = null;
+    };
+  }, [fetchDeals]);
 
   const handleAddToCart = async (product: ProductCardProduct) => {
     try {
@@ -137,20 +146,20 @@ export default function DealsPage() {
         {loading ? (
           <div className="rounded-[2rem] border border-border/60 bg-card p-10 text-center shadow-xl shadow-primary/10">
             <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-border border-t-primary" />
-            <p className="font-semibold text-muted-foreground">Loading deals...</p>
+            <p className="font-semibold text-muted-foreground">{t("loading")}</p>
           </div>
         ) : error ? (
           <div className="rounded-[2rem] border border-border/60 bg-card p-10 text-center shadow-xl shadow-primary/10">
             <p className="mb-5 font-bold text-destructive">{error}</p>
-            <Button onClick={() => window.location.reload()} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
-              Try Again
+            <Button onClick={() => fetchDeals()} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+              {t("tryAgain")}
             </Button>
           </div>
         ) : deals.length === 0 ? (
           <div className="rounded-[2rem] border border-border/60 bg-card p-10 text-center shadow-xl shadow-primary/10">
             <Tag className="mx-auto mb-4 h-14 w-14 text-muted-foreground" />
-            <h2 className="text-2xl font-black text-foreground">No active deals</h2>
-            <p className="mt-2 text-muted-foreground">Check back soon for new offers.</p>
+            <h2 className="text-2xl font-black text-foreground">{t("noActiveDeals")}</h2>
+            <p className="mt-2 text-muted-foreground">{t("checkBackSoon")}</p>
           </div>
         ) : (
           <>
@@ -165,15 +174,15 @@ export default function DealsPage() {
                       {featuredDeal.name}
                     </h2>
                     <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-                      Featured discount from our current product catalog.
+                      {t("featuredDiscount")}
                     </p>
                     <div className="mt-6 flex flex-wrap items-center gap-3 text-sm font-bold text-muted-foreground">
                       <span className="rounded-full border border-primary/25 bg-primary/10 px-4 py-2">
                         <Clock className="mr-2 inline h-4 w-4 text-primary" />
-                        Limited stock
+                        {t("limitedStock")}
                       </span>
                       <span className="rounded-full border border-primary/25 bg-primary/10 px-4 py-2">
-                        Save today
+                        {t("saveToday")}
                       </span>
                     </div>
                     <div className="mt-8 flex flex-wrap gap-3">
@@ -197,10 +206,10 @@ export default function DealsPage() {
 
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-2xl font-black text-foreground">
-                All Current Deals
+                {t("allCurrentDeals")}
               </h2>
               <Button asChild={true} variant="outline" className="rounded-full">
-                <Link href="/products?onSale=true">View All Deals</Link>
+                <Link href="/products?onSale=true">{t("viewAllDeals")}</Link>
               </Button>
             </div>
 
@@ -219,3 +228,4 @@ export default function DealsPage() {
     </main>
   );
 }
+

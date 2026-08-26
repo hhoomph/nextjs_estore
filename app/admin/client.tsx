@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Module for admin client
  *
  * @author hh.oomph@gmail.com
@@ -150,7 +150,7 @@ export default function AdminDashboard() {
     setLoading(true);
     setError("");
     try {
-      const response = await fetch("/api/dashboard/stats");
+      const response = await fetch("/api/dashboard/stats", { credentials: "include" });
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.error || "Failed to fetch dashboard stats");
@@ -228,7 +228,7 @@ export default function AdminDashboard() {
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-2">
             <p className="text-xs font-semibold uppercase tracking-wider text-primary">{t("welcomeBack")}</p>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">{t("dashboard")}</h1>
+            <h1 data-testid="admin-dashboard-heading" className="text-3xl font-bold tracking-tight text-foreground">{t("dashboard")}</h1>
             <p className="text-sm leading-relaxed text-muted-foreground max-w-2xl">{t("dashboardDescription")}</p>
           </div>
           <div className="rounded-2xl bg-muted px-4 py-3 text-sm text-muted-foreground shrink-0">

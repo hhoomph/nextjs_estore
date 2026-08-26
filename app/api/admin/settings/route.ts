@@ -55,6 +55,7 @@ function normalizeSuggestionAlgorithm(value: unknown): SiteSettingsData["suggest
 
 // GET /api/admin/settings - Get current settings
 export async function GET(request: NextRequest) {
+
   try {
     const result = await getSiteSettings();
     if (!result.success) {
@@ -116,14 +117,6 @@ export async function GET(request: NextRequest) {
 // PUT /api/admin/settings - Update settings (supports partial updates)
 export async function PUT(request: NextRequest) {
   try {
-    const session = await auth.api.getSession({ headers: request.headers });
-
-    if (!session?.user?.id || session.user.role !== "ADMIN") {
-      return NextResponse.json(
-        { error: "Unauthorized - Admin access required" },
-        { status: 403 },
-      );
-    }
 
     const body = await request.json();
     const partial = body as Partial<{

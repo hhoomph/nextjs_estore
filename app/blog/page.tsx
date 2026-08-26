@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Blog Page Component
  *
  * Displays a list of published blog posts with categories and search functionality.
@@ -18,11 +18,12 @@ import prisma from "@/lib/prisma";
 export async function generateMetadata({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }): Promise<Metadata> {
   const t = await getTranslations("Blog");
-  const category = searchParams.category as string;
-  const search = searchParams.q as string;
+  const params = await searchParams;
+  const category = params.category as string;
+  const search = params.q as string;
 
   let title = t("title");
   const description = t("description");
@@ -40,16 +41,17 @@ export async function generateMetadata({
 }
 
 interface BlogPageProps {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export const dynamic = "force-dynamic";
+export const revalidate = 600;
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
   const t = await getTranslations("Blog");
-  const categorySlug = searchParams.category as string;
-  const searchQuery = searchParams.q as string;
-  const page = parseInt(searchParams.page as string) || 1;
+  const params = await searchParams;
+  const categorySlug = params.category as string;
+  const searchQuery = params.q as string;
+  const page = parseInt(params.page as string) || 1;
   const limit = 12;
 
   let posts: any[] = [];

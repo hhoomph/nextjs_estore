@@ -429,7 +429,7 @@ export function ProductsPageClient({ initialData }: ProductsPageClientProps) {
         </aside>
 
         <main>
-          <div className="mb-6 flex flex-col justify-between gap-4 rounded-[2rem] border border-border/60 bg-card/95 p-5 shadow-xl shadow-primary/10 md:flex-row md:items-end">
+          <div data-testid="products-title" className="mb-6 flex flex-col justify-between gap-4 rounded-[2rem] border border-border/60 bg-card/95 p-5 shadow-xl shadow-primary/10 md:flex-row md:items-end">
             <SectionHeading
               eyebrow={t("title")}
               title={t("subtitle")}

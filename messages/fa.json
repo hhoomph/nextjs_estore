@@ -35,7 +35,9 @@
     "profile": "پروفایل",
     "adminPanel": "پنل مدیریت",
     "language": "زبان",
-    "signOut": "خروج"
+    "signOut": "خروج",
+    "loadingCategories": "در حال بارگذاری دسته‌بندی‌ها...",
+    "noCategoriesAvailable": "هیچ دسته‌بندی‌ای در دسترس نیست"
   },
   "Authentication": {
     "signIn": "ورود",
@@ -83,7 +85,9 @@
     "language": "زبان",
     "selectLanguage": "زبان مورد نظر خود را انتخاب کنید",
     "currency": "واحد پول",
-    "displayCurrency": "نمایش قیمت‌ها به واحد پول مورد نظر"
+    "displayCurrency": "نمایش قیمت‌ها به واحد پول مورد نظر",
+    "pleaseSignIn": "لطفا وارد شوید",
+    "signInRequired": "برای دسترسی به تنظیمات خود باید وارد شوید."
   },
   "Admin Theme Settings": {
     "workspaceStyling": "استایل فضای کار",
@@ -223,7 +227,10 @@
     "processingPayment": "در حال پردازش پرداخت...",
     "payAmount": "پرداخت {amount}",
     "failedToCreateOrder": "خطا در ایجاد سفارش",
-    "checkoutError": "خطا در پرداخت"
+    "checkoutError": "خطا در پرداخت",
+    "loadingOrderDetails": "در حال بارگذاری جزئیات سفارش...",
+    "orderNotFound": "سفارش پیدا نشد",
+    "backToHome": "بازگشت به خانه"
   },
   "Account": {
     "pleaseSignIn": "لطفا وارد شوید",
@@ -969,7 +976,8 @@
         "signUpFailed": "ثبت نام ناموفق بود",
         "socialSignUpFailed": "ثبت نام از طریق شبکه اجتماعی ناموفق بود",
         "unexpectedError": "خطای غیرمنتظره‌ای رخ داد"
-      }
+      },
+      "backToHome": "بازگشت به خانه"
     }
   },
   "Social Sharing": {
@@ -1033,7 +1041,9 @@
     "guest": "مهمان",
     "lowStock": "موجودی کم",
     "viewAnalytics": "مشاهده آمار",
-    "checkSalesPerformance": "بررسی فروش و عملکرد"
+    "checkSalesPerformance": "بررسی فروش و عملکرد",
+    "loadingUsers": "در حال بارگذاری کاربران...",
+    "noUsersFound": "کاربری یافت نشد"
   },
   "categories": {
     "title": "دسته‌بندی‌ها",
@@ -1372,7 +1382,6 @@
     "clearFilters": "پاک کردن فیلترها",
     "filters": "فیلترها",
     "filterDescription": "فیلتر کردن مقالات بر اساس دسته‌بندی، برچسب یا جستجو",
-    "category": "دسته‌بندی",
     "tag": "برچسب",
     "activeFilters": "فیلترهای فعال"
   },
@@ -1438,5 +1447,52 @@
         "description": "برای هرگونه سوال در مورد این شرایط، لطفاً با پشتیبانی مشتریان ما تماس بگیرید."
       }
     }
-  }
+  },
+  "Orders": {
+    "orders": "سفارشات",
+    "loading": "در حال بارگذاری سفارشات...",
+    "pleaseSignIn": "لطفا وارد شوید",
+    "signInRequired": "برای مشاهده سفارشات خود باید وارد شوید.",
+    "noOrdersYet": "هنوز سفارشی وجود ندارد",
+    "ordersDescription": "سفارشات شما اینجا ظاهر می‌شوند.",
+    "browseProducts": "مشاهده محصولات"
+  },
+  "Deals": {
+    "loading": "در حال بارگذاری تخفیف‌ها...",
+    "errorTitle": "خطا در بارگذاری تخفیف‌ها",
+    "fetchFailed": "بارگذاری تخفیف‌ها ناموفق بود. لطفاً دوباره تلاش کنید.",
+    "tryAgain": "تلاش مجدد",
+    "noActiveDeals": "تخفیف فعالی وجود ندارد",
+    "checkBackSoon": "برای پیشنهادات جدید به زود بازگردید.",
+    "limitedTimeOffers": "پیشنهادات محدود زمانی",
+    "title": "تخفیف‌های ویژه و پیشنهادات",
+    "description": "در محصولات با تخفیف قبل از انقای این پیشنهادات پس‌انداز کنید.",
+    "hotDeal": "تخفیف داغ",
+    "featuredDiscount": "تخفیف ویژه از کاتالوگ محصولات فعلی.",
+    "limitedStock": "موجودی محدود",
+    "saveToday": "امروز پس‌انداز کنید",
+    "shopThisDeal": "خرید این تخفیف",
+    "addToCart": "افزودن به سبد خرید",
+    "allCurrentDeals": "همه تخفیف‌های فعلی",
+    "viewAllDeals": "مشاهده همه تخفیف‌ها"
+  },
+  "Addresses": {
+    "loading": "در حال بارگذاری آدرس‌ها...",
+    "noAddressesFound": "آدرسی یافت نشد",
+    "addNew": "افزودن آدرس جدید",
+    "deliveryAddress": "آدرس ارسال",
+    "pleaseSelect": "لطفا یک آدرس انتخاب کنید",
+    "addressSelected": "آدرس انتخاب شد"
+  },
+  "Admin Signin": {
+    "title": "دسترسی مدیریت",
+    "subtitle": "برای دسترسی به پنل مدیریت وارد شوید",
+    "restricted": "دسترسی مدیریت فقط برای پرسنل مجاز محدود است.",
+    "notAdmin": "مدیر نیستید؟",
+    "signInAsUser": "ورود به عنوان کاربر",
+    "needHelp": "نیازمند کمک برای دسترسی مدیریت هستید؟",
+    "contactAdmin": "با مدیر سیستم خود تماس بگیرید",
+    "backToSite": "بازگشت به سایت"
+  },
+  "loadingOrderDetails": "در حال بارگذاری جزئیات سفارش..."
 }

@@ -31,6 +31,42 @@
   font-weight: 400;
   font-style: normal;
   font-display: swap;
+ }
+
+ @font-face {
+  font-family: "Iransansweb";
+  src:
+    url("/fonts/iransansweb.woff2") format("woff2"),
+    url("/fonts/iransansweb.woff") format("woff"),
+    url("/fonts/iransansweb.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+0590-05FF;
+}
+
+@font-face {
+  font-family: "Iransansweb";
+  src:
+    url("/fonts/iransansweb_bold.woff2") format("woff2"),
+    url("/fonts/iransansweb_bold.woff") format("woff"),
+    url("/fonts/iransansweb_bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+0590-05FF;
+}
+
+@font-face {
+  font-family: "Iransansweb";
+  src:
+    url("/fonts/iransansweb_light.woff2") format("woff2"),
+    url("/fonts/iransansweb_light.woff") format("woff"),
+    url("/fonts/iransansweb_light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF, U+0590-05FF;
 }
 
 @import "tailwindcss";
@@ -178,7 +214,9 @@
     "Inter", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI",
     "Roboto", "sans-serif";
   --font-family-persian:
-    "Vazirmatn", "Shabnam", "Inter", "system-ui", "sans-serif";
+    "Iransansweb", "Vazirmatn", "Shabnam", "Inter", "system-ui", "sans-serif";
+  --font-family-iransans:
+    "Iransansweb", "Vazirmatn", "Shabnam", "system-ui", "sans-serif";
   --font-family-mono:
     "JetBrains Mono", "Fira Code", "Monaco", "Cascadia Code", "Roboto Mono",
     "Consolas", "monospace";
@@ -189,7 +227,7 @@
   --font-persian: var(--font-family-persian);
   --font-geist-sans: var(--font-family-sans);
   --font-geist-mono: var(--font-family-mono);
-  --font-iran-sans: var(--font-family-persian);
+  --font-iran-sans: var(--font-family-iransans);
   /* Font Sizes - Perfect Scale */
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
@@ -657,7 +695,7 @@ body::-webkit-scrollbar-thumb {
 
 /* Persian text styles */
 .persian-text {
-  font-family: var(--font-persian);
+  font-family: var(--font-family-iransans);
   direction: rtl;
   text-align: right;
 }

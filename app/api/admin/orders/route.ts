@@ -6,6 +6,8 @@
  * @since 2025-01-01
  */
 import { type NextRequest, NextResponse } from "next/server";
+
+import { type OrderStatus } from "@/lib/generated/prisma/client";
 import { auth } from "@/lib/auth/config";
 import { prisma } from "@/lib/database";
 
@@ -40,7 +42,7 @@ export async function GET(request: NextRequest) {
         };
         id?: { contains: string };
       }>;
-      status?: string;
+      status?: OrderStatus;
     } = {};
 
     if (search) {
@@ -58,7 +60,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (status && status !== "all") {
-      where.status = status;
+      where.status = status as OrderStatus;
     }
 
     const [orders, total] = await Promise.all([
@@ -110,3 +112,4 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+

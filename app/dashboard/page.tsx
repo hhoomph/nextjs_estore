@@ -262,7 +262,7 @@ function DashboardContent() {
     >
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">
+        <h1 data-testid="user-welcome" className="text-3xl font-bold">
           {t("welcomeBack", { name: user.name || "" })}
         </h1>
         <p className="text-muted-foreground mt-1">

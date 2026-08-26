@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Module for index
  *
  * @author hh.oomph@gmail.com
@@ -7,7 +7,7 @@
  */
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../../app/generated/prisma/client";
+import { PrismaClient } from "../../lib/generated/prisma/client";
 
 // Global singleton pattern for Prisma client
 const globalForPrisma = globalThis as unknown as {
@@ -38,7 +38,7 @@ function createPrismaClient(): PrismaClient {
     adapter,
     log:
       process.env.NODE_ENV === "development"
-        ? ["query", "error", "warn"]
+        ? ["error", "warn"]
         : ["error"],
   });
 }

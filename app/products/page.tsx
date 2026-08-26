@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Module for page
  *
  * @author hh.oomph@gmail.com
@@ -11,7 +11,7 @@ import { getProducts } from "@/lib/actions/products";
 import { ProductsBreadcrumb } from "./breadcrumb";
 import { ProductsPageClient } from "./client";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export default async function ProductsPage() {
   // Server component - fetch initial data

@@ -8,6 +8,7 @@
 "use client";
 
 import { RefreshCw, ShoppingBag, User, X } from "lucide-react";
+import { useEffect } from "react";
 // Lazy load cart item component for bundle optimization
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -27,7 +28,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "@/lib/auth-client";
 import { useCartSync } from "@/lib/hooks/use-cart-sync";
 import { useCartStore } from "@/lib/stores/cart-store";
-import { useGuestCartStore } from "@/lib/stores/guest-cart-store";
+import { useGuestCartStore, initializeGuestCart } from "@/lib/stores/guest-cart-store";
 import {
   getThemeAwareBorderClasses,
   getThemeAwareTextClasses,
@@ -58,6 +59,11 @@ export function CartSidebar({}: CartSidebarProps = {}) {
   const t = useTranslations("Cart Sidebar");
   const { data: session } = useSession();
   const { isSyncing, error } = useCartSync();
+  // Initialize guest cart auto-sync once on mount
+  useEffect(() => {
+    const cleanup = initializeGuestCart();
+    return cleanup;
+  }, []);
 
   // Use explicit per-field selectors with safe defaults so the component
   // is resilient to partial store rehydration during SSR.
@@ -216,6 +222,7 @@ export function CartSidebar({}: CartSidebarProps = {}) {
               {t("emptyMessage")}
             </p>
             <Button
+              data-testid="continue-shopping"
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
               asChild={true}
               onClick={() => setCartOpen(false)}
@@ -278,6 +285,7 @@ export function CartSidebar({}: CartSidebarProps = {}) {
                 aria-label={t("checkoutActions")}
               >
                 <Button
+                  data-testid="checkout-btn"
                   className="w-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl dark:shadow-primary/25 dark:hover:shadow-2xl"
                   size="lg"
                   asChild={true}

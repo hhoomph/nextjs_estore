@@ -7,10 +7,22 @@
  * @since 2025-01-01
  */
 import { type NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth/config";
 import prisma from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
+
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+
     const { userId, sessionId } = await request.json();
 
     if (!userId && !sessionId) {
@@ -20,12 +32,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Build where clause to match cart items for user or session
+    if (userId && session.user.id !== userId) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+
+    if (sessionId && session.user.id !== sessionId) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+
     const where: { userId?: string; sessionId?: string } = {};
     if (userId) where.userId = userId;
     if (sessionId) where.sessionId = sessionId;
 
-    // Delete cart items
     const deleteResult = await prisma.cartItem.deleteMany({
       where,
     });

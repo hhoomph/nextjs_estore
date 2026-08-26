@@ -1,5 +1,5 @@
 import "dotenv/config"; // ✅ CRITICAL: Load environment variables
-import type { User } from "../app/generated/prisma/client";
+import type { User } from "../lib/generated/prisma/client";
 import prisma from "../lib/prisma";
 
 async function testDatabase() {

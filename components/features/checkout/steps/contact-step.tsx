@@ -197,7 +197,7 @@ export function ContactStep({ form, onNext }: ContactStepProps) {
           )}
 
           <div className="flex justify-end pt-4">
-            <Button type="button" onClick={handleNext}>Continue to Shipping</Button>
+            <Button data-testid="continue-to-shipping" type="button" onClick={handleNext}>Continue to Shipping</Button>
           </div>
         </form>
       </CardContent>

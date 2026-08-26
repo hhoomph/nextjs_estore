@@ -10,6 +10,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Suspense, useEffect, useState } from "react";
 
 // Force dynamic rendering to avoid prerendering issues
@@ -44,6 +45,7 @@ interface OrderDetails {
 }
 
 function CheckoutSuccessContent() {
+  const t = useTranslations();
   const searchParams = useSearchParams();
   const router = useRouter();
   const orderId = searchParams.get("order");
@@ -106,7 +108,7 @@ function CheckoutSuccessContent() {
     return (
       <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <span className="ml-2">Loading order details...</span>
+        <span className="ml-2">{t("loadingOrderDetails")}</span>
       </div>
     );
   }
@@ -129,7 +131,7 @@ function CheckoutSuccessContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div data-testid="order-confirmation" className="min-h-screen bg-background">
       {/* Breadcrumb */}
       <div className="border-b">
         <div className="container px-4 py-3">
@@ -153,7 +155,7 @@ function CheckoutSuccessContent() {
           <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="h-8 w-8 text-success" />
           </div>
-          <h1 className="text-4xl font-bold mb-4">Order Confirmed!</h1>
+          <h1 data-testid="order-success-message" className="text-4xl font-bold mb-4">Order Confirmed!</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Thank you for your purchase. Your order has been successfully placed
             and is being processed.
@@ -174,7 +176,7 @@ function CheckoutSuccessContent() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <h3 className="font-semibold mb-2">Order Number</h3>
-                    <p className="text-lg font-mono">{order.orderNumber}</p>
+                    <p data-testid="order-number" className="text-lg font-mono">{order.orderNumber}</p>
                   </div>
                   <div>
                     <h3 className="font-semibold mb-2">Order Date</h3>
@@ -431,13 +433,14 @@ function CheckoutSuccessContent() {
 }
 
 export default function CheckoutSuccessPage() {
+  const t = useTranslations();
   return (
     <Suspense
       fallback={
         <div className="min-h-screen bg-background">
           <div className="flex justify-center items-center py-20">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <span className="ml-2">Loading...</span>
+            <span className="ml-2">{t("loading")}</span>
           </div>
         </div>
       }

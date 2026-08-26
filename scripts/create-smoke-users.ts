@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Script to create smoke test users via Better Auth API.
  * Run while dev server is active on localhost:3000
  */
@@ -10,7 +10,7 @@ const HEADERS = { "Content-Type": "application/json" };
 
 async function main() {
   const { PrismaPg } = await import("@prisma/adapter-pg");
-  const { PrismaClient } = await import("../app/generated/prisma/client");
+  const { PrismaClient } = await import("../lib/generated/prisma/client");
   const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
   const prisma = new PrismaClient({ adapter });
 

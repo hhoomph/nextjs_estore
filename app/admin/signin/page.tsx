@@ -19,6 +19,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,6 +37,7 @@ export default function AdminSignInPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const t = useTranslations("Admin Signin");
 
   const form = useForm<AdminSignInForm>({
     resolver: zodResolver(adminSignInSchema),
@@ -58,24 +60,12 @@ export default function AdminSignInPage() {
       if (result.error) {
         setError(result.error.message || "Sign in failed");
       } else {
-        // Get the user from sign-in result - role is stored in the database but may not be in the type
-        const user = result.data?.user as any;
+        // Always verify admin role via session after sign-in
+        // Better Auth may not include additional fields (like role) in the sign-in response
+        const sessionResult = await authClient.getSession();
+        const sessionUser = sessionResult.data?.user as any;
         
-        if (!user) {
-          // Try to get session after sign-in
-          const sessionResult = await authClient.getSession();
-          const sessionUser = sessionResult.data?.user as any;
-          if (sessionUser?.role === "ADMIN") {
-            router.push("/admin");
-            router.refresh();
-            return;
-          }
-          setError("Unable to verify admin status. Please try again.");
-          return;
-        }
-        
-        // Check if user has admin role (cast to any since role is a custom field)
-        if (user.role === "ADMIN") {
+        if (sessionUser?.role === "ADMIN") {
           router.push("/admin");
           router.refresh();
         } else {
@@ -93,14 +83,14 @@ export default function AdminSignInPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8">
-      {/* Back to site link */}
+      {/* {t("backToSite")} link */}
       <div className="absolute top-4 left-4">
         <Link
           href="/"
           className="flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to site
+          {t("backToSite")}
         </Link>
       </div>
 
@@ -112,10 +102,10 @@ export default function AdminSignInPage() {
             </div>
           </div>
           <CardTitle className="text-2xl font-bold">
-            Admin Access
+            {t("title")}
           </CardTitle>
           <CardDescription>
-            Sign in to access the admin panel
+            {t("subtitle")}
           </CardDescription>
         </CardHeader>
 
@@ -132,6 +122,7 @@ export default function AdminSignInPage() {
               <Label htmlFor="email">Admin Email</Label>
               <Input
                 id="email"
+                data-testid="admin-email"
                 type="email"
                 placeholder="admin@example.com"
                 {...form.register("email")}
@@ -148,6 +139,7 @@ export default function AdminSignInPage() {
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
+                data-testid="admin-password"
                 type="password"
                 placeholder="Enter your admin password"
                 {...form.register("password")}
@@ -166,11 +158,11 @@ export default function AdminSignInPage() {
           </form>
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
-            <p className="mb-2">Admin access is restricted to authorized personnel only.</p>
+            <p className="mb-2">{t("restricted")}</p>
             <p>
-              Not an admin?{" "}
+              {t("notAdmin")}{" "}
               <Link href="/auth/signin" className="text-primary hover:underline">
-                Sign in as user
+                {t("signInAsUser")}
               </Link>
             </p>
           </div>
@@ -178,8 +170,8 @@ export default function AdminSignInPage() {
           <Separator className="my-6" />
 
           <div className="text-center text-xs text-muted-foreground">
-            <p className="mb-2">Need help with admin access?</p>
-            <p>Contact your system administrator</p>
+            <p className="mb-2">{t("needHelp")}</p>
+            <p>{t("contactAdmin")}</p>
           </div>
         </CardContent>
       </Card>

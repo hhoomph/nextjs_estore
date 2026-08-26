@@ -42,6 +42,15 @@ export function ProductImageGallery({
   alt = "Product image",
   className = "",
 }: ProductImageGalleryProps) {
+  const safeImages = images && images.length > 0 ? images : [PLACEHOLDER_IMAGE];
+
+  const [galleryImages, setGalleryImages] = useState<string[]>(safeImages);
+
+  // Sync galleryImages when safeImages changes
+  useEffect(() => {
+    setGalleryImages(safeImages);
+  }, [safeImages]);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
@@ -57,23 +66,22 @@ export function ProductImageGallery({
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const thumbnailRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  const safeImages = images && images.length > 0 ? images : [PLACEHOLDER_IMAGE];
 
   // Ensure currentIndex is valid when images change
   useEffect(() => {
-    if (currentIndex >= safeImages.length) {
+    if (currentIndex >= galleryImages.length) {
       setCurrentIndex(0);
     }
-  }, [currentIndex, safeImages.length]);
+  }, [currentIndex, galleryImages.length]);
 
   // Carousel navigation
   const nextImage = useCallback(() => {
-    setCurrentIndex((prev) => (prev + 1) % safeImages.length);
-  }, [safeImages.length]);
+    setCurrentIndex((prev) => (prev + 1) % galleryImages.length);
+  }, [galleryImages.length]);
 
   const prevImage = useCallback(() => {
-    setCurrentIndex((prev) => (prev - 1 + safeImages.length) % safeImages.length);
-  }, [safeImages.length]);
+    setCurrentIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
+  }, [galleryImages.length]);
 
   const goToImage = useCallback((index: number) => {
     setCurrentIndex(index);
@@ -88,16 +96,16 @@ export function ProductImageGallery({
   }, []);
 
   const nextLightboxImage = useCallback(() => {
-    setLightboxIndex((prev) => (prev + 1) % safeImages.length);
+    setLightboxIndex((prev) => (prev + 1) % galleryImages.length);
     setZoomLevel(1);
     setPanOffset({ x: 0, y: 0 });
-  }, [safeImages.length]);
+  }, [galleryImages.length]);
 
   const prevLightboxImage = useCallback(() => {
-    setLightboxIndex((prev) => (prev - 1 + safeImages.length) % safeImages.length);
+    setLightboxIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
     setZoomLevel(1);
     setPanOffset({ x: 0, y: 0 });
-  }, [safeImages.length]);
+  }, [galleryImages.length]);
 
   // Zoom controls for lightbox
   const handleZoomIn = useCallback(() => {
@@ -221,7 +229,7 @@ export function ProductImageGallery({
     }
   }, [currentIndex]);
 
-  const currentImage = safeImages[currentIndex];
+  const currentImage = galleryImages[currentIndex];
 
   return (
     <div className={`flex flex-col gap-4 ${className}`}>
@@ -241,16 +249,17 @@ export function ProductImageGallery({
           onTouchEnd={handleTouchEnd}
         >
           <Image
-            src={currentImage}
+            src={galleryImages[currentIndex] || PLACEHOLDER_IMAGE}
             alt={`${alt} ${currentIndex + 1}`}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
             className="object-cover transition-transform duration-300"
             priority
+             onError={() => setGalleryImages(prev => prev.map((img, idx) => idx === currentIndex ? PLACEHOLDER_IMAGE : img))}
           />
 
           {/* Zoom Lens */}
-          {lensPos.visible && safeImages.length > 1 && (
+          {lensPos.visible && galleryImages.length > 1 && (
             <div
               className="absolute w-24 h-24 border-2 border-primary rounded-full pointer-events-none transition-opacity duration-200"
               style={{
@@ -266,7 +275,7 @@ export function ProductImageGallery({
         </div>
 
         {/* Navigation Arrows */}
-        {safeImages.length > 1 && (
+        {galleryImages.length > 1 && (
           <>
             <Button
               variant="secondary"
@@ -294,9 +303,9 @@ export function ProductImageGallery({
         )}
 
         {/* Image Counter */}
-        {safeImages.length > 1 && (
+        {galleryImages.length > 1 && (
           <div className="absolute bottom-3 right-3 bg-background/80 backdrop-blur-md px-3 py-1 rounded-full text-sm font-medium shadow-sm border border-border/60">
-            {currentIndex + 1} / {safeImages.length}
+            {currentIndex + 1} / {galleryImages.length}
           </div>
         )}
 
@@ -307,9 +316,9 @@ export function ProductImageGallery({
       </div>
 
       {/* Thumbnail Strip */}
-      {safeImages.length > 1 && (
+      {galleryImages.length > 1 && (
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-rounded-full">
-          {safeImages.map((image, index) => (
+          {galleryImages.map((image, index) => (
             <button
               key={index}
               ref={(el) => { thumbnailRefs.current[index] = el; }}
@@ -327,6 +336,7 @@ export function ProductImageGallery({
                 sizes="80px"
                 className="object-cover"
                 loading={index < 3 ? "eager" : "lazy"}
+                 onError={() => setGalleryImages(prev => prev.map((img, idx) => idx === index ? PLACEHOLDER_IMAGE : img))}
               />
             </button>
           ))}
@@ -358,18 +368,19 @@ export function ProductImageGallery({
                 }}
               >
                 <Image
-                  src={safeImages[lightboxIndex]}
+                  src={galleryImages[lightboxIndex]}
                   alt={`${alt} ${lightboxIndex + 1}`}
                   width={1200}
                   height={800}
                   className="max-w-full max-h-[85vh] object-contain"
+                   onError={() => setGalleryImages(prev => prev.map((img, idx) => idx === lightboxIndex ? PLACEHOLDER_IMAGE : img))}
                   priority
                 />
               </div>
             </div>
 
             {/* Lightbox Navigation */}
-            {safeImages.length > 1 && (
+            {galleryImages.length > 1 && (
               <>
                 <Button
                   variant="secondary"
@@ -427,13 +438,13 @@ export function ProductImageGallery({
 
             {/* Image Counter */}
             <div className="absolute bottom-6 left-6 bg-background/20 hover:bg-background/40 backdrop-blur-md px-4 py-2 rounded-full text-white text-sm font-medium border border-white/10">
-              {lightboxIndex + 1} / {safeImages.length}
+              {lightboxIndex + 1} / {galleryImages.length}
             </div>
 
             {/* Thumbnail Strip in Lightbox */}
-            {safeImages.length > 1 && (
+            {galleryImages.length > 1 && (
               <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 overflow-x-auto max-w-[80vw]">
-                {safeImages.map((image, index) => (
+                {galleryImages.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => {
@@ -464,3 +475,4 @@ export function ProductImageGallery({
     </div>
   );
 }
+

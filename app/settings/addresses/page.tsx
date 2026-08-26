@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTranslations } from "next-intl";
 import { useSession } from "@/lib/auth-client";
 
 export default function AddressesPage() {
@@ -80,7 +81,7 @@ export default function AddressesPage() {
     return (
       <div className="flex justify-center items-center py-20">
         <Loader2 className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Loading...</span>
+        <span className="ml-2">{t("loading")}</span>
       </div>
     );
   }

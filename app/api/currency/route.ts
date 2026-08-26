@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Currency API Route
  *
  * Handles currency preference based on locale.
@@ -9,14 +9,15 @@
  * @since 2025-01-01
  */
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@/lib/auth/config";
 
 const LOCALE_CURRENCY_MAP: Record<string, string> = {
   fa: "toman-fa",
   en: "usd",
 };
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const cookieHeader = request.headers.get("cookie") || "";
   const localeCookie = cookieHeader
     .split("; ")
@@ -30,8 +31,19 @@ export async function GET(request: Request) {
   return NextResponse.json({ currency });
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    const session = await auth.api.getSession({
+      headers: request.headers,
+    });
+
+    if (!session) {
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
     const { currency } = await request.json();
 
     const validCurrencies = ["toman-fa", "usd"];
@@ -45,8 +57,9 @@ export async function POST(request: Request) {
     const response = NextResponse.json({ success: true, currency });
     response.cookies.set("app-currency", currency, {
       path: "/",
-      httpOnly: false,
-      sameSite: "lax",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
       maxAge: 60 * 60 * 24 * 365, // 1 year
     });
 

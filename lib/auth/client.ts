@@ -11,11 +11,9 @@ import { createAuthClient } from "better-auth/react";
 export const authClient = createAuthClient({
   /** The base URL of the server (optional if you're using the same domain) */
   baseURL:
-    process.env.NODE_ENV === "production"
-      ? process.env.BETTER_AUTH_URL
-      : typeof window !== "undefined"
-        ? window.location.origin
-        : "http://localhost:3000",
+    typeof window !== "undefined"
+      ? window.location.origin
+      : "http://localhost:3000",
   plugins: [adminClient(), phoneNumberClient()],
 });
 export const { signIn, signUp, signOut, useSession } = authClient;

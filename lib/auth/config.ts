@@ -35,6 +35,7 @@ export const auth = betterAuth({
       },
     },
     fieldMap: {
+      phone_number: "phoneNumber",
       emailVerified: "emailVerified",
       image: "image",
     },
@@ -105,6 +106,8 @@ export const auth = betterAuth({
   trustedOrigins: [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:3002",
+    "http://127.0.0.1:3002",
     // Add your production URL here
     ...(process.env.NEXT_PUBLIC_APP_URL
       ? [process.env.NEXT_PUBLIC_APP_URL]

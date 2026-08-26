@@ -194,6 +194,7 @@ export default function ContactPage() {
                 <Label htmlFor="subject">Subject</Label>
                 <Input
                   id="subject"
+                  data-testid="contact-subject"
                   placeholder="How can we help?"
                   {...form.register("subject")}
                 />

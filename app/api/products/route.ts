@@ -1,3 +1,5 @@
+import { NextResponse } from "next/server";
+import { auth } from "@/lib/auth/config";
 import { type NextRequest } from "next/server";
 import { z } from "zod";
 import {
@@ -243,8 +245,26 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const session = await auth.api.getSession({ headers: request.headers });
+  if (!session?.user?.id || session.user.role !== "ADMIN") {
+    return NextResponse.json(
+      { error: "Unauthorized - Admin access required" },
+      { status: 403 },
+    );
+  }
+
+
   try {
-    const securityResult = await securityMiddleware(request);
+    const securityResult = await createSecurityMiddleware({
+      rateLimit: true,
+      rateLimitType: "api",
+      sanitization: true,
+      securityHeaders: true,
+      csrf: true,
+      validation: {
+        body: createProductSchema,
+      },
+    })(request);
     if (securityResult) {
       return securityResult;
     }

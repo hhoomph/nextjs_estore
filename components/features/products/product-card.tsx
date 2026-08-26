@@ -53,6 +53,7 @@ export function ProductCard({
   showAddToCart = true,
 }: ProductCardProps) {
   const [isHydrated, setIsHydrated] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const productHref = product.slug ? `/products/${product.slug}` : "/products";
   const productName = product.name || unknownProductLabel;
   const categoryName = product.category?.name || uncategorizedLabel;
@@ -79,11 +80,12 @@ export function ProductCard({
           <div className="group/image relative aspect-square overflow-hidden bg-muted">
             {imageSrc ? (
               <Image
-                src={imageSrc}
+                src={imgError ? PLACEHOLDER_IMAGE : imageSrc}
                 alt={productName}
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 className="object-cover transition duration-700 group-hover/image:scale-110"
+                 onError={() => setImgError(true)}
               />
             ) : (
               <div className="relative h-full w-full bg-muted">
@@ -121,6 +123,7 @@ export function ProductCard({
         </Link>
         <ProductPrice
           data-testid="product-price"
+          price={product.price}
           discountPrice={product.discount_price}
           amountClassName="text-xl font-black text-foreground"
           originalClassName="text-xs text-muted-foreground"
