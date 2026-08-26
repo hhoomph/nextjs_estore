@@ -76,10 +76,10 @@ interface User {
 }
 // Density options
 type Density = "compact" | "comfortable" | "spacious";
-const DENSITY_OPTIONS: { value: Density; label: string }[] = [
-  { value: "compact", label: "Compact" },
-  { value: "comfortable", label: "Comfortable" },
-  { value: "spacious", label: "Spacious" },
+const DENSITY_OPTIONS: { value: Density; labelKey: string }[] = [
+  { value: "compact", labelKey: "compact" },
+  { value: "comfortable", labelKey: "comfortable" },
+  { value: "spacious", labelKey: "spacious" },
 ];
 // Admin sidebar navigation item definition
 interface AdminNavItem {
@@ -91,30 +91,30 @@ interface AdminNavItem {
 }
 // Admin navigation groups
 const ADMIN_NAV_ITEMS: AdminNavItem[] = [
-  { href: "/", label: "Main Page", icon: Globe, group: "dashboard" as const },
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard, group: "dashboard" as const },
+  { href: "/", label: "mainPage", icon: Globe, group: "dashboard" as const },
+  { href: "/admin", label: "dashboard", icon: LayoutDashboard, group: "dashboard" as const },
   // Commerce
-  { href: "/admin/products", label: "Products", icon: Package, group: "commerce" as const, testId: "nav-products" },
-  { href: "/admin/categories", label: "Categories", icon: FolderTree, group: "commerce" as const },
-  { href: "/admin/collections", label: "Collections", icon: Package, group: "commerce" as const },
-  { href: "/admin/orders", label: "Orders", icon: ShoppingCart, group: "commerce" as const, testId: "nav-orders" },
+  { href: "/admin/products", label: "products", icon: Package, group: "commerce" as const, testId: "nav-products" },
+  { href: "/admin/categories", label: "categories", icon: FolderTree, group: "commerce" as const },
+  { href: "/admin/collections", label: "collections", icon: Package, group: "commerce" as const },
+  { href: "/admin/orders", label: "orders", icon: ShoppingCart, group: "commerce" as const, testId: "nav-orders" },
   // Content
-  { href: "/admin/analytics", label: "Analytics", icon: BarChart3, group: "content" as const, testId: "nav-analytics" },
+  { href: "/admin/analytics", label: "analytics", icon: BarChart3, group: "content" as const, testId: "nav-analytics" },
   // Users
-  { href: "/admin/users", label: "Users", icon: Users, group: "users" as const, testId: "nav-users" },
+  { href: "/admin/users", label: "users", icon: Users, group: "users" as const, testId: "nav-users" },
   // Settings
-  { href: "/admin/settings", label: "Settings", icon: Settings, group: "settings" as const, testId: "nav-settings" },
-  { href: "/admin/settings/seo", label: "SEO", icon: Search, group: "settings" as const },
-  { href: "/admin/settings/site", label: "Site", icon: Globe, group: "settings" as const },
-  { href: "/admin/settings/theme", label: "Theme", icon: Palette, group: "settings" as const },
+  { href: "/admin/settings", label: "settings", icon: Settings, group: "settings" as const, testId: "nav-settings" },
+  { href: "/admin/settings/seo", label: "seo", icon: Search, group: "settings" as const },
+  { href: "/admin/settings/site", label: "site", icon: Globe, group: "settings" as const },
+  { href: "/admin/settings/theme", label: "theme", icon: Palette, group: "settings" as const },
 ];
 // Group metadata for sidebar section headers
-const NAV_GROUPS: Record<string, { label: string }> = {
-  dashboard: { label: "Overview" },
-  commerce: { label: "Commerce" },
-  content: { label: "Content" },
-  users: { label: "Users" },
-  settings: { label: "Settings" },
+const NAV_GROUPS: Record<string, { labelKey: string }> = {
+  dashboard: { labelKey: "overview" },
+  commerce: { labelKey: "commerce" },
+  content: { labelKey: "content" },
+  users: { labelKey: "users" },
+  settings: { labelKey: "settings" },
 };
 const GROUP_ORDER: Readonly<Array<keyof typeof NAV_GROUPS>> = ["dashboard", "commerce", "content", "users", "settings"];
 /**
@@ -153,6 +153,8 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const t = useTranslations("Navigation");
+  const tAdmin = useTranslations("Admin Layout");
+  const tAdminNav = useTranslations("Admin Navigation");
   const locale = useLocale();
   const sidebarTheme = useAdminTheme();
   const navbarClasses = sidebarTheme.getAdminNavbarClasses();
@@ -312,8 +314,8 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
       <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
         <div className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-primary" />
-          <h2 className="mb-2 text-xl font-semibold text-foreground">Checking Permissions</h2>
-          <p className="text-sm text-muted-foreground">Redirecting to admin panel...</p>
+          <h2 className="mb-2 text-xl font-semibold text-foreground">{tAdmin("checkingPermissions")}</h2>
+          <p className="text-sm text-muted-foreground">{tAdmin("redirectingToAdmin")}</p>
         </div>
       </div>
     );
@@ -327,7 +329,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
       <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
         <div className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-primary" />
-          <h2 className="mb-2 text-xl font-semibold text-foreground">Redirecting...</h2>
+          <h2 className="mb-2 text-xl font-semibold text-foreground">{tAdmin("redirecting")}</h2>
         </div>
       </div>
     );
@@ -346,8 +348,10 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
         {/* Sidebar */}
         <div
           className={cn(
-            "fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-border transition-transform duration-300 ease-in-out",
-            isMobile && !sidebarOpen && "-translate-x-full",
+            "fixed inset-y-0 z-50 flex w-72 flex-col border-border transition-transform duration-300 ease-in-out",
+            "start-0 rtl:right-0 ltr:left-0",
+            "border-e rtl:border-l ltr:border-r",
+            isMobile && !sidebarOpen && "-translate-x-full rtl:translate-x-full",
             isMobile && sidebarOpen && "translate-x-0",
             !isMobile && "translate-x-0",
             sidebarClasses.background,
@@ -360,7 +364,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                 <LayoutDashboard className="h-5 w-5" />
               </div>
               <span className={cn("text-base font-semibold tracking-tight", sidebarClasses.text)} suppressHydrationWarning={true}>
-                {t("adminPanel")}
+                {tAdmin("adminPanel")}
               </span>
             </Link>
           </div>
@@ -373,7 +377,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                 <div key={groupKey} className="mb-6">
                   {/* Group section title */}
                   <p className={cn("mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground", sidebarClasses.section.title)}>
-                    {NAV_GROUPS[groupKey].label}
+                    {tAdminNav(`groups.${NAV_GROUPS[groupKey].labelKey}`)}
                   </p>
                   {/* Group items */}
                   <div className="space-y-1">
@@ -393,7 +397,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                           {...navTestProps}
                         >
                           <Icon className="mr-3 h-5 w-5 shrink-0 rtl:ml-3 rtl:mr-0" />
-                          <span suppressHydrationWarning={true}>{item.label}</span>
+                          <span suppressHydrationWarning={true}>{tAdminNav(item.label)}</span>
                         </button>
                       );
                     })}
@@ -409,13 +413,13 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                 className={cn("mb-1 w-full justify-start rounded-xl px-3 py-2.5 text-sm font-medium", sidebarClasses.menu.item)}
               >
                 <LogOut className="mr-3 h-5 w-5 shrink-0 rtl:ml-3 rtl:mr-0" />
-                <span suppressHydrationWarning={true}>{t("signOut")}</span>
+                <span suppressHydrationWarning={true}>{tAdmin("signOut")}</span>
               </Button>
             </div>
           </nav>
         </div>
         {/* Main Content */}
-        <div className="apex-admin-shell pl-0 md:pl-72">
+        <div className="apex-admin-shell ps-0 md:ps-72">
           {/* Top Bar */}
           <div className={cn("sticky top-0 z-40", navbarClasses.background)}>
             <div className="flex items-center justify-between px-6 py-4">
@@ -426,7 +430,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                   </Button>
                 )}
                 <h1 className={cn("text-xl font-semibold tracking-tight", navbarClasses.text)} suppressHydrationWarning={true}>
-                  {t("adminPanel")}
+                  {tAdmin("adminPanel")}
                 </h1>
               </div>
               <div className="flex items-center gap-2 md:gap-4">
@@ -438,7 +442,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                   )}
                 >
                   <Search className="h-4 w-4 shrink-0" />
-                  <span>Search...</span>
+                  <span>{tAdmin("search")}</span>
                   <kbd className="ml-4 inline-flex h-5 select-none items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
                     <span className="text-xs">⌘</span>K
                   </kbd>
@@ -457,15 +461,15 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                   >
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-semibold leading-none text-foreground">Customize</p>
-                        <p className="text-xs leading-none text-muted-foreground">Layout, density, and theme</p>
+                        <p className="text-sm font-semibold leading-none text-foreground">{tAdmin("customize")}</p>
+                        <p className="text-xs leading-none text-muted-foreground">{tAdmin("customizeDescription")}</p>
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator className="bg-border" />
                     <div className="p-2 space-y-4">
                       {/* Density */}
                       <div className="space-y-2">
-                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Density</p>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{tAdmin("density")}</p>
                         <Select value={density} onValueChange={(value: Density) => handleDensityChange(value)}>
                           <SelectTrigger className="rounded-xl border-border bg-background">
                             <SelectValue />
@@ -473,7 +477,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                           <SelectContent>
                             {DENSITY_OPTIONS.map((option) => (
                               <SelectItem key={option.value} value={option.value}>
-                                {option.label}
+                                {tAdmin(option.labelKey)}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -481,12 +485,12 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                       </div>
                       {/* Theme mode */}
                       <div className="space-y-2">
-                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Theme</p>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{tAdmin("theme")}</p>
                         <div className="grid grid-cols-3 gap-2">
                           {[
-                            { value: "light", label: "Light", icon: Sun },
-                            { value: "dark", label: "Dark", icon: Moon },
-                            { value: "system", label: "System", icon: Monitor },
+                            { value: "light", labelKey: "light", icon: Sun },
+                            { value: "dark", labelKey: "dark", icon: Moon },
+                            { value: "system", labelKey: "system", icon: Monitor },
                           ].map((themeOption) => {
                             const Icon = themeOption.icon;
                             return (
@@ -496,7 +500,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                                 className="flex flex-col items-center gap-1 rounded-xl border border-border p-2 text-xs transition-colors hover:bg-muted"
                               >
                                 <Icon className="h-4 w-4" />
-                                {themeOption.label}
+                                {tAdmin(themeOption.labelKey)}
                               </button>
                             );
                           })}
@@ -504,13 +508,13 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                       </div>
                       {/* Color preset */}
                       <div className="space-y-2">
-                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Color Preset</p>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{tAdmin("colorPreset")}</p>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild={true}>
                             <Button variant="outline" className="w-full rounded-xl justify-between">
                               <span className="flex items-center gap-2">
                                 <div className="h-4 w-4 rounded-full bg-primary" />
-                                Apex Blue
+                                {tAdmin("apexBlue")}
                               </span>
                               <ChevronDown className="h-4 w-4 opacity-50" />
                             </Button>
@@ -524,7 +528,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                       </div>
                       {/* Language */}
                       <div className="space-y-2">
-                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Language</p>
+                        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{tAdmin("language")}</p>
                         <div className="grid grid-cols-2 gap-2">
                           {[
                             { code: "fa" as const, label: "فارسی", flag: "🇮🇷" },
@@ -536,8 +540,8 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                               className="rounded-xl justify-center gap-2"
                               onClick={() => handleSwitchLanguage(lang.code)}
                             >
-                              <span className="mr-2 text-xs font-medium"> {lang.flag} </span>
-                              <span className="mr-2 text-xs font-medium"> {lang.label} </span>
+                              <span className="me-2 text-xs font-medium"> {lang.flag} </span>
+                              <span className="me-2 text-xs font-medium"> {lang.label} </span>
                             </Button>
                           ))}
                         </div>
@@ -584,9 +588,9 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                         href="/admin"
                         className="flex items-center rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                       >
-                        <LayoutDashboard className="mr-3 h-4 w-4 text-muted-foreground" />
+                        <LayoutDashboard className="me-3 h-4 w-4 text-muted-foreground" />
                         <span className="font-medium text-foreground" suppressHydrationWarning={true}>
-                          {t("dashboard")}
+                          {tAdminNav("dashboard")}
                         </span>
                       </Link>
                     </DropdownMenuItem>
@@ -595,16 +599,16 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                         href="/account"
                         className="flex items-center rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                       >
-                        <User className="mr-3 h-4 w-4 text-muted-foreground" />
+                        <User className="me-3 h-4 w-4 text-muted-foreground" />
                         <span className="font-medium text-foreground" suppressHydrationWarning={true}>
-                          {t("profile")}
+                          {tAdmin("profile")}
                         </span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-border" />
                     <DropdownMenuItem onClick={handleSignOut} className="rounded-xl text-destructive focus:text-destructive hover:bg-destructive/10">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span suppressHydrationWarning={true}>{t("signOut")}</span>
+                      <LogOut className="me-2 h-4 w-4" />
+                      <span suppressHydrationWarning={true}>{tAdmin("signOut")}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -620,7 +624,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                   <Search className="h-4 w-4 text-muted-foreground shrink-0" />
                   <input
                     autoFocus
-                    placeholder="Search pages, actions, and settings..."
+                    placeholder={tAdmin("searchPlaceholder")}
                     className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
                     onKeyDown={(e) => {
                       if (e.key === "Escape") setSearchOpen(false);
@@ -631,11 +635,11 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                   </kbd>
                 </div>
                 <div className="mt-4">
-                  <p className="px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Quick Links</p>
+                  <p className="px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">{tAdmin("quickLinks")}</p>
                   <div className="space-y-1">
                     <SearchQuickLink
                       href="/admin"
-                      label="Dashboard"
+                      label={tAdminNav("dashboard")}
                       icon={LayoutDashboard}
                       onSelect={() => {
                         setSearchOpen(false);
@@ -644,7 +648,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                     />
                     <SearchQuickLink
                       href="/admin/products"
-                      label="Products"
+                      label={tAdminNav("products")}
                       icon={Package}
                       onSelect={() => {
                         setSearchOpen(false);
@@ -653,7 +657,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                     />
                     <SearchQuickLink
                       href="/admin/users"
-                      label="Users"
+                      label={tAdminNav("users")}
                       icon={Users}
                       onSelect={() => {
                         setSearchOpen(false);
@@ -662,7 +666,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                     />
                     <SearchQuickLink
                       href="/admin/analytics"
-                      label="Analytics"
+                      label={tAdminNav("analytics")}
                       icon={BarChart3}
                       onSelect={() => {
                         setSearchOpen(false);

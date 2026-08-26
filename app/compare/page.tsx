@@ -112,6 +112,7 @@ export default function ComparePage() {
         alt={product.name}
         fill={true}
         className="object-cover"
+        style={{ width: "auto", height: "auto" }}
       />
       <div className="absolute top-2 left-2 flex gap-1">
         {product.discount_price && <Badge className="bg-success text-success-foreground">Sale</Badge>}

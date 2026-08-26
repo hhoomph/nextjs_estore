@@ -384,58 +384,93 @@
 
 :root {
   --radius: 0.75rem;
-  --background: oklch(0.985 0.015 75);
-  --foreground: oklch(0.21 0.03 45);
+
+  /* Background and text - improved contrast */
+  --background: oklch(0.99 0.005 75);
+  --foreground: oklch(0.18 0.02 45);
+
+  /* Card and popover - clean white surfaces */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.21 0.03 45);
+  --card-foreground: oklch(0.18 0.02 45);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.21 0.03 45);
-  --primary: oklch(0.62 0.2 28);
+  --popover-foreground: oklch(0.18 0.02 45);
+
+  /* Primary - vibrant orange-red with better contrast */
+  --primary: oklch(0.58 0.22 28);
   --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.96 0.025 75);
-  --secondary-foreground: oklch(0.28 0.03 45);
-  --muted: oklch(0.965 0.02 75);
-  --muted-foreground: oklch(0.48 0.03 70);
-  --accent: oklch(0.96 0.03 35);
-  --accent-foreground: oklch(0.28 0.03 45);
-  --destructive: oklch(0.58 0.2 25);
+
+  /* Secondary - subtle background */
+  --secondary: oklch(0.97 0.01 75);
+  --secondary-foreground: oklch(0.25 0.02 45);
+
+  /* Muted - better contrast for secondary text */
+  --muted: oklch(0.97 0.01 75);
+  --muted-foreground: oklch(0.45 0.02 70);
+
+  /* Accent - interactive hover state */
+  --accent: oklch(0.97 0.015 35);
+  --accent-foreground: oklch(0.25 0.02 45);
+
+  /* Destructive - clear error state */
+  --destructive: oklch(0.55 0.22 25);
   --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.92 0.025 75);
-  --input: oklch(0.985 0.01 75);
-  --ring: oklch(0.62 0.2 28);
-  --chart-1: oklch(0.62 0.2 28);
-  --chart-2: oklch(0.68 0.18 80);
+
+  /* Borders and inputs */
+  --border: oklch(0.90 0.015 75);
+  --input: oklch(0.99 0.005 75);
+  --ring: oklch(0.58 0.22 28);
+
+  /* Charts - vibrant colors */
+  --chart-1: oklch(0.58 0.22 28);
+  --chart-2: oklch(0.65 0.18 80);
   --chart-3: oklch(0.55 0.18 150);
-  --chart-4: oklch(0.72 0.16 65);
-  --chart-5: oklch(0.62 0.2 330);
+  --chart-4: oklch(0.68 0.16 65);
+  --chart-5: oklch(0.58 0.2 330);
 }
 
-/* Dark mode variables */
+/* Dark mode variables - improved contrast and aesthetics */
 .dark {
-  --background: oklch(0.16 0.02 45);
-  --foreground: oklch(0.97 0 0);
-  --card: oklch(0.2 0.02 45);
-  --card-foreground: oklch(0.97 0 0);
-  --popover: oklch(0.2 0.02 45);
-  --popover-foreground: oklch(0.97 0 0);
-  --primary: oklch(0.68 0.2 28);
-  --primary-foreground: oklch(0.2 0.02 45);
-  --secondary: oklch(0.27 0.02 45);
-  --secondary-foreground: oklch(0.97 0 0);
-  --muted: oklch(0.26 0.02 45);
-  --muted-foreground: oklch(0.72 0.02 70);
-  --accent: oklch(0.28 0.03 35);
-  --accent-foreground: oklch(0.97 0 0);
-  --destructive: oklch(0.58 0.2 25);
+  /* Background layers - slightly lighter for better depth perception */
+  --background: oklch(0.18 0.015 250);
+  --foreground: oklch(0.98 0.005 250);
+
+  /* Card and popover - elevated above background */
+  --card: oklch(0.22 0.018 250);
+  --card-foreground: oklch(0.98 0.005 250);
+  --popover: oklch(0.24 0.018 250);
+  --popover-foreground: oklch(0.98 0.005 250);
+
+  /* Primary - vibrant blue with better contrast */
+  --primary: oklch(0.72 0.18 250);
+  --primary-foreground: oklch(0.15 0.01 250);
+
+  /* Secondary - subtle elevated surface */
+  --secondary: oklch(0.30 0.018 250);
+  --secondary-foreground: oklch(0.98 0.005 250);
+
+  /* Muted - better contrast for secondary text */
+  --muted: oklch(0.28 0.015 250);
+  --muted-foreground: oklch(0.78 0.015 250);
+
+  /* Accent - interactive hover state */
+  --accent: oklch(0.32 0.02 250);
+  --accent-foreground: oklch(0.98 0.005 250);
+
+  /* Destructive - clear error/warning state */
+  --destructive: oklch(0.65 0.22 25);
   --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.28 0.02 45);
-  --input: oklch(0.24 0.02 45);
-  --ring: oklch(0.68 0.2 28);
-  --chart-1: oklch(0.68 0.2 28);
-  --chart-2: oklch(0.7 0.18 80);
-  --chart-3: oklch(0.55 0.18 150);
-  --chart-4: oklch(0.72 0.16 65);
-  --chart-5: oklch(0.62 0.2 330);
+
+  /* Borders and inputs */
+  --border: oklch(0.32 0.015 250);
+  --input: oklch(0.26 0.015 250);
+  --ring: oklch(0.72 0.18 250);
+
+  /* Charts - vibrant colors for dark mode */
+  --chart-1: oklch(0.72 0.2 250);
+  --chart-2: oklch(0.75 0.18 160);
+  --chart-3: oklch(0.70 0.18 80);
+  --chart-4: oklch(0.75 0.16 50);
+  --chart-5: oklch(0.70 0.2 320);
 }
 
 /* Apex admin visual identity */
@@ -492,7 +527,7 @@
   --accent: var(--apex-bg-subtle);
   --accent-foreground: var(--apex-foreground);
   --destructive: var(--apex-danger);
-  --destructive-foreground: var(--apex-danger-soft);
+  --destructive-foreground: oklch(0.99 0 0);
   --border: var(--apex-border-soft);
   --input: var(--apex-surface);
   --ring: var(--apex-primary);
@@ -519,37 +554,46 @@
 }
 
 .dark[data-admin-theme="apex"] {
-  --apex-bg: #020617;
-  --apex-bg-subtle: #0f172a;
-  --apex-surface: #0f172a;
-  --apex-surface-elevated: #111827;
-  --apex-foreground: #f8fafc;
-  --apex-muted: #94a3b8;
+  /* Background layers - layered for depth */
+  --apex-bg: #0a0f1c;
+  --apex-bg-subtle: #111827;
+  --apex-surface: #131b2e;
+  --apex-surface-elevated: #1a2235;
+
+  /* Text - high contrast for readability */
+  --apex-foreground: #f1f5f9;
+  --apex-muted: #a8b3c7;
   --apex-muted-strong: #cbd5e1;
-  --apex-border: #1e293b;
-  --apex-border-soft: #1e293b;
-  --apex-sidebar: #020617;
-  --apex-sidebar-accent: #0f172a;
+
+  /* Borders - visible but subtle */
+  --apex-border: #243049;
+  --apex-border-soft: #1c2640;
+
+  /* Sidebar - distinct from main content */
+  --apex-sidebar: #080d18;
+  --apex-sidebar-accent: #0f1626;
   --apex-sidebar-border: #1e293b;
   --apex-sidebar-foreground: #e2e8f0;
-  --apex-sidebar-muted: #94a3b8;
-  --apex-sidebar-hover: #1e293b;
-  --apex-card-shadow: 0 18px 45px rgb(0 0 0 / 0.28);
-  --apex-card-shadow-soft: 0 10px 28px rgb(0 0 0 / 0.22);
-  --apex-sidebar-shadow: 0 24px 70px rgb(0 0 0 / 0.34);
+  --apex-sidebar-muted: #a8b3c7;
+  --apex-sidebar-hover: #1a2235;
 
-  /* Apex color tokens (dark-adapted) */
-  --apex-primary: #3b82f6;
+  /* Shadows - deeper for dark mode */
+  --apex-card-shadow: 0 18px 45px rgb(0 0 0 / 0.4);
+  --apex-card-shadow-soft: 0 10px 28px rgb(0 0 0 / 0.3);
+  --apex-sidebar-shadow: 0 24px 70px rgb(0 0 0 / 0.5);
+
+  /* Apex color tokens (dark-adapted with better contrast) */
+  --apex-primary: #60a5fa;
   --apex-primary-soft: #1e3a8a;
-  --apex-success: #22c55e;
+  --apex-success: #4ade80;
   --apex-success-soft: #052e16;
-  --apex-warning: #f59e0b;
+  --apex-warning: #fbbf24;
   --apex-warning-soft: #451a03;
-  --apex-danger: #ef4444;
+  --apex-danger: #f87171;
   --apex-danger-soft: #450a0a;
-  --apex-cyan: #22d3ee;
-  --apex-violet: #a78bfa;
-  --apex-muted: #94a3b8;
+  --apex-cyan: #67e8f9;
+  --apex-violet: #c4b5fd;
+  --apex-muted: #a8b3c7;
 
   /* Semantic status mapping (dark) */
   --success: var(--apex-success);
@@ -583,7 +627,7 @@
   --accent: var(--apex-bg-subtle);
   --accent-foreground: var(--apex-foreground);
   --destructive: var(--apex-danger);
-  --destructive-foreground: var(--apex-danger-soft);
+  --destructive-foreground: oklch(0.99 0 0);
   --border: var(--apex-border-soft);
   --input: var(--apex-surface);
   --ring: var(--apex-primary);

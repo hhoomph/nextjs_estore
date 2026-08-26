@@ -61,6 +61,7 @@ export default async function RootLayout({
     <html
       lang={locale}
       dir={isRTL ? "rtl" : "ltr"}
+      data-scroll-behavior="smooth"
       suppressHydrationWarning={true}
     >
       <body suppressHydrationWarning={true}>
