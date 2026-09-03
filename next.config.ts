@@ -1,4 +1,4 @@
-﻿import type { NextConfig } from "next";
+import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.tsx");
@@ -21,20 +21,50 @@ const nextConfig: NextConfig = {
     formats: ["image/webp", "image/avif"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    remotePatterns: [
-      {
+    // Production-safe allowlist for remote image hosts.
+    // Override per environment via NEXT_PUBLIC_IMAGE_ALLOWED_HOSTS
+    // (comma-separated hostnames, e.g. "cdn.example.com,images.unsplash.com").
+    // In development we also allow localhost so local dev still works.
+    remotePatterns: (() => {
+      const isDev = process.env.NODE_ENV === "development";
+      const fromEnv = (process.env.NEXT_PUBLIC_IMAGE_ALLOWED_HOSTS ?? "")
+        .split(",")
+        .map((h) => h.trim().toLowerCase())
+        .filter(Boolean);
+
+      const prodHosts =
+        fromEnv.length > 0
+          ? fromEnv
+          : // Sensible production defaults — extend via env var as needed.
+            [
+              "lh3.googleusercontent.com",
+              "avatars.githubusercontent.com",
+              "images.unsplash.com",
+              "res.cloudinary.com",
+            ];
+
+      const patterns: Array<{
+        protocol: "https" | "http";
+        hostname: string;
+        port: string;
+        pathname: string;
+      }> = prodHosts.map((hostname) => ({
         protocol: "https",
-        hostname: "**",
+        hostname,
         port: "",
         pathname: "/**",
-      },
-      {
-        protocol: "http",
-        hostname: "localhost",
-        port: "3000",
-        pathname: "/**",
-      },
-    ],
+      }));
+
+      if (isDev) {
+        patterns.push({
+          protocol: "http" as const,
+          hostname: "localhost",
+          port: "3000",
+          pathname: "/**",
+        });
+      }
+      return patterns;
+    })(),
     // Disable static image optimization for external URLs in development
     unoptimized: process.env.NODE_ENV === "development",
     // Disable image caching in development
