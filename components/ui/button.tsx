@@ -80,7 +80,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref,
   ) => {
-    const Comp = asChild ? Slot : "button";
     const isDisabled = disabled || loading;
     // Generate unique IDs for accessibility
     const buttonId = React.useId();

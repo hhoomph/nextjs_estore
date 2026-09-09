@@ -46,7 +46,6 @@ import { signOut } from "@/lib/auth-client";
 import { useSimplifiedCartSync } from "@/lib/hooks/use-simplified-cart-sync";
 import { useSimplifiedSessionSync } from "@/lib/hooks/use-simplified-session-sync";
 import { useWishlistStore } from "@/lib/stores/wishlist-store";
-import { HydrationSafe } from "@/components/hydration-safe";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 // Route exclusion logic has been moved to ConditionalNavbar component
 // This navbar component now always renders when called

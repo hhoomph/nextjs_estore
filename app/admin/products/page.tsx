@@ -164,13 +164,13 @@ export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [productImages, setProductImages] = useState<string[]>([]);
-  const [categoriesLoading, setCategoriesLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 

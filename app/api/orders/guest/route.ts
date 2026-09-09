@@ -256,8 +256,6 @@ async function validateProductsAndInventory(items: GuestOrderItem[]) {
 async function createGuestOrder(orderData: GuestOrderData) {
   const {
     guestInfo,
-    shippingAddress,
-    billingAddress,
     items,
     sessionId,
     totals,
@@ -268,7 +266,7 @@ async function createGuestOrder(orderData: GuestOrderData) {
     const orderId = `ORD-GUEST-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
     // Create order record
-    const order = await tx.order.create({
+    await tx.order.create({
       data: {
         id: orderId,
         userId: null, // Guest order
@@ -345,5 +343,6 @@ async function createGuestOrder(orderData: GuestOrderData) {
     return orderId;
   });
 }
+
 
 

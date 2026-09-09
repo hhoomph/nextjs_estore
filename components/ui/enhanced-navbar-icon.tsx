@@ -14,7 +14,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import type React from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { navbarPerformanceUtils } from "@/lib/animations/navbar-animations";
 import { useNavbarAnimations } from "@/lib/hooks/use-navbar-animations";

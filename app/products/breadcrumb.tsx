@@ -11,7 +11,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 export function ProductsBreadcrumb() {
-  const t = useTranslations("products");
+  const t = useTranslations("products") as (key: string) => string;
 
   return (
     <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
@@ -23,3 +23,4 @@ export function ProductsBreadcrumb() {
     </nav>
   );
 }
+

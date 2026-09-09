@@ -122,13 +122,13 @@ export function useCartActions() {
   }, [isAuthenticated]);
 
   const addToCart = useCallback(
-    async (item: any) => {
+    async (item: unknown) => {
       try {
         await ensureCartHydrated();
         const cart = isAuthenticated
           ? useCartStore.getState()
           : useGuestCartStore.getState();
-        cart.addItem(item);
+        cart.addItem(item as any);
       } catch (error) {
         console.error("Failed to add item to cart:", error);
       }

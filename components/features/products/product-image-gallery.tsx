@@ -13,7 +13,7 @@
 
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,7 +42,7 @@ export function ProductImageGallery({
   alt = "Product image",
   className = "",
 }: ProductImageGalleryProps) {
-  const safeImages = images && images.length > 0 ? images : [PLACEHOLDER_IMAGE];
+  const safeImages = useMemo(() => images && images.length > 0 ? images : [PLACEHOLDER_IMAGE], [images]);
 
   const [galleryImages, setGalleryImages] = useState<string[]>(safeImages);
 
@@ -55,9 +55,10 @@ export function ProductImageGallery({
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
+  const isDragging = useRef(false);
   const [lensPos, setLensPos] = useState<LensPosition>({ x: 0, y: 0, visible: false });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
+
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
 
   const galleryRef = useRef<HTMLDivElement>(null);
@@ -122,7 +123,7 @@ export function ProductImageGallery({
 
   // Hover zoom lens for main image
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!mainImageRef.current || isDragging) return;
+    if (!mainImageRef.current || isDragging.current) return;
 
     const rect = mainImageRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -133,7 +134,7 @@ export function ProductImageGallery({
       y: (y / rect.height) * 100,
       visible: true,
     });
-  }, [isDragging]);
+  }, []);
 
   const handleMouseLeave = useCallback(() => {
     setLensPos((prev) => ({ ...prev, visible: false }));
@@ -229,7 +230,6 @@ export function ProductImageGallery({
     }
   }, [currentIndex]);
 
-  const currentImage = galleryImages[currentIndex];
 
   return (
     <div className={`flex flex-col gap-4 ${className}`}>

@@ -24,7 +24,7 @@ function toProductCard(item: WishlistItem): ProductCardProduct {
 }
 
 export default function WishlistPage() {
-  const t = useTranslations("Navigation");
+  const t = useTranslations("Wishlist");
   const { items, removeItem, clearWishlist } = useWishlistStore();
   const { addToCart } = useCartActions();
 
@@ -55,10 +55,10 @@ export default function WishlistPage() {
         <div className="container px-4 py-3">
           <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
             <Link href="/" className="font-semibold text-foreground">
-              Home
+              {t("home")}
             </Link>
             <span>/</span>
-            <span className="font-bold text-foreground">{t("wishlist")}</span>
+            <span className="font-bold text-foreground">{t("title")}</span>
           </nav>
         </div>
       </div>
@@ -66,9 +66,9 @@ export default function WishlistPage() {
       <section className="overflow-hidden bg-background">
         <div className="container px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
           <SectionHeading
-            eyebrow="Saved for Later"
-            title="Your Wishlist"
-            description="Keep track of products you love and move them to your cart when you are ready."
+            eyebrow={t("eyebrow")}
+            title={t("title")}
+            description={t("description")}
           />
         </div>
       </section>
@@ -77,17 +77,17 @@ export default function WishlistPage() {
         {items.length === 0 ? (
           <div className="mx-auto max-w-xl rounded-[2.5rem] border border-border/60 bg-card p-10 text-center shadow-xl shadow-primary/10">
             <Heart className="mx-auto mb-5 h-16 w-16 text-primary/70" />
-            <h1 className="text-2xl font-black text-foreground">Your wishlist is empty</h1>
-            <p className="mt-3 text-muted-foreground">Save products from product cards to build your personal collection.</p>
+            <h1 className="text-2xl font-black text-foreground">{t("empty.title")}</h1>
+            <p className="mt-3 text-muted-foreground">{t("empty.description")}</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
               <Button asChild={true} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
                 <Link href="/products">
                   <ShoppingBag className="mr-2 h-4 w-4" />
-                  Browse Products
+                  {t("empty.browseProducts")}
                 </Link>
               </Button>
               <Button asChild={true} variant="outline" className="rounded-full">
-                <Link href="/deals">View Deals</Link>
+                <Link href="/deals">{t("empty.viewDeals")}</Link>
               </Button>
             </div>
           </div>
@@ -95,22 +95,22 @@ export default function WishlistPage() {
           <>
             <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-2xl font-black text-foreground">Saved Products</h2>
-                <p className="mt-1 text-muted-foreground">{items.length} items saved</p>
+                <h2 className="text-2xl font-black text-foreground">{t("savedProducts")}</h2>
+                <p className="mt-1 text-muted-foreground">{t("itemsSaved", { count: items.length })}</p>
               </div>
               <Button variant="outline" className="rounded-full" onClick={() => clearWishlist()}>
-                Clear Wishlist
+                {t("clearWishlist")}
               </Button>
             </div>
 
             <ProductGrid
               products={items.map(toProductCard)}
               onAddToCart={handleAddToCart}
-              unknownProductLabel="Unknown Product"
-              outOfStockLabel="Out of Stock"
-              saleLabel="Sale"
-              addToCartLabel="Add to Cart"
-              uncategorizedLabel="Wishlist"
+              unknownProductLabel={t("unknownProduct")}
+              outOfStockLabel={t("outOfStock")}
+              saleLabel={t("sale")}
+              addToCartLabel={t("addToCart")}
+              uncategorizedLabel={t("title")}
             />
 
             <div className="mt-8 space-y-4">
@@ -128,7 +128,7 @@ export default function WishlistPage() {
                     />
                   </div>
                   <Button variant="ghost" className="rounded-full text-destructive" onClick={() => handleRemoveItem(item.product_id)}>
-                    Remove
+                    {t("remove")}
                   </Button>
                 </div>
               ))}

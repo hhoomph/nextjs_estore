@@ -50,6 +50,7 @@ const analyticsInitialState: AnalyticsState = {
 };
 
 export function Analytics() {
+  const t = useTranslations("Admin Analytics");
   const [analytics, setAnalytics] = useState<AnalyticsState>(
     analyticsInitialState,
   );
@@ -364,3 +365,4 @@ function cnActivityDot(color: "primary" | "success" | "warning" | "danger") {
 
   return `h-2.5 w-2.5 rounded-full ${colorClass}`;
 }
+

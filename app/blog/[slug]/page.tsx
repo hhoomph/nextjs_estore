@@ -14,6 +14,7 @@ import { BlogComments } from "@/components/blog/blog-comments";
 import { BlogPostContent } from "@/components/blog/blog-post-content";
 import { BlogRelatedPosts } from "@/components/blog/blog-related-posts";
 import prisma from "@/lib/prisma";
+import type { BlogPostContentData, BlogPostListData } from "@/components/blog/types";
 
 export async function generateMetadata({
   params,
@@ -68,8 +69,8 @@ export const dynamic = "force-dynamic";
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const t = await getTranslations("Blog");
 
-  let post: any = null;
-  let relatedPosts: any[] = [];
+  let post: BlogPostContentData | null = null;
+  let relatedPosts: BlogPostListData[] = [];
 
   try {
     // Get the blog post with all relations
@@ -143,12 +144,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     });
 
     // Get related posts (same category, different tags, etc.)
-    relatedPosts = await prisma.blogPost.findMany({
+    relatedPosts = (await prisma.blogPost.findMany({
       where: {
         id: { not: post.id },
         status: "published",
         publishedAt: { not: null },
-        categoryId: post.categoryId,
+        categoryId: (post as unknown as { categoryId: string | null }).categoryId ?? undefined,
       },
       include: {
         author: {
@@ -169,7 +170,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       },
       orderBy: { publishedAt: "desc" },
       take: 4,
-    });
+    })) as unknown as import("@/components/blog/types").BlogPostListData[];
   } catch (error) {
     console.error("Error loading blog post:", error);
     return (
@@ -194,7 +195,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <section className="mb-12">
           <BlogComments
             postId={post.id}
-            comments={post.comments}
+            comments={post.comments as import("@/components/blog/types").BlogCommentData[]}
             commentCount={post.comments.length}
           />
         </section>
@@ -209,3 +210,4 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     </div>
   );
 }
+

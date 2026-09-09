@@ -12,7 +12,7 @@ import { useCallback, useEffect, useState } from "react";
 import type * as React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import type { User } from "@/types/user";
 
@@ -31,6 +31,7 @@ interface PaginationInfo {
 }
 
 export function UserManagement() {
+  const t = useTranslations("Admin Users");
   const [users, setUsers] = useState<UserWithCounts[]>([]);
   const [pagination, setPagination] = useState<PaginationInfo>({
     page: 1,
@@ -229,7 +230,7 @@ export function UserManagement() {
                 {loading ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-10 text-center text-muted-foreground">
-                      {t("loadingUsers")}
+                      {t("loading")}
                     </td>
                   </tr>
                 ) : users.length === 0 ? (
@@ -535,3 +536,5 @@ function FormField({
     </div>
   );
 }
+
+

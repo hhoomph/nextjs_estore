@@ -23,9 +23,9 @@ import {
   User,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // Use client-side API endpoint instead of importing server actions
 import { Button } from "@/components/ui/button";
@@ -46,7 +46,6 @@ import { useWishlistStore } from "@/lib/stores/wishlist-store";
 
 export function NavbarFallback() {
   // Core hooks - must be called first, always
-  const pathname = usePathname();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
 
@@ -57,7 +56,7 @@ export function NavbarFallback() {
   const [hydrated, setHydrated] = useState(false);
 
   // ALWAYS call hooks at top level - never conditionally
-  const { user, isAuthenticated, isLoading } = useSimplifiedSessionSync();
+  const { user, isAuthenticated } = useSimplifiedSessionSync();
   const { itemCount: cartCount } = useSimplifiedCartSync();
   const { getItemCount: getWishlistCount } = useWishlistStore();
 
@@ -458,3 +457,5 @@ export function NavbarFallback() {
     </header>
   );
 }
+
+

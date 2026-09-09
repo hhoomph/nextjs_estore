@@ -87,15 +87,10 @@ export async function GET(request: NextRequest) {
       ...collection,
       productCount: collection._count.products,
       products: collection.products.map(
-        (cp: {
-          product: {
-            id: string;
-            name: string | null;
-            price: any;
-            status: number | null;
-            quantity: number;
-          };
-        }) => cp.product,
+        (cp) => ({
+          ...cp.product,
+          price: Number(cp.product.price),
+        }),
       ),
     }));
 
@@ -182,15 +177,10 @@ export async function POST(request: NextRequest) {
       ...collection,
       productCount: collection._count.products,
       products: collection.products.map(
-        (cp: {
-          product: {
-            id: string;
-            name: string | null;
-            price: any;
-            status: number | null;
-            quantity: number;
-          };
-        }) => cp.product,
+        (cp) => ({
+          ...cp.product,
+          price: Number(cp.product.price),
+        }),
       ),
     };
 

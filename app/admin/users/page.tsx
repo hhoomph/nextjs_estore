@@ -10,8 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+// Dialog imports removed
+// Form imports removed
 import {
   Table,
   TableBody,
@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, Eye, UserCheck, UserX, Plus, Edit, Loader2, Trash2 } from "lucide-react";
+import { Search, Eye, UserCheck, UserX, Edit, Loader2, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -54,15 +54,14 @@ export default function AdminUsersPage() {
   const t = useTranslations("Admin Users");
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  // submitting removed
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
+  // dialogOpen removed
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   const form = useForm<UserFormData>({
@@ -166,40 +165,8 @@ export default function AdminUsersPage() {
     }
   };
 
-  const handleSubmit = async (data: UserFormData) => {
-    setSubmitting(true);
-    try {
-      const method = editingUser ? "PUT" : "POST";
-      const url = editingUser ? `/api/admin/users/${editingUser.id}` : "/api/admin/users";
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (response.ok) {
-        toast.success(t(editingUser ? "userUpdated" : "userCreated"));
-        setDialogOpen(false);
-        form.reset();
-        setEditingUser(null);
-        fetchUsers(searchTerm);
-      } else {
-        const errorData = await response.json();
-        toast.error(errorData.error || "Failed to save user");
-      }
-    } catch (error) {
-      console.error("Failed to save user:", error);
-      toast.error("Failed to save user. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   const handleEdit = (user: User) => {
-    setEditingUser(user);
     form.reset({
       name: user.name || "",
       email: user.email,
@@ -207,7 +174,6 @@ export default function AdminUsersPage() {
       role: user.role,
       active: user.active ?? true,
     });
-    setDialogOpen(true);
   };
 
   const handleDelete = async (userId: string) => {
@@ -454,4 +420,6 @@ export default function AdminUsersPage() {
     </div>
   );
 }
+
+
 

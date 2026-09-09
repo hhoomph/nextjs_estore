@@ -20,15 +20,14 @@ interface GetProductsParams {
   inStock?: boolean;
 }
 
-type ProductWhereClause = Record<string, any>; // Prisma where clause type
 
 interface ProductWithPictures {
   id: string;
   name: string | null;
   desc: string | null;
   slug: string | null;
-  price: any; // Prisma Decimal
-  discountPrice: any | null; // Prisma Decimal
+  price: unknown;
+  discountPrice: unknown | null;
   quantity: number;
   categoryId: string | null;
   ogImage: string | null;
@@ -89,7 +88,7 @@ async function fetchProducts(
     const skip = (page - 1) * limit;
 
     // Build where clause
-    const where: any = {
+    const where: Record<string, unknown> = {
       status: 1, // Active products only
     };
 
@@ -105,9 +104,10 @@ async function fetchProducts(
     }
 
     if (minPrice !== undefined || maxPrice !== undefined) {
-      where.price = {};
-      if (minPrice !== undefined) where.price.gte = minPrice;
-      if (maxPrice !== undefined) where.price.lte = maxPrice;
+      const priceCondition: Record<string, number> = {};
+      if (minPrice !== undefined) priceCondition.gte = minPrice;
+      if (maxPrice !== undefined) priceCondition.lte = maxPrice;
+      where.price = priceCondition;
     }
 
     if (inStock === true) {

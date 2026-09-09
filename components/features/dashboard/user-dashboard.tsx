@@ -9,6 +9,7 @@
 
 import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 import type { User } from "@/types/user";
 
 type Session = typeof authClient.$Infer.Session;
@@ -20,6 +21,7 @@ interface UserDashboardProps {
 export function UserDashboard({ session }: UserDashboardProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<
     "profile" | "orders" | "addresses"
   >("profile");
@@ -46,7 +48,7 @@ export function UserDashboard({ session }: UserDashboardProps) {
 
   const handleSignOut = async () => {
     await authClient.signOut();
-    window.location.href = "/";
+    router.push("/");
   };
 
   const handleUpdateProfile = async (profileData: Partial<User>) => {

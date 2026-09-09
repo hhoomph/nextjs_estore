@@ -5,9 +5,8 @@
  * @version 1.0.0
  * @since 2025-01-01
  */
-import { type NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getSiteSettings, updateSiteSettings } from "@/lib/actions/seo";
-import { auth } from "@/lib/auth/config";
 import type { SiteSettingsData } from "@/lib/validations/schemas/seo";
 
 const DEFAULT_SETTINGS = {
@@ -54,7 +53,7 @@ function normalizeSuggestionAlgorithm(value: unknown): SiteSettingsData["suggest
 }
 
 // GET /api/admin/settings - Get current settings
-export async function GET(request: NextRequest) {
+export async function GET() {
 
   try {
     const result = await getSiteSettings();
@@ -268,3 +267,6 @@ export async function PUT(request: NextRequest) {
     );
   }
 }
+
+
+

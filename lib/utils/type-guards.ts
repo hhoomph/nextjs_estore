@@ -21,7 +21,7 @@ export function createTypeGuard<T>(
 ): TypeGuard<T> {
   const guard = ((value: unknown): value is T =>
     validator(value)) as TypeGuard<T>;
-  (guard as any).typeName = typeName;
+  (guard as unknown as { typeName: string }).typeName = typeName;
   return guard;
 }
 

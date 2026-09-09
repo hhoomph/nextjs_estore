@@ -37,7 +37,28 @@ export function useSessionUpdates() {
   const previousSessionRef = useRef<Session | null>(null);
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Monitor session changes and trigger updates
+  const checkSessionChanged = useCallback(
+    (prev: Session | null, current: Session | null): boolean => {
+      // Quick reference check first
+      if (prev === current) return false;
+
+      // If either is null, they're different
+      if (!prev || !current) return true;
+
+      // Check user reference first (most common change)
+      if (prev.user !== current.user) return true;
+
+      // Shallow comparison of key properties
+      return (
+        prev.user?.id !== current.user?.id ||
+        prev.user?.email !== current.user?.email ||
+        prev.user?.role !== current.user?.role ||
+        prev.user?.name !== current.user?.name
+      );
+    },
+    [],
+  );
+
   useEffect(() => {
     if (isPending) {
       setSessionLoading(true);
@@ -89,30 +110,8 @@ export function useSessionUpdates() {
     setSessionLoading,
     setLastSessionUpdate,
     updateRealTimeData,
+    checkSessionChanged,
   ]);
-
-  // Helper function for optimized session comparison
-  const checkSessionChanged = useCallback(
-    (prev: Session | null, current: Session | null): boolean => {
-      // Quick reference check first
-      if (prev === current) return false;
-
-      // If either is null, they're different
-      if (!prev || !current) return true;
-
-      // Check user reference first (most common change)
-      if (prev.user !== current.user) return true;
-
-      // Shallow comparison of key properties
-      return (
-        prev.user?.id !== current.user?.id ||
-        prev.user?.email !== current.user?.email ||
-        prev.user?.role !== current.user?.role ||
-        prev.user?.name !== current.user?.name
-      );
-    },
-    [],
-  );
 
   // Return enhanced session data
   const enhancedSession: EnhancedSession | null = session

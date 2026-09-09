@@ -110,7 +110,7 @@ function ErrorDisplay({
   error: string;
   onRetry: () => void;
 }) {
-  const t = useTranslations("products");
+  const t = useTranslations("products") as (key: string) => string;
 
   return (
     <div className="rounded-[2rem] border border-border/60 bg-card p-10 text-center shadow-xl shadow-primary/10">
@@ -148,7 +148,7 @@ function FilterContent({
   setInStockOnly: (value: boolean) => void;
   categoryOptions: Array<{ key: string; label: string }>;
 }) {
-  const t = useTranslations("products");
+  const t = useTranslations("products") as (key: string) => string;
 
   return (
     <div className="space-y-7">
@@ -268,7 +268,7 @@ function toProductCard(product: Product): ProductCardProduct {
 }
 
 export function ProductsPageClient({ initialData }: ProductsPageClientProps) {
-  const t = useTranslations("products");
+  const t = useTranslations("products") as (key: string) => string;
   const [availableCategories, setAvailableCategories] = useState<CategoryOption[]>([]);
   const [products, setProducts] = useState<Product[]>(initialData.data);
   const [loading, setLoading] = useState(false);
@@ -597,3 +597,4 @@ export function ProductsPageClient({ initialData }: ProductsPageClientProps) {
     </div>
   );
 }
+

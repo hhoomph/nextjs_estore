@@ -66,7 +66,7 @@ export function LocaleProvider({
 
     void syncLocale();
     return () => controller.abort();
-  }, []);
+  }, [locale]);
 
   /**
    * Set locale via API and reload the page to apply new locale
@@ -98,7 +98,7 @@ export function LocaleProvider({
         setIsLoading(false);
       }
     },
-    [locale],
+    [locale, router],
   );
 
   return (

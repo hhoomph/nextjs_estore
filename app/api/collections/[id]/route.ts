@@ -66,16 +66,10 @@ export async function GET(
       ...collection,
       productCount: collection._count.products,
       products: collection.products.map(
-        (cp: {
-          product: {
-            id: string;
-            name: string | null;
-            price: any;
-            status: number | null;
-            quantity: number;
-            slug: string | null;
-          };
-        }) => cp.product,
+        (cp) => ({
+          ...cp.product,
+          price: Number(cp.product.price),
+        }),
       ),
     };
 
@@ -163,16 +157,10 @@ export async function PUT(
       ...collection,
       productCount: collection._count.products,
       products: collection.products.map(
-        (cp: {
-          product: {
-            id: string;
-            name: string | null;
-            price: any;
-            status: number | null;
-            quantity: number;
-            slug: string | null;
-          };
-        }) => cp.product,
+        (cp) => ({
+          ...cp.product,
+          price: Number(cp.product.price),
+        }),
       ),
     };
 

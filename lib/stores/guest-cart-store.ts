@@ -24,7 +24,6 @@ import { QuantitySchema } from "@/lib/validations/cart";
 import { fetchWithRetry } from "@/lib/utils/fetch-with-retry";
 import { randomUUID } from "@/lib/utils/crypto-ssr";
 import {
-  CART_ERROR_CODES,
   CART_STORAGE_KEYS,
   type CartState,
   type CartUpdate,

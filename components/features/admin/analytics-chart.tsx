@@ -251,10 +251,8 @@ export function AnalyticsChart({
 // Specialized chart components for common use cases
 export function SalesChart({
   data,
-  period,
 }: {
   data: ChartData[];
-  period: string;
 }) {
   return (
     <AnalyticsChart
@@ -271,10 +269,8 @@ export function SalesChart({
 
 export function OrdersChart({
   data,
-  period,
 }: {
   data: ChartData[];
-  period: string;
 }) {
   return (
     <AnalyticsChart
@@ -292,10 +288,8 @@ export function OrdersChart({
 
 export function UserGrowthChart({
   data,
-  period,
 }: {
   data: ChartData[];
-  period: string;
 }) {
   return (
     <AnalyticsChart
@@ -323,3 +317,10 @@ export function CategoryChart({ data }: { data: ChartData[] }) {
     />
   );
 }
+
+
+
+
+
+
+

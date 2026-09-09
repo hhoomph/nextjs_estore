@@ -1,14 +1,15 @@
-import { MapPin } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
+import { MapPin, Truck } from "lucide-react";
+import type { UseFormReturn } from "react-hook-form";
+import type { GuestCheckoutFormData } from "../guest-checkout-flow";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import type { GuestCheckoutFormData } from "../guest-checkout-flow";
 
 interface ShippingStepProps {
-  form: any;
+  form: UseFormReturn<GuestCheckoutFormData>;
   billingSameAsShipping: boolean;
   setBillingSameAsShipping: (value: boolean) => void;
   onNext: () => void;
@@ -184,3 +185,5 @@ export function ShippingStep({
     </Card>
   );
 }
+
+

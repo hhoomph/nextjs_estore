@@ -3,7 +3,7 @@
 export const dynamic = "force-dynamic";
 
 import { useCallback, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -64,6 +64,10 @@ export default function AdminSiteSettingsPage() {
       descriptionFa: "",
     },
   });
+
+  const allowRegistration = useWatch({ control: form.control, name: "allowRegistration" });
+  const maintenanceMode = useWatch({ control: form.control, name: "maintenanceMode" });
+  const defaultCurrency = useWatch({ control: form.control, name: "defaultCurrency" });
 
   const fetchSettings = useCallback(async () => {
     try {
@@ -194,7 +198,7 @@ export default function AdminSiteSettingsPage() {
               <div className="space-y-2">
                 <Label htmlFor="defaultCurrency">Default Currency</Label>
                 <Select
-                  value={form.watch("defaultCurrency")}
+                  value={defaultCurrency}
                   onValueChange={(value) => form.setValue("defaultCurrency", value)}
                 >
                   <SelectTrigger>
@@ -240,7 +244,7 @@ export default function AdminSiteSettingsPage() {
                 </div>
                 <Switch
                   id="maintenanceMode"
-                  checked={form.watch("maintenanceMode")}
+                  checked={maintenanceMode}
                   onCheckedChange={(checked) =>
                     form.setValue("maintenanceMode", checked)
                   }
@@ -255,7 +259,7 @@ export default function AdminSiteSettingsPage() {
                 </div>
                 <Switch
                   id="allowRegistration"
-                  checked={form.watch("allowRegistration")}
+                  checked={allowRegistration}
                   onCheckedChange={(checked) =>
                     form.setValue("allowRegistration", checked)
                   }

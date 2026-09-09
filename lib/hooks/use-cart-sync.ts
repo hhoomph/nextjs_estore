@@ -18,7 +18,6 @@ import { useSession } from "@/lib/auth-client";
 import { toast } from "@/lib/hooks/use-toast";
 import { useCartStore } from "@/lib/stores/cart-store";
 import { useGuestCartStore } from "@/lib/stores/guest-cart-store";
-import { fetchWithRetry } from "@/lib/utils/fetch-with-retry";
 import { SafeSessionStorage } from "@/lib/utils/storage-ssr";
 import type { EnhancedCartItem, UseCartSyncReturn } from "@/types/cart";
 
@@ -38,13 +37,6 @@ export function useCartSync(): UseCartSyncReturn {
     })),
   );
 
-  const userState = useCartStore(
-    useShallow((s) => ({
-      items: s.items ?? [],
-      isOpen: s.isOpen,
-    })),
-  );
-
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSync, setLastSync] = useState<Date | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -59,7 +51,7 @@ export function useCartSync(): UseCartSyncReturn {
 
   // Sync function with retry and exponential backoff
   const syncCart = useCallback(async () => {
-    if (syncInProgressRef.current || isSyncing) return;
+    if (syncInProgressRef.current) return;
 
     syncInProgressRef.current = true;
     setIsSyncing(true);
@@ -96,7 +88,7 @@ export function useCartSync(): UseCartSyncReturn {
 
     setIsSyncing(false);
     syncInProgressRef.current = false;
-  }, [isSyncing]);
+  }, []);
 
   // Simplified merge function - moved outside useEffect
   const mergeGuestCartToUserCart = useCallback(async () => {
@@ -203,9 +195,10 @@ export function useCartSync(): UseCartSyncReturn {
 
   // Cleanup on unmount
   useEffect(() => {
+    const timeout = timeoutRef.current;
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+      if (timeout) {
+        clearTimeout(timeout);
       }
     };
   }, []);

@@ -240,7 +240,7 @@ export function safeJsonParse<T>(jsonString: string | null, fallback: T): T {
 /**
  * Utility function to safely stringify JSON
  */
-export function safeJsonStringify(value: any): string {
+export function safeJsonStringify(value: unknown): string {
   try {
     return JSON.stringify(value);
   } catch (error) {

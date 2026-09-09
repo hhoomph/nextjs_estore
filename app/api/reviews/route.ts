@@ -209,19 +209,6 @@ export async function POST(request: NextRequest) {
 
     // Check if user has purchased this product (optional - for review validation)
     // This is a basic check - in production you might want more sophisticated validation
-    const hasPurchased = await prisma.orderItem.findFirst({
-      where: {
-        productId: productId,
-        order: {
-          userId: session.user.id,
-          payment: {
-            some: {
-              status: "completed",
-            },
-          },
-        },
-      },
-    });
 
     // For now, we'll allow reviews without purchase validation
     // Uncomment the following lines to enable purchase validation:
@@ -278,3 +265,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+

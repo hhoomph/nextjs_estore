@@ -281,6 +281,7 @@ export function Cascader({
       role="combobox"
       aria-expanded={open}
       aria-haspopup="listbox"
+      aria-controls="cascader-listbox"
       aria-disabled={disabled}
       tabIndex={disabled ? -1 : 0}
       className={cn(
@@ -320,6 +321,7 @@ export function Cascader({
   const columnsContent = (
     <div
       ref={scrollContainerRef}
+      id="cascader-listbox"
       className={cn("flex", isMobile && "overflow-x-auto scrollbar-thin")}
       role="listbox"
       aria-label={placeholder}
@@ -359,7 +361,6 @@ export function Cascader({
                   role="option"
                   aria-selected={isSelected}
                   aria-disabled={option.disabled}
-                  aria-expanded={hasChildren ? isExpanded : undefined}
                   tabIndex={isFocused && open ? 0 : -1}
                   className={cn(
                     "flex items-center justify-between px-3 py-1.5 cursor-pointer text-sm",

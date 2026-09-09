@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, Grid3X3, Package, Search } from "lucide-react";
 import { SectionHeading } from "@/components/features/layout/section-heading";
 import { Badge } from "@/components/ui/badge";
@@ -75,7 +75,7 @@ export default function CategoriesPage() {
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const controllerRef = { current: null as AbortController | null };
+  const controllerRef = useRef<AbortController | null>(null);
 
   const fetchCategories = useCallback(async () => {
     setLoading(true);
@@ -271,3 +271,7 @@ export default function CategoriesPage() {
     </div>
   );
 }
+
+
+
+

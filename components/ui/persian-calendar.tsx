@@ -19,9 +19,7 @@
  */
 
 import { Calendar, ChevronLeft, ChevronRight, X } from "lucide-react";
-import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -113,14 +111,14 @@ interface CalendarState {
 export function PersianCalendar({
   selectedDate,
   onDateSelect,
-  mode = "persian",
+
   minDate,
   maxDate,
   showTodayButton = true,
   className,
   disabled = false,
   placeholder = "Select date...",
-  showTimePicker = false,
+
   highlightedDates = [],
   disabledDates = [],
 }: PersianCalendarProps) {
@@ -289,7 +287,7 @@ export function PersianCalendar({
     }
   }, [disabled]);
 
-  const handleInputBlur = useCallback((e: React.FocusEvent) => {
+  const handleInputBlur = useCallback(() => {
     // Close calendar if focus moves outside
     setTimeout(() => {
       if (!calendarRef.current?.contains(document.activeElement)) {

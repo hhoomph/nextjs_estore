@@ -13,13 +13,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertTriangle,
   CheckCircle,
-  Eye,
-  EyeOff,
-  Info,
+
+
+
   Settings,
-  SkipForward,
-  Volume2,
-  VolumeX,
+
+
+
   X,
 } from "lucide-react";
 import * as React from "react";
@@ -52,8 +52,6 @@ const SkipLink: React.FC<SkipLinkProps> = ({ href, children, className }) => {
       }
     };
 
-    const handleFocus = () => setIsVisible(true);
-    const handleBlur = () => setIsVisible(false);
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);

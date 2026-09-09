@@ -18,7 +18,7 @@ import {
   Settings as SettingsIcon,
 } from "lucide-react";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -102,10 +102,13 @@ export function SettingsForm({
     },
   });
 
+  const defaultCurrency = useWatch({ control: form.control, name: "defaultCurrency" });
+  const maintenanceMode = useWatch({ control: form.control, name: "maintenanceMode" });
+  const allowRegistration = useWatch({ control: form.control, name: "allowRegistration" });
   const handleSubmit = async (data: SettingsFormData) => {
     try {
       await onSubmit(data);
-    } catch (err) {
+    } catch {
       // Error handling is done by parent component
     }
   };
@@ -195,7 +198,7 @@ export function SettingsForm({
               <div className="space-y-2">
                 <Label htmlFor="defaultCurrency">Default Currency *</Label>
                 <Select
-                  value={form.watch("defaultCurrency")}
+                  value={defaultCurrency}
                   onValueChange={(value) =>
                     form.setValue("defaultCurrency", value)
                   }
@@ -251,7 +254,7 @@ export function SettingsForm({
               </div>
               <Switch
                 id="maintenanceMode"
-                checked={form.watch("maintenanceMode")}
+                checked={maintenanceMode}
                 onCheckedChange={(checked) =>
                   form.setValue("maintenanceMode", checked)
                 }
@@ -269,7 +272,7 @@ export function SettingsForm({
               </div>
               <Switch
                 id="allowRegistration"
-                checked={form.watch("allowRegistration")}
+                checked={allowRegistration}
                 onCheckedChange={(checked) =>
                   form.setValue("allowRegistration", checked)
                 }
@@ -391,3 +394,7 @@ export function QuickSettings({
     </Card>
   );
 }
+
+
+
+

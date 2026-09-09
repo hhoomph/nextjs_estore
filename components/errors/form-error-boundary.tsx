@@ -34,10 +34,10 @@ interface FormErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
   errorInfo: ErrorInfo | null;
-  formData: Record<string, any> | null;
+  formData: Record<string, unknown> | null;
   validationErrors: Record<string, string[]> | null;
   submissionErrors: string[] | null;
-  lastValidState: Record<string, any> | null;
+  lastValidState: Record<string, unknown> | null;
   canRecover: boolean;
 }
 
@@ -45,10 +45,10 @@ interface FormErrorBoundaryProps {
   children: ReactNode;
   fallback?: ReactNode;
   enableRecovery?: boolean;
-  onFormDataCapture?: (data: Record<string, any>) => void;
+  onFormDataCapture?: (data: Record<string, unknown>) => void;
   onValidationError?: (errors: Record<string, string[]>) => void;
   onSubmissionError?: (errors: string[]) => void;
-  onRecovery?: (recoveredData: Record<string, any>) => void;
+  onRecovery?: (recoveredData: Record<string, unknown>) => void;
 }
 
 export class FormErrorBoundary extends Component<
@@ -140,10 +140,10 @@ export class FormErrorBoundary extends Component<
     try {
       // Handle Zod errors
       if (error.name === "ZodError" && "issues" in error) {
-        const zodError = error as any;
+        const zodError = error as unknown as { issues: Array<{ path: unknown[]; message: string }> };
         const errors: Record<string, string[]> = {};
 
-        zodError.issues.forEach((issue: any) => {
+        zodError.issues.forEach((issue) => {
           const path = issue.path.join(".");
           if (!errors[path]) {
             errors[path] = [];
@@ -156,7 +156,7 @@ export class FormErrorBoundary extends Component<
 
       // Handle Yup errors
       if (error.name === "ValidationError" && "path" in error) {
-        const yupError = error as any;
+        const yupError = error as { path: string; message: string };
         return {
           [yupError.path]: [yupError.message],
         };
@@ -201,7 +201,7 @@ export class FormErrorBoundary extends Component<
   };
 
   // Method to capture form data (call this from form components)
-  captureFormData = (data: Record<string, any>) => {
+  captureFormData = (data: Record<string, unknown>) => {
     this.setState({
       formData: { ...data },
       lastValidState: { ...data },
@@ -454,7 +454,7 @@ export function useFormErrorCapture() {
   const errorBoundary = React.useContext(FormErrorBoundaryContext);
 
   const captureFormData = React.useCallback(
-    (data: Record<string, any>) => {
+    (data: Record<string, unknown>) => {
       if (errorBoundary) {
         errorBoundary.captureFormData(data);
       }

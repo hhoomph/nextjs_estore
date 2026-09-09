@@ -28,7 +28,7 @@ export function getThemeAwareStyles(
 export function ensureContrastRatio(
   bgColor: string,
   textColor: string,
-  minRatio = 4.5,
+  _minRatio = 4.5,
 ): boolean {
   // Simple contrast check - would need proper luminance calculation in production
   // For now, return true as placeholder

@@ -12,6 +12,7 @@
 import { formatDistanceToNow } from "date-fns";
 import { MessageCircle, Reply, Send } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ export function BlogComments({
   commentCount,
 }: BlogCommentsProps) {
   const t = useTranslations("Blog");
+  const router = useRouter();
   const [newComment, setNewComment] = useState("");
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState("");
@@ -321,3 +323,7 @@ function CommentItem({
     </Card>
   );
 }
+
+
+
+

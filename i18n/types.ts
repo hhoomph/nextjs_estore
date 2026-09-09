@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Centralized TypeScript type definitions for next-intl internationalization
  *
  * Provides comprehensive type safety for all message namespaces, locales, and ICU message arguments
@@ -53,6 +53,8 @@ export interface NavigationMessages {
   adminPanel: string;
   language: string;
   signOut: string;
+  loadingCategories: string;
+  noCategoriesAvailable: string;
 }
 
 export interface AuthenticationMessages {
@@ -412,6 +414,10 @@ export interface ContactMessages {
     message: string;
     messagePlaceholder: string;
     submit: string;
+    sending: string;
+    successTitle: string;
+    successMessage: string;
+    sendAnother: string;
   };
   info: {
     title: string;
@@ -419,15 +425,12 @@ export interface ContactMessages {
     phone: string;
     email: string;
     hours: string;
-  };
-  faq: {
-    title: string;
-    q1: string;
-    a1: string;
-    q2: string;
-    a2: string;
-    q3: string;
-    a3: string;
+    mondayFriday: string;
+    saturday: string;
+    sunday: string;
+    mondayFridayTime: string;
+    saturdayTime: string;
+    sundayTime: string;
   };
 }
 
@@ -514,15 +517,8 @@ export interface BlogMessages {
 export interface HelpMessages {
   title: string;
   subtitle: string;
-  search: {
-    placeholder: string;
-  };
   categories: {
     gettingStarted: {
-      title: string;
-      description: string;
-    };
-    account: {
       title: string;
       description: string;
     };
@@ -530,7 +526,7 @@ export interface HelpMessages {
       title: string;
       description: string;
     };
-    orders: {
+    account: {
       title: string;
       description: string;
     };
@@ -538,37 +534,32 @@ export interface HelpMessages {
       title: string;
       description: string;
     };
-    viewGuides: string;
+    shipping: {
+      title: string;
+      description: string;
+    };
+    contactSupport: {
+      title: string;
+      description: string;
+    };
   };
   faqs: {
     title: string;
-    subtitle: string;
-    shipping: {
-      question: string;
-      answer: string;
-    };
-    returns: {
-      question: string;
-      answer: string;
-    };
-    payment: {
-      question: string;
-      answer: string;
-    };
-    account: {
-      question: string;
-      answer: string;
-    };
-    tracking: {
-      question: string;
-      answer: string;
-    };
+    q1: string;
+    a1: string;
+    q2: string;
+    a2: string;
+    q3: string;
+    a3: string;
+    q4: string;
+    a4: string;
+    q5: string;
+    a5: string;
   };
-  contact: {
+  contactCTA: {
     title: string;
     description: string;
-    email: string;
-    phone: string;
+    button: string;
   };
 }
 
@@ -1011,6 +1002,208 @@ export interface LegalMessages {
   privacyPolicy: PrivacyPolicyMessages;
   termsConditions: TermsConditionsMessages;
 }
+export interface ForgotPasswordMessages {
+  title: string;
+  subtitle: string;
+  email: {
+    label: string;
+    placeholder: string;
+  };
+  submit: string;
+  loading: string;
+  success: {
+    title: string;
+    message: string;
+    backToSignIn: string;
+  };
+  backToSignIn: string;
+  errors: {
+    sendFailed: string;
+    unexpectedError: string;
+  };
+}
+
+export interface WishlistMessages {
+  home: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+  empty: {
+    title: string;
+    description: string;
+    browseProducts: string;
+    viewDeals: string;
+  };
+  savedProducts: string;
+  itemsSaved: string;
+  clearWishlist: string;
+  remove: string;
+  unknownProduct: string;
+  outOfStock: string;
+  sale: string;
+  addToCart: string;
+}
+
+export interface NotFoundMessages {
+  title: string;
+  message: string;
+  goHome: string;
+}
+
+export interface GlobalErrorMessages {
+  title: string;
+  message: string;
+  developmentDetails: string;
+  tryAgain: string;
+  goHome: string;
+}
+
+export interface CheckoutSuccessMessages {
+  loadingOrderDetails: string;
+  loading: string;
+  orderNotFound: string;
+  backToHome: string;
+  orderConfirmed: string;
+  thankYouMessage: string;
+  orderDetails: string;
+  orderNumber: string;
+  orderDate: string;
+  orderStatus: string;
+  transactionId: string;
+  orderSummary: string;
+  subtotal: string;
+  shipping: string;
+  tax: string;
+  total: string;
+  purchasedItems: string;
+  whatsNext: string;
+  orderProcessing: string;
+  orderProcessingDesc: string;
+  shippingTitle: string;
+  shippingDesc: string;
+  delivery: string;
+  deliveryDesc: string;
+  quickActions: string;
+  viewAllOrders: string;
+  continueShopping: string;
+  downloadReceipt: string;
+  shippingInformation: string;
+  estimatedDelivery: string;
+  shippingMethod: string;
+  tracking: string;
+  needHelp: string;
+  questionsAboutOrder: string;
+  contactSupport: string;
+  orCallUs: string;
+  loveShopping: string;
+  discoverMore: string;
+}
+
+export interface AdminSigninMessages {
+  title: string;
+  subtitle: string;
+  restricted: string;
+  notAdmin: string;
+  signInAsUser: string;
+  needHelp: string;
+  contactAdmin: string;
+  backToSite: string;
+  emailLabel: string;
+  emailPlaceholder: string;
+  passwordLabel: string;
+  passwordPlaceholder: string;
+  submit: string;
+  submitLoading: string;
+}
+
+export interface AdminLayoutMessages {
+  loading: string;
+  checkingPermissions: string;
+  redirectingToAdmin: string;
+  redirecting: string;
+  signOut: string;
+  adminPanel: string;
+  search: string;
+  searchPlaceholder: string;
+  quickLinks: string;
+  customize: string;
+  customizeDescription: string;
+  density: string;
+  theme: string;
+  colorPreset: string;
+  language: string;
+  light: string;
+  dark: string;
+  system: string;
+  compact: string;
+  comfortable: string;
+  spacious: string;
+  apexBlue: string;
+  dashboardLink: string;
+  profile: string;
+}
+
+export interface AdminNavigationMessages {
+  mainPage: string;
+  dashboard: string;
+  products: string;
+  categories: string;
+  collections: string;
+  orders: string;
+  analytics: string;
+  users: string;
+  settings: string;
+  seo: string;
+  site: string;
+  theme: string;
+  groups: {
+    overview: string;
+    commerce: string;
+    content: string;
+    users: string;
+    settings: string;
+  };
+}
+
+export interface DealsMessages {
+  loading: string;
+  errorTitle: string;
+  fetchFailed: string;
+  tryAgain: string;
+  noActiveDeals: string;
+  checkBackSoon: string;
+  limitedTimeOffers: string;
+  title: string;
+  description: string;
+  hotDeal: string;
+  featuredDiscount: string;
+  limitedStock: string;
+  saveToday: string;
+  shopThisDeal: string;
+  addToCart: string;
+  allCurrentDeals: string;
+  viewAllDeals: string;
+}
+
+export interface OrdersMessages {
+  orders: string;
+  loading: string;
+  pleaseSignIn: string;
+  signInRequired: string;
+  noOrdersYet: string;
+  ordersDescription: string;
+  browseProducts: string;
+}
+
+export interface AddressesMessages {
+  loading: string;
+  noAddressesFound: string;
+  addNew: string;
+  deliveryAddress: string;
+  pleaseSelect: string;
+  addressSelected: string;
+  addressesDescription: string;
+}
 // Complete messages structure type
 export interface AppMessages {
   loading: string;
@@ -1020,7 +1213,7 @@ export interface AppMessages {
   Settings: SettingsMessages;
   "API Messages": Record<string, string>;
   "Toast Messages": Record<string, string>;
-  "Form Validation": Record<string, any>;
+  "Form Validation": Record<string, unknown>;
   "Status Messages": StatusMessages;
   "Common Actions": CommonActions;
   Placeholders: Placeholders;
@@ -1030,7 +1223,7 @@ export interface AppMessages {
   Confirmations: Record<string, string>;
   Analytics: Record<string, string>;
   "Footer & Additional UI": Record<string, string>;
-  "Theme Colors": Record<string, any>;
+  "Theme Colors": Record<string, unknown>;
   "Product Related": ProductRelatedMessages;
   "Checkout & Cart": CheckoutCartMessages;
   "Cart Operations": CartOperationsMessages;
@@ -1042,8 +1235,8 @@ export interface AppMessages {
   "Payment Information": PaymentInformationMessages;
   "Order Review": OrderReviewMessages;
   "Order Status": OrderStatusMessages;
-  "Form Validation - Cart & Checkout": Record<string, any>;
-  "Error Messages - Cart & Checkout": Record<string, any>;
+  "Form Validation - Cart & Checkout": Record<string, unknown>;
+  "Error Messages - Cart & Checkout": Record<string, unknown>;
   "Success Messages": Record<string, string>;
   "Terms and Conditions": Record<string, string>;
   "User Actions": Record<string, string>;
@@ -1056,21 +1249,27 @@ export interface AppMessages {
   "Admin Users": AdminUsersMessages;
   "Admin Analytics": AdminAnalyticsMessages;
   "Admin Settings": AdminSettingsMessages;
-  "Language Settings": Record<string, any>;
-  "Product Suggestions": Record<string, any>;
-  "Site Settings": Record<string, any>;
-  "Multilingual Tips": Record<string, any>;
-  "Product Comparison": Record<string, any>;
+  "Admin Layout": AdminLayoutMessages;
+  "Admin Navigation": AdminNavigationMessages;
+  Deals: DealsMessages;
+  Orders: OrdersMessages;
+  Addresses: AddressesMessages;
+  "Admin Signin": AdminSigninMessages;
+  "Language Settings": Record<string, unknown>;
+  "Product Suggestions": Record<string, unknown>;
+  "Site Settings": Record<string, unknown>;
+  "Multilingual Tips": Record<string, unknown>;
+  "Product Comparison": Record<string, unknown>;
   Dashboard: DashboardMessages;
   Checkout: CheckoutMessages;
   Account: AccountMessages;
   "Recently Viewed": Record<string, string>;
   "Social Sharing": Record<string, string>;
   Home: HomeMessages;
-  products: Record<string, any>;
+  products: Record<string, unknown>;
   categories: Record<string, any>;
   cart: Record<string, string>;
-  auth: Record<string, any>;
+  auth: Record<string, unknown>;
   SEO: SEOMessages;
   Contact: ContactMessages;
   blog: {
@@ -1083,18 +1282,23 @@ export interface AppMessages {
   Blog: BlogMessages;
   Legal: LegalMessages;
   Help: HelpMessages;
+  "Forgot Password": ForgotPasswordMessages;
+  Wishlist: WishlistMessages;
+  NotFound: NotFoundMessages;
+  GlobalError: GlobalErrorMessages;
+  "Checkout Success": CheckoutSuccessMessages;
 }
 
 // Type-safe translation function
 export type TranslationFunction = (
   key: keyof AppMessages | string,
-  values?: Record<string, any>,
+  values?: Record<string, unknown>,
 ) => string;
 
 // Type-safe getTranslations function return type
 export type GetTranslationsReturn = ((
   key: keyof AppMessages | string,
-  values?: Record<string, any>,
+  values?: Record<string, unknown>,
 ) => string) & {
   [K in keyof AppMessages]: AppMessages[K] extends Record<string, any>
     ? GetTranslationsReturn
@@ -1105,3 +1309,5 @@ export type GetTranslationsReturn = ((
 export type UseTranslationsReturn = GetTranslationsReturn & {
   locale: AppLocale;
 };
+
+

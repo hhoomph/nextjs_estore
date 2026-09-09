@@ -142,12 +142,19 @@ export async function validateMessageKeys(locale: Locale, keys: string[]) {
  * @param path - Dot-separated path (e.g., 'nav.home')
  * @returns True if property exists
  */
-function hasNestedProperty(obj: any, path: string): boolean {
-  return (
-    path.split(".").reduce((current, key) => {
-      return current && current[key] !== undefined ? current[key] : undefined;
-    }, obj) !== undefined
-  );
+function hasNestedProperty(obj: unknown, path: string): boolean {
+  const keys = path.split(".");
+  let current: unknown = obj;
+
+  for (const key of keys) {
+    if (current && typeof current === "object" && key in (current as Record<string, unknown>)) {
+      current = (current as Record<string, unknown>)[key];
+    } else {
+      return false;
+    }
+  }
+
+  return current !== undefined;
 }
 
 /**

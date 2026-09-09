@@ -9,7 +9,7 @@
 "use client";
 
 import { format } from "date-fns";
-import { ArrowRight, Calendar, Clock, MessageCircle, User } from "lucide-react";
+import { ArrowRight, Calendar, Clock, MessageCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -129,7 +129,7 @@ interface BlogCardProps {
 }
 
 function BlogCard({ post, locale }: BlogCardProps) {
-  const t = (useTranslations as any)("Blog");
+  const t = useTranslations("Blog");
 
   return (
     <Card className="group overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
@@ -273,7 +273,7 @@ function BlogPagination({
   totalPosts,
   locale,
 }: BlogPaginationProps) {
-  const t = (useTranslations as any)("Blog");
+  const t = useTranslations("Blog");
 
   const getPageUrl = (page: number) => {
     const params = new URLSearchParams();

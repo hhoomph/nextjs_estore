@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
  * GET /api/errors - Retrieve error reports (admin only)
  * This would typically require authentication and admin privileges
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // In a real implementation, you would:
     // 1. Check authentication and admin privileges
@@ -177,25 +177,3 @@ function generateReportId(): string {
  * Rate limiting for error reporting (basic implementation)
  * In production, use a more robust solution like Redis or Upstash
  */
-const errorReports = new Map<string, { count: number; resetTime: number }>();
-
-function checkRateLimit(
-  identifier: string,
-  maxRequests = 10,
-  windowMs = 60000,
-): boolean {
-  const now = Date.now();
-  const userLimit = errorReports.get(identifier);
-
-  if (!userLimit || now > userLimit.resetTime) {
-    errorReports.set(identifier, { count: 1, resetTime: now + windowMs });
-    return true;
-  }
-
-  if (userLimit.count >= maxRequests) {
-    return false;
-  }
-
-  userLimit.count++;
-  return true;
-}

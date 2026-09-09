@@ -8,23 +8,18 @@
  * @version 1.0.0
  * @since 2025-01-01
  */
-import { type NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth/config";
-import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
 import {
   type CartSyncPayload,
   type CartSyncResponse,
-  CartUpdate,
-  EnhancedCartItem,
 } from "@/types/cart";
 
 // POST /api/cart/sync - Synchronize guest cart with server
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth.api.getSession({ headers: request.headers });
     const body: CartSyncPayload = await request.json();
 
-    const { guestId, updates, items } = body;
+    const { guestId, items } = body;
 
     if (!guestId) {
       return NextResponse.json(
@@ -78,3 +73,5 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+

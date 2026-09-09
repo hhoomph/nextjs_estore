@@ -54,9 +54,10 @@ export function useNavbarAnimations(): NavbarAnimationHook {
 
   // Clean up timeouts on unmount
   useEffect(() => {
+    const timeouts = animationTimeoutsRef.current;
     return () => {
-      animationTimeoutsRef.current.forEach((timeout) => clearTimeout(timeout));
-      animationTimeoutsRef.current.clear();
+      timeouts.forEach((timeout) => clearTimeout(timeout));
+      timeouts.clear();
     };
   }, []);
 

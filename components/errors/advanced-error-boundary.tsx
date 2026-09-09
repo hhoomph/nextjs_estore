@@ -206,8 +206,9 @@ export class AdvancedErrorBoundary extends Component<
 
     // Navigate home as part of reset action
     try {
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
       window.location.href = "/";
-    } catch (_e) {
+    } catch {
       // ignore in non-browser environments
     }
   };
@@ -366,3 +367,4 @@ export function withErrorBoundary<P extends object>(
 
   return WrappedComponent;
 }
+

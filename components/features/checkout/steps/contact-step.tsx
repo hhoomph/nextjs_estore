@@ -1,6 +1,6 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Mail, User } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { Mail } from "lucide-react";
+import { checkoutContactSchema } from "@/lib/validations/checkout";
+import type { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,45 +8,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-const contactSchema = z
-  .object({
-    email: z.string().email("Please enter a valid email address"),
-    firstName: z.string().min(1, "First name is required"),
-    lastName: z.string().min(1, "Last name is required"),
-    phone: z.string().min(10, "Please enter a valid phone number"),
-    createAccount: z.boolean(),
-    password: z.string().optional(),
-    confirmPassword: z.string().optional(),
-  })
-  .refine(
-    (data) => {
-      if (data.createAccount) {
-        return data.password && data.password.length >= 8;
-      }
-      return true;
-    },
-    {
-      message: "Password must be at least 8 characters",
-      path: ["password"],
-    },
-  )
-  .refine(
-    (data) => {
-      if (data.createAccount && data.password && data.confirmPassword) {
-        return data.password === data.confirmPassword;
-      }
-      return true;
-    },
-    {
-      message: "Passwords do not match",
-      path: ["confirmPassword"],
-    },
-  );
-
-export type ContactFormData = z.infer<typeof contactSchema>;
+export type ContactFormData = z.infer<typeof checkoutContactSchema>;
 
 interface ContactStepProps {
-  form: any;
+  form: UseFormReturn<ContactFormData>;
   onNext: () => void;
 }
 
@@ -204,3 +169,6 @@ export function ContactStep({ form, onNext }: ContactStepProps) {
     </Card>
   );
 }
+
+
+

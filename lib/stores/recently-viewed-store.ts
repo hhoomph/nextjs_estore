@@ -1,3 +1,4 @@
+import { createJSONStorage, persist } from "zustand/middleware";
 /**
  * Recently viewed products store using Zustand
  *
@@ -6,7 +7,7 @@
  * @since 2025-01-01
  */
 import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+
 import { randomUUID } from "@/lib/utils/crypto-ssr";
 import {
   createStorageWithExpiration,
@@ -123,11 +124,6 @@ export const useRecentlyViewedStore = create<RecentlyViewedStore>()(
        */
       syncWithServer: (serverData: RecentlyViewedProduct[]) => {
         set((state) => {
-          // Create a map of existing products for quick lookup
-          const existingProducts = new Map(
-            state.products.map((p) => [p.product_id, p]),
-          );
-
           // Merge server data with local data
           const mergedProducts = [...serverData];
 

@@ -973,7 +973,12 @@
     "tryAgain": "Try Again",
     "uncategorized": "Uncategorized",
     "sale": "Sale",
-    "unknownProduct": "Unknown Product"
+    "unknownProduct": "Unknown Product",
+    "description": "Description",
+    "customerReviews": "Customer Reviews",
+    "backToProducts": "Back to Products",
+    "noDescription": "No description available.",
+    "anonymous": "Anonymous"
   },
   "categories": {
     "title": "Categories",
@@ -1082,94 +1087,83 @@
   },
   "Contact": {
     "title": "Contact Us",
-    "subtitle": "Get in touch with our team",
+    "subtitle": "Have a question or need help? We'd love to hear from you.",
     "form": {
-      "title": "Send us a message",
-      "name": "Full Name",
-      "namePlaceholder": "Enter your full name",
-      "email": "Email Address",
-      "emailPlaceholder": "Enter your email address",
+      "title": "Send a Message",
+      "name": "Name",
+      "namePlaceholder": "Your name",
+      "email": "Email",
+      "emailPlaceholder": "your@email.com",
       "subject": "Subject",
-      "subjectPlaceholder": "What's this about?",
+      "subjectPlaceholder": "How can we help?",
       "message": "Message",
-      "messagePlaceholder": "Tell us how we can help you...",
-      "submit": "Send Message"
+      "messagePlaceholder": "Tell us more about your inquiry...",
+      "submit": "Send Message",
+      "sending": "Sending...",
+      "successTitle": "Message Sent!",
+      "successMessage": "Thank you for contacting us. We'll get back to you as soon as possible.",
+      "sendAnother": "Send Another Message"
     },
     "info": {
-      "title": "Contact Information",
+      "title": "Get in Touch",
       "address": "Address",
       "phone": "Phone",
       "email": "Email",
-      "hours": "Business Hours"
-    },
-    "faq": {
-      "title": "Frequently Asked Questions",
-      "q1": "How can I track my order?",
-      "a1": "You can track your order using the tracking number provided in your confirmation email.",
-      "q2": "What is your return policy?",
-      "a2": "We accept returns within 30 days of purchase. Items must be in original condition.",
-      "q3": "Do you offer international shipping?",
-      "a3": "Yes, we ship to most countries worldwide. Shipping costs vary by location."
+      "hours": "Business Hours",
+      "mondayFriday": "Monday - Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday",
+      "mondayFridayTime": "9:00 AM - 6:00 PM",
+      "saturdayTime": "10:00 AM - 4:00 PM",
+      "sundayTime": "Closed"
     }
   },
   "Help": {
-    "title": "Help & Support",
-    "subtitle": "Find answers and get support",
-    "search": {
-      "placeholder": "Search for help..."
-    },
+    "title": "How can we help you?",
+    "subtitle": "Find answers to common questions or contact our support team",
     "categories": {
       "gettingStarted": {
         "title": "Getting Started",
-        "description": "Learn the basics and get started with our platform"
-      },
-      "account": {
-        "title": "Account & Profile",
-        "description": "Manage your account settings and profile information"
+        "description": "Learn the basics of shopping on our platform"
       },
       "shopping": {
         "title": "Shopping Guide",
-        "description": "Learn how to browse, search, and purchase products"
+        "description": "How to browse, search, and purchase products"
       },
-      "orders": {
-        "title": "Orders & Tracking",
-        "description": "Track orders, manage deliveries, and handle returns"
+      "account": {
+        "title": "Account & Profile",
+        "description": "Managing your account settings and preferences"
       },
       "payment": {
-        "title": "Payment & Billing",
-        "description": "Payment methods, billing questions, and refunds"
+        "title": "Payment Methods",
+        "description": "Accepted payments and security information"
       },
-      "viewGuides": "View Guides"
+      "shipping": {
+        "title": "Shipping & Delivery",
+        "description": "Delivery times, costs, and tracking orders"
+      },
+      "contactSupport": {
+        "title": "Contact Support",
+        "description": "Get in touch with our support team"
+      }
     },
     "faqs": {
       "title": "Frequently Asked Questions",
-      "subtitle": "Quick answers to common questions",
-      "shipping": {
-        "question": "How long does shipping take?",
-        "answer": "Standard shipping takes 3-5 business days. Express shipping is available for 1-2 business days."
-      },
-      "returns": {
-        "question": "What is your return policy?",
-        "answer": "We offer a 30-day return policy on most items. Returns are free for defective items."
-      },
-      "payment": {
-        "question": "What payment methods do you accept?",
-        "answer": "We accept credit cards, debit cards, PayPal, and bank transfers."
-      },
-      "account": {
-        "question": "How do I reset my password?",
-        "answer": "Click 'Forgot Password' on the sign-in page and follow the instructions sent to your email."
-      },
-      "tracking": {
-        "question": "How can I track my order?",
-        "answer": "Use the tracking number from your confirmation email on our tracking page."
-      }
+      "q1": "How do I create an account?",
+      "a1": "Click on the 'Sign Up' button in the navigation menu and fill in your details to create an account.",
+      "q2": "How can I track my order?",
+      "a2": "You can track your order by visiting the 'Orders' section in your account dashboard.",
+      "q3": "What payment methods do you accept?",
+      "a3": "We accept major credit cards, debit cards, and popular digital payment methods.",
+      "q4": "How do I return a product?",
+      "a4": "Visit our Returns & Exchanges page or contact our support team for assistance.",
+      "q5": "Can I change my shipping address after placing an order?",
+      "a5": "Please contact us as soon as possible if you need to change your shipping address."
     },
-    "contact": {
-      "title": "Still need help?",
-      "description": "Can't find what you're looking for? Our support team is here to help.",
-      "email": "Contact via Email",
-      "phone": "Call Us"
+    "contactCTA": {
+      "title": "Still have questions?",
+      "description": "Can't find the answer you're looking for? Our support team is here to help.",
+      "button": "Contact Us"
     }
   },
   "Blog": {
@@ -1338,9 +1332,15 @@
     "restricted": "Admin access is restricted to authorized personnel only.",
     "notAdmin": "Not an admin?",
     "signInAsUser": "Sign in as user",
-    "needHelp": "Need help with admin access?",
+    "needHelp": "Need help accessing admin?",
     "contactAdmin": "Contact your system administrator",
-    "backToSite": "Back to site"
+    "backToSite": "Back to site",
+    "emailLabel": "Admin Email",
+    "emailPlaceholder": "admin@example.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your admin password",
+    "submit": "Access Admin Panel",
+    "submitLoading": "Signing in..."
   },
   "Deals": {
     "loading": "Loading deals...",
@@ -1450,5 +1450,96 @@
     "lightMode": "Light",
     "darkMode": "Dark",
     "systemMode": "System"
+  },
+  "Forgot Password": {
+    "title": "Forgot password?",
+    "subtitle": "Enter your email and we'll send you a reset link",
+    "email": {
+      "label": "Email",
+      "placeholder": "you@example.com"
+    },
+    "submit": "Send reset link",
+    "loading": "Sending...",
+    "success": {
+      "title": "Check your email",
+      "message": "If an account exists for {email}, we've sent a password reset link.",
+      "backToSignIn": "Back to sign in"
+    },
+    "backToSignIn": "Back to sign in",
+    "errors": {
+      "sendFailed": "Failed to send reset email. Please try again.",
+      "unexpectedError": "An unexpected error occurred. Please try again."
+    }
+  },
+  "Wishlist": {
+    "eyebrow": "Saved for Later",
+    "title": "Your Wishlist",
+    "description": "Keep track of products you love and move them to your cart when you are ready.",
+    "empty": {
+      "title": "Your wishlist is empty",
+      "description": "Save products from product cards to build your personal collection.",
+      "browseProducts": "Browse Products",
+      "viewDeals": "View Deals"
+    },
+    "savedProducts": "Saved Products",
+    "itemsSaved": "{count} items saved",
+    "clearWishlist": "Clear Wishlist",
+    "remove": "Remove",
+    "unknownProduct": "Unknown Product",
+    "outOfStock": "Out of Stock",
+    "sale": "Sale",
+    "addToCart": "Add to Cart",
+    "home": "Home"
+  },
+  "notFound": {
+    "title": "404 - Page Not Found",
+    "message": "The page you are looking for does not exist.",
+    "goHome": "Go Home"
+  },
+  "globalError": {
+    "title": "Something went wrong",
+    "message": "We encountered an unexpected error. Please try refreshing the page.",
+    "developmentDetails": "Error Details (Development)",
+    "tryAgain": "Try Again",
+    "goHome": "Go Home"
+  },
+  "Checkout Success": {
+    "loadingOrderDetails": "Loading order details...",
+    "orderNotFound": "Order Not Found",
+    "backToHome": "Back to Home",
+    "orderConfirmed": "Order Confirmed!",
+    "thankYouMessage": "Thank you for your purchase. Your order has been successfully placed and is being processed.",
+    "orderDetails": "Order Details",
+    "orderNumber": "Order Number",
+    "orderDate": "Order Date",
+    "orderStatus": "Order Status",
+    "transactionId": "Transaction ID",
+    "orderSummary": "Order Summary",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "tax": "Tax",
+    "total": "Total",
+    "purchasedItems": "Purchased Items",
+    "whatsNext": "What's Next?",
+    "orderProcessing": "Order Processing",
+    "orderProcessingDesc": "We're preparing your order for shipment. This usually takes 1-2 business days.",
+    "shippingTitle": "Shipping",
+    "shippingDesc": "Once shipped, you'll receive a tracking number via email.",
+    "delivery": "Delivery",
+    "deliveryDesc": "Standard delivery takes 3-5 business days. Express delivery is 1-2 days.",
+    "quickActions": "Quick Actions",
+    "viewAllOrders": "View All Orders",
+    "continueShopping": "Continue Shopping",
+    "downloadReceipt": "Download Receipt",
+    "shippingInformation": "Shipping Information",
+    "estimatedDelivery": "Estimated Delivery",
+    "shippingMethod": "Shipping Method",
+    "tracking": "Tracking",
+    "needHelp": "Need Help?",
+    "questionsAboutOrder": "Questions about your order?",
+    "contactSupport": "Contact our support team at",
+    "orCallUs": "Or call us at",
+    "loveShopping": "Love Shopping With Us?",
+    "discoverMore": "Discover more amazing products and enjoy exclusive deals on your next purchase."
   }
 }

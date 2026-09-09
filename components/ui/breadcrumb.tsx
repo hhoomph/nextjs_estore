@@ -7,8 +7,7 @@
  */
 "use client";
 
-import { ChevronRight, Home } from "lucide-react";
-import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
@@ -52,9 +51,9 @@ BreadcrumbItem.displayName = "BreadcrumbItem";
 const BreadcrumbLink = React.forwardRef<
   HTMLAnchorElement,
   React.ComponentPropsWithoutRef<"a"> & {
-    asChild?: boolean;
+    
   }
->(({ asChild, className, ...props }, ref) => {
+>(({ className, ...props }, ref) => {
   return (
     <a
       ref={ref}

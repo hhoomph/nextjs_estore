@@ -44,7 +44,7 @@ export function generateAriaAttributes(options: {
   atomic?: boolean;
   relevant?: string;
 }) {
-  const attributes: Record<string, any> = {};
+  const attributes: Record<string, unknown> = {};
 
   if (options.expanded !== undefined) {
     attributes["aria-expanded"] = options.expanded;

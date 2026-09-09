@@ -14,22 +14,19 @@ import {
   Check,
   ExternalLink,
   Gift,
-  MoreVertical,
+
   Package,
   Search,
-  Settings,
+
   Shield,
-  Truck,
+
   X,
 } from "lucide-react";
-import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import {
   Sheet,
   SheetContent,
@@ -38,7 +35,6 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useSession } from "@/lib/auth-client";
 import {
   getThemeAwareBackgroundClasses,
   getThemeAwareBorderClasses,
@@ -139,16 +135,13 @@ const getNotificationColor = (
 };
 
 export function NotificationSidebar({
-  theme,
-  animations = true,
+  
   open,
   onOpenChange,
 }: NotificationSidebarProps & {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 } = {}) {
-  const { data: session } = useSession();
-  const { theme: currentTheme } = useTheme();
 
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = open !== undefined;
@@ -289,7 +282,7 @@ export function NotificationSidebar({
             ].map((tab) => (
               <button
                 key={tab.value}
-                onClick={() => setFilter(tab.value as any)}
+                onClick={() => setFilter(tab.value as "all" | "unread" | "read")}
                 className={`flex-1 px-3 py-1.5 text-sm rounded-md transition-colors ${
                   filter === tab.value
                     ? "bg-background text-foreground shadow-sm"

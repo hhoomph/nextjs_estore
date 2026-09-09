@@ -8,7 +8,6 @@
 import { create } from "zustand";
 import { devtools, persist, subscribeWithSelector } from "zustand/middleware";
 import { toast } from "@/lib/hooks/use-toast";
-import { CART_CONSTANTS } from "@/lib/constants/cart";
 import { randomUUID } from "@/lib/utils/crypto-ssr";
 
 export interface WishlistItem {

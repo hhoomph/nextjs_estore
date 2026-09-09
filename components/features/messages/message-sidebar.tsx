@@ -10,7 +10,7 @@
 "use client";
 
 import {
-  Info,
+
   MessageCircle,
   MoreVertical,
   Phone,
@@ -19,15 +19,12 @@ import {
   Video,
   X,
 } from "lucide-react";
-import Image from "next/image";
-import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import {
   Sheet,
   SheetContent,
@@ -85,16 +82,13 @@ const mockMessages: MessageItem[] = [
 ];
 
 export function MessageSidebar({
-  theme,
-  animations = true,
+  
   open,
   onOpenChange,
 }: MessageSidebarProps & {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 } = {}) {
-  const { data: session } = useSession();
-  const { theme: currentTheme } = useTheme();
 
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = open !== undefined;
@@ -103,6 +97,7 @@ export function MessageSidebar({
   const [messages, setMessages] = useState<MessageItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const { data: session } = useSession();
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(
     null,
   );

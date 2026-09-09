@@ -294,8 +294,8 @@ export async function saveThemeColors(
       phone_fa: currentSettings.phoneFa || undefined,
       description_en: currentSettings.descriptionEn || undefined,
       description_fa: currentSettings.descriptionFa || undefined,
-      language_mode: (currentSettings.languageMode as any) || "multilingual",
-      default_language: (currentSettings.defaultLanguage as any) || "fa",
+      language_mode: (currentSettings.languageMode as "multilingual" | "single_fa" | "single_en") || "multilingual",
+      default_language: (currentSettings.defaultLanguage as "fa" | "en") || "fa",
       enable_product_suggestions:
         currentSettings.enableProductSuggestions ?? true,
       suggestion_algorithm:

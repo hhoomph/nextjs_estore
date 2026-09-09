@@ -29,7 +29,7 @@ export function AdminRedirect() {
     if (isPending) return;
 
     // Check both possible session data structures
-    const userObj = (session?.user as any) || (session?.session as any)?.user;
+    const userObj = (session?.user as { role?: string } | undefined) || (session?.session as { user?: { role?: string } } | undefined)?.user;
 
     // Session was fetched and user is not signed in or not admin
     if (!userObj) {

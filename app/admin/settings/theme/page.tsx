@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 
 import { useEffect, useMemo, useState } from "react";
 import type * as React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -67,11 +67,12 @@ export default function AdminThemeSettingsPage() {
     defaultValues: DEFAULT_THEME,
   });
 
-  const primaryColor = useMemo(() => form.watch("primaryColor"), [form]);
-  const secondaryColor = useMemo(() => form.watch("secondaryColor"), [form]);
-  const backgroundColor = useMemo(() => form.watch("backgroundColor"), [form]);
-  const foregroundColor = useMemo(() => form.watch("foregroundColor"), [form]);
-  const borderColor = useMemo(() => form.watch("borderColor"), [form]);
+  const primaryColor = useWatch({ control: form.control, name: "primaryColor" });
+  const secondaryColor = useWatch({ control: form.control, name: "secondaryColor" });
+  const backgroundColor = useWatch({ control: form.control, name: "backgroundColor" });
+  const foregroundColor = useWatch({ control: form.control, name: "foregroundColor" });
+  const borderColor = useWatch({ control: form.control, name: "borderColor" });
+  const mode = useWatch({ control: form.control, name: "mode" });
 
   const previewStyle = useMemo(
     () =>
@@ -172,7 +173,7 @@ export default function AdminThemeSettingsPage() {
                 <div className="space-y-2">
                   <Label htmlFor="mode">{t("activeMode")}</Label>
                   <Select
-                    value={form.watch("mode")}
+                    value={mode}
                     onValueChange={(value: "light" | "dark" | "system") =>
                       form.setValue("mode", value)
                     }

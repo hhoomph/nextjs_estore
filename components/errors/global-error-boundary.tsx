@@ -9,17 +9,15 @@
 
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertTriangle,
   Bug,
-  ChevronDown,
-  ChevronUp,
   Home,
   RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
+import { motion } from "framer-motion";
 import {
   Accordion,
   AccordionContent,
@@ -70,7 +68,6 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({
   onReport,
   className,
 }) => {
-  const [showErrorDetails, setShowErrorDetails] = React.useState(false);
   const [retryCount, setRetryCount] = React.useState(0);
   const [isRetrying, setIsRetrying] = React.useState(false);
 

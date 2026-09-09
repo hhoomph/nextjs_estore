@@ -39,7 +39,7 @@ export default function SignUpPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const router = useRouter();
-  const t = useTranslations("auth.signup");
+  const t = useTranslations("auth.signup") as (key: string, options?: Record<string, unknown>) => string;
 
   const form = useForm<SignUpForm>({
     resolver: zodResolver(signUpSchema),
@@ -228,3 +228,4 @@ export default function SignUpPage() {
     </div>
   );
 }
+

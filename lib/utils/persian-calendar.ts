@@ -140,11 +140,6 @@ export function persianToGregorian(
   dayOfYear += persianDay;
 
   // Adjust for leap years
-  const leapDays =
-    Math.floor((gregorianYear - 1) / 4) -
-    Math.floor((gregorianYear - 1) / 100) +
-    Math.floor((gregorianYear - 1) / 400);
-
   if (dayOfYear <= 286) {
     gregorianYear--;
     dayOfYear += 79;
@@ -240,11 +235,6 @@ export function getPersianMonthCalendar(
   weekdayOffset: number;
 } {
   const firstDayOfMonth = persianToGregorian(year, month, 1);
-  const lastDayOfMonth =
-    month === 12
-      ? persianToGregorian(year, month, 29 + (isPersianLeapYear(year) ? 1 : 0))
-      : persianToGregorian(year, month, PERSIAN_MONTH_DAYS[month - 1]);
-
   const today = new Date();
   const todayPersian = gregorianToPersian(today);
 

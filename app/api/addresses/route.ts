@@ -103,10 +103,7 @@ export async function PUT(request: NextRequest) {
     const { id, ...updateData } = body;
 
     // Add user_id to the update data for validation
-    const dataWithUserId = {
-      ...updateData,
-      user_id: session.user.id,
-    };
+    
 
     const result = await updateAddress(session.user.id, {
       id,

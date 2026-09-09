@@ -9,9 +9,7 @@
  * @since 2025-01-01
  */
 
-import { revalidateTag } from "next/cache";
 import { cache } from "react";
-import { createErrorResponse, createSuccessResponse } from "@/lib/api/helpers";
 import prisma from "@/lib/prisma";
 import type { CartSyncResponse, EnhancedCartItem } from "@/types/cart";
 
@@ -59,7 +57,7 @@ export const addToCart = cache(
     params: AddToCartParams,
   ): Promise<{ success: boolean; error?: string }> => {
     try {
-      const { product_id, quantity, user_id } = params;
+      const { product_id, quantity } = params;
 
       // Validate product exists and is in stock
       const product = await prisma.product.findUnique({
@@ -149,7 +147,7 @@ export const removeCartItem = cache(
 export const syncGuestCart = cache(
   async (params: SyncCartParams): Promise<CartSyncResponse> => {
     try {
-      const { guestId, updates, items, userId } = params;
+      const { guestId, updates, items } = params;
 
       if (!guestId) {
         return {

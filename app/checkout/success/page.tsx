@@ -45,7 +45,7 @@ interface OrderDetails {
 }
 
 function CheckoutSuccessContent() {
-  const t = useTranslations();
+  const t = useTranslations("Checkout Success");
   const searchParams = useSearchParams();
   const router = useRouter();
   const orderId = searchParams.get("order");
@@ -433,7 +433,7 @@ function CheckoutSuccessContent() {
 }
 
 export default function CheckoutSuccessPage() {
-  const t = useTranslations();
+  const t = useTranslations("Checkout Success");
   return (
     <Suspense
       fallback={
@@ -449,4 +449,5 @@ export default function CheckoutSuccessPage() {
     </Suspense>
   );
 }
+
 

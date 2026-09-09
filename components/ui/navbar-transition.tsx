@@ -13,15 +13,12 @@
 
 import { AnimatePresence, motion, useAnimation } from "framer-motion";
 import type React from "react";
-import { useEffect, useState } from "react";
-import { Loading } from "@/components/ui/loading";
+
 import { useNavbarAnimations } from "@/lib/hooks/use-navbar-animations";
-import { cn } from "@/lib/utils";
 import { navbarPerformanceUtils } from "@/lib/utils/navbar-animations";
 
 interface NavbarTransitionProps {
   children: React.ReactNode;
-  showLoadingState?: boolean;
   transitionType?: "fade" | "slide" | "scale" | "none";
   className?: string;
 }
@@ -56,11 +53,10 @@ const transitionConfig = {
 
 export function NavbarTransition({
   children,
-  showLoadingState = true,
+  
   transitionType = "fade",
   className,
 }: NavbarTransitionProps) {
-  const { isAnimating } = useNavbarAnimations();
   const controls = useAnimation();
 
   // Check performance settings
@@ -126,12 +122,10 @@ export function NavbarSectionTransition({
 // Transition wrapper for navbar items
 export function NavbarItemTransition({
   children,
-  itemKey,
   delay = 0,
   className,
 }: {
   children: React.ReactNode;
-  itemKey: string;
   delay?: number;
   className?: string;
 }) {

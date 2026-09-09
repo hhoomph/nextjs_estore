@@ -131,7 +131,7 @@ export const lazyComponents = {
 };
 
 // Intersection Observer for lazy loading
-export function useLazyLoad(options?: IntersectionObserverInit) {
+export function useLazyLoad(_options?: IntersectionObserverInit) {
   return {
     ref: { current: null },
     isIntersecting: false,

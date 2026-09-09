@@ -1,4 +1,3 @@
-import { routing } from "./i18n/routing";
 import { AppMessages, AppLocale } from "./i18n/types";
 
 declare module "next-intl" {

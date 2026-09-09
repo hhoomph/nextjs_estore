@@ -121,8 +121,6 @@ export function formatPriceInteger(
  * @returns Parsed number
  */
 export function parsePrice(formattedPrice: string, locale: "fa" | "en" = "fa"): number {
-  const config = CURRENCY_CONFIG[locale];
-
   // Remove currency symbol and format characters
   const cleaned = formattedPrice
     .replace(/[^\d.,]/g, "")

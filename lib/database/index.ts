@@ -27,7 +27,7 @@ function createPrismaClient(): PrismaClient {
       console.warn(
         "DATABASE_URL not set during build phase, using mock Prisma client",
       );
-      return new PrismaClient({} as any) as PrismaClient;
+      return new PrismaClient({}) as PrismaClient;
     }
     throw new Error("DATABASE_URL environment variable is required");
   }

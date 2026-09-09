@@ -25,7 +25,7 @@ export interface ComparisonProduct {
   product_pictures: Array<{
     picture: { url: string };
   }>;
-  specifications?: Record<string, any>;
+  specifications?: Record<string, unknown>;
   rating?: number;
   review_count?: number;
   in_stock: boolean;

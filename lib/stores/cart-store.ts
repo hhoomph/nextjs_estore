@@ -129,7 +129,7 @@ export const useCartStore = create<CartStore>()(
             } else {
               // Add new item with all EnhancedCartItem properties
               const cartItem: EnhancedCartItem = {
-                ...(newItem as any),
+                ...(newItem as unknown as EnhancedCartItem),
                 id: `${productId}-${optionsId || "default"}-${Date.now()}`,
                 quantity,
                 addedAt: new Date(),

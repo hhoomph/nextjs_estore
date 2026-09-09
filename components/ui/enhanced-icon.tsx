@@ -252,7 +252,7 @@ export interface EnhancedIconProps
     | "warning"
     | "error"
     | "info";
-  animate?: boolean;
+
   spin?: boolean;
   pulse?: boolean;
   bounce?: boolean;
@@ -309,7 +309,7 @@ const EnhancedIconComponent = React.forwardRef<
       size = "md",
       variant = "default",
       color = "default",
-      animate = false,
+
       spin = false,
       pulse = false,
       bounce = false,
@@ -325,12 +325,6 @@ const EnhancedIconComponent = React.forwardRef<
     const IconComponent = iconMap[name];
     const [isHovered, setIsHovered] = React.useState(false);
 
-    const animationVariants = {
-      spin: { rotate: 360 },
-      pulse: { scale: [1, 1.1, 1] },
-      bounce: { y: [0, -2, 0] },
-      hover: { scale: 1.1 },
-    };
 
     const getAnimationProps = () => {
       if (spin)
@@ -352,6 +346,8 @@ const EnhancedIconComponent = React.forwardRef<
       return {};
     };
 
+    const { onDrag: _onDrag, onDragEnd: _onDragEnd, onDragStart: _onDragStart, ...rest } = props;
+    const divProps = rest as Omit<React.HTMLAttributes<HTMLDivElement>, "onDrag" | "onDragEnd" | "onDragStart">;
     const iconElement = (
       <motion.div
         ref={ref}
@@ -364,7 +360,7 @@ const EnhancedIconComponent = React.forwardRef<
         onMouseLeave={() => setIsHovered(false)}
         whileHover={interactive ? { scale: 1.05 } : undefined}
         whileTap={interactive ? { scale: 0.95 } : undefined}
-        {...(props as any)}
+        {...(divProps as any)}
       >
         <motion.div
           className={cn(

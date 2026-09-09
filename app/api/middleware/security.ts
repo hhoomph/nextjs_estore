@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Security middleware for API routes
  *
  * Provides comprehensive security protections including:
@@ -13,17 +13,12 @@
  */
 
 import { type NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import {
   createRateLimit,
   createSecurityHeaders,
   getClientIP,
 } from "@/lib/security";
-import {
-  sanitizeEmail,
-  sanitizeFilename,
-  sanitizeText,
-  sanitizeUrl,
-} from "@/lib/security/sanitization";
 
 // Rate limiters for different API endpoints
 const authRateLimiter = createRateLimit({
@@ -45,7 +40,7 @@ const uploadRateLimiter = createRateLimit({
 });
 
 // Security headers middleware
-export async function securityHeadersMiddleware(request: NextRequest) {
+export async function securityHeadersMiddleware() {
   const response = NextResponse.next();
 
   // Add security headers
@@ -114,11 +109,7 @@ export async function rateLimitMiddleware(
 // Input validation middleware
 export async function validationMiddleware(
   request: NextRequest,
-  schema?: {
-    body?: any;
-    query?: any;
-    headers?: any;
-  },
+  schema?: { body?: z.ZodSchema<unknown>; query?: z.ZodSchema<unknown>; headers?: z.ZodSchema<unknown> },
 ) {
   try {
     // Validate request body if schema provided
@@ -126,7 +117,7 @@ export async function validationMiddleware(
       const body = await request.json();
       const validatedBody = schema.body.parse(body);
       // Reconstruct request with validated body
-      (request as any).validatedBody = validatedBody;
+      (request as unknown as { validatedBody?: unknown }).validatedBody = validatedBody;
     }
 
     // Validate query parameters
@@ -136,20 +127,20 @@ export async function validationMiddleware(
         queryParams[key] = value;
       });
       const validatedQuery = schema.query.parse(queryParams);
-      (request as any).validatedQuery = validatedQuery;
+      (request as unknown as { validatedQuery?: unknown }).validatedQuery = validatedQuery;
     }
 
     // Validate headers
     if (schema?.headers) {
       const headers: Record<string, string> = {};
-      schema.headers.forEach((header: string) => {
+      Object.keys(schema.headers as unknown as Record<string, unknown>).forEach((header) => {
         const value = request.headers.get(header);
         if (value) {
           headers[header] = value;
         }
       });
       const validatedHeaders = schema.headers.parse(headers);
-      (request as any).validatedHeaders = validatedHeaders;
+      (request as unknown as { validatedHeaders?: unknown }).validatedHeaders = validatedHeaders;
     }
 
     return null; // Continue to next middleware
@@ -229,11 +220,7 @@ export function createSecurityMiddleware(
   options: {
     rateLimit?: boolean;
     rateLimitType?: "auth" | "api" | "upload";
-    validation?: {
-      body?: any;
-      query?: any;
-      headers?: any;
-    };
+    validation?: { body?: z.ZodSchema<unknown>; query?: z.ZodSchema<unknown>; headers?: z.ZodSchema<unknown> };
     csrf?: boolean;
     sanitization?: boolean;
     securityHeaders?: boolean;
@@ -288,7 +275,7 @@ export function createSecurityMiddleware(
 
 // Security response wrapper
 export function createSecureResponse(
-  data: any,
+  data: unknown,
   options: {
     status?: number;
     headers?: Record<string, string>;
@@ -337,3 +324,4 @@ export async function securityLoggingMiddleware(request: NextRequest) {
 
   return null; // Continue to next middleware
 }
+

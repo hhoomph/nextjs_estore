@@ -70,7 +70,6 @@ export function Footer() {
     return () => controller.abort();
   }, []);
 
-  const year = new Date().getFullYear();
 
   return (
     <footer className="bg-background text-foreground">

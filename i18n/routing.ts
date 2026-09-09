@@ -1,5 +1,4 @@
 import { defineRouting } from "next-intl/routing";
-import { getCookieLocale } from "@/lib/i18n/cookie-locale";
 
 /**
  * Routing configuration for cookie-based i18n (no locale prefix)
@@ -49,6 +48,15 @@ export const routing = defineRouting({
     "/test": "/test",
     "/blog": "/blog",
     "/blog/[slug]": "/blog/[slug]",
+    "/auth/signin": "/auth/signin",
+    "/auth/signup": "/auth/signup",
+    "/auth/forgot-password": "/auth/forgot-password",
+    "/contact": "/contact",
+    "/help": "/help",
+    "/privacy-policy": "/privacy-policy",
+    "/terms-condition": "/terms-condition",
+    "/admin/signin": "/admin/signin",
+
 
     // Dynamic routes
     "/products/[slug]": "/products/[slug]",
@@ -56,6 +64,45 @@ export const routing = defineRouting({
     "/orders/[id]": "/orders/[id]",
   },
 });
+export const routeMatcherGroups = [
+  // Public routes
+  { pattern: '/', locale: false },
+  { pattern: '/products', locale: false },
+  { pattern: '/products/:path*', locale: false },
+  { pattern: '/categories', locale: false },
+  { pattern: '/categories/:path*', locale: false },
+  { pattern: '/cart', locale: false },
+  { pattern: '/checkout', locale: false },
+  { pattern: '/checkout/success', locale: false },
+  { pattern: '/search', locale: false },
+  { pattern: '/wishlist', locale: false },
+  { pattern: '/compare', locale: false },
+  { pattern: '/deals', locale: false },
+  { pattern: '/popular', locale: false },
+  { pattern: '/recently-viewed', locale: false },
+  { pattern: '/blog', locale: false },
+  { pattern: '/blog/:path*', locale: false },
+  { pattern: '/contact', locale: false },
+  { pattern: '/help', locale: false },
+  { pattern: '/privacy-policy', locale: false },
+  { pattern: '/terms-condition', locale: false },
+  // Auth routes
+  { pattern: '/auth/signin', locale: false },
+  { pattern: '/auth/signup', locale: false },
+  { pattern: '/auth/forgot-password', locale: false },
+  // Account routes
+  { pattern: '/account', locale: false },
+  { pattern: '/account/:path*', locale: false },
+  { pattern: '/orders', locale: false },
+  { pattern: '/orders/:path*', locale: false },
+  { pattern: '/settings', locale: false },
+  { pattern: '/settings/:path*', locale: false },
+  { pattern: '/dashboard', locale: false },
+  // Admin routes
+  { pattern: '/admin', locale: false },
+  { pattern: '/admin/signin', locale: false },
+  { pattern: '/admin/:path*', locale: false },
+];
 
 /**
  * Helper function to extract locale from cookie header string
@@ -75,3 +122,7 @@ function getCookieLocaleFromHeader(cookieHeader: string): "en" | "fa" {
 
   return "fa";
 }
+
+
+
+

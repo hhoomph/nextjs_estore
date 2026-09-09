@@ -9,7 +9,7 @@
  */
 "use client";
 
-import { AlertCircle, MessageSquare, Send, X } from "lucide-react";
+import { AlertCircle, MessageSquare, Send } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -251,3 +251,4 @@ export const ErrorReportButton: React.FC<ErrorReportButtonProps> = ({
     </Button>
   );
 };
+

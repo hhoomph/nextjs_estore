@@ -63,7 +63,7 @@ export default function AdminSignInPage() {
         // Always verify admin role via session after sign-in
         // Better Auth may not include additional fields (like role) in the sign-in response
         const sessionResult = await authClient.getSession();
-        const sessionUser = sessionResult.data?.user as any;
+        const sessionUser = sessionResult.data?.user as { role?: string } | undefined;
         
         if (sessionUser?.role === "ADMIN") {
           router.push("/admin");

@@ -9,9 +9,7 @@
 
 import {
   AlertTriangle,
-  Building,
   CheckCircle,
-  Edit,
   Home,
   Loader2,
   MapPin,
@@ -37,7 +35,6 @@ interface AddressSelectorProps {
   onAddNew?: () => void;
   title?: string;
   description?: string;
-  allowNullSelection?: boolean;
 }
 
 export function AddressSelector({
@@ -46,7 +43,6 @@ export function AddressSelector({
   onAddNew,
   title = "Select Delivery Address",
   description = "Choose a delivery address for your order",
-  allowNullSelection = false,
 }: AddressSelectorProps) {
   const { data: session } = useSession();
   const { toast } = useToast();
@@ -91,13 +87,17 @@ export function AddressSelector({
     }
   };
 
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     fetchAddresses();
   }, [session?.user?.id]);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     setSelectedId(selectedAddressId || null);
   }, [selectedAddressId]);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   const handleAddressChange = (addressId: string) => {
     const address = addresses.find((addr) => addr.id === addressId);

@@ -9,7 +9,6 @@
 "use client";
 
 import { Filter, Search, X } from "lucide-react";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -59,16 +58,16 @@ interface BlogFiltersProps {
   currentCategory?: string;
   currentTag?: string;
   searchQuery?: string;
-  locale: string;
 }
 
 export function BlogFilters({
   categories,
   tags,
   currentCategory,
+
   currentTag,
   searchQuery,
-  locale,
+
 }: BlogFiltersProps) {
   const t = useTranslations("Blog");
   const router = useRouter();

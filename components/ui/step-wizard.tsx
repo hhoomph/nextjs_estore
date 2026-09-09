@@ -14,7 +14,7 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
-  Circle,
+
   Loader2,
 } from "lucide-react";
 import * as React from "react";
@@ -36,7 +36,7 @@ interface StepWizardProps {
   steps: WizardStep[];
   currentStep?: number;
   onStepChange?: (step: number) => void;
-  onComplete?: (data?: any) => void;
+  onComplete?: (data?: unknown) => void;
   onCancel?: () => void;
   showProgress?: boolean;
   showNavigation?: boolean;
@@ -45,8 +45,8 @@ interface StepWizardProps {
   variant?: "horizontal" | "vertical" | "compact";
   size?: "sm" | "md" | "lg";
   className?: string;
-  stepData?: Record<string, any>;
-  onStepDataChange?: (stepId: string, data: any) => void;
+  stepData?: Record<string, unknown>;
+
 }
 
 const StepWizard: React.FC<StepWizardProps> = ({
@@ -62,8 +62,8 @@ const StepWizard: React.FC<StepWizardProps> = ({
   variant = "horizontal",
   size = "md",
   className,
-  stepData = {},
-  onStepDataChange,
+  stepData = {} as Record<string, unknown>
+
 }) => {
   const [internalStep, setInternalStep] = React.useState(0);
   const [completedSteps, setCompletedSteps] = React.useState<Set<number>>(
@@ -92,7 +92,7 @@ const StepWizard: React.FC<StepWizardProps> = ({
             setStepStates((prev) => ({ ...prev, [currentStep]: "error" }));
             return;
           }
-        } catch (error) {
+        } catch {
           setStepStates((prev) => ({ ...prev, [currentStep]: "error" }));
           return;
         }

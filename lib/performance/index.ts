@@ -37,7 +37,7 @@ export class PerformanceMonitor {
       });
       lcpObserver.observe({ entryTypes: ["largest-contentful-paint"] });
       this.observers.push(lcpObserver);
-    } catch (e) {
+    } catch {
       console.warn("LCP observer not supported");
     }
 
@@ -52,7 +52,7 @@ export class PerformanceMonitor {
       });
       fidObserver.observe({ entryTypes: ["first-input"] });
       this.observers.push(fidObserver);
-    } catch (e) {
+    } catch {
       console.warn("FID observer not supported");
     }
 
@@ -71,7 +71,7 @@ export class PerformanceMonitor {
       });
       clsObserver.observe({ entryTypes: ["layout-shift"] });
       this.observers.push(clsObserver);
-    } catch (e) {
+    } catch {
       console.warn("CLS observer not supported");
     }
 
@@ -88,7 +88,7 @@ export class PerformanceMonitor {
       });
       navigationObserver.observe({ entryTypes: ["navigation"] });
       this.observers.push(navigationObserver);
-    } catch (e) {
+    } catch {
       console.warn("Navigation observer not supported");
     }
   }
@@ -187,7 +187,7 @@ export function monitorNetworkRequests() {
         }
       });
       observer.observe({ entryTypes: ["resource"] });
-    } catch (e) {
+    } catch {
       console.warn("Network monitoring not supported");
     }
   }

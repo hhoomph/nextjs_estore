@@ -71,7 +71,7 @@ export default function AccountPage() {
 
   useEffect(() => {
     const effectiveUser = isClient && (session?.user || browserSession?.user);
-    if (!effectiveUser?.id) return;
+    if (!isClient || !effectiveUser || !('id' in effectiveUser) || !effectiveUser.id) return;
 
     let cancelled = false;
     const loadStats = async () => {
@@ -140,7 +140,7 @@ export default function AccountPage() {
 
   const effectiveSession = isClient && (session?.user ? session : browserSession);
 
-  if (!effectiveSession?.user) {
+  if (!effectiveSession || !('user' in effectiveSession) || !effectiveSession.user) {
     return (
       <div className="container px-4 py-16 text-center">
         <div className="max-w-md mx-auto">
@@ -464,4 +464,5 @@ export default function AccountPage() {
     </div>
   );
 }
+
 

@@ -58,7 +58,7 @@ function toProductCard(product: Product): ProductCardProduct {
 function SearchBoard() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const t = useTranslations("products");
+  const t = useTranslations("products") as (key: string) => string;
   const initialQuery = searchParams.get("q") || "";
   const searchAbortRef = useRef<AbortController | null>(null);
 
@@ -363,3 +363,4 @@ export default function SearchPage() {
     </Suspense>
   );
 }
+

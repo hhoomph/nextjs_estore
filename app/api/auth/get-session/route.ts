@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 
     const user = {
       ...session.user,
-      role: (session.user as any).role || "USER",
+      role: (session.user as { role?: string }).role || "USER",
     };
 
     return NextResponse.json({

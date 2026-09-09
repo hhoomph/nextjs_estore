@@ -9,7 +9,6 @@ import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/lib/auth/config";
 import { prisma } from "@/lib/database";
-import { ErrorResponse, SuccessResponse } from "@/lib/types/api-responses";
 
 // Force Node.js runtime for Prisma compatibility
 export const runtime = "nodejs";
@@ -45,26 +44,7 @@ interface RecentlyViewedWithProduct {
   };
 }
 
-interface RecentlyViewedResponseItem {
-  id: string;
-  productId: string;
-  viewedAt: Date;
-  product: {
-    id: string;
-    name: string | null;
-    price: number;
-    discountPrice: number | null;
-    slug: string | null;
-    productPictures: Array<{
-      id: string;
-      displayOrder: number;
-      picture: {
-        id: string;
-        url: string;
-      };
-    }>;
-  };
-}
+
 
 /**
  * GET /api/recently-viewed
@@ -227,3 +207,4 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+

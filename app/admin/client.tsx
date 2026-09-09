@@ -6,8 +6,8 @@
  * @since 2025-01-01
  */
 "use client";
-import { AlertTriangle, ChevronUp, ChevronDown, DollarSign, Package, PackagePlus, Settings, ShoppingCart, TrendingUp, Users, UserCheck } from "lucide-react";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { AlertTriangle, ChevronUp, ChevronDown, DollarSign, Package, PackagePlus, Settings, ShoppingCart, Users, UserCheck } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import type * as React from "react";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
@@ -140,9 +140,10 @@ export default function AdminDashboard() {
   const messageTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   // Clear message timeout on unmount
   useEffect(() => {
+    const timeoutId = messageTimeoutRef.current;
     return () => {
-      if (messageTimeoutRef.current) {
-        clearTimeout(messageTimeoutRef.current);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
       }
     };
   }, []);

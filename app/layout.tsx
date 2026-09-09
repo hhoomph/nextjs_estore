@@ -37,13 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     ...seoMetadata,
-    link: [
-      ...(seoMetadata.link || []),
-      { rel: "preload", href: "/fonts/iransansweb.woff2", as: "font", type: "font/woff2", crossOrigin: "anonymous" },
-      { rel: "preload", href: "/fonts/iransansweb_bold.woff2", as: "font", type: "font/woff2", crossOrigin: "anonymous" },
-      { rel: "preload", href: "/fonts/iransansweb_light.woff2", as: "font", type: "font/woff2", crossOrigin: "anonymous" },
-    ],
-  };
+}
 }
 
 export default async function RootLayout({
@@ -127,3 +121,5 @@ export default async function RootLayout({
     </html>
   );
 }
+
+

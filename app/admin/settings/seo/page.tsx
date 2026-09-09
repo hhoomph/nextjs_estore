@@ -2,8 +2,8 @@
 
 export const dynamic = "force-dynamic";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useCallback, useEffect, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -60,9 +60,9 @@ export default function AdminSEOSettingsPage() {
     fetchSettings();
   }, [fetchSettings]);
 
-  const defaultSeoTitle = useMemo(() => form.watch("defaultSeoTitle"), [form]);
-  const defaultSeoDescription = useMemo(() => form.watch("defaultSeoDescription"), [form]);
-  const defaultOgImage = useMemo(() => form.watch("defaultOgImage"), [form]);
+  const defaultSeoTitle = useWatch({ control: form.control, name: "defaultSeoTitle" });
+  const defaultSeoDescription = useWatch({ control: form.control, name: "defaultSeoDescription" });
+  const defaultOgImage = useWatch({ control: form.control, name: "defaultOgImage" });
 
   const onSubmit = async (data: SEOSettingsFormData) => {
     setSaving(true);
@@ -236,4 +236,6 @@ export default function AdminSEOSettingsPage() {
     </div>
   );
 }
+
+
 

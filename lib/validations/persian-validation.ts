@@ -417,11 +417,10 @@ export function createPersianFormValidator<T extends z.ZodSchema>(
   schema: T,
   options: {
     language?: "fa" | "en";
-    strict?: boolean;
     transformErrors?: boolean;
   } = {},
 ) {
-  const { language = "fa", strict = false, transformErrors = true } = options;
+  const { language = "fa", transformErrors = true } = options;
 
   return (
     data: unknown,

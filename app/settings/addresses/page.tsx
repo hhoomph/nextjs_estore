@@ -41,6 +41,7 @@ import { useSession } from "@/lib/auth-client";
 
 export default function AddressesPage() {
   const { data: session, isPending } = useSession();
+  const t = useTranslations("Addresses");
   const [activeTab, setActiveTab] = useState("list");
   const [isClient, setIsClient] = useState(false);
 
@@ -48,7 +49,7 @@ export default function AddressesPage() {
     setIsClient(true);
   }, []);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingAddress, setEditingAddress] = useState<any>(null);
+  const [editingAddress, setEditingAddress] = useState<Record<string, unknown> | undefined>(undefined);
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
@@ -57,19 +58,19 @@ export default function AddressesPage() {
     }
   }, [session, isPending]);
 
-  const handleEditAddress = (address: any) => {
-    setEditingAddress(address);
+  const handleEditAddress = (address: Record<string, unknown>) => {
+    setEditingAddress(address as Record<string, unknown>);
     setDialogOpen(true);
   };
 
   const handleAddNew = () => {
-    setEditingAddress(null);
+    setEditingAddress(undefined);
     setDialogOpen(true);
   };
 
   const handleFormSuccess = () => {
     setDialogOpen(false);
-    setEditingAddress(null);
+    setEditingAddress(undefined);
     setRefreshKey((prev) => prev + 1); // Trigger refresh
   };
 

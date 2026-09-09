@@ -170,7 +170,7 @@ export function validateCsrfTokenFromSession(
  * session.csrfToken = token;
  * ```
  */
-export function getCachedCsrfToken(session: any): string {
+export function getCachedCsrfToken(session: unknown): string {
   // Return cached token if it's fresh
   if (session.csrfToken && !isTokenExpired(session.csrfTokenTimestamp)) {
     return session.csrfToken;
@@ -212,7 +212,7 @@ export function isTokenExpired(timestamp: number): boolean {
  * ```
  */
 export function createCsrfMiddleware() {
-  return (req: any, res: any, next: any) => {
+  return (req: unknown, res: unknown, next: () => void) => {
     // Get token from headers or cookies
     const token =
       req.headers['x-csrf-token'] ||
@@ -241,7 +241,7 @@ export function createCsrfMiddleware() {
  * const token = getTokenFromRequest(req);
  * ```
  */
-export function getTokenFromRequest(req: any): string | null {
+export function getTokenFromRequest(req: unknown): string | null {
   return (
     req.headers['x-csrf-token'] ||
     req.cookies?.csrfToken ||
@@ -261,7 +261,7 @@ export function getTokenFromRequest(req: any): string | null {
  * setCsrfTokenInResponse(res, token);
  * ```
  */
-export function setCsrfTokenInResponse(res: any, token: string) {
+export function setCsrfTokenInResponse(res: unknown, token: string) {
   res.setHeader('X-CSRF-Token', token);
   res.cookie('csrfToken', token, {
     httpOnly: true,

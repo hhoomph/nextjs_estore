@@ -9,6 +9,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type * as React from "react";
+import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import {
   AlertTriangle,
@@ -35,6 +36,7 @@ type TabType = "overview" | "users" | "analytics" | "settings";
 
 export function AdminDashboard({ session }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<TabType>("overview");
+  const router = useRouter();
   const [stats, setStats] = useState({
     totalUsers: 0,
     activeUsers: 0,
@@ -66,7 +68,7 @@ export function AdminDashboard({ session }: AdminDashboardProps) {
 
   const handleSignOut = async () => {
     await authClient.signOut();
-    window.location.href = "/";
+    router.push("/");
   };
 
   return (

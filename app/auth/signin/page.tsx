@@ -16,7 +16,6 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { FormEvent } from "react";
 import * as z from "zod";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,15 +29,13 @@ const signInSchema = z.object({
   password: z.string().min(6),
 });
 
-type SignInForm = z.infer<typeof signInSchema>;
-
 export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
-  const t = useTranslations("auth.signin");
+  const t = useTranslations("auth.signin") as (key: string, options?: Record<string, unknown>) => string;
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -198,3 +195,5 @@ export default function SignInPage() {
     </div>
   );
 }
+
+

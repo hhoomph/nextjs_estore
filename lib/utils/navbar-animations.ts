@@ -81,21 +81,13 @@ export const navbarAnimationPresets = {
 
 // Create transition utility
 export function createNavbarTransition(
-  from: Record<string, any>,
-  to: Record<string, any>,
+  from: Record<string, unknown>,
+  to: Record<string, unknown>,
   config: AnimationConfig = {},
 ): string {
   const { duration = 300, easing = "ease-out", delay = 0 } = config;
 
-  const fromProps = Object.entries(from)
-    .map(([key, value]) => `${key}: ${value}`)
-    .join("; ");
-
-  const toProps = Object.entries(to)
-    .map(([key, value]) => `${key}: ${value}`)
-    .join("; ");
-
-  return `transition: all ${duration}ms ${easing} ${delay}ms;`;
+  return `transition: all ${duration}ms ${easing} ${delay}ms`;
 }
 
 // Performance optimization utilities

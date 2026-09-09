@@ -133,7 +133,7 @@ export async function compressionMiddleware(
 export async function performanceMonitoringMiddleware(
   request: NextRequest,
 ): Promise<NextResponse | null> {
-  const startTime = Date.now();
+  
   const url = request.nextUrl.pathname;
 
   // Log request start
@@ -171,9 +171,7 @@ export async function resourceOptimizationMiddleware(
 /**
  * Database query optimization middleware
  */
-export async function databaseOptimizationMiddleware(
-  request: NextRequest,
-): Promise<NextResponse | null> {
+export async function databaseOptimizationMiddleware(request: NextRequest): Promise<NextResponse | null> {
   // This would integrate with your ORM to add query optimization
   // For Prisma, we can add query logging and optimization hints
 
@@ -400,3 +398,4 @@ export function monitorMemoryUsage() {
 
   return null;
 }
+

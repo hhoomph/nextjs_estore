@@ -10,7 +10,6 @@
  */
 
 import DOMPurify from 'dompurify';
-import { useEffect, useState } from 'react';
 
 /**
  * Sanitize HTML content to prevent XSS attacks
@@ -359,7 +358,7 @@ export function sanitizeSqlParam(param: string): string {
  * // Returns: { test: 1 }
  * ```
  */
-export function sanitizeJson<T = any>(json: string): T | null {
+export function sanitizeJson<T = unknown>(json: string): T | null {
   try {
     const parsed = JSON.parse(json);
     return parsed;

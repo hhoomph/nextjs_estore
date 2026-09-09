@@ -14,6 +14,7 @@ import { BlogCategories } from "@/components/blog/blog-categories";
 import { BlogPostList } from "@/components/blog/blog-post-list";
 import { BlogSearch } from "@/components/blog/blog-search";
 import prisma from "@/lib/prisma";
+import type { BlogPostListData, BlogCategoryWithCount } from "@/components/blog/types";
 
 export async function generateMetadata({
   searchParams,
@@ -54,8 +55,8 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const page = parseInt(params.page as string) || 1;
   const limit = 12;
 
-  let posts: any[] = [];
-  let categories: any[] = [];
+  let posts: BlogPostListData[] = [];
+  let categories: BlogCategoryWithCount[] = [];
   let totalPages = 0;
 
   try {

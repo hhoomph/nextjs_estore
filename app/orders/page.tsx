@@ -54,9 +54,9 @@ export default function OrdersPage() {
     setIsClient(true);
   }, []);
 
+  const userId = session?.user?.id;
   useEffect(() => {
-    if (!session?.user) return;
-
+    if (!userId) return;
     const loadOrders = async () => {
       setLoading(true);
       setError("");
@@ -79,7 +79,7 @@ export default function OrdersPage() {
     };
 
     void loadOrders();
-  }, [session?.user?.id]);
+  }, [userId]);
 
   if (!isClient || isPending || loading) {
     return (
@@ -99,7 +99,7 @@ export default function OrdersPage() {
           <h1 className="text-2xl font-bold mb-4">{t("pleaseSignIn")}</h1>
           <p className="text-muted-foreground mb-6">{t("signInRequired")}</p>
           <Button asChild={true}>
-            <Link href="/auth/signin?redirect=/orders">{t("signIn")}</Link>
+            <Link href="/auth/signin?redirect=/orders">{t("pleaseSignIn")}</Link>
           </Button>
         </div>
       </div>
@@ -179,3 +179,7 @@ export default function OrdersPage() {
     </div>
   );
 }
+
+
+
+

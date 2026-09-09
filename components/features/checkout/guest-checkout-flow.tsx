@@ -5,6 +5,7 @@ import Link from "next/link";
 import { lazy, Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { checkoutContactSchema } from "@/lib/validations/checkout";
 import { SHIPPING_COST, TAX_RATE } from "@/lib/constants/checkout";
 import type { EnhancedCartItem } from "@/types/cart";
 import { CheckoutProgress } from "./checkout-progress";
@@ -22,12 +23,7 @@ const ReviewStep = lazy(() =>
   import("./steps/review-step").then((m) => ({ default: m.ReviewStep })),
 );
 
-const guestCheckoutSchema = z
-  .object({
-    email: z.string().email("Please enter a valid email address"),
-    firstName: z.string().min(1, "First name is required"),
-    lastName: z.string().min(1, "Last name is required"),
-    phone: z.string().min(10, "Please enter a valid phone number"),
+const guestCheckoutSchema = checkoutContactSchema.extend({
     shippingAddress: z.object({
       address_line1: z.string().min(1, "Address is required"),
       address_line2: z.string().optional(),
@@ -54,9 +50,6 @@ const guestCheckoutSchema = z
       cvv: z.string().min(3, "CVV must be at least 3 digits"),
       cardName: z.string().min(1, "Cardholder name is required"),
     }),
-    createAccount: z.boolean(),
-    password: z.string().optional(),
-    confirmPassword: z.string().optional(),
   })
   .refine(
     (data) => {
@@ -105,7 +98,7 @@ export function GuestCheckoutFlow({
   const [billingSameAsShipping, setBillingSameAsShipping] = useState(true);
 
   const form = useForm<GuestCheckoutFormData>({
-    resolver: zodResolver(guestCheckoutSchema),
+    resolver: zodResolver(guestCheckoutSchema as any),
     defaultValues: {
       email: "",
       firstName: "",
@@ -132,25 +125,6 @@ export function GuestCheckoutFlow({
     },
   });
 
-  const watchedCreateAccount = form.watch("createAccount");
-
-  const handleContactSubmit = form.handleSubmit(() => {
-    setCurrentStep("shipping");
-  });
-
-  const handleShippingSubmit = form.handleSubmit((data) => {
-    if (!billingSameAsShipping && !data.billingAddress) {
-      form.setError("billingAddress.address_line1", {
-        message: "Billing address is required",
-      });
-      return;
-    }
-    setCurrentStep("payment");
-  });
-
-  const handlePaymentSubmit = form.handleSubmit(() => {
-    setCurrentStep("review");
-  });
 
   const handleFinalSubmit = form.handleSubmit(async (data) => {
     setIsSubmitting(true);
@@ -231,12 +205,12 @@ export function GuestCheckoutFlow({
 
       <Suspense fallback={<LoadingStep />}>
         {currentStep === "contact" && (
-          <ContactStep form={form} onNext={() => setCurrentStep("shipping")} />
+          <ContactStep form={form as any} onNext={() => setCurrentStep("shipping")} />
         )}
 
         {currentStep === "shipping" && (
           <ShippingStep
-            form={form}
+            form={form as any}
             billingSameAsShipping={billingSameAsShipping}
             setBillingSameAsShipping={setBillingSameAsShipping}
             onNext={() => setCurrentStep("payment")}
@@ -246,7 +220,7 @@ export function GuestCheckoutFlow({
 
         {currentStep === "payment" && (
           <PaymentStep
-            form={form}
+            form={form as any}
             onNext={() => setCurrentStep("review")}
             onPrevious={goToPreviousStep}
           />
@@ -277,4 +251,6 @@ export function GuestCheckoutFlow({
     </div>
   );
 }
+
+
 

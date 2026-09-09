@@ -15,37 +15,6 @@ import { validateRequestSize } from "@/lib/security/sanitization";
 import type { ApiResponse } from "@/types/api/responses";
 
 // Type definitions for API helpers
-interface ProductWhereClause {
-  status?: number;
-  OR?: Array<{
-    name?: { contains: string; mode: string };
-    desc?: { contains: string; mode: string };
-  }>;
-  categoryId?: string;
-  price?: {
-    gte?: number;
-    lte?: number;
-  };
-  quantity?: { gt: number };
-}
-
-interface ProductWithPictures {
-  id: string;
-  name: string | null;
-  desc: string | null;
-  slug: string | null;
-  price: number; // Prisma Decimal converted to number
-  discountPrice: number | null; // Prisma Decimal converted to number
-  quantity: number;
-  categoryId: string | null;
-  productPictures: Array<{
-    picture: {
-      url: string;
-    };
-  }>;
-  createdAt: Date;
-}
-
 interface TransformedProduct {
   id: string;
   name: string | null;
@@ -61,18 +30,6 @@ interface TransformedProduct {
   images: string[];
   inStock: boolean;
   createdAt: Date;
-}
-
-interface CachedResult {
-  data: TransformedProduct[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    pages: number;
-    hasNext: boolean;
-    hasPrev: boolean;
-  };
 }
 
 // Error response helper

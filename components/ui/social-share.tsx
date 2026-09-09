@@ -21,7 +21,7 @@ import type { ProductShareData } from "@/lib/utils/social-sharing";
 import {
   createProductShareData,
   getAvailablePlatforms,
-  isPlatformSupported,
+  
   SOCIAL_PLATFORMS,
   shareProduct,
 } from "@/lib/utils/social-sharing";

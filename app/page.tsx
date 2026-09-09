@@ -1,10 +1,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LoadingPage } from "@/components/ui/loading";
-import { ProductPrice } from "@/components/ui/product-price";
 import { SectionHeading } from "@/components/features/layout/section-heading";
 import { HomeHero, type HomeHeroProduct } from "@/components/features/home/home-hero";
 import { HomePromoGrid } from "@/components/features/home/home-promo-grid";
@@ -264,3 +262,4 @@ export default async function HomePage() {
     </div>
   );
 }
+

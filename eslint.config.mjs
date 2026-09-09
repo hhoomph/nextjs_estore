@@ -1,6 +1,7 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
+import reactHooksPlugin from "eslint-plugin-react-hooks";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -27,6 +28,7 @@ const eslintConfig = defineConfig([
       "playwright-report/**",
       "playwright-smoke-report/**",
       "app/generated/**",
+      "lib/generated/**",
       "design-to-code-mcp/**",
       "fix-*.cjs",
     ],
@@ -39,6 +41,9 @@ const eslintConfig = defineConfig([
     },
   },
   {
+    plugins: {
+      "react-hooks": reactHooksPlugin,
+    },
     rules: {
       "@next/next/no-img-element": "off",
       "@typescript-eslint/no-explicit-any": "warn",

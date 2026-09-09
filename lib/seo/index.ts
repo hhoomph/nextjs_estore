@@ -436,13 +436,13 @@ export const metaTags = {
 // Performance monitoring utilities
 export const performance = {
   // Core Web Vitals tracking
-  trackWebVitals: (metric: any) => {
+  trackWebVitals: (metric: { name: string; id: string; value: number }) => {
     // Send to analytics service
     console.log("Web Vitals:", metric);
 
     // Example: Send to Google Analytics
-    if (typeof window !== "undefined" && (window as any).gtag) {
-      (window as any).gtag("event", metric.name, {
+    if (typeof window !== "undefined" && (window as unknown as Record<string, unknown>).gtag) {
+      ((window as unknown) as { gtag: (...args: unknown[]) => void }).gtag("event", metric.name, {
         event_category: "Web Vitals",
         event_label: metric.id,
         value: Math.round(
@@ -458,8 +458,8 @@ export const performance = {
     console.log(`Page ${page} loaded in ${loadTime}ms`);
 
     // Send to analytics
-    if (typeof window !== "undefined" && (window as any).gtag) {
-      (window as any).gtag("event", "page_load_time", {
+    if (typeof window !== "undefined" && (window as unknown as Record<string, unknown>).gtag) {
+      ((window as unknown) as { gtag: (...args: unknown[]) => void }).gtag("event", "page_load_time", {
         event_category: "Performance",
         event_label: page,
         value: loadTime,

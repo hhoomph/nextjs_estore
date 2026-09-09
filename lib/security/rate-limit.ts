@@ -130,10 +130,10 @@ export function checkRateLimit(
  * ```
  */
 export function withRateLimit<T>(
-  handler: (request: Request, ...args: any[]) => Promise<NextResponse<T>>,
+  handler: (request: Request, ...args: unknown[]) => Promise<NextResponse<T>>,
   config: Partial<RateLimitConfig> = {},
-): (request: Request, ...args: any[]) => Promise<NextResponse<T | { error: string; retryAfterMs: number }>> {
-  return async (request: Request, ...args: any[]) => {
+): (request: Request, ...args: unknown[]) => Promise<NextResponse<T | { error: string; retryAfterMs: number }>> {
+  return async (request: Request, ...args: unknown[]) => {
     const ip =
       request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       request.headers.get("x-real-ip") ||

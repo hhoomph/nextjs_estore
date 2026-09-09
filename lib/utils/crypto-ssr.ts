@@ -65,7 +65,7 @@ export async function subtleDigest(
 ): Promise<ArrayBuffer> {
   if (isWebCryptoAvailable) {
     // Type cast to bypass TypeScript strict typing issue
-    return crypto.subtle.digest(algorithm, data as any);
+    return crypto.subtle.digest(algorithm, data as BufferSource);
   }
 
   // Server-side fallback using Node.js crypto

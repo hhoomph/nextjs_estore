@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Module for admin layout
  *
  * @author hh.oomph@gmail.com
@@ -377,7 +377,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                 <div key={groupKey} className="mb-6">
                   {/* Group section title */}
                   <p className={cn("mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground", sidebarClasses.section.title)}>
-                    {tAdminNav(`groups.${NAV_GROUPS[groupKey].labelKey}`)}
+                    {tAdminNav(`groups.${NAV_GROUPS[groupKey].labelKey}` as any)}
                   </p>
                   {/* Group items */}
                   <div className="space-y-1">
@@ -397,7 +397,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                           {...navTestProps}
                         >
                           <Icon className="mr-3 h-5 w-5 shrink-0 rtl:ml-3 rtl:mr-0" />
-                          <span suppressHydrationWarning={true}>{tAdminNav(item.label)}</span>
+                          <span suppressHydrationWarning={true}>{tAdminNav(item.label as any)}</span>
                         </button>
                       );
                     })}
@@ -477,7 +477,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                           <SelectContent>
                             {DENSITY_OPTIONS.map((option) => (
                               <SelectItem key={option.value} value={option.value}>
-                                {tAdmin(option.labelKey)}
+                                {tAdmin(option.labelKey as any)}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -500,7 +500,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                                 className="flex flex-col items-center gap-1 rounded-xl border border-border p-2 text-xs transition-colors hover:bg-muted"
                               >
                                 <Icon className="h-4 w-4" />
-                                {tAdmin(themeOption.labelKey)}
+                                {tAdmin(themeOption.labelKey as any)}
                               </button>
                             );
                           })}
@@ -638,7 +638,6 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                   <p className="px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">{tAdmin("quickLinks")}</p>
                   <div className="space-y-1">
                     <SearchQuickLink
-                      href="/admin"
                       label={tAdminNav("dashboard")}
                       icon={LayoutDashboard}
                       onSelect={() => {
@@ -647,7 +646,6 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                       }}
                     />
                     <SearchQuickLink
-                      href="/admin/products"
                       label={tAdminNav("products")}
                       icon={Package}
                       onSelect={() => {
@@ -656,7 +654,6 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                       }}
                     />
                     <SearchQuickLink
-                      href="/admin/users"
                       label={tAdminNav("users")}
                       icon={Users}
                       onSelect={() => {
@@ -665,7 +662,6 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
                       }}
                     />
                     <SearchQuickLink
-                      href="/admin/analytics"
                       label={tAdminNav("analytics")}
                       icon={BarChart3}
                       onSelect={() => {
@@ -687,7 +683,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     </AdvancedErrorBoundary>
   );
 }
-function SearchQuickLink({ href, label, icon: Icon, onSelect }: { href: string; label: string; icon: LucideIcon; onSelect: () => void }) {
+function SearchQuickLink({ label, icon: Icon, onSelect }: { label: string; icon: LucideIcon; onSelect: () => void }) {
   return (
     <button onClick={onSelect} className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm transition-colors hover:bg-muted">
       <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">

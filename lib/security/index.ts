@@ -6,7 +6,6 @@
  * @since 2025-01-01
  */
 
-import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 import { getRandomValues, randomUUID, subtleDigest } from "../utils/crypto-ssr";
 
@@ -45,8 +44,6 @@ export function createRateLimit(config: RateLimitConfig) {
     const clientId = identifier || getClientIP(request);
 
     const now = Date.now();
-    const windowStart = now - config.windowMs;
-
     // Get current rate limit data
     let clientData = rateLimitStore.get(clientId);
 
@@ -440,7 +437,6 @@ export function createAPISecurityMiddleware(options: {
 }) {
   return async function apiSecurityMiddleware(
     request: NextRequest,
-    context?: { params?: Record<string, string> },
   ): Promise<NextResponse | null> {
     // Rate limiting
     if (options.rateLimit) {

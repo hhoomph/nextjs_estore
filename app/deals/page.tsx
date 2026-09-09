@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowRight, Clock, Percent, Tag } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +23,7 @@ interface Product {
 }
 
 interface ProductResult {
+  error?: string;
   data: Product[];
   pagination: {
     total: number;
@@ -49,7 +50,7 @@ export default function DealsPage() {
   const [error, setError] = useState("");
   const { addToCart } = useCartActions();
 
-  const controllerRef = { current: null as AbortController | null };
+  const controllerRef = useRef<AbortController | null>(null);
 
   const fetchDeals = useCallback(async () => {
     setLoading(true);
@@ -228,4 +229,9 @@ export default function DealsPage() {
     </main>
   );
 }
+
+
+
+
+
 

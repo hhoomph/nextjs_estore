@@ -1,3 +1,5 @@
+"use client";
+import { z } from "zod";
 /**
  * Module for AddressForm
  *
@@ -5,7 +7,6 @@
  * @version 1.0.0
  * @since 2025-01-01
  */
-"use client";
 
 /**
  * Address Form Component - Create and Edit User Addresses
@@ -26,12 +27,12 @@
  */
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, MapPin, Save, X } from "lucide-react";
+import { Loader2, Save, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
@@ -51,23 +52,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  createAddress,
-  getUserAddresses,
-  updateAddress,
-} from "@/lib/actions/addresses";
+
+import { createAddress, updateAddress } from "@/lib/actions/addresses";
 import { useSession } from "@/lib/auth-client";
 import { useToast } from "@/lib/hooks/use-toast";
-import {
-  convertPersianToEnglish,
-  formatPhoneNumber,
-  sanitizeIranianPhone,
-} from "@/lib/utils/persian";
+
 import { addressSchema } from "@/lib/validations/schemas/address";
 
 interface AddressFormProps {
-  address?: any;
+  address?: Record<string, unknown>;
   onSuccess: () => void;
   onCancel: () => void;
 }
@@ -212,43 +205,43 @@ export function AddressForm({
   const { data: session } = useSession();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [setAsDefault, setSetAsDefault] = useState(
-    address?.is_default || false,
+  const [setAsDefault, setSetAsDefault] = useState<boolean>(
+    (address?.is_default as boolean) || false,
   );
 
   const form = useForm({
     resolver: zodResolver(addressSchema),
     defaultValues: {
-      address_line1: address?.address_line1 || "",
-      address_line2: address?.address_line2 || "",
-      city: address?.city || "",
-      state: address?.state || "",
-      postal_code: address?.postal_code || "",
-      telephone: address?.telephone || "",
-      mobile: address?.mobile || "",
-      location: address?.location || "",
-      is_default: address?.is_default || false,
+      address_line1: (address?.address_line1 as string) || "",
+      address_line2: (address?.address_line2 as string) || "",
+      city: (address?.city as string) || "",
+      state: (address?.state as string) || "",
+      postal_code: (address?.postal_code as string) || "",
+      telephone: (address?.telephone as string) || "",
+      mobile: (address?.mobile as string) || "",
+      location: (address?.location as string) || "",
+      is_default: (address?.is_default as boolean) || false,
     },
   });
 
   useEffect(() => {
     if (address) {
       form.reset({
-        address_line1: address.address_line1 || "",
-        address_line2: address.address_line2 || "",
-        city: address.city || "",
-        state: address.state || "",
-        postal_code: address.postal_code || "",
-        telephone: address.telephone || "",
-        mobile: address.mobile || "",
-        location: address.location || "",
-        is_default: address.is_default || false,
+        address_line1: (address.address_line1 as string) || "",
+        address_line2: (address.address_line2 as string) || "",
+        city: (address.city as string) || "",
+        state: (address.state as string) || "",
+        postal_code: (address.postal_code as string) || "",
+        telephone: (address.telephone as string) || "",
+        mobile: (address.mobile as string) || "",
+        location: (address.location as string) || "",
+        is_default: (address.is_default as boolean) || false,
       });
-      setSetAsDefault(address.is_default || false);
+      setSetAsDefault((address.is_default as boolean) || false);
     }
   }, [address, form]);
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: z.infer<typeof addressSchema>) => {
     if (!session?.user?.id) {
       toast({
         title: "Error",
@@ -268,7 +261,7 @@ export function AddressForm({
       if (address) {
         // Update existing address
         const result = await updateAddress(session.user.id, {
-          id: address.id,
+          id: address.id as string,
           ...formData,
         });
 
@@ -522,3 +515,11 @@ export function AddressForm({
     </Form>
   );
 }
+
+
+
+
+
+
+
+

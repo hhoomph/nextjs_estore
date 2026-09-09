@@ -7,7 +7,7 @@
  */
 "use client";
 
-import type { LatLng, Map as LeafletMap, LeafletMouseEvent } from "leaflet";
+import type { Map as LeafletMap, LeafletMouseEvent } from "leaflet";
 import { Loader2, MapPin, Navigation, RefreshCw } from "lucide-react";
 // Dynamically import Leaflet components to avoid SSR issues
 import dynamic from "next/dynamic";
@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from "react";
 import { useMapEvents } from "react-leaflet";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { getUserAddresses } from "@/lib/actions/addresses";
 import { useSession } from "@/lib/auth-client";
 import { useToast } from "@/lib/hooks/use-toast";
@@ -99,9 +99,11 @@ export function AddressMap({}: AddressMapProps) {
     }
   };
 
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     fetchAddresses();
   }, [session?.user?.id]);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   // Parse coordinates from address.location string
   const parseCoordinates = (location: string): [number, number] | null => {

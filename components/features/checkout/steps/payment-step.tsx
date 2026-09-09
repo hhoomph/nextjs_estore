@@ -1,12 +1,13 @@
 import { CreditCard } from "lucide-react";
+import type { UseFormReturn } from "react-hook-form";
+import type { GuestCheckoutFormData } from "../guest-checkout-flow";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { GuestCheckoutFormData } from "../guest-checkout-flow";
 
 interface PaymentStepProps {
-  form: any;
+  form: UseFormReturn<GuestCheckoutFormData>;
   onNext: () => void;
   onPrevious: () => void;
 }
@@ -137,3 +138,5 @@ export function PaymentStep({ form, onNext, onPrevious }: PaymentStepProps) {
     </Card>
   );
 }
+
+

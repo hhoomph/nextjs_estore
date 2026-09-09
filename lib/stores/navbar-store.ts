@@ -49,7 +49,7 @@ const initialRealTimeData: RealTimeData = {
 };
 
 export const useNavbarStore = create<NavbarState>()(
-  subscribeWithSelector((set, get) => ({
+  subscribeWithSelector((set, _get) => ({
     // Initial state
     isSessionLoading: true,
     lastSessionUpdate: null,
