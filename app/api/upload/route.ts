@@ -19,8 +19,17 @@ export async function POST(request: NextRequest) {
   try {
     const session = await auth.api.getSession({ headers: request.headers });
 
-    if (!session?.user?.id || session.user.role !== "ADMIN") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const url = new URL(request.url);
+    const uploadType = url.searchParams.get("type") || "product";
+
+    if (uploadType === "avatar") {
+      if (!session?.user?.id) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+    } else {
+      if (!session?.user?.id || session.user.role !== "ADMIN") {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
     }
 
     const data = await request.formData();
@@ -54,7 +63,7 @@ export async function POST(request: NextRequest) {
 
     const fileName = `${randomUUID()}.${rawExtension}`;
     const buffer = Buffer.from(await file.arrayBuffer());
-    const uploadDir = join(process.cwd(), "public", "uploads", "products");
+    const uploadDir = join(process.cwd(), "public", "uploads", uploadType === "avatar" ? "avatars" : "products");
 
     await mkdir(uploadDir, { recursive: true });
     await writeFile(join(uploadDir, fileName), buffer);
@@ -65,8 +74,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      url: `/uploads/products/${fileName}`,
-      fullUrl: `${baseUrl}/uploads/products/${fileName}`,
+      url: `/uploads/${uploadType === "avatar" ? "avatars" : "products"}/${fileName}`,
+      fullUrl: `${baseUrl}/uploads/${uploadType === "avatar" ? "avatars" : "products"}/${fileName}`,
       fileName,
     });
   } catch (error) {

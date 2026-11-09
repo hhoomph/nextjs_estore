@@ -7,7 +7,7 @@
  */
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // Force dynamic rendering to avoid prerendering issues
 export const dynamic = "force-dynamic";
@@ -105,6 +105,7 @@ function CurrencySelector() {
 const profileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
+  bio: z.string().max(500).optional(),
 });
 
 const passwordSchema = z
@@ -134,6 +135,8 @@ export default function SettingsPage() {
   const tCommon = useTranslations("Common Actions");
   const tNav = useTranslations("Navigation");
   const [activeTab, setActiveTab] = useState("profile");
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -184,6 +187,26 @@ export default function SettingsPage() {
       email: effectiveSession?.user?.email || "",
     },
   });
+  useEffect(() => {
+    if (effectiveSession?.user) {
+      setNotifications({
+        emailOrders: effectiveSession.user.emailOrders ?? true,
+        emailPromotions: effectiveSession.user.emailPromotions ?? false,
+        emailNewsletter: effectiveSession.user.emailNewsletter ?? true,
+        pushOrders: effectiveSession.user.pushOrders ?? true,
+        pushPromotions: effectiveSession.user.pushPromotions ?? false,
+      });
+    }
+  }, [effectiveSession?.user?.id]);
+
+  useEffect(() => {
+    if (effectiveSession?.user) {
+      profileForm.reset({
+        name: effectiveSession.user.name || "",
+        email: effectiveSession.user.email || "",
+      });
+    }
+  }, [effectiveSession?.user?.id]);
 
   const passwordForm = useForm<PasswordForm>({
     resolver: zodResolver(passwordSchema),
@@ -254,6 +277,32 @@ export default function SettingsPage() {
     }
   };
 
+
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !effectiveSession?.user?.id) return;
+    setPhotoUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const uploadRes = await fetch("/api/upload?type=avatar", { method: "POST", body: formData });
+      if (!uploadRes.ok) throw new Error("Upload failed");
+      const { url } = await uploadRes.json();
+      const updateRes = await fetch(`/api/users/${effectiveSession.user.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: url }),
+      });
+      if (!updateRes.ok) throw new Error("Failed to update profile picture");
+      console.log("Profile picture updated");
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setPhotoUploading(false);
+    }
+  };
+
   const onPasswordSubmit = async (data: PasswordForm) => {
     try {
       const response = await fetch("/api/auth/change-password", {
@@ -271,6 +320,43 @@ export default function SettingsPage() {
     } catch (error) {
       console.error(error);
       // Can show an error toast here
+    }
+  };
+
+
+  const saveNotifications = async () => {
+    if (!effectiveSession?.user?.id) return;
+    try {
+      const res = await fetch(`/api/users/${effectiveSession.user.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(notifications),
+      });
+      if (!res.ok) throw new Error("Failed");
+      console.log("Notifications saved");
+      alert("Notification settings saved");
+    } catch (e) {
+      console.error(e);
+      alert("Failed to save notification settings");
+    }
+  };
+
+  const savePreferences = async () => {
+    if (!effectiveSession?.user?.id) return;
+    try {
+      const res = await fetch(`/api/users/${effectiveSession.user.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          preferredTheme: theme,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      console.log("Preferences saved");
+      alert("Preferences saved");
+    } catch (e) {
+      console.error(e);
+      alert("Failed to save preferences");
     }
   };
 
@@ -395,6 +481,21 @@ export default function SettingsPage() {
                           )}
                         </div>
                       </div>
+
+                       <div className="space-y-2">
+                         <Label htmlFor="bio">Bio</Label>
+                         <textarea
+                           id="bio"
+                           {...profileForm.register("bio")}
+                           placeholder="Tell us about yourself"
+                           className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                         />
+                         {profileForm.formState.errors.bio && (
+                           <p className="text-sm text-destructive">
+                             {profileForm.formState.errors.bio.message}
+                           </p>
+                         )}
+                       </div>
 
                       <div className="flex items-center gap-2 pt-4">
                         <Badge variant="secondary">
@@ -684,6 +785,12 @@ export default function SettingsPage() {
               </Card>
             </TabsContent>
 
+              <div className="flex justify-end pt-4">
+                <Button onClick={saveNotifications}>
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Notification Settings
+                </Button>
+              </div>
             {/* Preferences Tab */}
             <TabsContent value="preferences" className="mt-6">
               <div className="space-y-6">
@@ -756,10 +863,15 @@ export default function SettingsPage() {
                 </Card>
               </div>
             </TabsContent>
+              <div className="flex justify-end pt-4">
+                <Button onClick={savePreferences}>
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Preferences
+                </Button>
+              </div>
           </Tabs>
         </div>
       </div>
     </div>
   );
 }
-

@@ -59,6 +59,8 @@ export type ErrorSeverity = "low" | "medium" | "high" | "critical";
 
 export class EnhancedErrorBoundary extends Component<Props, State> {
   private retryTimeoutId: NodeJS.Timeout | null = null;
+  private hasHandledError = false;
+  private static handledDevtoolsError = false;
 
   constructor(props: Props) {
     super(props);
@@ -70,7 +72,19 @@ export class EnhancedErrorBoundary extends Component<Props, State> {
     };
   }
 
-  static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): State | null {
+    const isSimulatedDevtools =
+      process.env.NODE_ENV === "development" &&
+      error?.message?.includes("Simulated error coming from DevTools");
+
+    if (isSimulatedDevtools) {
+      if (EnhancedErrorBoundary.handledDevtoolsError) {
+        // Already handled once; avoid re-render loop by not updating state.
+        return null;
+      }
+      EnhancedErrorBoundary.handledDevtoolsError = true;
+    }
+
     return {
       hasError: true,
       error,
@@ -99,6 +113,14 @@ export class EnhancedErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    if (this.hasHandledError) return;
+    if (
+      process.env.NODE_ENV === "development" &&
+      error?.message?.includes("Simulated error coming from DevTools")
+    ) {
+      return;
+    }
+    this.hasHandledError = true;
     console.error("EnhancedErrorBoundary caught an error:", error, errorInfo);
 
     // Categorize and assess severity of the error
@@ -156,6 +178,7 @@ export class EnhancedErrorBoundary extends Component<Props, State> {
     this.setState({ isRetrying: true, retryCount: retryCount + 1 });
 
     this.retryTimeoutId = setTimeout(() => {
+      this.hasHandledError = false;
       this.setState({
         hasError: false,
         error: undefined,

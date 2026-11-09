@@ -32,6 +32,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AddressList } from "@/components/features/addresses/AddressList";
+import { AddressForm } from "@/components/features/addresses/AddressForm";
 import { formatAmount } from "@/lib/utils/currency";
 import { useCurrencyStore } from "@/lib/stores/currency-store";
 import { signOut, useSession } from "@/lib/auth-client";
@@ -39,6 +41,8 @@ import { useTranslations } from "next-intl";
 
 export default function AccountPage() {
   const t = useTranslations("Account");
+  const [showAddressForm, setShowAddressForm] = useState(false);
+  const [editingAddress, setEditingAddress] = useState<any>(null);
   const { data: session, isPending, refetch } = useSession();
   const { currency } = useCurrencyStore();
   const [activeTab, setActiveTab] = useState("overview");
@@ -437,26 +441,18 @@ export default function AccountPage() {
 
             {/* Addresses Tab */}
             <TabsContent value="addresses" className="mt-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>{t("savedAddresses")}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-12">
-                    <MapPin className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">
-                      {t("noAddressesSaved")}
-                    </h3>
-                    <p className="text-muted-foreground mb-6">
-                      {t("addressesDescription")}
-                    </p>
-                    <Button>
-                      <Edit className="h-4 w-4 mr-2" />
-                      {t("addAddress")}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              {showAddressForm ? (
+                <AddressForm
+                  address={editingAddress || undefined}
+                  onSuccess={() => { setShowAddressForm(false); setEditingAddress(null); }}
+                  onCancel={() => { setShowAddressForm(false); setEditingAddress(null); }}
+                />
+              ) : (
+                <AddressList
+                  onEdit={(addr: any) => { setEditingAddress(addr); setShowAddressForm(true); }}
+                  onAddNew={() => { setEditingAddress(null); setShowAddressForm(true); }}
+                />
+              )}
             </TabsContent>
           </Tabs>
         </div>

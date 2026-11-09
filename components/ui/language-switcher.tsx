@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Language Switcher Component
  *
  * Switches language using cookies and client-side navigation without page reload.
@@ -54,6 +54,9 @@ export function LanguageSwitcher(props: { "data-testid"?: string } = {}) {
       await new Promise((resolve) => setTimeout(resolve, 50));
       // Refresh client components and re-render server components with the new locale
       router.refresh();
+      // Wait for refresh to complete before re-enabling the button
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      setIsLoading(false);
     } catch (error) {
       console.error("Error switching language:", error);
       setIsLoading(false);

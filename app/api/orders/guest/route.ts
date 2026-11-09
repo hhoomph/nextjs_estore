@@ -222,9 +222,15 @@ async function validateProductsAndInventory(items: GuestOrderItem[]) {
         continue;
       }
 
-      // Validate price matches current price
-      const expectedPrice = Number(product.discountPrice || product.price);
-      if (Math.abs(expectedPrice - Number(item.product.price)) > 0.01) {
+      // Validate price matches current price (accept either base or discounted price)
+      const basePrice = Number(product.price);
+      const discountedPrice = product.discountPrice ? Number(product.discountPrice) : basePrice;
+      const expectedPrice = discountedPrice;
+      const submittedPrice = Number(item.product.price);
+      if (
+        Math.abs(submittedPrice - basePrice) > 0.01 &&
+        Math.abs(submittedPrice - discountedPrice) > 0.01
+      ) {
         errors.push(
           `Price mismatch for "${product.name}". Please refresh and try again.`,
         );

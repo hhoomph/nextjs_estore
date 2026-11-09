@@ -24,10 +24,6 @@ export const auth = betterAuth({
         defaultValue: "USER",
         required: false,
       },
-      phone_number: {
-        type: "string",
-        required: false,
-      },
       active: {
         type: "boolean",
         defaultValue: true,
@@ -35,7 +31,6 @@ export const auth = betterAuth({
       },
     },
     fieldMap: {
-      phone_number: "phoneNumber",
       emailVerified: "emailVerified",
       image: "image",
     },

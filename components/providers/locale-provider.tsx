@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Locale Provider for Client Components
  *
  * Provides locale context and switching functionality for client-side components.
@@ -8,9 +8,7 @@
  * @version 1.0.0
  * @since 2025-01-01
  */
-
 "use client";
-
 import { useRouter } from "next/navigation";
 import {
   createContext,
@@ -20,20 +18,16 @@ import {
   useState,
 } from "react";
 import type { CookieLocale } from "@/lib/i18n/cookie-locale";
-
 interface LocaleContextType {
   locale: CookieLocale;
   setLocale: (locale: CookieLocale) => Promise<void>;
   isLoading: boolean;
 }
-
 const LocaleContext = createContext<LocaleContextType | undefined>(undefined);
-
 interface LocaleProviderProps {
   children: React.ReactNode;
   initialLocale: CookieLocale;
 }
-
 /**
  * Provider component for locale management
  */
@@ -44,7 +38,6 @@ export function LocaleProvider({
   const [locale, setLocaleState] = useState<CookieLocale>(initialLocale);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-
   // Sync locale with cookie on mount only
   useEffect(() => {
     const controller = new AbortController();
@@ -63,18 +56,15 @@ export function LocaleProvider({
         console.error("Failed to sync locale:", error);
       }
     };
-
     void syncLocale();
     return () => controller.abort();
-  }, [locale]);
-
+  }, []);
   /**
    * Set locale via API and reload the page to apply new locale
    */
   const setLocale = useCallback(
     async (newLocale: CookieLocale) => {
       if (newLocale === locale) return;
-
       setIsLoading(true);
       try {
         const response = await fetch("/api/locale", {
@@ -84,11 +74,11 @@ export function LocaleProvider({
           },
           body: JSON.stringify({ locale: newLocale }),
         });
-
         if (response.ok) {
           setLocaleState(newLocale);
           // Refresh client components and re-render server components with the new locale
           router.refresh();
+           setIsLoading(false);
         } else {
           console.error("Failed to set locale");
           setIsLoading(false);
@@ -100,14 +90,12 @@ export function LocaleProvider({
     },
     [locale, router],
   );
-
   return (
     <LocaleContext.Provider value={{ locale, setLocale, isLoading }}>
       {children}
     </LocaleContext.Provider>
   );
 }
-
 /**
  * Hook to use locale context
  */
@@ -118,7 +106,6 @@ export function useCookieLocale(): LocaleContextType {
   }
   return context;
 }
-
 /**
  * Standalone function to switch locale without context
  * Useful for components that can't access context
@@ -132,7 +119,6 @@ export async function switchLocale(locale: CookieLocale): Promise<boolean> {
       },
       body: JSON.stringify({ locale }),
     });
-
     return response.ok;
   } catch (error) {
     console.error("Error switching locale:", error);

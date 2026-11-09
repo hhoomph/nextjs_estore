@@ -53,18 +53,6 @@ const guestCheckoutSchema = checkoutContactSchema.extend({
   })
   .refine(
     (data) => {
-      if (data.createAccount) {
-        return Boolean(data.password && data.password.length >= 8);
-      }
-      return true;
-    },
-    {
-      message: "Password must be at least 8 characters",
-      path: ["password"],
-    },
-  )
-  .refine(
-    (data) => {
       if (data.createAccount && data.password && data.confirmPassword) {
         return data.password === data.confirmPassword;
       }
