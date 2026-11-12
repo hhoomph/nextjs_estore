@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "cross-env REACT_EDITOR=code NODE_OPTIONS='--inspect' next dev",
     "build": "next build",
-    "vercel-build": "prisma generate && prisma migrate deploy && next build",
+    "vercel-build": "next build",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:migrate:status": "prisma migrate status",
     "start": "next start",
@@ -180,5 +180,8 @@
     "puppeteer",
     "sharp",
     "unrs-resolver"
-  ]
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  }
 }
