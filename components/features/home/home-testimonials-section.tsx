@@ -107,7 +107,7 @@ export function HomeTestimonialsSection() {
                       alt={testimonial.user.name}
                       width={48}
                       height={48}
-                      className="rounded-full object-cover"
+                      className="h-12 w-12 rounded-full object-cover"
                     />
                   ) : (
                     <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-sm font-black text-muted-foreground">

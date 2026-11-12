@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Language Switcher Component
  *
  * Switches language using cookies and client-side navigation without page reload.

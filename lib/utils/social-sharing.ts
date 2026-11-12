@@ -210,7 +210,7 @@ export function generateOpenGraphTags(
     "og:url": data.url,
     "og:image": data.image || "/default-product-image.jpg",
     "og:type": "product",
-    "og:site_name": "E-Store",
+    "og:site_name": "Northline Supply",
     "product:price:amount": data.price?.toString() || "",
     "product:price:currency": data.currency || "IRR",
   };

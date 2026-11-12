@@ -10,20 +10,22 @@ import { getSiteSettings, updateSiteSettings } from "@/lib/actions/seo";
 import type { SiteSettingsData } from "@/lib/validations/schemas/seo";
 
 const DEFAULT_SETTINGS = {
-  site_title_en: "My E-commerce Store",
-  site_title_fa: "فروشگاه آنلاین من",
-  phone_en: "+1 (555) 123-4567",
-  phone_fa: "021-12345678",
-  description_en: "A modern e-commerce platform",
-  description_fa: "پلتفرم فروش آنلاین مدرن",
-  default_seo_title: "My E-commerce Store - Online Shopping",
+  site_title_en: "Northline Supply",
+  site_title_fa: "نورث‌لاین",
+  phone_en: "",
+  phone_fa: "",
+  description_en:
+    "Everyday essentials and considered upgrades for your desk, kitchen and travels, shipped from our own warehouse.",
+  description_fa:
+    "لوازم ضروری روزمره و ارتقاهای کاربردی برای میز کار، آشپزخانه و سفر، ارسال‌شده از انبار اختصاصی ما.",
+  default_seo_title: "Northline Supply — Everyday essentials, upgraded",
   default_seo_description:
-    "Shop the best products online with fast shipping and great prices.",
+    "Shop audio, computing, home and outdoor essentials at Northline Supply. Free shipping over $75 and 30-day returns.",
   default_og_image: null,
   google_analytics_id: null,
   maintenance_mode: false,
   allow_registration: true,
-  default_currency: "IRR",
+  default_currency: "USD",
   low_stock_threshold: 10,
 };
 
@@ -72,6 +74,9 @@ export async function GET() {
         siteName: s.siteTitleEn ?? "",
         siteDescription: s.descriptionEn ?? "",
         contactEmail: s.phoneEn ?? "",
+        phoneEn: s.phoneEn ?? "",
+        emailEn: "",
+        emailFa: "",
         maintenanceMode: s.maintenanceMode ?? false,
         allowRegistration: s.allowRegistration ?? true,
         defaultCurrency: s.defaultCurrency || "IRR",
@@ -89,6 +94,9 @@ export async function GET() {
         siteName: DEFAULT_SETTINGS.site_title_en,
         siteDescription: DEFAULT_SETTINGS.description_en,
         contactEmail: DEFAULT_SETTINGS.phone_en,
+        phoneEn: DEFAULT_SETTINGS.phone_en,
+        emailEn: "",
+        emailFa: "",
         maintenanceMode: DEFAULT_SETTINGS.maintenance_mode,
         allowRegistration: DEFAULT_SETTINGS.allow_registration,
         defaultCurrency: DEFAULT_SETTINGS.default_currency,

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "cross-env REACT_EDITOR=code next dev",
+    "dev": "cross-env REACT_EDITOR=code NODE_OPTIONS='--inspect' next dev",
     "build": "next build",
     "vercel-build": "prisma generate && prisma migrate deploy && next build",
     "db:migrate:deploy": "prisma migrate deploy",

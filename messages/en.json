@@ -288,7 +288,8 @@
       "orderId": "Order ID",
       "status": "Status",
       "total": "Total"
-    }
+    },
+    "confirmed": "Confirmed"
   },
   "Admin Users": {
     "title": "Users",
@@ -650,7 +651,7 @@
     }
   },
   "Footer & Additional UI": {
-    "copyright": "© 2025 E-Store. All rights reserved.",
+    "copyright": "© 2026 Northline Supply. All rights reserved.",
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service",
     "contactUs": "Contact Us",
@@ -997,7 +998,7 @@
       "viewDetails": "View Details"
     },
     "features": {
-      "title": "Why Choose E-Store?",
+      "title": "Why Choose Northline Supply?",
       "subtitle": "Experience shopping like never before with our premium features and services.",
       "freeShipping": {
         "title": "Free Shipping",
@@ -1037,7 +1038,7 @@
     },
     "cta": {
       "title": "Ready to start shopping?",
-      "subtitle": "Join thousands of satisfied customers who trust E-Store for their shopping needs.",
+      "subtitle": "Join thousands of satisfied customers who trust Northline Supply for their shopping needs.",
       "createAccount": "Create Account",
       "browseProducts": "Browse Products"
     }
@@ -1163,13 +1164,13 @@
     }
   },
   "SEO": {
-    "defaultTitle": "E-Store - Your Premier Online Shopping Destination",
+    "defaultTitle": "Northline Supply - Your Premier Online Shopping Destination",
     "defaultDescription": "Discover amazing products at great prices with fast, secure delivery and exceptional customer service. Shop the latest trends and find everything you need in one place.",
-    "siteName": "E-Store",
+    "siteName": "Northline Supply",
     "twitterHandle": "@estore",
     "home": {
-      "title": "Welcome to E-Store - Amazing Products & Great Deals",
-      "description": "Discover our amazing collection of products with fast shipping and secure checkout. Shop electronics, fashion, home goods and more at E-Store."
+      "title": "Welcome to Northline Supply - Amazing Products & Great Deals",
+      "description": "Discover our amazing collection of products with fast shipping and secure checkout. Shop electronics, fashion, home goods and more at Northline Supply."
     },
     "category": {
       "title": "Shop by Category - Find What You Need",
@@ -1189,7 +1190,7 @@
     },
     "account": {
       "title": "My Account - Manage Your Profile & Orders",
-      "description": "Manage your account, view order history, update your profile, and track your purchases on E-Store."
+      "description": "Manage your account, view order history, update your profile, and track your purchases on Northline Supply."
     }
   },
   "Cart Sidebar": {

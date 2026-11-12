@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @vitest-environment jsdom
  * Advanced Error Boundary Component Tests
  *

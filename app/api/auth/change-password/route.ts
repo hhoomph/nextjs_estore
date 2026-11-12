@@ -1,14 +1,5 @@
-/**
- * Module for change-password route
- *
- * @author hh.oomph@gmail.com
- * @version 1.0.0
- * @since 2025-01-01
- */
 import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/config";
-import { prisma } from "@/lib/database";
-import { password } from "@/lib/security";
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,37 +20,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-    });
-
-    if (!user || !user.password) {
-      // Should not happen for a user who is logged in with a password.
-      // Could be a social login user trying to change password.
+    if (newPassword.length < 8) {
       return NextResponse.json(
-        { error: "User not found or password not set" },
+        { error: "New password must be at least 8 characters" },
         { status: 400 },
       );
     }
 
-    const isPasswordCorrect = await password.verify(
-      currentPassword,
-      user.password,
-    );
+    try {
+      // Delegate to Better Auth so the credential account is verified and
+      // re-hashed with the same scrypt parameters used at sign-in.
+      await auth.api.changePassword({
+        headers: request.headers,
+        body: {
+          currentPassword,
+          newPassword,
+          revokeOtherSessions: false,
+        },
+      });
+    } catch (error) {
+      const apiError = error as { status?: string; statusCode?: number; message?: string };
+      const status =
+        typeof apiError?.statusCode === "number"
+          ? apiError.statusCode
+          : apiError?.status === "UNAUTHORIZED" || apiError?.status === "FORBIDDEN"
+            ? 401
+            : 400;
 
-    if (!isPasswordCorrect) {
       return NextResponse.json(
-        { error: "Incorrect current password" },
-        { status: 400 },
+        { error: apiError?.message ?? "Incorrect current password" },
+        { status },
       );
     }
-
-    const hashedPassword = await password.hash(newPassword);
-
-    await prisma.user.update({
-      where: { id: session.user.id },
-      data: { password: hashedPassword, updatedAt: new Date() },
-    });
 
     return NextResponse.json({ message: "Password updated successfully" });
   } catch (error) {

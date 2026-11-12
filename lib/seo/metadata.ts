@@ -1,4 +1,4 @@
-﻿/**
+/**
  * SEO Metadata Management
  *
  * Centralized SEO metadata for all pages and routes
@@ -15,8 +15,8 @@ import type { Metadata } from "next";
  */
 export const siteMetadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === "production" ? "https://yourdomain.com" : "http://localhost:3000")),
-  title: "NextJS E-Store",
-  titleTemplate: "%s | NextJS E-Store",
+  title: "Northline Supply",
+  titleTemplate: "%s | Northline Supply",
   description:
     "Your premium e-commerce destination for quality products with fast delivery and excellent customer service.",
   keywords: [
@@ -57,16 +57,16 @@ export const siteMetadata = {
     type: "website",
     locale: "en_US",
     url: "https://yourdomain.com",
-    title: "NextJS E-Store",
+    title: "Northline Supply",
     description:
       "Your premium e-commerce destination for quality products with fast delivery and excellent customer service.",
-    siteName: "NextJS E-Store",
+    siteName: "Northline Supply",
     images: [
       {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "NextJS E-Store",
+        alt: "Northline Supply",
       },
     ],
   },
@@ -82,7 +82,7 @@ export const siteMetadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "NextJS E-Store",
+    title: "Northline Supply",
   },
   formatDetection: {
     telephone: false,
@@ -96,7 +96,7 @@ export const siteMetadata = {
  * Homepage metadata
  */
 export const homepageMetadata = {
-  title: "NextJS E-Store - Premium E-Commerce",
+  title: "Northline Supply - Premium E-Commerce",
   description:
     "Discover amazing products at unbeatable prices. Shop from a wide range of categories including electronics, fashion, home & garden, and more.",
   keywords: [
@@ -117,7 +117,7 @@ export const homepageMetadata = {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "NextJS E-Store - Homepage",
+        alt: "Northline Supply - Homepage",
       },
     ],
   },
@@ -143,7 +143,7 @@ export function getProductPageMetadata(
   };
 } {
   return {
-    title: `${productName} - NextJS E-Store`,
+    title: `${productName} - Northline Supply`,
     description: `Buy ${productName} at the best price. Quality guaranteed with fast shipping and secure payment options.`,
     keywords: [
       productName,
@@ -179,7 +179,7 @@ export function getCategoryPageMetadata(
   keywords: string[];
 } {
   return {
-    title: `${categoryName} - Products - NextJS E-Store`,
+    title: `${categoryName} - Products - Northline Supply`,
     description: `Browse and buy ${itemCount || "quality"} products from ${categoryName} category. Best prices, fast shipping.`,
     keywords: [
       categoryName,
@@ -201,7 +201,7 @@ export function getSearchPageMetadata(query: string): {
   keywords: string[];
 } {
   return {
-    title: `Search: ${query} - NextJS E-Store`,
+    title: `Search: ${query} - Northline Supply`,
     description: `Search results for "${query}". Browse quality products across all categories.`,
     keywords: [query, "e-commerce", "search", "nextjs", "ecommerce"],
   };
@@ -211,7 +211,7 @@ export function getSearchPageMetadata(query: string): {
  * Deals page metadata
  */
 export const dealsPageMetadata = {
-  title: "Hot Deals & Special Offers - NextJS E-Store",
+  title: "Hot Deals & Special Offers - Northline Supply",
   description:
     "Discover amazing deals, discounts, and special offers on premium products. Limited time offers you don't want to miss!",
   keywords: [
@@ -230,7 +230,7 @@ export const dealsPageMetadata = {
         url: "/og-deals.jpg",
         width: 1200,
         height: 630,
-        alt: "Hot Deals - NextJS E-Store",
+        alt: "Hot Deals - Northline Supply",
       },
     ],
   },
@@ -240,7 +240,7 @@ export const dealsPageMetadata = {
  * Contact page metadata
  */
 export const contactPageMetadata = {
-  title: "Contact Us - NextJS E-Store",
+  title: "Contact Us - Northline Supply",
   description:
     "Get in touch with our customer service team. We're here to help with any questions about your orders.",
   keywords: ["contact", "support", "help", "customer service", "questions"],
@@ -250,7 +250,7 @@ export const contactPageMetadata = {
  * Terms & Conditions page metadata
  */
 export const termsPageMetadata = {
-  title: "Terms & Conditions - NextJS E-Store",
+  title: "Terms & Conditions - Northline Supply",
   description:
     "Read our terms and conditions for online shopping. Understand your rights and responsibilities as a customer.",
   keywords: ["terms", "conditions", "terms and conditions", "policy"],
@@ -260,7 +260,7 @@ export const termsPageMetadata = {
  * Privacy Policy page metadata
  */
 export const privacyPageMetadata = {
-  title: "Privacy Policy - NextJS E-Store",
+  title: "Privacy Policy - Northline Supply",
   description:
     "We care about your privacy. Read our privacy policy to understand how we collect, use, and protect your personal information.",
   keywords: ["privacy policy", "privacy", "data protection", "gdpr"],
@@ -270,7 +270,7 @@ export const privacyPageMetadata = {
  * Cart page metadata
  */
 export const cartPageMetadata = {
-  title: "Shopping Cart - NextJS E-Store",
+  title: "Shopping Cart - Northline Supply",
   description:
     "Review and manage your shopping cart. Ready to checkout and complete your purchase?",
   keywords: ["cart", "shopping cart", "checkout", "basket", "view cart"],
@@ -280,7 +280,7 @@ export const cartPageMetadata = {
  * Wishlist page metadata
  */
 export const wishlistPageMetadata = {
-  title: "Wishlist - NextJS E-Store",
+  title: "Wishlist - Northline Supply",
   description:
     "Save your favorite products for later. View and manage your wishlist items.",
   keywords: ["wishlist", "saved items", "favorites", "saved products"],
@@ -290,7 +290,7 @@ export const wishlistPageMetadata = {
  * Orders page metadata
  */
 export const ordersPageMetadata = {
-  title: "My Orders - NextJS E-Store",
+  title: "My Orders - Northline Supply",
   description:
     "Track and manage your orders. View order history, shipping status, and track your packages.",
   keywords: ["orders", "order history", "track order", "my orders"],
@@ -300,7 +300,7 @@ export const ordersPageMetadata = {
  * Dashboard page metadata
  */
 export const dashboardPageMetadata = {
-  title: "Dashboard - NextJS E-Store",
+  title: "Dashboard - Northline Supply",
   description:
     "Manage your account, view orders, update profile, and access all your account settings.",
   keywords: ["dashboard", "account", "my account", "account settings"],
@@ -310,7 +310,7 @@ export const dashboardPageMetadata = {
  * Settings page metadata
  */
 export const settingsPageMetadata = {
-  title: "Settings - NextJS E-Store",
+  title: "Settings - Northline Supply",
   description: "Manage your account settings, preferences, and notification preferences.",
   keywords: ["settings", "account settings", "preferences", "notifications"],
 };
@@ -319,7 +319,7 @@ export const settingsPageMetadata = {
  * Admin pages metadata (sensitive - should be protected)
  */
 export const adminPageMetadata = {
-  title: "Admin Dashboard - NextJS E-Store",
+  title: "Admin Dashboard - Northline Supply",
   description: "Admin panel for managing the e-store. Access restricted.",
   keywords: ["admin", "dashboard", "management", "panel"],
 };
@@ -328,7 +328,7 @@ export const adminPageMetadata = {
  * Auth pages metadata
  */
 export const authPageMetadata = {
-  title: "Authentication - NextJS E-Store",
+  title: "Authentication - Northline Supply",
   description: "Sign in or create an account to access your order history and saved products.",
   keywords: ["sign in", "login", "register", "signup", "account"],
 };
@@ -337,7 +337,7 @@ export const authPageMetadata = {
  * Blog page metadata
  */
 export const blogPageMetadata = {
-  title: "Blog - NextJS E-Store",
+  title: "Blog - Northline Supply",
   description:
     "Read our latest articles, news, and tips for e-commerce success. Stay updated with industry trends.",
   keywords: ["blog", "articles", "news", "tips", "e-commerce", "nextjs"],
@@ -355,7 +355,7 @@ export function getBlogPostPageMetadata(
   keywords: string[];
 } {
   return {
-    title: `${title} - Blog - NextJS E-Store`,
+    title: `${title} - Blog - Northline Supply`,
     description: `Read about ${title} in our blog. Expert insights and tips for e-commerce success.`,
     keywords: [
       title,
@@ -371,7 +371,7 @@ export function getBlogPostPageMetadata(
  * Popular page metadata
  */
 export const popularPageMetadata = {
-  title: "Popular Products - NextJS E-Store",
+  title: "Popular Products - Northline Supply",
   description:
     "Discover the most popular and trending products among our customers. Shop the best-sellers now!",
   keywords: ["popular", "trending", "best sellers", "top products"],
@@ -381,7 +381,7 @@ export const popularPageMetadata = {
  * Compare page metadata
  */
 export const comparePageMetadata = {
-  title: "Product Comparison - NextJS E-Store",
+  title: "Product Comparison - Northline Supply",
   description:
     "Compare products side by side. Make informed decisions with our comparison feature.",
   keywords: ["compare", "compare products", "product comparison"],
@@ -400,7 +400,7 @@ export function generateSEOMetadata(
 ): Metadata {
   const { locale, keywords = [] } = params;
 
-  const siteTitle = locale === "fa" ? "فروشگاه آنلاین" : "NextJS E-Store";
+  const siteTitle = locale === "fa" ? "نورث‌لاین" : "Northline Supply";
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (process.env.NODE_ENV === "production" ? "https://yourdomain.com" : "http://localhost:3000");
 

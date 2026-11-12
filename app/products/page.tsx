@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Module for page
  *
  * @author hh.oomph@gmail.com

@@ -87,18 +87,18 @@ export function HomeHero({
 
           <div className="relative">
             <div className="relative rounded-[2.5rem] border border-border bg-background/70 p-4 shadow-2xl shadow-primary/10 backdrop-blur">
-              <div className="overflow-hidden rounded-[2rem] bg-muted">
+              <div className="relative aspect-square overflow-hidden rounded-[2rem] bg-muted">
                 {heroImage ? (
                   <Image
                     src={heroImage}
                     alt={productName}
-                    width={900}
-                    height={900}
-                    className="aspect-square object-cover"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 45vw"
+                    className="object-cover"
                     priority
                   />
                 ) : (
-                  <div className="flex aspect-square items-center justify-center bg-muted">
+                  <div className="flex h-full w-full items-center justify-center bg-muted">
                     <Package className="h-28 w-28 text-muted-foreground/50" />
                   </div>
                 )}
@@ -121,7 +121,7 @@ export function HomeHero({
                         alt=""
                         width={56}
                         height={56}
-                        className="rounded-2xl object-cover"
+                        className="h-14 w-14 rounded-2xl object-cover"
                       />
                     </Link>
                   )}

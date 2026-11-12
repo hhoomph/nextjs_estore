@@ -1,13 +1,7 @@
-/**
- * Module for route
- *
- * @author hh.oomph@gmail.com
- * @version 1.0.0
- * @since 2025-01-01
- */
 import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth/config";
 import prisma from "@/lib/prisma";
+import { normaliseOrderStatus } from "@/lib/utils/order-status";
 
 // PATCH /api/admin/orders/[id] - Update order status
 export async function PATCH(
@@ -15,7 +9,6 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    // Check if user is admin
     const session = await auth.api.getSession({
       headers: request.headers,
     });
@@ -29,33 +22,25 @@ export async function PATCH(
     const { status } = body;
 
     if (!status) {
-      return NextResponse.json(
-        { error: "Status is required" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Status is required" }, { status: 400 });
     }
 
-    // Validate status
-    const validStatuses = [
-      "pending",
-      "processing",
-      "shipped",
-      "delivered",
-      "cancelled",
-    ];
-    if (!validStatuses.includes(status)) {
+    // The database stores the OrderStatus enum in upper case, while clients may
+    // send lower case (or the legacy "processing" value) - normalise first.
+    const normalised = normaliseOrderStatus(status);
+    if (!normalised) {
       return NextResponse.json(
         {
-          error: "Invalid status. Must be one of: " + validStatuses.join(", "),
+          error:
+            "Invalid status. Must be one of: PENDING, CONFIRMED, SHIPPED, DELIVERED, CANCELLED",
         },
         { status: 400 },
       );
     }
 
-    // Update order status
     const updatedOrder = await prisma.order.update({
       where: { id },
-      data: { status },
+      data: { status: normalised },
       include: {
         user: {
           select: {

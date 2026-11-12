@@ -137,8 +137,19 @@ export async function POST(request: NextRequest) {
     const session = await auth.api.getSession({ headers: request.headers });
     const body = await request.json();
 
-    // Validate input
-    const { productId } = addRecentlyViewedSchema.parse(body);
+    // Validate input (accept both the documented camelCase and the app-wide snake_case)
+    const parsed = addRecentlyViewedSchema.safeParse({
+      productId: body?.productId ?? body?.product_id,
+    });
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0]?.message ?? "Invalid request" },
+        { status: 400 },
+      );
+    }
+
+    const { productId } = parsed.data;
 
     // Verify product exists
     const product = await prisma.product.findUnique({

@@ -51,7 +51,7 @@ export function SEOMetaTags({
   noindex = false,
 }: SEOMetaTagsProps) {
   // Generate final SEO values
-  const siteTitle = siteSettings?.siteTitleEn || "E-commerce Store";
+  const siteTitle = siteSettings?.siteTitleEn || "Northline Supply";
   const siteDescription =
     siteSettings?.descriptionEn || "Your trusted online shopping destination";
 

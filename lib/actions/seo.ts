@@ -45,15 +45,18 @@ export async function updateProductSEO(productId: string, data: SEOData) {
 
 export async function getSiteSettings() {
   try {
-    // Since we want only one settings record, get the first one or create default
-    let settings = await prisma.siteSettings.findFirst();
+    // There is exactly one settings record, keyed by a fixed id.
+    let settings = await prisma.siteSettings.findUnique({
+      where: { id: "default" },
+    });
 
     if (!settings) {
       // Create default settings if none exist
       settings = await prisma.siteSettings.create({
         data: {
-          siteTitleEn: "E-commerce Store",
-          siteTitleFa: "فروشگاه آنلاین",
+          id: "default",
+          siteTitleEn: "Northline Supply",
+          siteTitleFa: "نورث‌لاین",
           maintenanceMode: false,
           allowRegistration: true,
           defaultCurrency: "USD",

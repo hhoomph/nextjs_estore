@@ -1,6 +1,6 @@
 "use client";
 
-import { Mail, MapPin, Package, Phone, User, X } from "lucide-react";
+import { Mail, Package, Phone, User, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, type SVGProps } from "react";
 import { useTranslations } from "next-intl";
@@ -32,7 +32,7 @@ function LinkedinIcon(props: SVGProps<SVGSVGElement>) {
 
 export function Footer() {
   const t = useTranslations("Footer & Additional UI");
-  const [siteTitle, setSiteTitle] = useState("E-Store");
+  const [siteTitle, setSiteTitle] = useState("Northline Supply");
   const [contactInfo, setContactInfo] = useState({
     phone: "",
     email: "",
@@ -49,7 +49,7 @@ export function Footer() {
         if (!res.ok) return;
         const result = await res.json();
         if (result?.settings) {
-          setSiteTitle(result.settings.siteTitleEn || "E-Store");
+          setSiteTitle(result.settings.siteTitleEn || "Northline Supply");
           setContactInfo({
             phone: result.settings.phoneEn || "",
             email: result.settings.emailEn || "",
@@ -120,22 +120,32 @@ export function Footer() {
               {t("help")}
             </h3>
             <ul className="space-y-4 text-sm text-muted-foreground">
-              <li className="flex items-start gap-3">
-                <Phone className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <a href={contactInfo.phone ? `tel:${contactInfo.phone}` : "#"} className="transition hover:text-primary">
-                  {contactInfo.phone || "+1 (555) 123-4567"}
-                </a>
-              </li>
-              <li className="flex items-start gap-3">
-                <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <a href={contactInfo.email ? `mailto:${contactInfo.email}` : "#"} className="transition hover:text-primary">
-                  {contactInfo.email || "support@example.com"}
-                </a>
-              </li>
-              <li className="flex items-start gap-3">
-                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <span>685 Market Street, Las Vegas</span>
-              </li>
+              {contactInfo.phone || contactInfo.email ? (
+                <>
+                  {contactInfo.phone && (
+                    <li className="flex items-start gap-3">
+                      <Phone className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                      <a href={`tel:${contactInfo.phone}`} className="transition hover:text-primary">
+                        {contactInfo.phone}
+                      </a>
+                    </li>
+                  )}
+                  {contactInfo.email && (
+                    <li className="flex items-start gap-3">
+                      <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                      <a href={`mailto:${contactInfo.email}`} className="transition hover:text-primary">
+                        {contactInfo.email}
+                      </a>
+                    </li>
+                  )}
+                </>
+              ) : (
+                <li>
+                  <Link href="/help" className="transition hover:text-primary">
+                    {t("help")}
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
 
@@ -180,6 +190,7 @@ export function Footer() {
               <Link href="/privacy-policy" className="transition hover:text-primary">{t("privacyPolicy")}</Link>
               <Link href="/terms-condition" className="transition hover:text-primary">{t("termsOfService")}</Link>
               <Link href="/contact" className="transition hover:text-primary">{t("contactUs")}</Link>
+              <Link href="/credits" className="transition hover:text-primary">Image credits</Link>
             </div>
           </div>
           <div className="mt-6 flex flex-wrap gap-2">

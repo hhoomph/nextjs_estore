@@ -110,6 +110,7 @@ export interface SettingsMessages {
 
 export interface StatusMessages {
   pending: string;
+  confirmed: string;
   processing: string;
   shipped: string;
   delivered: string;
@@ -826,6 +827,7 @@ export interface AdminOrdersMessages {
   searchOrders: string;
   filterByStatus: string;
   allStatus: string;
+  confirmed: string;
   pending: string;
   processing: string;
   shipped: string;

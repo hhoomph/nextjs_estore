@@ -167,7 +167,7 @@ export default function AdminOrdersPage() {
               <SelectContent>
                 <SelectItem value="all">{t("allStatus")}</SelectItem>
                 <SelectItem value="pending">{t("pending")}</SelectItem>
-                <SelectItem value="processing">{t("processing")}</SelectItem>
+                <SelectItem value="confirmed">{t("confirmed")}</SelectItem>
                 <SelectItem value="shipped">{t("shipped")}</SelectItem>
                 <SelectItem value="delivered">{t("delivered")}</SelectItem>
                 <SelectItem value="cancelled">{t("cancelled")}</SelectItem>

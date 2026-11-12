@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Currency API Route
  *
  * Handles currency preference based on locale.

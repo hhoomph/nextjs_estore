@@ -146,7 +146,7 @@ export function SettingsForm({
                 <Input
                   id="siteName"
                   {...form.register("siteName")}
-                  placeholder="My E-commerce Store"
+                  placeholder="Northline Supply"
                 />
                 {form.formState.errors.siteName && (
                   <p className="text-sm text-destructive">

@@ -10,6 +10,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { type OrderStatus } from "@/lib/generated/prisma/client";
 import { auth } from "@/lib/auth/config";
 import { prisma } from "@/lib/database";
+import { normaliseOrderStatus } from "@/lib/utils/order-status";
 
 // GET /api/admin/orders - Get all orders for admin
 export async function GET(request: NextRequest) {
@@ -60,7 +61,11 @@ export async function GET(request: NextRequest) {
     }
 
     if (status && status !== "all") {
-      where.status = status as OrderStatus;
+      const normalised = normaliseOrderStatus(status);
+      if (!normalised) {
+        return NextResponse.json({ error: "Invalid status filter" }, { status: 400 });
+      }
+      where.status = normalised;
     }
 
     const [orders, total] = await Promise.all([

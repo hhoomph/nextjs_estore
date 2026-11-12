@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Locale Provider for Client Components
  *
  * Provides locale context and switching functionality for client-side components.

@@ -102,7 +102,7 @@ export function PaymentStep({ form, onNext, onPrevious }: PaymentStepProps) {
             <Label htmlFor="payment.cardName">Cardholder Name</Label>
             <Input data-testid="card-name"
               id="payment.cardName"
-              placeholder="John Doe"
+              placeholder="Name on card"
               {...form.register("payment.cardName")}
               className={
                 form.formState.errors.payment?.cardName ? "border-destructive" : ""

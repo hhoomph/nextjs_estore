@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Module for button
  *
  * @author hh.oomph@gmail.com

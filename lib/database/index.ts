@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Module for index
  *
  * @author hh.oomph@gmail.com

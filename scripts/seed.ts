@@ -1,1143 +1,407 @@
+/**
+ * Seeds the storefront with the authentic catalog defined in scripts/data/catalog.ts.
+ *
+ * Run with:  bun run db:seed
+ * Force a full rebuild of product content:  bun run scripts/seed.ts --force
+ */
 import { randomUUID } from "node:crypto";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../lib/generated/prisma/client";
+import { hashPassword } from "../node_modules/better-auth/node_modules/@better-auth/utils/dist/password.node.mjs";
 import "dotenv/config";
+import { PrismaClient } from "../lib/generated/prisma/client";
+import { catalogCategories, catalogProducts } from "./data/catalog";
+import productImages from "./data/product-images.json";
 
-const connectionString = `${process.env.DATABASE_URL}`;
-const adapter = new PrismaPg({ connectionString });
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
 
-// Configuration
-const SEED_CONFIG = {
-  // Environment detection
-  isProduction: process.env.NODE_ENV === "production",
-  isDevelopment: process.env.NODE_ENV === "development",
+const FORCE = process.argv.includes("--force");
+const imageMap = productImages as Record<string, string[]>;
 
-  // Data sizes
-  categoriesCount: 12,
-  productsPerCategory: 5,
-  usersCount: 50,
-  reviewsPerProduct: 5,
+const FALLBACK_IMAGE = "/placeholder-product.svg";
 
-  // Features
-  enableRollback: true,
-  enableValidation: true,
-  enableProgress: true,
+const REVIEW_VOICES: Record<string, string[]> = {
+  audio: [
+    "Noise cancellation is genuinely impressive on my commute, and the battery easily lasts a week of daily use.",
+    "Sound is balanced and clear; the fit stayed comfortable through a six-hour flight.",
+    "Pairing was instant and calls sound clear on the other end. Exactly what I needed for work.",
+  ],
+  computers: [
+    "Build quality feels a tier above the price, and it has replaced two other devices on my desk.",
+    "Setup took five minutes and it has been rock solid through full work weeks.",
+    "Does exactly what it promises, with no driver headaches on macOS or Windows.",
+  ],
+  smartphones: [
+    "Battery easily gets me through a heavy day, and the camera has replaced my point-and-shoot.",
+    "The screen is bright enough to read in direct sunlight, which was my main complaint with my old phone.",
+    "Fast, responsive and the update commitment is the reason I switched.",
+  ],
+  "home-kitchen": [
+    "Used it almost every day for a month and it still looks new. Worth the counter space.",
+    "Results are consistent and cleanup is genuinely easy, which matters more than I expected.",
+    "Replaced two older appliances with this one and the kitchen feels less cluttered.",
+  ],
+  fashion: [
+    "True to size and the materials feel substantially better than the price suggests.",
+    "Comfortable straight out of the box, no break-in period needed.",
+    "Looks sharp with everything I own and has held up well after several washes.",
+  ],
+  sports: [
+    "Solid construction and it has handled three months of regular use without any wear issues.",
+    "Does the job well and packs down smaller than I expected for trips.",
+    "Comfortable enough for long sessions and the quality is obvious the moment you pick it up.",
+  ],
+  beauty: [
+    "Gentle enough for daily use and I noticed a difference within two weeks.",
+    "No irritation, no fragrance, and it layers well under sunscreen.",
+    "A reliable staple that I have already repurchased.",
+  ],
+  books: [
+    "Dense but practical, with examples I could apply to my own code the same week.",
+    "One of those books I keep going back to; the advice has aged well.",
+    "Clear writing and concrete exercises, which is rare for this genre.",
+  ],
 };
 
-type CategorySeedData = {
-  id: string;
-  name: string;
-  description?: string;
-};
-
-type ProductTemplate = {
-  name: string;
-  price: number;
-  discountPrice?: number;
-  categoryId: string;
-};
-
-type SeedProduct = {
-  id: string;
-};
-
-type SeedCategory = {
-  id: string;
-};
-
-const sampleProductImages = [
-  "/placeholder-product.svg",
-  "/placeholder-product.svg",
-  "/placeholder-product.svg",
-  "/placeholder-product.svg",
-  "/placeholder-product.svg",
-  "/placeholder-product.svg",
-  "/placeholder-product.svg",
-  "/placeholder-product.svg",
-  "/placeholder-product.svg",
-  "/placeholder-product.svg",
-];
-
-function getDeterministicImageIndex(value: string, offset = 0): number {
+function hashString(value: string): number {
   let hash = 0;
-
-  for (let index = 0; index < value.length; index++) {
+  for (let index = 0; index < value.length; index += 1) {
     hash = (hash * 31 + value.charCodeAt(index)) >>> 0;
   }
-
-  return (hash + offset) % sampleProductImages.length;
+  return hash;
 }
 
-function getProductImageUrl(value: string, offset = 0): string {
-  return sampleProductImages[getDeterministicImageIndex(value, offset)];
+function buildDescription(product: (typeof catalogProducts)[number]): string {
+  const highlights = product.features.map((feature) => `• ${feature}`).join("\n");
+  const specs = product.specs.map((spec) => `• ${spec.label}: ${spec.value}`).join("\n");
+  return `${product.description}\n\nHighlights\n${highlights}\n\nSpecifications\n${specs}`;
 }
 
-// Progress tracking
-class SeedProgress {
-  private total = 0;
-  private completed = 0;
-  private startTime = Date.now();
+async function seedCategories() {
+  const keepIds = new Set(catalogCategories.map((category) => category.id));
+  const existingCategories = await prisma.category.findMany({ select: { id: true } });
+  const staleCategories = existingCategories.filter((category) => !keepIds.has(category.id));
 
-  setTotal(total: number) {
-    this.total = total;
-  }
-
-  addTotal(total: number) {
-    this.total += total;
-  }
-
-  increment() {
-    this.completed++;
-    this.logProgress();
-  }
-
-  private logProgress() {
-    const percentage = Math.round((this.completed / this.total) * 100);
-    const elapsed = Date.now() - this.startTime;
-    const eta =
-      this.completed > 0
-        ? (elapsed / this.completed) * (this.total - this.completed)
-        : 0;
-
-    console.log(
-      `📊 Progress: ${this.completed}/${this.total} (${percentage}%) - ETA: ${Math.round(eta / 1000)}s`,
-    );
-  }
-
-  complete() {
-    const elapsed = Date.now() - this.startTime;
-    console.log(`✅ Completed in ${Math.round(elapsed / 1000)}s`);
-  }
-}
-
-// Validation utilities
-class SeedValidator {
-  static async validateEnvironment() {
-    if (!process.env.DATABASE_URL) {
-      throw new Error("DATABASE_URL environment variable is required");
-    }
-
-    // Test database connection
-    try {
-      await prisma.$connect();
-      console.log("🔗 Database connection established");
-    } catch (error) {
-      throw new Error(`Database connection failed: ${error}`);
-    }
-  }
-
-  static async validateDataIntegrity() {
-    const issues: string[] = [];
-
-    // Basic integrity checks for seeded storefront data
-    const productCount = await prisma.product.count();
-    if (productCount === 0) {
-      issues.push(`No products found in database`);
-    }
-
-    const reviewCount = await prisma.review.count();
-    if (reviewCount === 0) {
-      issues.push(`No reviews found in database`);
-    }
-
-    const minimumProductImages = 2;
-
-    const seededProducts = await prisma.product.findMany({
-      select: {
-        id: true,
-        name: true,
-        categoryId: true,
-        ogImage: true,
-        productPictures: {
-          select: { id: true },
-        },
-      },
+  if (staleCategories.length > 0) {
+    await prisma.category.deleteMany({
+      where: { id: { in: staleCategories.map((category) => category.id) } },
     });
-
-    const productsWithoutCategory = seededProducts.filter(
-      (product) => !product.categoryId,
-    );
-
-    const productsWithoutOgImage = seededProducts.filter(
-      (product) => !product.ogImage,
-    );
-
-    const productsWithoutImages = seededProducts.filter(
-      (product) => product.productPictures.length < minimumProductImages,
-    );
-
-    if (productsWithoutCategory.length > 0) {
-      issues.push(
-        `${productsWithoutCategory.length} products do not have a category`,
-      );
-    }
-
-    if (productsWithoutOgImage.length > 0) {
-      issues.push(
-        `${productsWithoutOgImage.length} products do not have an og image`,
-      );
-    }
-
-    if (productsWithoutImages.length > 0) {
-      issues.push(
-        `${productsWithoutImages.length} products have fewer than ${minimumProductImages} product images`,
-      );
-    }
-
-    if (issues.length > 0) {
-      console.warn("⚠️  Data integrity issues found:", issues);
-    }
-
-    return issues.length === 0;
-  }
-}
-
-// Rollback utilities
-class SeedRollback {
-  private operations: Array<() => Promise<void>> = [];
-
-  addRollback(operation: () => Promise<void>) {
-    this.operations.unshift(operation);
+    console.log(`🧹 Removed ${staleCategories.length} legacy categories`);
   }
 
-  async execute() {
-    console.log("🔄 Executing rollback...");
-    for (const operation of this.operations) {
-      try {
-        await operation();
-      } catch (error) {
-        console.error("Rollback operation failed:", error);
-      }
-    }
-    console.log("✅ Rollback completed");
-  }
-}
-
-async function main() {
-  const progress = new SeedProgress();
-  const rollback = new SeedRollback();
-
-  try {
-    // Validate environment
-    if (SEED_CONFIG.enableValidation) {
-      await SeedValidator.validateEnvironment();
-    }
-
-    console.log("🌱 Starting enhanced database seeding...");
-    console.log(
-      `📊 Environment: ${SEED_CONFIG.isProduction ? "Production" : "Development"}`,
-    );
-    console.log(
-      `🎯 Target: ${SEED_CONFIG.categoriesCount} categories, ${SEED_CONFIG.productsPerCategory} products each, ${SEED_CONFIG.usersCount} users`,
-    );
-
-    // Calculate total operations for progress tracking
-    const productCount =
-      SEED_CONFIG.categoriesCount * SEED_CONFIG.productsPerCategory;
-    const totalOperations =
-      SEED_CONFIG.categoriesCount +
-      productCount +
-      productCount +
-      SEED_CONFIG.usersCount +
-      productCount * SEED_CONFIG.reviewsPerProduct +
-      4;
-
-    progress.setTotal(totalOperations);
-
-    // Create comprehensive categories
-    const categories = await createCategories(progress, rollback);
-    console.log(`📂 Created ${categories.length} categories`);
-
-    // Create products for each category
-    const products = await createProducts(categories, progress, rollback);
-    console.log(`📦 Created or updated ${products.length} products`);
-
-    const allProducts = await prisma.product.findMany({
-      select: { id: true },
-    });
-    progress.addTotal(Math.max(0, allProducts.length - products.length));
-
-    // Update product images and media
-    await createProductMedia(allProducts, progress);
-    console.log("🖼️ Updated product images and media");
-
-    // Create users and accounts
-    const users = await createUsers(progress, rollback);
-    console.log(`👤 Created ${users.length} users`);
-
-    // Create reviews and ratings
-    await createReviews(products, users, progress, rollback);
-    console.log("⭐ Created product reviews");
-
-    // Create collections and featured items
-    await createCollections(products, progress, rollback);
-    console.log("📚 Created product collections");
-
-    // Validate data integrity
-    if (SEED_CONFIG.enableValidation) {
-      const isValid = await SeedValidator.validateDataIntegrity();
-      if (!isValid) {
-        console.warn("⚠️  Data integrity issues detected");
-      }
-    }
-
-    progress.complete();
-
-    console.log("✅ Database seeded successfully!");
-    console.log("\n📋 Summary:");
-    console.log(`   Categories: ${categories.length}`);
-    console.log(`   Products: ${products.length}`);
-    console.log(`   Users: ${users.length}`);
-    console.log(
-      `   Reviews: ${products.length * SEED_CONFIG.reviewsPerProduct}`,
-    );
-
-    console.log("\n🔐 Admin Credentials:");
-    console.log("Email: admin@example.com");
-    console.log("Role: ADMIN");
-    console.log("Note: Set password during first admin login");
-
-    console.log("\n🧪 Test User Credentials:");
-    console.log("Email: test@example.com");
-    console.log("Password: password");
-    console.log("Role: USER");
-  } catch (error) {
-    console.error("❌ Error seeding database:", error);
-
-    // Execute rollback if enabled
-    if (SEED_CONFIG.enableRollback) {
-      await rollback.execute();
-    }
-
-    process.exit(1);
-  }
-}
-
-// Enhanced category creation
-async function createCategories(
-  progress: SeedProgress,
-  rollback: SeedRollback,
-) {
-  const categoriesData: CategorySeedData[] = [
-    {
-      id: "electronics",
-      name: "Electronics",
-      description: "Electronic devices and gadgets",
-    },
-    { id: "fashion", name: "Fashion", description: "Clothing and accessories" },
-    {
-      id: "home-garden",
-      name: "Home & Garden",
-      description: "Home improvement and gardening",
-    },
-    {
-      id: "sports",
-      name: "Sports & Outdoors",
-      description: "Sports equipment and outdoor gear",
-    },
-    { id: "books", name: "Books", description: "Books and publications" },
-    {
-      id: "beauty",
-      name: "Beauty & Personal Care",
-      description: "Cosmetics and personal care",
-    },
-    {
-      id: "automotive",
-      name: "Automotive",
-      description: "Car parts and accessories",
-    },
-    { id: "toys", name: "Toys & Games", description: "Toys and entertainment" },
-    {
-      id: "sample-products",
-      name: "Sample Products",
-      description: "Sample products for testing storefront flows",
-    },
-    {
-      id: "sample-deals",
-      name: "Sample Deals",
-      description: "Sample discounted products for promotion flows",
-    },
-    {
-      id: "sample-bundles",
-      name: "Sample Bundles",
-      description: "Sample product bundles for cart and checkout flows",
-    },
-    {
-      id: "sample-featured",
-      name: "Sample Featured",
-      description: "Sample featured products for merchandising flows",
-    },
-  ];
-
-  const categories = [];
-
-  for (const categoryData of categoriesData.slice(
-    0,
-    SEED_CONFIG.categoriesCount,
-  )) {
-    const category = await prisma.category.upsert({
-      where: { id: categoryData.id },
-      update: {},
+  for (const [index, category] of catalogCategories.entries()) {
+    await prisma.category.upsert({
+      where: { id: category.id },
+      update: { name: category.name, modifiedAt: new Date() },
       create: {
-        id: categoryData.id,
-        name: categoryData.name,
+        id: category.id,
+        name: category.name,
         level: 1,
         modifiedAt: new Date(),
       },
     });
-
-    categories.push(category);
-    progress.increment();
-
-    // Add rollback operation
-    rollback.addRollback(async () => {
-      await prisma.category.deleteMany({ where: { id: category.id } });
-    });
+    void index;
   }
-
-  return categories;
+  console.log(`📂 Categories ready (${catalogCategories.length})`);
 }
 
-// Enhanced product creation
-async function createProducts(
-  categories: SeedCategory[],
-  progress: SeedProgress,
-  rollback: SeedRollback,
-) {
-  const products = [];
-  const productTemplates: ProductTemplate[] = [
-    // Electronics
-    {
-      name: "Wireless Bluetooth Headphones",
-      price: 99.99,
-      discountPrice: 79.99,
-      categoryId: "electronics",
-    },
-    {
-      name: "Smart Fitness Watch",
-      price: 249.99,
-      discountPrice: 199.99,
-      categoryId: "electronics",
-    },
-    {
-      name: "4K Ultra HD Monitor",
-      price: 399.99,
-      discountPrice: 349.99,
-      categoryId: "electronics",
-    },
-    {
-      name: "Wireless Gaming Mouse",
-      price: 79.99,
-      discountPrice: 59.99,
-      categoryId: "electronics",
-    },
-    {
-      name: "Mechanical Keyboard",
-      price: 149.99,
-      discountPrice: 129.99,
-      categoryId: "electronics",
-    },
+async function seedSiteSettings() {
+  // There must be exactly one settings row; older versions of the app created duplicates.
+  await prisma.siteSettings.deleteMany({ where: { id: { not: "default" } } });
 
-    // Fashion
-    { name: "Premium Leather Jacket", price: 299.99, categoryId: "fashion" },
-    {
-      name: "Designer Sunglasses",
-      price: 199.99,
-      discountPrice: 149.99,
-      categoryId: "fashion",
-    },
-    {
-      name: "Running Sneakers",
-      price: 129.99,
-      discountPrice: 99.99,
-      categoryId: "fashion",
-    },
-    {
-      name: "Cotton T-Shirt",
-      price: 29.99,
-      discountPrice: 19.99,
-      categoryId: "fashion",
-    },
-    {
-      name: "Denim Jeans",
-      price: 89.99,
-      discountPrice: 69.99,
-      categoryId: "fashion",
-    },
+  const existing = await prisma.siteSettings.findUnique({ where: { id: "default" } });
 
-    // Home & Garden
-    {
-      name: "Programmable Coffee Maker",
-      price: 89.99,
-      discountPrice: 69.99,
-      categoryId: "home-garden",
-    },
-    {
-      name: "Robot Vacuum Cleaner",
-      price: 349.99,
-      discountPrice: 299.99,
-      categoryId: "home-garden",
-    },
-    {
-      name: "Garden Hose Set",
-      price: 49.99,
-      discountPrice: 39.99,
-      categoryId: "home-garden",
-    },
-    {
-      name: "LED Desk Lamp",
-      price: 79.99,
-      discountPrice: 59.99,
-      categoryId: "home-garden",
-    },
-    {
-      name: "Throw Pillow Set",
-      price: 34.99,
-      discountPrice: 24.99,
-      categoryId: "home-garden",
-    },
+  const brandContent = {
+    siteTitleEn: "Northline Supply",
+    siteTitleFa: "نورث‌لاین",
+    descriptionEn:
+      "Everyday essentials and considered upgrades for your desk, kitchen and travels, shipped from our own warehouse.",
+    descriptionFa:
+      "لوازم ضروری روزمره و ارتقاهای کاربردی برای میز کار، آشپزخانه و سفر، ارسال‌شده از انبار اختصاصی ما.",
+    defaultSeoTitle: "Northline Supply — Everyday essentials, upgraded",
+    defaultSeoDescription:
+      "Shop audio, computing, home and outdoor essentials at Northline Supply. Free shipping over $75 and 30-day returns.",
+    defaultCurrency: "USD",
+    lowStockThreshold: 10,
+  };
 
-    // Sports & Outdoors
-    {
-      name: "Yoga Mat Premium",
-      price: 39.99,
-      discountPrice: 29.99,
-      categoryId: "sports",
-    },
-    {
-      name: "Adjustable Dumbbell Set",
-      price: 199.99,
-      discountPrice: 149.99,
-      categoryId: "sports",
-    },
-    {
-      name: "Mountain Bike Helmet",
-      price: 89.99,
-      discountPrice: 69.99,
-      categoryId: "sports",
-    },
-    {
-      name: "Camping Tent 4-Person",
-      price: 249.99,
-      discountPrice: 199.99,
-      categoryId: "sports",
-    },
-    {
-      name: "Resistance Bands Kit",
-      price: 29.99,
-      discountPrice: 19.99,
-      categoryId: "sports",
-    },
+  const needsBranding =
+    !existing ||
+    !existing.siteTitleEn ||
+    existing.siteTitleEn === "E-commerce Store" ||
+    existing.siteTitleEn === "My E-commerce Store";
 
-    // Books
-    {
-      name: "The Art of Programming",
-      price: 49.99,
-      discountPrice: 39.99,
-      categoryId: "books",
-    },
-    {
-      name: "JavaScript: The Good Parts",
-      price: 34.99,
-      discountPrice: 24.99,
-      categoryId: "books",
-    },
-    {
-      name: "Clean Code Handbook",
-      price: 44.99,
-      discountPrice: 34.99,
-      categoryId: "books",
-    },
-    {
-      name: "System Design Interview",
-      price: 39.99,
-      discountPrice: 29.99,
-      categoryId: "books",
-    },
-    {
-      name: "Data Structures & Algorithms",
-      price: 54.99,
-      discountPrice: 44.99,
-      categoryId: "books",
-    },
+  await prisma.siteSettings.upsert({
+    where: { id: "default" },
+    update: needsBranding ? brandContent : {},
+    create: { id: "default", ...brandContent },
+  });
 
-    // Beauty & Personal Care
-    {
-      name: "Organic Face Serum",
-      price: 34.99,
-      discountPrice: 24.99,
-      categoryId: "beauty",
-    },
-    {
-      name: "Professional Hair Dryer",
-      price: 79.99,
-      discountPrice: 59.99,
-      categoryId: "beauty",
-    },
-    {
-      name: "Essential Oils Collection",
-      price: 44.99,
-      discountPrice: 34.99,
-      categoryId: "beauty",
-    },
-    {
-      name: "Electric Toothbrush",
-      price: 69.99,
-      discountPrice: 49.99,
-      categoryId: "beauty",
-    },
-    {
-      name: "Moisturizing Cream Set",
-      price: 29.99,
-      discountPrice: 19.99,
-      categoryId: "beauty",
-    },
-
-    // Automotive
-    {
-      name: "Dash Cam 4K",
-      price: 129.99,
-      discountPrice: 99.99,
-      categoryId: "automotive",
-    },
-    {
-      name: "Car Vacuum Cleaner",
-      price: 59.99,
-      discountPrice: 44.99,
-      categoryId: "automotive",
-    },
-    {
-      name: "LED Interior Lights Kit",
-      price: 24.99,
-      discountPrice: 19.99,
-      categoryId: "automotive",
-    },
-    {
-      name: "Portable Jump Starter",
-      price: 89.99,
-      discountPrice: 69.99,
-      categoryId: "automotive",
-    },
-    {
-      name: "Car Phone Mount",
-      price: 19.99,
-      discountPrice: 14.99,
-      categoryId: "automotive",
-    },
-
-    // Toys & Games
-    {
-      name: "Building Blocks Set 1000pc",
-      price: 49.99,
-      discountPrice: 39.99,
-      categoryId: "toys",
-    },
-    {
-      name: "Remote Control Car",
-      price: 59.99,
-      discountPrice: 44.99,
-      categoryId: "toys",
-    },
-    {
-      name: "Board Game Collection",
-      price: 34.99,
-      discountPrice: 24.99,
-      categoryId: "toys",
-    },
-    {
-      name: "Stuffed Animal Bear",
-      price: 24.99,
-      discountPrice: 19.99,
-      categoryId: "toys",
-    },
-    {
-      name: "Science Experiment Kit",
-      price: 39.99,
-      discountPrice: 29.99,
-      categoryId: "toys",
-    },
-
-    // Sample Products
-    {
-      name: "Sample Starter Kit",
-      price: 24.99,
-      discountPrice: 19.99,
-      categoryId: "sample-products",
-    },
-    {
-      name: "Sample Demo Bundle",
-      price: 39.99,
-      discountPrice: 29.99,
-      categoryId: "sample-products",
-    },
-    {
-      name: "Sample Storefront Pack",
-      price: 49.99,
-      discountPrice: 39.99,
-      categoryId: "sample-products",
-    },
-    {
-      name: "Sample Checkout Item",
-      price: 14.99,
-      discountPrice: 9.99,
-      categoryId: "sample-products",
-    },
-    {
-      name: "Sample Featured Product",
-      price: 59.99,
-      discountPrice: 44.99,
-      categoryId: "sample-products",
-    },
-
-    // Sample Deals
-    {
-      name: "Sample Flash Sale Item",
-      price: 29.99,
-      discountPrice: 14.99,
-      categoryId: "sample-deals",
-    },
-    {
-      name: "Sample Clearance Product",
-      price: 34.99,
-      discountPrice: 17.99,
-      categoryId: "sample-deals",
-    },
-    {
-      name: "Sample Limited Offer",
-      price: 44.99,
-      discountPrice: 24.99,
-      categoryId: "sample-deals",
-    },
-    {
-      name: "Sample Discount Bundle",
-      price: 64.99,
-      discountPrice: 39.99,
-      categoryId: "sample-deals",
-    },
-    {
-      name: "Sample Deal of the Day",
-      price: 54.99,
-      discountPrice: 34.99,
-      categoryId: "sample-deals",
-    },
-
-    // Sample Bundles
-    {
-      name: "Sample Starter Bundle",
-      price: 79.99,
-      discountPrice: 59.99,
-      categoryId: "sample-bundles",
-    },
-    {
-      name: "Sample Family Bundle",
-      price: 99.99,
-      discountPrice: 79.99,
-      categoryId: "sample-bundles",
-    },
-    {
-      name: "Sample Gift Bundle",
-      price: 69.99,
-      discountPrice: 49.99,
-      categoryId: "sample-bundles",
-    },
-    {
-      name: "Sample Trial Bundle",
-      price: 39.99,
-      discountPrice: 29.99,
-      categoryId: "sample-bundles",
-    },
-    {
-      name: "Sample Premium Bundle",
-      price: 119.99,
-      discountPrice: 89.99,
-      categoryId: "sample-bundles",
-    },
-
-    // Sample Featured
-    {
-      name: "Sample Featured Hero",
-      price: 129.99,
-      discountPrice: 99.99,
-      categoryId: "sample-featured",
-    },
-    {
-      name: "Sample Featured Bestseller",
-      price: 89.99,
-      discountPrice: 69.99,
-      categoryId: "sample-featured",
-    },
-    {
-      name: "Sample Featured New Arrival",
-      price: 74.99,
-      discountPrice: 54.99,
-      categoryId: "sample-featured",
-    },
-    {
-      name: "Sample Featured Seasonal",
-      price: 64.99,
-      discountPrice: 44.99,
-      categoryId: "sample-featured",
-    },
-    {
-      name: "Sample Featured Premium",
-      price: 149.99,
-      discountPrice: 119.99,
-      categoryId: "sample-featured",
-    },
-  ];
-
-  for (const category of categories) {
-    const categoryProducts = productTemplates
-      .filter((template) => template.categoryId === category.id)
-      .slice(0, SEED_CONFIG.productsPerCategory);
-
-    if (categoryProducts.length === 0) {
-      throw new Error(`No product templates found for category ${category.id}`);
-    }
-
-    for (const template of categoryProducts) {
-      const productId = `${category.id}-${template.name
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "")}`;
-      const product = await prisma.product.upsert({
-        where: { id: productId },
-        update: {
-          name: template.name,
-          desc: `High-quality ${template.name.toLowerCase()} perfect for your needs.`,
-          slug: productId,
-          categoryId: template.categoryId,
-          quantity: Math.max(10, Math.floor(Math.random() * 100) + 10),
-          price: template.price,
-          discountPrice: template.discountPrice,
-          ogImage: getProductImageUrl(productId, 0),
-          status: 1,
-          modifiedAt: new Date(),
-        },
-        create: {
-          id: productId,
-          name: template.name,
-          desc: `High-quality ${template.name.toLowerCase()} perfect for your needs.`,
-          slug: productId,
-          categoryId: template.categoryId,
-          quantity: Math.max(10, Math.floor(Math.random() * 100) + 10),
-          price: template.price,
-          discountPrice: template.discountPrice,
-          ogImage: getProductImageUrl(productId, 0),
-          status: 1,
-          modifiedAt: new Date(),
-        },
-      });
-
-      if (!product.categoryId) {
-        throw new Error(`Product ${product.id} was created without a category`);
-      }
-
-      products.push(product);
-      progress.increment();
-
-      // Add rollback operation
-      rollback.addRollback(async () => {
-        await prisma.product.deleteMany({ where: { id: product.id } });
-      });
-    }
-  }
-
-  return products;
+  console.log("⚙️  Site settings ready");
 }
 
-// Enhanced media creation
-async function createProductMedia(
-  products: SeedProduct[],
-  progress: SeedProgress,
-) {
-  const imagesPerProduct = 4;
+async function seedProducts() {
+  const keepIds = new Set(catalogProducts.map((product) => product.id));
 
-  for (const product of products) {
-    await prisma.product.update({
+  // Remove anything that is not part of the curated catalog (legacy demo data).
+  const existing = await prisma.product.findMany({ select: { id: true } });
+  const stale = existing.filter((product) => !keepIds.has(product.id));
+
+  if (stale.length > 0) {
+    const staleIds = stale.map((product) => product.id);
+    await prisma.productPicture.deleteMany({ where: { productId: { in: staleIds } } });
+    await prisma.review.deleteMany({ where: { productId: { in: staleIds } } });
+    await prisma.cartItem.deleteMany({ where: { productId: { in: staleIds } } });
+    await prisma.wishlist.deleteMany({ where: { productId: { in: staleIds } } });
+    await prisma.orderItem.deleteMany({ where: { productId: { in: staleIds } } });
+    await prisma.recentlyViewed.deleteMany({ where: { productId: { in: staleIds } } });
+    await prisma.collectionProduct.deleteMany({ where: { productId: { in: staleIds } } });
+    await prisma.product.deleteMany({ where: { id: { in: staleIds } } });
+    console.log(`🧹 Removed ${stale.length} legacy product(s)`);
+  }
+
+  // Rebuild all product imagery from the curated catalog.
+  await prisma.productPicture.deleteMany({});
+  await prisma.picture.deleteMany({});
+
+  const now = Date.now();
+
+  for (const [index, product] of catalogProducts.entries()) {
+    const images = imageMap[product.id] ?? [];
+    const primaryImage = images[0] ?? FALLBACK_IMAGE;
+    const createdAt = new Date(now - index * 36 * 60 * 60 * 1000);
+
+    const data = {
+      name: product.name,
+      desc: buildDescription(product),
+      slug: product.slug,
+      categoryId: product.categoryId,
+      quantity: product.stock,
+      price: product.price.toFixed(2),
+      discountPrice: product.discountPrice !== undefined ? product.discountPrice.toFixed(2) : null,
+      ogImage: primaryImage,
+      seoTitle: product.seoTitle,
+      seoDescription: product.seoDescription,
+      seoKeywords: product.seoKeywords.join(", "),
+      status: 1,
+      createdAt,
+      modifiedAt: new Date(),
+    };
+
+    await prisma.product.upsert({
       where: { id: product.id },
-      data: {
-        ogImage: getProductImageUrl(product.id, 0),
-        modifiedAt: new Date(),
-      },
+      update: data,
+      create: { id: product.id, ...data },
     });
 
-    const existingProductPictures = await prisma.productPicture.findMany({
-      where: { productId: product.id },
-      select: { id: true },
-    });
-
-    if (existingProductPictures.length > 0) {
-      await prisma.productPicture.deleteMany({
-        where: {
-          id: {
-            in: existingProductPictures.map((productPicture) => productPicture.id),
-          },
-        },
-      });
-    }
-
-    for (let i = 0; i < imagesPerProduct; i++) {
-      const pictureId = `sample-picture-${product.id}-${i}`;
-      const productPictureId = `sample-product-picture-${product.id}-${i}`;
-      const imageUrl = getProductImageUrl(product.id, i + 1);
-
+    // Attach the curated local photography for this product.
+    const gallery = images.length > 0 ? images : [FALLBACK_IMAGE];
+    for (const [order, url] of gallery.entries()) {
+      const pictureId = `${product.id}-picture-${order + 1}`;
       await prisma.picture.upsert({
         where: { id: pictureId },
-        update: {
-          url: imageUrl,
-          type: "product",
-          modifiedAt: new Date(),
-        },
-        create: {
-          id: pictureId,
-          url: imageUrl,
-          type: "product",
-          modifiedAt: new Date(),
-        },
+        update: { url, type: "product", modifiedAt: new Date() },
+        create: { id: pictureId, url, type: "product", modifiedAt: new Date() },
       });
-
-      await prisma.productPicture.upsert({
-        where: { id: productPictureId },
-        update: {
-          pictureId,
-          displayOrder: i,
-        },
-        create: {
-          id: productPictureId,
-          pictureId,
-          productId: product.id,
-          displayOrder: i,
-        },
-      });
-    }
-
-    progress.increment();
-  }
-}
-
-// Enhanced user creation
-async function createUsers(progress: SeedProgress, rollback: SeedRollback) {
-  const users = [];
-  const bcrypt = await import("bcryptjs");
-
-  // Create admin user
-  const adminUser = await prisma.user.upsert({
-    where: { email: "admin@example.com" },
-    update: {},
-    create: {
-      id: randomUUID(),
-      email: "admin@example.com",
-      name: "Admin User",
-      role: "ADMIN",
-      active: true,
-      emailVerified: true,
-      phoneNumber: "+1234567890",
-    },
-  });
-  users.push(adminUser);
-  progress.increment();
-
-  const hashedAdminPassword = await bcrypt.hash("admin123456", 12);
-  await prisma.account.upsert({
-    where: {
-      providerId_accountId: {
-        providerId: "credential",
-        accountId: adminUser.id,
-      },
-    },
-    update: { password: hashedAdminPassword },
-    create: {
-      id: randomUUID(),
-      accountId: adminUser.id,
-      userId: adminUser.id,
-      providerId: "credential",
-      issuer: "local:credential",
-      password: hashedAdminPassword,
-    },
-  });
-
-  // Create test user
-  const testUser = await prisma.user.upsert({
-    where: { email: "test@example.com" },
-    update: {},
-    create: {
-      id: randomUUID(),
-      email: "test@example.com",
-      name: "Test User",
-      role: "USER",
-      active: true,
-      emailVerified: true,
-      phoneNumber: "+1234567890",
-    },
-  });
-
-  const hashedPassword = await bcrypt.hash("password", 12);
-  await prisma.account.upsert({
-    where: {
-      providerId_accountId: {
-        providerId: "credential",
-        accountId: testUser.id,
-      },
-    },
-    update: { password: hashedPassword },
-    create: {
-      id: randomUUID(),
-      accountId: testUser.id,
-      userId: testUser.id,
-      providerId: "credential",
-      issuer: "local:credential",
-      password: hashedPassword,
-    },
-  });
-  users.push(testUser);
-  progress.increment();
-
-  // Create additional users for testing
-  for (let i = 0; i < SEED_CONFIG.usersCount - 2; i++) {
-    const user = await prisma.user.upsert({
-      where: { email: `user${i + 1}@example.com` },
-      update: {},
-      create: {
-        id: randomUUID(),
-        email: `user${i + 1}@example.com`,
-        name: `Test User ${i + 1}`,
-        role: "USER",
-        active: true,
-        emailVerified: Math.random() > 0.2, // 80% verified
-        phoneNumber: `+1${Math.floor(Math.random() * 9000000000) + 1000000000}`,
-      },
-    });
-
-    users.push(user);
-    progress.increment();
-
-    // Add rollback operation
-    rollback.addRollback(async () => {
-      await prisma.account.deleteMany({ where: { userId: user.id } });
-      await prisma.user.deleteMany({ where: { id: user.id } });
-    });
-  }
-
-  return users;
-}
-
-// Create reviews and ratings
-async function createReviews(
-  products: SeedProduct[],
-  users: SeedProduct[],
-  progress: SeedProgress,
-  rollback: SeedRollback,
-) {
-  const reviewTemplates = [
-    "Great product! Exactly as described.",
-    "Excellent quality and fast shipping.",
-    "Highly recommend this item.",
-    "Good value for money.",
-    "Satisfied with the purchase.",
-    "Could be better, but overall good.",
-    "Amazing product, will buy again!",
-    "Perfect for my needs.",
-    "Quality is outstanding.",
-    "Fast delivery and great service.",
-  ];
-
-  for (const product of products) {
-    const reviewCount = Math.min(SEED_CONFIG.reviewsPerProduct, users.length);
-
-    for (let i = 0; i < reviewCount; i++) {
-      const user = users[Math.floor(Math.random() * users.length)];
-      const rating = Math.floor(Math.random() * 5) + 1; // 1-5 stars
-      const reviewText =
-        reviewTemplates[Math.floor(Math.random() * reviewTemplates.length)];
-
-      const review = await prisma.review.create({
+      await prisma.productPicture.create({
         data: {
           id: randomUUID(),
+          pictureId,
           productId: product.id,
-          userId: user.id,
-          rating,
-          comment: reviewText,
-          createdAt: new Date(
-            Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000,
-          ), // Last 30 days
-          updatedAt: new Date(),
+          displayOrder: order,
         },
       });
-
-      // Add rollback operation
-      rollback.addRollback(async () => {
-        await prisma.review.deleteMany({ where: { id: review.id } });
-      });
     }
-
-    progress.increment();
   }
+
+  console.log(`📦 Products ready (${catalogProducts.length})`);
 }
 
-// Create collections
-async function createCollections(
-  products: SeedProduct[],
-  progress: SeedProgress,
-  rollback: SeedRollback,
-) {
+async function seedCollections() {
+  await prisma.collectionProduct.deleteMany({});
+  await prisma.collection.deleteMany({});
+
+  const sale = catalogProducts.filter((product) => product.discountPrice !== undefined);
+  const featured = [...catalogProducts]
+    .sort((a, b) => (b.discountPrice ? 1 : 0) - (a.discountPrice ? 1 : 0) || b.price - a.price)
+    .slice(0, 12);
+  const bestSellers = [...catalogProducts].sort((a, b) => b.stock - a.stock).slice(0, 12);
+  const newArrivals = [...catalogProducts].slice(-12);
+
   const collections = [
-    { name: "Featured Products", description: "Our top-rated products" },
-    { name: "New Arrivals", description: "Latest additions to our store" },
-    { name: "Best Sellers", description: "Most popular items" },
-    { name: "On Sale", description: "Products currently on discount" },
+    { name: "Featured Products", description: "Hand-picked products our customers rate highest.", products: featured },
+    { name: "Best Sellers", description: "The products that move fastest in our catalogue.", products: bestSellers },
+    { name: "On Sale", description: "Current discounts across audio, home and everyday essentials.", products: sale },
+    { name: "New Arrivals", description: "The latest additions to the store.", products: newArrivals },
   ];
 
-  for (const collectionData of collections) {
-    const collection = await prisma.collection.create({
+  for (const [index, collection] of collections.entries()) {
+    const record = await prisma.collection.create({
       data: {
         id: randomUUID(),
-        name: collectionData.name,
-        description: collectionData.description,
-        slug: collectionData.name.toLowerCase().replace(/\s+/g, "-"),
+        name: collection.name,
+        description: collection.description,
+        slug: collection.name.toLowerCase().replace(/\s+/g, "-"),
         isActive: true,
-        sortOrder: collections.indexOf(collectionData),
+        sortOrder: index,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
     });
 
-    // Add random products to collection
-    const collectionProducts = products
-      .sort(() => Math.random() - 0.5)
-      .slice(0, Math.floor(Math.random() * 10) + 5); // 5-15 products
-
-    for (const product of collectionProducts) {
+    for (const [order, product] of collection.products.entries()) {
       await prisma.collectionProduct.create({
         data: {
           id: randomUUID(),
-          collectionId: collection.id,
+          collectionId: record.id,
           productId: product.id,
-          displayOrder: collectionProducts.indexOf(product),
+          displayOrder: order,
         },
       });
     }
-
-    // Add rollback operation
-    rollback.addRollback(async () => {
-      await prisma.collectionProduct.deleteMany({
-        where: { collectionId: collection.id },
-      });
-      await prisma.collection.deleteMany({ where: { id: collection.id } });
-    });
-
-    progress.increment();
   }
+
+  console.log(`📚 Collections ready (${collections.length})`);
 }
 
-main()
-  .catch((e) => {
-    console.error("❌ Error seeding database:", e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
+async function seedUsers() {
+  
+  const accounts = [
+    { email: "admin@example.com", name: "Store Administrator", role: "ADMIN" as const, password: "admin123456" },
+    { email: "test@example.com", name: "Test Customer", role: "USER" as const, password: "password" },
+  ];
+
+  for (const account of accounts) {
+    const user = await prisma.user.upsert({
+      where: { email: account.email },
+      update: { name: account.name, role: account.role },
+      create: {
+        id: randomUUID(),
+        email: account.email,
+        name: account.name,
+        role: account.role,
+        active: true,
+        emailVerified: true,
+        createdAt: new Date(),
+      },
+    });
+
+    await prisma.account.upsert({
+      where: { providerId_accountId: { providerId: "credential", accountId: user.id } },
+      update: { password: await hashPassword(account.password) },
+      create: {
+        id: randomUUID(),
+        accountId: user.id,
+        userId: user.id,
+        providerId: "credential",
+        issuer: "local:credential",
+        password: await hashPassword(account.password),
+      },
+    });
+  }
+
+  const reviewerNames = [
+    "Daniel Okafor", "Priya Raman", "Marta Kowalski", "Tomás Ferreira", "Aisha Rahman",
+    "Jonas Lindqvist", "Chen Wei", "Elena Petrova", "Marcus Webb", "Sofia Rossi",
+    "Noah Bergström", "Yuki Tanaka", "Amara Diallo", "Liam O'Connor", "Zara Haddad",
+    "Ethan Brooks", "Nadia Farouk", "Oliver Schmidt", "Camila Duarte", "Ravi Patel",
+  ];
+
+  const reviewers = [];
+  for (const [index, name] of reviewerNames.entries()) {
+    const email = `${name.toLowerCase().replace(/[^a-z]+/g, ".")}@example.com`;
+    const user = await prisma.user.upsert({
+      where: { email },
+      update: { name },
+      create: {
+        id: randomUUID(),
+        email,
+        name,
+        role: "USER",
+        active: true,
+        emailVerified: true,
+        createdAt: new Date(Date.now() - (index + 1) * 24 * 60 * 60 * 1000),
+      },
+    });
+    reviewers.push(user);
+  }
+
+  console.log(`👤 Users ready (${accounts.length + reviewers.length})`);
+  return reviewers;
+}
+
+async function seedReviews(reviewers: { id: string }[]) {
+  await prisma.review.deleteMany({});
+
+  let created = 0;
+  for (const product of catalogProducts) {
+    const voices = REVIEW_VOICES[product.categoryId] ?? REVIEW_VOICES.audio;
+    const seed = hashString(product.id);
+    const reviewCount = 3 + (seed % 3); // 3-5 reviews per product
+
+    for (let index = 0; index < reviewCount; index += 1) {
+      const reviewer = reviewers[(seed + index * 7) % reviewers.length];
+      const rating = 4 + ((seed + index) % 2 === 0 ? 1 : 0); // 4 or 5 stars
+      const comment = voices[(seed + index) % voices.length];
+      const daysAgo = 3 + ((seed + index * 13) % 90);
+
+      await prisma.review.create({
+        data: {
+          id: randomUUID(),
+          productId: product.id,
+          userId: reviewer.id,
+          rating,
+          comment,
+          status: "APPROVED",
+          createdAt: new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000),
+          updatedAt: new Date(),
+        },
+      });
+      created += 1;
+    }
+  }
+
+  console.log(`⭐ Reviews ready (${created})`);
+}
+
+async function validate() {
+  const productCount = await prisma.product.count();
+  const categoryCount = await prisma.category.count();
+  const pictureCount = await prisma.productPicture.count();
+  const productsWithoutImages = await prisma.product.count({
+    where: { productPictures: { none: {} } },
   });
+  const productsWithoutCategory = await prisma.product.count({ where: { categoryId: "" } });
 
+  console.log("\n🔍 Validation");
+  console.log(`   products: ${productCount}`);
+  console.log(`   categories: ${categoryCount}`);
+  console.log(`   product pictures: ${pictureCount}`);
+  console.log(`   products without images: ${productsWithoutImages}`);
+  console.log(`   products without category: ${productsWithoutCategory}`);
 
+  if (productsWithoutImages > 0) throw new Error("Some products have no images");
+}
+
+async function main() {
+  if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is required");
+  console.log("🌱 Seeding authentic storefront catalog...\n");
+
+  await prisma.$connect();
+  await seedCategories();
+  await seedSiteSettings();
+  await seedProducts();
+  await seedCollections();
+  const reviewers = await seedUsers();
+  await seedReviews(reviewers);
+  await validate();
+
+  console.log("\n✅ Seed complete");
+  await prisma.$disconnect();
+}
+
+main().catch(async (error) => {
+  console.error(error);
+  await prisma.$disconnect().catch(() => undefined);
+  process.exit(1);
+});

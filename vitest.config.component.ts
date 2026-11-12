@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Component test configuration for Vitest
  * Separate config for component tests using jsdom environment
  *

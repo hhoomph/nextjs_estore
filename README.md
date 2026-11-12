@@ -1,4 +1,4 @@
-﻿# Next.js E-Commerce Platform
+# Next.js E-Commerce Platform
 
 A modern, full-featured e-commerce platform built with Next.js 16, featuring advanced authentication, internationalization, comprehensive testing, and production-ready optimizations.
 

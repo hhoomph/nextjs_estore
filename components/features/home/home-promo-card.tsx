@@ -26,14 +26,14 @@ export function HomePromoCard({
 }: HomePromoCardProps) {
   return (
     <article className="group overflow-hidden rounded-[2rem] border border-border/60 bg-card/80 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl">
-      <div className="relative overflow-hidden bg-muted">
+      <div className={`relative overflow-hidden bg-muted ${index === 0 ? "aspect-[4/3]" : "aspect-square"}`}>
         {product.images?.[0] ? (
           <Image
             src={product.images[0]}
             alt={product.name || title}
-            width={index === 0 ? 900 : 640}
-            height={index === 0 ? 720 : 520}
-            className={`object-cover transition duration-700 group-hover:scale-105 ${index === 0 ? "aspect-[4/3]" : "aspect-square"}`}
+            fill
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-cover transition duration-700 group-hover:scale-105"
           />
         ) : (
           <div className="relative aspect-square bg-muted">

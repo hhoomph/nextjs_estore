@@ -44,6 +44,7 @@ export async function GET(request: NextRequest) {
       topProducts,
       categoryPerformance,
       totalStats,
+      orderStatusBreakdown,
     ] = await Promise.all([
       // Sales data (revenue and orders by day)
       getSalesData(startDate, endDate),
@@ -59,6 +60,9 @@ export async function GET(request: NextRequest) {
 
       // Total statistics
       getTotalStats(days),
+
+      // Order status distribution
+      getOrderStatusBreakdown(startDate, endDate),
     ]);
 
     const analytics = {
@@ -67,6 +71,7 @@ export async function GET(request: NextRequest) {
       topProducts,
       categoryPerformance,
       totalStats,
+      orderStatusBreakdown,
     };
 
     return NextResponse.json({ analytics });
@@ -247,4 +252,22 @@ async function getTotalStats(days: number) {
     totalCustomers: totalCustomers.length,
     averageOrderValue: Number(averageOrderValue._avg.total || 0),
   };
+}
+
+async function getOrderStatusBreakdown(startDate: Date, endDate: Date) {
+  const rows = await prisma.$queryRaw<Array<{ status: string; count: number }>>`
+    SELECT status, COUNT(*)::int as count
+    FROM "order"
+    WHERE "createdAt" >= ${startDate} AND "createdAt" <= ${endDate}
+    GROUP BY status
+    ORDER BY count DESC
+  `;
+
+  const total = rows.reduce((sum, row) => sum + Number(row.count), 0);
+
+  return rows.map((row) => ({
+    status: row.status,
+    count: Number(row.count),
+    percentage: total > 0 ? Math.round((Number(row.count) / total) * 100) : 0,
+  }));
 }

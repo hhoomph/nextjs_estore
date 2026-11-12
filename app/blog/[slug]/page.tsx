@@ -19,13 +19,14 @@ import type { BlogPostContentData, BlogPostListData } from "@/components/blog/ty
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const t = await getTranslations("Blog");
+  const { slug } = await params;
 
   try {
     const post = await prisma.blogPost.findUnique({
-      where: { slug: params.slug, status: "published" },
+      where: { slug, status: "published" },
       include: {
         category: true,
         tags: { include: { tag: true } },
@@ -60,14 +61,23 @@ export async function generateMetadata({
   }
 }
 
+function isNextControlFlowError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    typeof (error as { digest?: unknown }).digest === "string" &&
+    ((error as { digest: string }).digest).startsWith("NEXT_")
+  );
+}
 interface BlogPostPageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export const dynamic = "force-dynamic";
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const t = await getTranslations("Blog");
+  const { slug } = await params;
 
   let post: BlogPostContentData | null = null;
   let relatedPosts: BlogPostListData[] = [];
@@ -75,7 +85,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   try {
     // Get the blog post with all relations
     post = await prisma.blogPost.findUnique({
-      where: { slug: params.slug, status: "published" },
+      where: { slug, status: "published" },
       include: {
         author: {
           select: {
@@ -172,6 +182,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       take: 4,
     })) as unknown as import("@/components/blog/types").BlogPostListData[];
   } catch (error) {
+    // notFound()/redirect() throw Next.js control-flow errors. Rethrow them so the
+    // framework can render the real 404 page instead of an error screen with HTTP 200.
+    if (isNextControlFlowError(error)) throw error;
     console.error("Error loading blog post:", error);
     return (
       <div className="container mx-auto px-4 py-8">

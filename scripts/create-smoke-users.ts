@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Script to create smoke test users via Better Auth API.
  * Run while dev server is active on localhost:3000
  */

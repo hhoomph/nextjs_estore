@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Admin Theme Overrides and Utilities
  *
  * Specialized theme utilities for admin panel components,

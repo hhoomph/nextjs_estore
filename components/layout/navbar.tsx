@@ -61,7 +61,7 @@ export function Navbar() {
   const { data: sessionData } = useSession();
   const [searchQuery, setSearchQuery] = useState("");
   const [mounted, setMounted] = useState(false); // Track hydration state
-  const [siteTitle, setSiteTitle] = useState("E-Store");
+  const [siteTitle, setSiteTitle] = useState("Northline Supply");
   const router = useRouter();
   const getItemCount = useCartStore((state) => state.getItemCount ?? (() => 0));
   const toggleCart = useCartStore((state) => state.toggleCart ?? (() => {}));
@@ -106,7 +106,7 @@ export function Navbar() {
         if (!res.ok) return;
         const result = await res.json();
         if (result?.settings)
-          setSiteTitle(result.settings.siteTitleEn || "E-Store");
+          setSiteTitle(result.settings.siteTitleEn || "Northline Supply");
       } catch (error) {
         console.error("Failed to fetch site settings:", error);
       }

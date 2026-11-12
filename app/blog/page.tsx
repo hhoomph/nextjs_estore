@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Blog Page Component
  *
  * Displays a list of published blog posts with categories and search functionality.

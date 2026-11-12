@@ -42,8 +42,10 @@ yarn-error.log*
 next-env.d.ts
 
 # Generated files
+# NOTE: lib/generated/prisma is committed on purpose. The installed Prisma CLI
+# (v8 release candidate) no longer exposes `prisma generate`, so a fresh checkout
+# cannot rebuild the client. Committing it keeps Vercel builds reproducible.
 /generated/prisma
-/lib/generated/
 
 # Project specific files
 /.clinerules

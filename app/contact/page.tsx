@@ -7,7 +7,7 @@
  */
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { AlertCircle, CheckCircle2, MapPin, Mail, Phone } from "lucide-react";
+import { AlertCircle, CheckCircle2, Mail, Phone } from "lucide-react";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -28,9 +28,33 @@ const contactSchema = z.object({
 type ContactForm = z.infer<typeof contactSchema>;
 
 export default function ContactPage() {
+  const [contactInfo, setContactInfo] = useState({ phone: "", email: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const loadSettings = async () => {
+      try {
+        const response = await fetch("/api/admin/settings", { signal: controller.signal });
+        if (!response.ok) return;
+        const payload = await response.json();
+        const settings = payload?.settings;
+        if (!settings) return;
+        setContactInfo({
+          phone: settings.phoneEn ?? "",
+          email: settings.emailEn ?? "",
+        });
+      } catch {
+        /* contact details are optional; the form below still works */
+      }
+    };
+
+    void loadSettings();
+    return () => controller.abort();
+  }, []);
 
   const form = useForm<ContactForm>({
     resolver: zodResolver(contactSchema),
@@ -98,31 +122,39 @@ export default function ContactPage() {
               <CardTitle>Get in Touch</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center gap-3">
-                <Mail className="h-5 w-5 text-primary" />
-                <div>
-                  <p className="font-medium">Email</p>
-                  <p className="text-sm text-muted-foreground">support@estore.com</p>
+              {contactInfo.email && (
+                <div className="flex items-center gap-3">
+                  <Mail className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-medium">Email</p>
+                    <a
+                      href={`mailto:${contactInfo.email}`}
+                      className="text-sm text-muted-foreground hover:text-primary"
+                    >
+                      {contactInfo.email}
+                    </a>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <Phone className="h-5 w-5 text-primary" />
-                <div>
-                  <p className="font-medium">Phone</p>
-                  <p className="text-sm text-muted-foreground">+1 (555) 123-4567</p>
+              )}
+              {contactInfo.phone && (
+                <div className="flex items-center gap-3">
+                  <Phone className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="font-medium">Phone</p>
+                    <a
+                      href={`tel:${contactInfo.phone}`}
+                      className="text-sm text-muted-foreground hover:text-primary"
+                    >
+                      {contactInfo.phone}
+                    </a>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <MapPin className="h-5 w-5 text-primary" />
-                <div>
-                  <p className="font-medium">Address</p>
-                  <p className="text-sm text-muted-foreground">
-                    123 Commerce Street<br />
-                    Suite 100<br />
-                    City, State 12345
-                  </p>
-                </div>
-              </div>
+              )}
+              {!contactInfo.email && !contactInfo.phone && (
+                <p className="text-sm text-muted-foreground">
+                  Send us a message with the form and our team will reply within one business day.
+                </p>
+              )}
             </CardContent>
           </Card>
 

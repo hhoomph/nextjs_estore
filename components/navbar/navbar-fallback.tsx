@@ -51,7 +51,7 @@ export function NavbarFallback() {
 
   // State hooks - must be called in same order
   const [searchQuery, setSearchQuery] = useState("");
-  const [siteTitle, setSiteTitle] = useState("E-Store");
+  const [siteTitle, setSiteTitle] = useState("Northline Supply");
   const [mounted, setMounted] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
@@ -81,7 +81,7 @@ export function NavbarFallback() {
         if (!res.ok) return;
         const result = await res.json();
         if (result?.settings)
-          setSiteTitle(result.settings.siteTitleEn || "E-Store");
+          setSiteTitle(result.settings.siteTitleEn || "Northline Supply");
       } catch (error) {
         console.error("Failed to fetch site settings:", error);
       }

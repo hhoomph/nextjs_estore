@@ -35,11 +35,19 @@ interface PopularProduct {
   revenue: number;
 }
 
+interface ActivityItemData {
+  id: string;
+  title: string;
+  time: string;
+  color: "primary" | "success" | "warning" | "danger";
+}
+
 interface AnalyticsState {
   userGrowth: UserGrowthDatum[];
   orderStats: OrderStat[];
   revenueStats: RevenueStat[];
   popularProducts: PopularProduct[];
+  recentActivity: ActivityItemData[];
 }
 
 const analyticsInitialState: AnalyticsState = {
@@ -47,6 +55,7 @@ const analyticsInitialState: AnalyticsState = {
   orderStats: [],
   revenueStats: [],
   popularProducts: [],
+  recentActivity: [],
 };
 
 export function Analytics() {
@@ -59,41 +68,63 @@ export function Analytics() {
   const fetchAnalytics = useCallback(async () => {
     setLoading(true);
     try {
-      setTimeout(() => {
-        setAnalytics({
-          userGrowth: [
-            { month: "Jan", users: 120 },
-            { month: "Feb", users: 150 },
-            { month: "Mar", users: 180 },
-            { month: "Apr", users: 220 },
-            { month: "May", users: 280 },
-            { month: "Jun", users: 350 },
-          ],
-          orderStats: [
-            { status: "Completed", count: 145, percentage: 65 },
-            { status: "Pending", count: 45, percentage: 20 },
-            { status: "Cancelled", count: 30, percentage: 15 },
-          ],
-          revenueStats: [
-            { month: "Jan", revenue: 12000 },
-            { month: "Feb", revenue: 15000 },
-            { month: "Mar", revenue: 18000 },
-            { month: "Apr", revenue: 22000 },
-            { month: "May", revenue: 28000 },
-            { month: "Jun", revenue: 35000 },
-          ],
-          popularProducts: [
-            { name: "Wireless Headphones", sales: 245, revenue: 12250 },
-            { name: "Smart Watch", sales: 189, revenue: 28350 },
-            { name: "Laptop Stand", sales: 156, revenue: 3120 },
-            { name: "USB Cable", sales: 134, revenue: 402 },
-            { name: "Phone Case", sales: 98, revenue: 980 },
-          ],
-        });
-        setLoading(false);
-      }, 1000);
+      const [analyticsResponse, ordersResponse] = await Promise.all([
+        fetch("/api/admin/analytics?period=90", { credentials: "include" }),
+        fetch("/api/admin/orders?limit=5", { credentials: "include" }),
+      ]);
+
+      if (!analyticsResponse.ok) {
+        throw new Error("Failed to load analytics");
+      }
+
+      const payload = await analyticsResponse.json();
+      const data = payload?.analytics ?? {};
+
+      let recentActivity: ActivityItemData[] = [];
+      if (ordersResponse.ok) {
+        const ordersPayload = await ordersResponse.json();
+        recentActivity = (ordersPayload?.orders ?? []).map((order: any) => ({
+          id: order.id,
+          title:
+            (order.user?.name ?? "Guest") +
+            " placed order #" +
+            String(order.id).slice(0, 8) +
+            " \u00b7 $" +
+            Number(order.total).toFixed(2),
+          time: formatRelativeTime(order.createdAt),
+          color:
+            order.status === "COMPLETED"
+              ? "success"
+              : order.status === "CANCELLED"
+                ? "danger"
+                : "primary",
+        }));
+      }
+
+      setAnalytics({
+        userGrowth: groupByMonth(data.userGrowth ?? [], "users").map((row) => ({
+          month: row.month,
+          users: row.value,
+        })),
+        revenueStats: groupByMonth(data.salesData ?? [], "revenue").map((row) => ({
+          month: row.month,
+          revenue: row.value,
+        })),
+        orderStats: (data.orderStatusBreakdown ?? []).map((stat: any) => ({
+          status: stat.status,
+          count: Number(stat.count),
+          percentage: Number(stat.percentage),
+        })),
+        popularProducts: (data.topProducts ?? []).slice(0, 5).map((product: any) => ({
+          name: product.name,
+          sales: Number(product.sales),
+          revenue: Number(product.revenue),
+        })),
+        recentActivity,
+      });
     } catch (error) {
       console.error("Error fetching analytics:", error);
+    } finally {
       setLoading(false);
     }
   }, []);
@@ -113,6 +144,8 @@ export function Analytics() {
     );
   }
 
+  const maxUserGrowth = Math.max(1, ...analytics.userGrowth.map((data) => data.users));
+  const maxRevenue = Math.max(1, ...analytics.revenueStats.map((data) => data.revenue));
   return (
     <div className="space-y-6">
       <section className="overflow-hidden rounded-[2rem] border border-border bg-card p-6 shadow-xl">
@@ -139,7 +172,7 @@ export function Analytics() {
               <div key={data.month} className="flex flex-1 flex-col items-center gap-2">
                 <div
                   className="w-full rounded-t-2xl bg-primary transition-all duration-300 hover:bg-primary/90"
-                  style={{ height: `${(data.users / 400) * 220}px` }}
+                  style={{ height: `${Math.max(4, (data.users / maxUserGrowth) * 200)}px` }}
                 />
                 <span className="text-xs font-medium text-muted-foreground">
                   {data.month}
@@ -189,7 +222,7 @@ export function Analytics() {
               <div key={data.month} className="flex flex-1 flex-col items-center gap-2">
                 <div
                   className="w-full rounded-t-2xl bg-warning transition-all duration-300 hover:bg-primary"
-                  style={{ height: `${(data.revenue / 40000) * 220}px` }}
+                  style={{ height: `${Math.max(4, (data.revenue / maxRevenue) * 200)}px` }}
                 />
                 <span className="text-xs font-medium text-muted-foreground">
                   {data.month}
@@ -243,26 +276,20 @@ export function Analytics() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            <ActivityItem
-              color="success"
-              title="John Doe placed an order for $299.99"
-              time="2 hours ago"
-            />
-            <ActivityItem
-              color="primary"
-              title="Jane Smith registered as a new user"
-              time="4 hours ago"
-            />
-            <ActivityItem
-              color="warning"
-              title="Order #1234 status changed to completed"
-              time="6 hours ago"
-            />
-            <ActivityItem
-              color="danger"
-              title="Payment failed for order #1235"
-              time="8 hours ago"
-            />
+            {analytics.recentActivity.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No recent orders yet.
+              </p>
+            ) : (
+              analytics.recentActivity.map((activity) => (
+                <ActivityItem
+                  key={activity.id}
+                  color={activity.color}
+                  title={activity.title}
+                  time={activity.time}
+                />
+              ))
+            )}
           </div>
         </CardContent>
       </Card>
@@ -366,3 +393,58 @@ function cnActivityDot(color: "primary" | "success" | "warning" | "danger") {
   return `h-2.5 w-2.5 rounded-full ${colorClass}`;
 }
 
+
+const MONTH_LABELS = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+function groupByMonth(
+  rows: Array<{ date: string } & Record<string, unknown>>,
+  valueKey: "users" | "revenue",
+): Array<{ month: string; value: number }> {
+  const buckets = new Map<string, number>();
+
+  for (const row of rows) {
+    const date = new Date(row.date);
+    if (Number.isNaN(date.getTime())) continue;
+    const key = date.getFullYear() + "-" + date.getMonth();
+    buckets.set(key, (buckets.get(key) ?? 0) + Number(row[valueKey] ?? 0));
+  }
+
+  return [...buckets.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, value]) => {
+      const monthIndex = Number(key.split("-")[1]);
+      return { month: MONTH_LABELS[monthIndex] ?? key, value: Math.round(value) };
+    });
+}
+
+function formatRelativeTime(value: string | Date): string {
+  const date = typeof value === "string" ? new Date(value) : value;
+  const diffMs = Date.now() - date.getTime();
+  const minutes = Math.round(diffMs / 60000);
+
+  if (minutes < 1) return "just now";
+  if (minutes < 60) {
+    return minutes + (minutes === 1 ? " minute ago" : " minutes ago");
+  }
+
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) {
+    return hours + (hours === 1 ? " hour ago" : " hours ago");
+  }
+
+  const days = Math.round(hours / 24);
+  if (days < 30) {
+    return days + (days === 1 ? " day ago" : " days ago");
+  }
+
+  const months = Math.round(days / 30);
+  if (months < 12) {
+    return months + (months === 1 ? " month ago" : " months ago");
+  }
+
+  const years = Math.round(months / 12);
+  return years + (years === 1 ? " year ago" : " years ago");
+}
