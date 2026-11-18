@@ -30,6 +30,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Save, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 
@@ -202,6 +203,7 @@ export function AddressForm({
   onSuccess,
   onCancel,
 }: AddressFormProps) {
+  const t = useTranslations("Addresses");
   const { data: session } = useSession();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -318,10 +320,10 @@ export function AddressForm({
             name="address_line1"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Address Line 1 *</FormLabel>
+                <FormLabel>{t("addressLine1")} *</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Street address, P.O. box, company name"
+                    placeholder={t("streetAddress")}
                     {...field}
                   />
                 </FormControl>
@@ -335,10 +337,10 @@ export function AddressForm({
             name="address_line2"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Address Line 2</FormLabel>
+                <FormLabel>{t("addressLine2")}</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Apartment, suite, unit, building, floor, etc."
+                    placeholder={t("apartment")}
                     {...field}
                   />
                 </FormControl>
@@ -357,7 +359,7 @@ export function AddressForm({
               <FormItem>
                 <FormLabel>City *</FormLabel>
                 <FormControl>
-                  <Input placeholder="City" {...field} />
+                  <Input placeholder={t("city")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -371,7 +373,7 @@ export function AddressForm({
               <FormItem>
                 <FormLabel>State/Province *</FormLabel>
                 <FormControl>
-                  <Input placeholder="State or Province" {...field} />
+                  <Input placeholder={t("stateProvince")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -388,7 +390,7 @@ export function AddressForm({
               <FormItem>
                 <FormLabel>Postal Code *</FormLabel>
                 <FormControl>
-                  <Input placeholder="ZIP or Postal Code" {...field} />
+                  <Input placeholder={t("postalCode")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -407,7 +409,7 @@ export function AddressForm({
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select a country" />
+                      <SelectValue placeholder={t("selectCountry")} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -465,7 +467,7 @@ export function AddressForm({
               <FormControl>
                 <div className="space-y-2">
                   <Input
-                    placeholder="Latitude, Longitude (e.g., 35.6892, 51.3890)"
+                    placeholder={t("mapPlaceholder")}
                     {...field}
                   />
                   <p className="text-xs text-muted-foreground">
@@ -501,12 +503,12 @@ export function AddressForm({
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                {address ? "Updating..." : "Adding..."}
+                {address ? t("updating") : t("adding")}
               </>
             ) : (
               <>
                 <Save className="h-4 w-4 mr-2" />
-                {address ? "Update Address" : "Add Address"}
+                {address ? t("updateAddress") : t("addAddress")}
               </>
             )}
           </Button>

@@ -1,11 +1,9 @@
-"use client";
-
+﻿"use client";
 import { Mail, Package, Phone, User, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, type SVGProps } from "react";
 import { useTranslations } from "next-intl";
 import { CurrencySelector } from "@/components/ui/currency-selector";
-
 function FacebookIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
@@ -13,7 +11,6 @@ function FacebookIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
-
 function InstagramIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
@@ -21,7 +18,6 @@ function InstagramIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
-
 function LinkedinIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
@@ -29,7 +25,6 @@ function LinkedinIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
-
 export function Footer() {
   const t = useTranslations("Footer & Additional UI");
   const [siteTitle, setSiteTitle] = useState("Northline Supply");
@@ -37,10 +32,8 @@ export function Footer() {
     phone: "",
     email: "",
   });
-
   useEffect(() => {
     const controller = new AbortController();
-
     const fetchSiteSettings = async () => {
       try {
         const res = await fetch("/api/admin/settings", {
@@ -64,16 +57,12 @@ export function Footer() {
         }
       }
     };
-
     void fetchSiteSettings();
-
     return () => controller.abort();
   }, []);
-
-
   return (
     <footer className="bg-background text-foreground">
-      <div className="container px-4 py-14 sm:px-6 lg:px-8">
+      <div className="container px-4 py-14 sm:px-6 lg:px-8 min-w-full">
         <div className="grid gap-10 lg:grid-cols-[1.3fr_0.8fr_0.8fr_1.1fr]">
           <div>
             <div className="mb-5 flex items-center gap-3">
@@ -100,7 +89,6 @@ export function Footer() {
               </a>
             </div>
           </div>
-
           <div>
             <h3 className="mb-5 text-sm font-black uppercase tracking-widest text-primary">
               {t("shop")}
@@ -114,7 +102,6 @@ export function Footer() {
               <li><Link href="/wishlist" className="transition hover:text-primary">{t("wishlist")}</Link></li>
             </ul>
           </div>
-
           <div>
             <h3 className="mb-5 text-sm font-black uppercase tracking-widest text-primary">
               {t("help")}
@@ -148,7 +135,6 @@ export function Footer() {
               )}
             </ul>
           </div>
-
           <div>
             <h3 className="mb-5 text-sm font-black uppercase tracking-widest text-primary">
               {t("account")}
@@ -162,26 +148,6 @@ export function Footer() {
             </ul>
           </div>
         </div>
-
-        <div className="mt-12 rounded-[2rem] bg-muted p-6">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <h3 className="text-lg font-black">{t("downloadApp")}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">{t("downloadAppDescription")}</p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <button type="button" className="rounded-2xl border border-border bg-background px-4 py-3 text-left transition hover:bg-primary hover:text-primary-foreground">
-                <span className="block text-xs text-muted-foreground">{t("downloadOn")}</span>
-                <span className="block text-sm font-black">{t("appStore")}</span>
-              </button>
-              <button type="button" className="rounded-2xl border border-border bg-background px-4 py-3 text-left transition hover:bg-primary hover:text-primary-foreground">
-                <span className="block text-xs text-muted-foreground">{t("getItOn")}</span>
-                <span className="block text-sm font-black">{t("googlePlay")}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
         <div className="mt-8 border-t border-border pt-8">
           <div className="flex flex-col justify-between gap-4 text-sm text-muted-foreground md:flex-row">
             <p>{t("copyright")}</p>
@@ -192,13 +158,6 @@ export function Footer() {
               <Link href="/contact" className="transition hover:text-primary">{t("contactUs")}</Link>
               <Link href="/credits" className="transition hover:text-primary">Image credits</Link>
             </div>
-          </div>
-          <div className="mt-6 flex flex-wrap gap-2">
-            {["Visa", "PayPal", "Mastercard", "Apple Pay", "Google Pay"].map((payment) => (
-              <span key={payment} className="rounded-full border border-border bg-background px-3 py-1 text-xs font-black text-foreground">
-                {payment}
-              </span>
-            ))}
           </div>
         </div>
       </div>

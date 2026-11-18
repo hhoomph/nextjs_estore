@@ -21,6 +21,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,6 +40,7 @@ interface AddressListProps {
 }
 
 export function AddressList({ onEdit, onAddNew }: AddressListProps) {
+  const t = useTranslations("Addresses");
   const { data: session } = useSession();
   const { toast } = useToast();
   const [addresses, setAddresses] = useState<any[]>([]);
@@ -153,7 +155,7 @@ export function AddressList({ onEdit, onAddNew }: AddressListProps) {
     return (
       <div className="flex justify-center items-center py-12">
         <Loader2 className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Loading addresses...</span>
+        <span className="ml-2">{t("loading")}</span>
       </div>
     );
   }
@@ -163,7 +165,7 @@ export function AddressList({ onEdit, onAddNew }: AddressListProps) {
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-12">
           <MapPin className="h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No addresses yet</h3>
+          <h3 className="text-lg font-semibold mb-2">{t("noAddresses")}</h3>
           <p className="text-muted-foreground text-center mb-6">
             Add your first delivery address to make checkout faster and easier.
           </p>
@@ -198,7 +200,7 @@ export function AddressList({ onEdit, onAddNew }: AddressListProps) {
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-2">
                   <Home className="h-4 w-4 text-muted-foreground" />
-                  <CardTitle className="text-base">Delivery Address</CardTitle>
+                  <CardTitle className="text-base">{t("deliveryAddress")}</CardTitle>
                 </div>
               </div>
             </CardHeader>
@@ -294,7 +296,7 @@ export function AddressList({ onEdit, onAddNew }: AddressListProps) {
           onClick={onAddNew}
         >
           <Plus className="h-8 w-8 text-muted-foreground mb-2" />
-          <p className="text-muted-foreground font-medium">Add New Address</p>
+          <p className="text-muted-foreground font-medium">{t("addAddress")}</p>
           <p className="text-xs text-muted-foreground mt-1">
             Click to add another delivery address
           </p>

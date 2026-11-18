@@ -54,7 +54,8 @@ export interface NavigationMessages {
   language: string;
   signOut: string;
   loadingCategories: string;
-  noCategoriesAvailable: string;
+  noCategoriesAvailable: string;
+  toggleTheme: string;
 }
 
 export interface AuthenticationMessages {
@@ -771,7 +772,26 @@ export interface CheckoutMessages {
   processingPayment: string;
   payAmount: string;
   failedToCreateOrder: string;
-  checkoutError: string;
+  checkoutError: string;  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  password: string;
+  createAccount: string;
+  addressLine1: string;
+  addressLine2: string;
+  city: string;
+  stateProvince: string;
+  postalCode: string;
+  country: string;
+  items: string;
+  subtotal: string;
+  total: string;
+  placeOrder: string;
+  backToContact: string;
+
+  confirmPassword: string;
+  continueToShipping: string;
 }
 
 export interface AccountMessages {
@@ -1204,9 +1224,55 @@ export interface AddressesMessages {
   deliveryAddress: string;
   pleaseSelect: string;
   addressSelected: string;
-  addressesDescription: string;
+  addressesDescription: string;  addressLine1: string;
+  addressLine2: string;
+  city: string;
+  stateProvince: string;
+  postalCode: string;
+  country: string;
+  telephone: string;
+  mobile: string;
+  mapLocation: string;
+  edit: string;
+  delete: string;
+  setAsDefault: string;
+  defaultBadge: string;
+  noAddresses: string;
+
+  streetAddress: string;
+  apartment: string;
+  cityPlaceholder: string;
+  statePlaceholder: string;
+  postalPlaceholder: string;
+  selectCountry: string;
+  telephonePlaceholder: string;
+  mobilePlaceholder: string;
+  mapPlaceholder: string;
+  save: string;
+  cancel: string;
+  addressLabel: string;
+  phoneLabel: string;
+  mobileLabel: string;
+  locationLabel: string;
+  defaultAddress: string;
+  updating: string;
+  adding: string;
+  updateAddress: string;
+  addAddress: string;
+  emptyAddressesHint: string;
+  addAnotherHint: string;
 }
 // Complete messages structure type
+interface ProductDetailMessages {
+  home: string;
+  products: string;
+  loadingProduct: string;
+  productAlt: string;
+  description: string;
+  noDescription: string;
+  customerReviews: string;
+  anonymous: string;
+}
 export interface AppMessages {
   loading: string;
   Navigation: NavigationMessages;
@@ -1256,6 +1322,7 @@ export interface AppMessages {
   Deals: DealsMessages;
   Orders: OrdersMessages;
   Addresses: AddressesMessages;
+  "ProductDetail": ProductDetailMessages;
   "Admin Signin": AdminSigninMessages;
   "Language Settings": Record<string, unknown>;
   "Product Suggestions": Record<string, unknown>;

@@ -1,5 +1,5 @@
 import { Mail } from "lucide-react";
-import { checkoutContactSchema } from "@/lib/validations/checkout";
+import { useTranslations } from "next-intl";import { checkoutContactSchema } from "@/lib/validations/checkout";
 import type { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ interface ContactStepProps {
 }
 
 export function ContactStep({ form, onNext }: ContactStepProps) {
+  const t = useTranslations("Checkout");
   const watchedCreateAccount = form.watch("createAccount");
 
   const handleNext = async () => {
@@ -48,7 +49,7 @@ export function ContactStep({ form, onNext }: ContactStepProps) {
         <form>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="firstName">First Name</Label>
+              <Label htmlFor="firstName">{t("firstName")}</Label>
               <Input data-testid="first-name"
                 id="firstName"
                 {...form.register("firstName")}
@@ -63,7 +64,7 @@ export function ContactStep({ form, onNext }: ContactStepProps) {
               )}
             </div>
             <div>
-              <Label htmlFor="lastName">Last Name</Label>
+              <Label htmlFor="lastName">{t("lastName")}</Label>
               <Input data-testid="last-name"
                 id="lastName"
                 {...form.register("lastName")}
@@ -80,7 +81,7 @@ export function ContactStep({ form, onNext }: ContactStepProps) {
           </div>
 
           <div>
-            <Label htmlFor="email">Email Address</Label>
+            <Label htmlFor="email">{t("email")}</Label>
             <Input data-testid="email"
               id="email"
               type="email"
@@ -95,7 +96,7 @@ export function ContactStep({ form, onNext }: ContactStepProps) {
           </div>
 
           <div>
-            <Label htmlFor="phone">Phone Number</Label>
+            <Label htmlFor="phone">{t("phone")}</Label>
             <Input data-testid="phone"
               id="phone"
               type="tel"
@@ -125,7 +126,7 @@ export function ContactStep({ form, onNext }: ContactStepProps) {
           {watchedCreateAccount && (
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t("password")}</Label>
                 <Input data-testid="password"
                   id="password"
                   type="password"
@@ -141,7 +142,7 @@ export function ContactStep({ form, onNext }: ContactStepProps) {
                 )}
               </div>
               <div>
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Label htmlFor="confirmPassword">{t("confirmPassword")}</Label>
                 <Input data-testid="confirm-password"
                   id="confirmPassword"
                   type="password"
@@ -162,7 +163,7 @@ export function ContactStep({ form, onNext }: ContactStepProps) {
           )}
 
           <div className="flex justify-end pt-4">
-            <Button data-testid="continue-to-shipping" type="button" onClick={handleNext}>Continue to Shipping</Button>
+            <Button data-testid="continue-to-shipping" type="button" onClick={handleNext}>{t("continueToShipping")}</Button>
           </div>
         </form>
       </CardContent>

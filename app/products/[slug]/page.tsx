@@ -7,6 +7,8 @@
  */
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
+import { getRequestLocale } from "@/lib/i18n/server";
 import prisma from "@/lib/prisma";
 import { LoadingPage } from "@/components/ui/loading";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,7 +28,7 @@ interface ProductPageProps {
 }
 
 // Fetch product by slug
-async function getProduct(slug: string) {
+async function getProduct(slug: string, locale: "fa" | "en") {
   try {
     const product = await prisma.product.findUnique({
       where: { slug },
@@ -60,7 +62,22 @@ async function getProduct(slug: string) {
       },
     });
 
-    return product;
+    if (!product) return null;
+
+    const translated = locale === "fa";
+    return {
+      ...product,
+      name: translated ? (product as { nameFa?: string | null }).nameFa || product.name : product.name,
+      desc: translated ? (product as { descFa?: string | null }).descFa || product.desc : product.desc,
+      category: product.category
+        ? {
+            ...product.category,
+            name: translated
+              ? (product.category as { nameFa?: string | null }).nameFa || product.category.name
+              : product.category.name,
+          }
+        : product.category,
+    };
   } catch (error) {
     console.error("Error fetching product:", error);
     return null;
@@ -69,7 +86,9 @@ async function getProduct(slug: string) {
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const resolvedParams = await params;
-  const product = await getProduct(resolvedParams.slug);
+  const locale = await getRequestLocale();
+  const t = await getTranslations("ProductDetail");
+  const product = await getProduct(resolvedParams.slug, locale);
 
   if (!product) {
     notFound();
@@ -91,23 +110,23 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <div className="border-b">
         <div className="container px-4 py-3">
           <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
-            <Link href="/" className="hover:text-foreground">Home</Link>
+            <Link href="/" className="hover:text-foreground">{t("home")}</Link>
             <span>/</span>
-            <Link href="/products" className="hover:text-foreground">Products</Link>
+            <Link href="/products" className="hover:text-foreground">{t("products")}</Link>
             <span>/</span>
             <span className="text-foreground">{product.name}</span>
           </nav>
         </div>
       </div>
 
-      <Suspense fallback={<LoadingPage text="Loading product..." />}>
+      <Suspense fallback={<LoadingPage text={t("loadingProduct")} />}>
         <div className="container px-4 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Product Images */}
             <div className="space-y-4" data-testid="product-image">
               <ProductImageGallery
                 images={productImages}
-                alt={product.name || "Product"}
+                alt={product.name || t("productAlt")}
                 className="rounded-[2rem] border border-border/60 bg-card p-3 shadow-xl shadow-primary/10"
               />
             </div>
@@ -156,9 +175,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
               {/* Description */}
               <div data-testid="product-description">
-                <h2 className="font-semibold mb-2">Description</h2>
+                <h2 className="font-semibold mb-2">{t("description")}</h2>
                 <p className="text-muted-foreground whitespace-pre-wrap">
-                  {product.desc || "No description available."}
+                  {product.desc || t("noDescription")}
                 </p>
               </div>
 
@@ -198,14 +217,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
           {/* Reviews Section */}
           {product.reviews.length > 0 && (
             <div className="mt-12">
-              <h2 className="text-2xl font-bold mb-6">Customer Reviews</h2>
+              <h2 className="text-2xl font-bold mb-6">{t("customerReviews")}</h2>
               <div className="space-y-4">
                 {product.reviews.map((review) => (
                   <Card key={review.id}>
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-base">
-                          {review.user.name || "Anonymous"}
+                          {review.user.name || t("anonymous")}
                         </CardTitle>
                         <div className="flex">
                           {Array.from({ length: 5 }).map((_, i) => (

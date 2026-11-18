@@ -11,7 +11,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -34,6 +34,7 @@ function categorySlug(name: string) {
 
 export function CategoryDropdown() {
   const t = useTranslations("Navigation");
+  const locale = useLocale();
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -41,7 +42,7 @@ export function CategoryDropdown() {
     const controller = new AbortController();
     const fetchCategories = async () => {
       try {
-        const res = await fetch("/api/categories", { signal: controller.signal });
+        const res = await fetch(`/api/categories?locale=${locale}`, { signal: controller.signal });
         if (!res.ok) return;
         const data = await res.json();
         // Filter to only categories that have active products

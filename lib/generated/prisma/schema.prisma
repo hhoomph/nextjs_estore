@@ -138,6 +138,7 @@ model Category {
   deletedAt  DateTime?
   level      Int?      @db.SmallInt
   name       String?   @db.VarChar(255)
+  nameFa     String?   @db.VarChar(255)
   createdAt  DateTime  @default(now())
   modifiedAt DateTime
   products   Product[]
@@ -261,8 +262,10 @@ model Picture {
 model Product {
   id                 String              @id
   name               String?             @db.VarChar(255)
+  nameFa             String?             @db.VarChar(255)
   deletedAt          DateTime?
   desc               String?
+  descFa             String?
   slug               String?             @db.VarChar(255)
   categoryId         String
   quantity           Int                 @default(0)
@@ -272,7 +275,9 @@ model Product {
   createdAt          DateTime            @default(now())
   modifiedAt         DateTime            @updatedAt
   seoTitle           String?             @db.VarChar(255)
+  seoTitleFa         String?             @db.VarChar(255)
   seoDescription     String?             @db.Text
+  seoDescriptionFa   String?             @db.Text
   seoKeywords        String?             @db.Text
   ogImage            String?
   canonicalUrl       String?

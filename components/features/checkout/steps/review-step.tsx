@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Badge } from "@/components/ui/badge";
+import { useTranslations } from "next-intl";import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -28,6 +28,7 @@ export function ReviewStep({
   onSubmit,
   onPrevious,
 }: ReviewStepProps) {
+  const t = useTranslations("Checkout");
   const total = cartTotal + shippingCost + tax;
 
   return (
@@ -40,7 +41,7 @@ export function ReviewStep({
       <CardContent className="space-y-6">
         <form onSubmit={onSubmit}>
           <div>
-            <h3 className="mb-4 font-black text-foreground">Items</h3>
+            <h3 className="mb-4 font-black text-foreground">{t("items")}</h3>
             <div className="space-y-3">
               {cartItems.map((item) => {
                 const image = item.product.product_pictures?.[0]?.picture?.url;
@@ -83,11 +84,11 @@ export function ReviewStep({
 
           <div className="space-y-2 rounded-3xl bg-muted p-4">
             <div className="flex justify-between text-muted-foreground">
-              <span>Subtotal</span>
+              <span>{t("subtotal")}</span>
               <span>{formatCurrency(cartTotal)}</span>
             </div>
             <div className="flex justify-between text-muted-foreground">
-              <span>Shipping</span>
+              <span>{t("shipping")}</span>
               <span>{formatCurrency(shippingCost)}</span>
             </div>
             <div className="flex justify-between text-muted-foreground">
@@ -96,7 +97,7 @@ export function ReviewStep({
             </div>
             <Separator />
             <div className="flex justify-between text-lg font-black text-foreground">
-              <span>Total</span>
+              <span>{t("total")}</span>
               <span>{formatCurrency(total)}</span>
             </div>
           </div>
@@ -115,7 +116,7 @@ export function ReviewStep({
               disabled={isSubmitting}
               className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              {isSubmitting ? "Processing..." : "Place Order"}
+              {isSubmitting ? "Processing..." : t("placeOrder")}
             </Button>
           </div>
         </form>

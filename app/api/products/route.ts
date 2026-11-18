@@ -108,6 +108,14 @@ export async function GET(request: NextRequest) {
     }
 
     const validatedQuery = (request as unknown as { validatedQuery: z.infer<typeof getProductsQuerySchema> }).validatedQuery;
+    const localeParam = new URL(request.url).searchParams.get("locale");
+    const cookieLocale = request.cookies.get("app-locale")?.value;
+    const locale =
+      localeParam === "en" || localeParam === "fa"
+        ? localeParam
+        : cookieLocale === "en"
+          ? "en"
+          : "fa";
     const {
       page = 1,
       limit = 12,
@@ -131,9 +139,12 @@ export async function GET(request: NextRequest) {
     }
 
     if (search?.trim()) {
+      const term = search.trim();
       where.OR = [
-        { name: { contains: search.trim(), mode: "insensitive" } },
-        { desc: { contains: search.trim(), mode: "insensitive" } },
+        { name: { contains: term, mode: "insensitive" } },
+        { desc: { contains: term, mode: "insensitive" } },
+        { nameFa: { contains: term, mode: "insensitive" } },
+        { descFa: { contains: term, mode: "insensitive" } },
       ];
     }
 
@@ -203,8 +214,14 @@ export async function GET(request: NextRequest) {
 
       return {
         id: product.id,
-        name: product.name,
-        desc: product.desc,
+        name:
+          locale === "fa"
+            ? (product as { nameFa?: string | null }).nameFa || product.name
+            : product.name,
+        desc:
+          locale === "fa"
+            ? (product as { descFa?: string | null }).descFa || product.desc
+            : product.desc,
         slug: product.slug,
         price: Number(product.price),
         discount_price: product.discountPrice

@@ -44,12 +44,22 @@ async function countActiveProductsInCategories(categoryIds: string[]) {
 }
 
 // GET /api/categories - Get all categories
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const localeParam = new URL(request.url).searchParams.get("locale");
+    const cookieLocale = request.cookies.get("app-locale")?.value;
+    const locale =
+      localeParam === "en" || localeParam === "fa"
+        ? localeParam
+        : cookieLocale === "en"
+          ? "en"
+          : "fa";
+
     const categories = await prisma.category.findMany({
       select: {
         id: true,
         name: true,
+        nameFa: true,
         level: true,
       },
       orderBy: [
@@ -60,12 +70,14 @@ export async function GET() {
 
     const transformedCategories = await Promise.all(
       categories.map(async (category) => {
+        const displayName =
+          locale === "fa" ? category.nameFa || category.name : category.name;
         const categoryIds = await getCategoryDescendantIds(category.id);
         const productCount = await countActiveProductsInCategories(categoryIds);
 
         return {
           id: category.id,
-          name: category.name ?? "Uncategorized",
+          name: displayName ?? "Uncategorized",
           level: category.level ?? 0,
           productCount,
         };

@@ -218,7 +218,7 @@ export function Navbar() {
                 >
                   <Sun className="h-4 w-4 rotate-0 scale-100 transition-all duration-300 dark:-rotate-90 dark:scale-0 text-warning" />
                   <Moon className="absolute inset-0 h-4 w-4 rotate-90 scale-0 transition-all duration-300 dark:rotate-0 dark:scale-100 text-primary" />
-                  <span className="sr-only">Toggle theme</span>
+                  <span className="sr-only">{t("toggleTheme")}</span>
                 </Button>
               )}
 
@@ -227,7 +227,7 @@ export function Navbar() {
                 icon={<Heart className="h-4 w-4" />}
                 count={wishlistCount}
                 href="/wishlist"
-                label="Wishlist"
+                label={t("wishlist")}
                 variant="ghost"
                 showBadge={mounted}
               />
@@ -287,7 +287,7 @@ export function Navbar() {
                           className="flex items-center px-2 py-2 hover:bg-accent/80 transition-colors duration-200 rounded-md cursor-pointer focus:bg-accent focus:text-accent-foreground"
                         >
                           <User className="mr-3 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                          <span className="font-medium">Profile</span>
+                          <span className="font-medium">{t("profile")}</span>
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild={true}>
@@ -305,7 +305,7 @@ export function Navbar() {
                           className="flex items-center px-2 py-2 hover:bg-accent/80 transition-colors duration-200 rounded-md cursor-pointer focus:bg-accent focus:text-accent-foreground"
                         >
                           <Heart className="mr-3 h-4 w-4 text-destructive group-hover:text-destructive transition-colors" />
-                          <span className="font-medium">Wishlist</span>
+                          <span className="font-medium">{t("wishlist")}</span>
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild={true}>
@@ -314,7 +314,7 @@ export function Navbar() {
                           className="flex items-center px-2 py-2 hover:bg-accent/80 transition-colors duration-200 rounded-md cursor-pointer focus:bg-accent focus:text-accent-foreground"
                         >
                           <Settings className="mr-3 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                          <span className="font-medium">Settings</span>
+                          <span className="font-medium">{t("settings")}</span>
                         </Link>
                       </DropdownMenuItem>
                       {sessionData?.user?.role === "ADMIN" && (

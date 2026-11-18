@@ -34,6 +34,7 @@ export const getCategories = cache(
     limit?: number;
     sortBy?: "name" | "createdAt" | "modifiedAt";
     sortOrder?: "asc" | "desc";
+    locale?: "fa" | "en";
   }): Promise<{
     data: CategoryWithCount[];
     total: number;
@@ -64,11 +65,15 @@ export const getCategories = cache(
         prisma.category.count(),
       ]);
 
+      const locale = options?.locale ?? "fa";
       const data = categories.map((category) => ({
         id: category.id,
         parentId: category.parentId,
         level: category.level,
-        name: category.name,
+        name:
+          locale === "fa"
+            ? (category as { nameFa?: string | null }).nameFa || category.name
+            : category.name,
         productCount: category._count.products,
         createdAt: category.createdAt,
         modifiedAt: category.modifiedAt,
@@ -266,6 +271,7 @@ export const getProductsByCategory = cache(
       limit?: number;
       sortBy?: "name" | "price" | "createdAt";
       sortOrder?: "asc" | "desc";
+      locale?: "fa" | "en";
     },
   ): Promise<any[]> => {
     if (!categoryId) return [];
@@ -278,6 +284,7 @@ export const getProductsByCategory = cache(
 
       const skip = (page - 1) * limit;
 
+      const locale = options?.locale ?? "fa";
       const products = await prisma.product.findMany({
         where: {
           categoryId: categoryId,
@@ -286,6 +293,7 @@ export const getProductsByCategory = cache(
           category: {
             select: {
               name: true,
+              nameFa: true,
             },
           },
         },
@@ -296,7 +304,27 @@ export const getProductsByCategory = cache(
         take: limit,
       });
 
-      return products;
+      return products.map((product) => ({
+        ...product,
+        name:
+          locale === "fa"
+            ? (product as { nameFa?: string | null }).nameFa || product.name
+            : product.name,
+        desc:
+          locale === "fa"
+            ? (product as { descFa?: string | null }).descFa || product.desc
+            : product.desc,
+        category: product.category
+          ? {
+              ...product.category,
+              name:
+                locale === "fa"
+                  ? (product.category as { nameFa?: string | null }).nameFa ||
+                    product.category.name
+                  : product.category.name,
+            }
+          : product.category,
+      }));
     } catch (error) {
       console.error("Error fetching products by category:", error);
       throw new Error("Failed to fetch products");

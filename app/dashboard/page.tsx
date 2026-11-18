@@ -40,7 +40,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useBrowserSession } from "@/lib/hooks/use-browser-session";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 // Force dynamic rendering to avoid prerendering issues
 export const dynamic = "force-dynamic";
@@ -159,6 +159,7 @@ function DashboardError({ message, onRetry }: { message: string; onRetry: () => 
 
 function DashboardContent() {
   const t = useTranslations("Dashboard");
+  const locale = useLocale();
   const { session: browserSession, isLoading: isSessionLoading } =
     useBrowserSession();
   const router = useRouter();
@@ -188,7 +189,7 @@ function DashboardContent() {
       const [statsResponse, ordersResponse, productsResponse] = await Promise.all([
         fetch("/api/dashboard/stats", { credentials: "include" }),
         fetch("/api/orders?limit=5", { credentials: "include" }),
-        fetch("/api/products?limit=5", { credentials: "include" }),
+        fetch(`/api/products?limit=5&locale=${locale}`, { credentials: "include" }),
       ]);
 
       const [statsData, ordersData, productsData] = await Promise.all([

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, Grid3X3, Package, Search } from "lucide-react";
 import { SectionHeading } from "@/components/features/layout/section-heading";
@@ -77,12 +77,14 @@ export default function CategoriesPage() {
 
   const controllerRef = useRef<AbortController | null>(null);
 
+  const locale = useLocale();
+
   const fetchCategories = useCallback(async () => {
     setLoading(true);
     setError("");
 
     try {
-      const response = await fetch("/api/categories", {
+      const response = await fetch(`/api/categories?locale=${locale}`, {
         signal: controllerRef.current?.signal,
       });
       const data = await response.json();

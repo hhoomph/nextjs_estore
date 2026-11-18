@@ -10,6 +10,7 @@ import { LoadingPage } from "@/components/ui/loading";
 import { getProducts } from "@/lib/actions/products";
 import { PopularBreadcrumb } from "./breadcrumb";
 import { ProductsPageClient } from "./client";
+import { getRequestLocale } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,7 @@ export default async function PopularProductsPage() {
       limit: 12,
       sortBy: "wishlistCount",
       sortOrder: "desc",
+      locale: await getRequestLocale(),
     });
   } catch (error) {
     console.warn(

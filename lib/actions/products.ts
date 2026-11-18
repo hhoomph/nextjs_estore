@@ -18,6 +18,7 @@ interface GetProductsParams {
   minPrice?: number;
   maxPrice?: number;
   inStock?: boolean;
+  locale?: "fa" | "en";
 }
 
 
@@ -83,6 +84,7 @@ async function fetchProducts(
       minPrice,
       maxPrice,
       inStock,
+      locale = "fa",
     } = params;
 
     const skip = (page - 1) * limit;
@@ -93,9 +95,12 @@ async function fetchProducts(
     };
 
     if (search && search.trim()) {
+      const term = search.trim();
       where.OR = [
-        { name: { contains: search.trim(), mode: "insensitive" } },
-        { desc: { contains: search.trim(), mode: "insensitive" } },
+        { name: { contains: term, mode: "insensitive" } },
+        { desc: { contains: term, mode: "insensitive" } },
+        { nameFa: { contains: term, mode: "insensitive" } },
+        { descFa: { contains: term, mode: "insensitive" } },
       ];
     }
 
@@ -170,11 +175,12 @@ async function fetchProducts(
      if (categoryIds.length > 0) {
        const categories = await prisma.category.findMany({
          where: { id: { in: categoryIds } },
-         select: { id: true, name: true },
+         select: { id: true, name: true, nameFa: true },
        });
 
-       categories.forEach((cat: { id: string; name: string | null }) => {
-         categoryMap.set(cat.id, { id: cat.id, name: cat.name || "Unknown" });
+       categories.forEach((cat: { id: string; name: string | null; nameFa?: string | null }) => {
+         const name = (locale === "fa" ? cat.nameFa || cat.name : cat.name) || "Unknown";
+         categoryMap.set(cat.id, { id: cat.id, name });
        });
      }
 
@@ -195,8 +201,16 @@ async function fetchProducts(
 
           return {
             id: product.id,
-            name: product.name,
-            desc: product.desc,
+            name:
+              locale === "fa"
+                ? (product as ProductWithPictures & { nameFa?: string | null }).nameFa ||
+                  product.name
+                : product.name,
+            desc:
+              locale === "fa"
+                ? (product as ProductWithPictures & { descFa?: string | null }).descFa ||
+                  product.desc
+                : product.desc,
             slug: product.slug,
             price: Number(product.price),
             discount_price: product.discountPrice

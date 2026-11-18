@@ -10991,6 +10991,7 @@ export namespace Prisma {
     deletedAt: Date | null
     level: number | null
     name: string | null
+    nameFa: string | null
     createdAt: Date | null
     modifiedAt: Date | null
   }
@@ -11001,6 +11002,7 @@ export namespace Prisma {
     deletedAt: Date | null
     level: number | null
     name: string | null
+    nameFa: string | null
     createdAt: Date | null
     modifiedAt: Date | null
   }
@@ -11011,6 +11013,7 @@ export namespace Prisma {
     deletedAt: number
     level: number
     name: number
+    nameFa: number
     createdAt: number
     modifiedAt: number
     _all: number
@@ -11031,6 +11034,7 @@ export namespace Prisma {
     deletedAt?: true
     level?: true
     name?: true
+    nameFa?: true
     createdAt?: true
     modifiedAt?: true
   }
@@ -11041,6 +11045,7 @@ export namespace Prisma {
     deletedAt?: true
     level?: true
     name?: true
+    nameFa?: true
     createdAt?: true
     modifiedAt?: true
   }
@@ -11051,6 +11056,7 @@ export namespace Prisma {
     deletedAt?: true
     level?: true
     name?: true
+    nameFa?: true
     createdAt?: true
     modifiedAt?: true
     _all?: true
@@ -11148,6 +11154,7 @@ export namespace Prisma {
     deletedAt: Date | null
     level: number | null
     name: string | null
+    nameFa: string | null
     createdAt: Date
     modifiedAt: Date
     _count: CategoryCountAggregateOutputType | null
@@ -11177,6 +11184,7 @@ export namespace Prisma {
     deletedAt?: boolean
     level?: boolean
     name?: boolean
+    nameFa?: boolean
     createdAt?: boolean
     modifiedAt?: boolean
     products?: boolean | Category$productsArgs<ExtArgs>
@@ -11189,6 +11197,7 @@ export namespace Prisma {
     deletedAt?: boolean
     level?: boolean
     name?: boolean
+    nameFa?: boolean
     createdAt?: boolean
     modifiedAt?: boolean
   }, ExtArgs["result"]["category"]>
@@ -11199,6 +11208,7 @@ export namespace Prisma {
     deletedAt?: boolean
     level?: boolean
     name?: boolean
+    nameFa?: boolean
     createdAt?: boolean
     modifiedAt?: boolean
   }, ExtArgs["result"]["category"]>
@@ -11209,11 +11219,12 @@ export namespace Prisma {
     deletedAt?: boolean
     level?: boolean
     name?: boolean
+    nameFa?: boolean
     createdAt?: boolean
     modifiedAt?: boolean
   }
 
-  export type CategoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "parentId" | "deletedAt" | "level" | "name" | "createdAt" | "modifiedAt", ExtArgs["result"]["category"]>
+  export type CategoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "parentId" | "deletedAt" | "level" | "name" | "nameFa" | "createdAt" | "modifiedAt", ExtArgs["result"]["category"]>
   export type CategoryInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     products?: boolean | Category$productsArgs<ExtArgs>
     _count?: boolean | CategoryCountOutputTypeDefaultArgs<ExtArgs>
@@ -11232,6 +11243,7 @@ export namespace Prisma {
       deletedAt: Date | null
       level: number | null
       name: string | null
+      nameFa: string | null
       createdAt: Date
       modifiedAt: Date
     }, ExtArgs["result"]["category"]>
@@ -11663,6 +11675,7 @@ export namespace Prisma {
     readonly deletedAt: FieldRef<"Category", 'DateTime'>
     readonly level: FieldRef<"Category", 'Int'>
     readonly name: FieldRef<"Category", 'String'>
+    readonly nameFa: FieldRef<"Category", 'String'>
     readonly createdAt: FieldRef<"Category", 'DateTime'>
     readonly modifiedAt: FieldRef<"Category", 'DateTime'>
   }
@@ -20141,8 +20154,10 @@ export namespace Prisma {
   export type ProductMinAggregateOutputType = {
     id: string | null
     name: string | null
+    nameFa: string | null
     deletedAt: Date | null
     desc: string | null
+    descFa: string | null
     slug: string | null
     categoryId: string | null
     quantity: number | null
@@ -20152,7 +20167,9 @@ export namespace Prisma {
     createdAt: Date | null
     modifiedAt: Date | null
     seoTitle: string | null
+    seoTitleFa: string | null
     seoDescription: string | null
+    seoDescriptionFa: string | null
     seoKeywords: string | null
     ogImage: string | null
     canonicalUrl: string | null
@@ -20161,8 +20178,10 @@ export namespace Prisma {
   export type ProductMaxAggregateOutputType = {
     id: string | null
     name: string | null
+    nameFa: string | null
     deletedAt: Date | null
     desc: string | null
+    descFa: string | null
     slug: string | null
     categoryId: string | null
     quantity: number | null
@@ -20172,7 +20191,9 @@ export namespace Prisma {
     createdAt: Date | null
     modifiedAt: Date | null
     seoTitle: string | null
+    seoTitleFa: string | null
     seoDescription: string | null
+    seoDescriptionFa: string | null
     seoKeywords: string | null
     ogImage: string | null
     canonicalUrl: string | null
@@ -20181,8 +20202,10 @@ export namespace Prisma {
   export type ProductCountAggregateOutputType = {
     id: number
     name: number
+    nameFa: number
     deletedAt: number
     desc: number
+    descFa: number
     slug: number
     categoryId: number
     quantity: number
@@ -20192,7 +20215,9 @@ export namespace Prisma {
     createdAt: number
     modifiedAt: number
     seoTitle: number
+    seoTitleFa: number
     seoDescription: number
+    seoDescriptionFa: number
     seoKeywords: number
     ogImage: number
     canonicalUrl: number
@@ -20217,8 +20242,10 @@ export namespace Prisma {
   export type ProductMinAggregateInputType = {
     id?: true
     name?: true
+    nameFa?: true
     deletedAt?: true
     desc?: true
+    descFa?: true
     slug?: true
     categoryId?: true
     quantity?: true
@@ -20228,7 +20255,9 @@ export namespace Prisma {
     createdAt?: true
     modifiedAt?: true
     seoTitle?: true
+    seoTitleFa?: true
     seoDescription?: true
+    seoDescriptionFa?: true
     seoKeywords?: true
     ogImage?: true
     canonicalUrl?: true
@@ -20237,8 +20266,10 @@ export namespace Prisma {
   export type ProductMaxAggregateInputType = {
     id?: true
     name?: true
+    nameFa?: true
     deletedAt?: true
     desc?: true
+    descFa?: true
     slug?: true
     categoryId?: true
     quantity?: true
@@ -20248,7 +20279,9 @@ export namespace Prisma {
     createdAt?: true
     modifiedAt?: true
     seoTitle?: true
+    seoTitleFa?: true
     seoDescription?: true
+    seoDescriptionFa?: true
     seoKeywords?: true
     ogImage?: true
     canonicalUrl?: true
@@ -20257,8 +20290,10 @@ export namespace Prisma {
   export type ProductCountAggregateInputType = {
     id?: true
     name?: true
+    nameFa?: true
     deletedAt?: true
     desc?: true
+    descFa?: true
     slug?: true
     categoryId?: true
     quantity?: true
@@ -20268,7 +20303,9 @@ export namespace Prisma {
     createdAt?: true
     modifiedAt?: true
     seoTitle?: true
+    seoTitleFa?: true
     seoDescription?: true
+    seoDescriptionFa?: true
     seoKeywords?: true
     ogImage?: true
     canonicalUrl?: true
@@ -20364,8 +20401,10 @@ export namespace Prisma {
   export type ProductGroupByOutputType = {
     id: string
     name: string | null
+    nameFa: string | null
     deletedAt: Date | null
     desc: string | null
+    descFa: string | null
     slug: string | null
     categoryId: string
     quantity: number
@@ -20375,7 +20414,9 @@ export namespace Prisma {
     createdAt: Date
     modifiedAt: Date
     seoTitle: string | null
+    seoTitleFa: string | null
     seoDescription: string | null
+    seoDescriptionFa: string | null
     seoKeywords: string | null
     ogImage: string | null
     canonicalUrl: string | null
@@ -20403,8 +20444,10 @@ export namespace Prisma {
   export type ProductSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
+    nameFa?: boolean
     deletedAt?: boolean
     desc?: boolean
+    descFa?: boolean
     slug?: boolean
     categoryId?: boolean
     quantity?: boolean
@@ -20414,7 +20457,9 @@ export namespace Prisma {
     createdAt?: boolean
     modifiedAt?: boolean
     seoTitle?: boolean
+    seoTitleFa?: boolean
     seoDescription?: boolean
+    seoDescriptionFa?: boolean
     seoKeywords?: boolean
     ogImage?: boolean
     canonicalUrl?: boolean
@@ -20433,8 +20478,10 @@ export namespace Prisma {
   export type ProductSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
+    nameFa?: boolean
     deletedAt?: boolean
     desc?: boolean
+    descFa?: boolean
     slug?: boolean
     categoryId?: boolean
     quantity?: boolean
@@ -20444,7 +20491,9 @@ export namespace Prisma {
     createdAt?: boolean
     modifiedAt?: boolean
     seoTitle?: boolean
+    seoTitleFa?: boolean
     seoDescription?: boolean
+    seoDescriptionFa?: boolean
     seoKeywords?: boolean
     ogImage?: boolean
     canonicalUrl?: boolean
@@ -20454,8 +20503,10 @@ export namespace Prisma {
   export type ProductSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
+    nameFa?: boolean
     deletedAt?: boolean
     desc?: boolean
+    descFa?: boolean
     slug?: boolean
     categoryId?: boolean
     quantity?: boolean
@@ -20465,7 +20516,9 @@ export namespace Prisma {
     createdAt?: boolean
     modifiedAt?: boolean
     seoTitle?: boolean
+    seoTitleFa?: boolean
     seoDescription?: boolean
+    seoDescriptionFa?: boolean
     seoKeywords?: boolean
     ogImage?: boolean
     canonicalUrl?: boolean
@@ -20475,8 +20528,10 @@ export namespace Prisma {
   export type ProductSelectScalar = {
     id?: boolean
     name?: boolean
+    nameFa?: boolean
     deletedAt?: boolean
     desc?: boolean
+    descFa?: boolean
     slug?: boolean
     categoryId?: boolean
     quantity?: boolean
@@ -20486,13 +20541,15 @@ export namespace Prisma {
     createdAt?: boolean
     modifiedAt?: boolean
     seoTitle?: boolean
+    seoTitleFa?: boolean
     seoDescription?: boolean
+    seoDescriptionFa?: boolean
     seoKeywords?: boolean
     ogImage?: boolean
     canonicalUrl?: boolean
   }
 
-  export type ProductOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "deletedAt" | "desc" | "slug" | "categoryId" | "quantity" | "price" | "status" | "discountPrice" | "createdAt" | "modifiedAt" | "seoTitle" | "seoDescription" | "seoKeywords" | "ogImage" | "canonicalUrl", ExtArgs["result"]["product"]>
+  export type ProductOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "nameFa" | "deletedAt" | "desc" | "descFa" | "slug" | "categoryId" | "quantity" | "price" | "status" | "discountPrice" | "createdAt" | "modifiedAt" | "seoTitle" | "seoTitleFa" | "seoDescription" | "seoDescriptionFa" | "seoKeywords" | "ogImage" | "canonicalUrl", ExtArgs["result"]["product"]>
   export type ProductInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     category?: boolean | CategoryDefaultArgs<ExtArgs>
     cartItems?: boolean | Product$cartItemsArgs<ExtArgs>
@@ -20528,8 +20585,10 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       name: string | null
+      nameFa: string | null
       deletedAt: Date | null
       desc: string | null
+      descFa: string | null
       slug: string | null
       categoryId: string
       quantity: number
@@ -20539,7 +20598,9 @@ export namespace Prisma {
       createdAt: Date
       modifiedAt: Date
       seoTitle: string | null
+      seoTitleFa: string | null
       seoDescription: string | null
+      seoDescriptionFa: string | null
       seoKeywords: string | null
       ogImage: string | null
       canonicalUrl: string | null
@@ -20977,8 +21038,10 @@ export namespace Prisma {
   interface ProductFieldRefs {
     readonly id: FieldRef<"Product", 'String'>
     readonly name: FieldRef<"Product", 'String'>
+    readonly nameFa: FieldRef<"Product", 'String'>
     readonly deletedAt: FieldRef<"Product", 'DateTime'>
     readonly desc: FieldRef<"Product", 'String'>
+    readonly descFa: FieldRef<"Product", 'String'>
     readonly slug: FieldRef<"Product", 'String'>
     readonly categoryId: FieldRef<"Product", 'String'>
     readonly quantity: FieldRef<"Product", 'Int'>
@@ -20988,7 +21051,9 @@ export namespace Prisma {
     readonly createdAt: FieldRef<"Product", 'DateTime'>
     readonly modifiedAt: FieldRef<"Product", 'DateTime'>
     readonly seoTitle: FieldRef<"Product", 'String'>
+    readonly seoTitleFa: FieldRef<"Product", 'String'>
     readonly seoDescription: FieldRef<"Product", 'String'>
+    readonly seoDescriptionFa: FieldRef<"Product", 'String'>
     readonly seoKeywords: FieldRef<"Product", 'String'>
     readonly ogImage: FieldRef<"Product", 'String'>
     readonly canonicalUrl: FieldRef<"Product", 'String'>
@@ -40620,6 +40685,7 @@ export namespace Prisma {
     deletedAt: 'deletedAt',
     level: 'level',
     name: 'name',
+    nameFa: 'nameFa',
     createdAt: 'createdAt',
     modifiedAt: 'modifiedAt'
   };
@@ -40728,8 +40794,10 @@ export namespace Prisma {
   export const ProductScalarFieldEnum: {
     id: 'id',
     name: 'name',
+    nameFa: 'nameFa',
     deletedAt: 'deletedAt',
     desc: 'desc',
+    descFa: 'descFa',
     slug: 'slug',
     categoryId: 'categoryId',
     quantity: 'quantity',
@@ -40739,7 +40807,9 @@ export namespace Prisma {
     createdAt: 'createdAt',
     modifiedAt: 'modifiedAt',
     seoTitle: 'seoTitle',
+    seoTitleFa: 'seoTitleFa',
     seoDescription: 'seoDescription',
+    seoDescriptionFa: 'seoDescriptionFa',
     seoKeywords: 'seoKeywords',
     ogImage: 'ogImage',
     canonicalUrl: 'canonicalUrl'
@@ -41630,6 +41700,7 @@ export namespace Prisma {
     deletedAt?: DateTimeNullableFilter<"Category"> | Date | string | null
     level?: IntNullableFilter<"Category"> | number | null
     name?: StringNullableFilter<"Category"> | string | null
+    nameFa?: StringNullableFilter<"Category"> | string | null
     createdAt?: DateTimeFilter<"Category"> | Date | string
     modifiedAt?: DateTimeFilter<"Category"> | Date | string
     products?: ProductListRelationFilter
@@ -41641,6 +41712,7 @@ export namespace Prisma {
     deletedAt?: SortOrderInput | SortOrder
     level?: SortOrderInput | SortOrder
     name?: SortOrderInput | SortOrder
+    nameFa?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     modifiedAt?: SortOrder
     products?: ProductOrderByRelationAggregateInput
@@ -41655,6 +41727,7 @@ export namespace Prisma {
     deletedAt?: DateTimeNullableFilter<"Category"> | Date | string | null
     level?: IntNullableFilter<"Category"> | number | null
     name?: StringNullableFilter<"Category"> | string | null
+    nameFa?: StringNullableFilter<"Category"> | string | null
     createdAt?: DateTimeFilter<"Category"> | Date | string
     modifiedAt?: DateTimeFilter<"Category"> | Date | string
     products?: ProductListRelationFilter
@@ -41666,6 +41739,7 @@ export namespace Prisma {
     deletedAt?: SortOrderInput | SortOrder
     level?: SortOrderInput | SortOrder
     name?: SortOrderInput | SortOrder
+    nameFa?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     modifiedAt?: SortOrder
     _count?: CategoryCountOrderByAggregateInput
@@ -41684,6 +41758,7 @@ export namespace Prisma {
     deletedAt?: DateTimeNullableWithAggregatesFilter<"Category"> | Date | string | null
     level?: IntNullableWithAggregatesFilter<"Category"> | number | null
     name?: StringNullableWithAggregatesFilter<"Category"> | string | null
+    nameFa?: StringNullableWithAggregatesFilter<"Category"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Category"> | Date | string
     modifiedAt?: DateTimeWithAggregatesFilter<"Category"> | Date | string
   }
@@ -42210,8 +42285,10 @@ export namespace Prisma {
     NOT?: ProductWhereInput | ProductWhereInput[]
     id?: StringFilter<"Product"> | string
     name?: StringNullableFilter<"Product"> | string | null
+    nameFa?: StringNullableFilter<"Product"> | string | null
     deletedAt?: DateTimeNullableFilter<"Product"> | Date | string | null
     desc?: StringNullableFilter<"Product"> | string | null
+    descFa?: StringNullableFilter<"Product"> | string | null
     slug?: StringNullableFilter<"Product"> | string | null
     categoryId?: StringFilter<"Product"> | string
     quantity?: IntFilter<"Product"> | number
@@ -42221,7 +42298,9 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Product"> | Date | string
     modifiedAt?: DateTimeFilter<"Product"> | Date | string
     seoTitle?: StringNullableFilter<"Product"> | string | null
+    seoTitleFa?: StringNullableFilter<"Product"> | string | null
     seoDescription?: StringNullableFilter<"Product"> | string | null
+    seoDescriptionFa?: StringNullableFilter<"Product"> | string | null
     seoKeywords?: StringNullableFilter<"Product"> | string | null
     ogImage?: StringNullableFilter<"Product"> | string | null
     canonicalUrl?: StringNullableFilter<"Product"> | string | null
@@ -42239,8 +42318,10 @@ export namespace Prisma {
   export type ProductOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrderInput | SortOrder
+    nameFa?: SortOrderInput | SortOrder
     deletedAt?: SortOrderInput | SortOrder
     desc?: SortOrderInput | SortOrder
+    descFa?: SortOrderInput | SortOrder
     slug?: SortOrderInput | SortOrder
     categoryId?: SortOrder
     quantity?: SortOrder
@@ -42250,7 +42331,9 @@ export namespace Prisma {
     createdAt?: SortOrder
     modifiedAt?: SortOrder
     seoTitle?: SortOrderInput | SortOrder
+    seoTitleFa?: SortOrderInput | SortOrder
     seoDescription?: SortOrderInput | SortOrder
+    seoDescriptionFa?: SortOrderInput | SortOrder
     seoKeywords?: SortOrderInput | SortOrder
     ogImage?: SortOrderInput | SortOrder
     canonicalUrl?: SortOrderInput | SortOrder
@@ -42272,8 +42355,10 @@ export namespace Prisma {
     OR?: ProductWhereInput[]
     NOT?: ProductWhereInput | ProductWhereInput[]
     name?: StringNullableFilter<"Product"> | string | null
+    nameFa?: StringNullableFilter<"Product"> | string | null
     deletedAt?: DateTimeNullableFilter<"Product"> | Date | string | null
     desc?: StringNullableFilter<"Product"> | string | null
+    descFa?: StringNullableFilter<"Product"> | string | null
     categoryId?: StringFilter<"Product"> | string
     quantity?: IntFilter<"Product"> | number
     price?: DecimalFilter<"Product"> | Decimal | DecimalJsLike | number | string
@@ -42282,7 +42367,9 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Product"> | Date | string
     modifiedAt?: DateTimeFilter<"Product"> | Date | string
     seoTitle?: StringNullableFilter<"Product"> | string | null
+    seoTitleFa?: StringNullableFilter<"Product"> | string | null
     seoDescription?: StringNullableFilter<"Product"> | string | null
+    seoDescriptionFa?: StringNullableFilter<"Product"> | string | null
     seoKeywords?: StringNullableFilter<"Product"> | string | null
     ogImage?: StringNullableFilter<"Product"> | string | null
     canonicalUrl?: StringNullableFilter<"Product"> | string | null
@@ -42300,8 +42387,10 @@ export namespace Prisma {
   export type ProductOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrderInput | SortOrder
+    nameFa?: SortOrderInput | SortOrder
     deletedAt?: SortOrderInput | SortOrder
     desc?: SortOrderInput | SortOrder
+    descFa?: SortOrderInput | SortOrder
     slug?: SortOrderInput | SortOrder
     categoryId?: SortOrder
     quantity?: SortOrder
@@ -42311,7 +42400,9 @@ export namespace Prisma {
     createdAt?: SortOrder
     modifiedAt?: SortOrder
     seoTitle?: SortOrderInput | SortOrder
+    seoTitleFa?: SortOrderInput | SortOrder
     seoDescription?: SortOrderInput | SortOrder
+    seoDescriptionFa?: SortOrderInput | SortOrder
     seoKeywords?: SortOrderInput | SortOrder
     ogImage?: SortOrderInput | SortOrder
     canonicalUrl?: SortOrderInput | SortOrder
@@ -42328,8 +42419,10 @@ export namespace Prisma {
     NOT?: ProductScalarWhereWithAggregatesInput | ProductScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Product"> | string
     name?: StringNullableWithAggregatesFilter<"Product"> | string | null
+    nameFa?: StringNullableWithAggregatesFilter<"Product"> | string | null
     deletedAt?: DateTimeNullableWithAggregatesFilter<"Product"> | Date | string | null
     desc?: StringNullableWithAggregatesFilter<"Product"> | string | null
+    descFa?: StringNullableWithAggregatesFilter<"Product"> | string | null
     slug?: StringNullableWithAggregatesFilter<"Product"> | string | null
     categoryId?: StringWithAggregatesFilter<"Product"> | string
     quantity?: IntWithAggregatesFilter<"Product"> | number
@@ -42339,7 +42432,9 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"Product"> | Date | string
     modifiedAt?: DateTimeWithAggregatesFilter<"Product"> | Date | string
     seoTitle?: StringNullableWithAggregatesFilter<"Product"> | string | null
+    seoTitleFa?: StringNullableWithAggregatesFilter<"Product"> | string | null
     seoDescription?: StringNullableWithAggregatesFilter<"Product"> | string | null
+    seoDescriptionFa?: StringNullableWithAggregatesFilter<"Product"> | string | null
     seoKeywords?: StringNullableWithAggregatesFilter<"Product"> | string | null
     ogImage?: StringNullableWithAggregatesFilter<"Product"> | string | null
     canonicalUrl?: StringNullableWithAggregatesFilter<"Product"> | string | null
@@ -44222,6 +44317,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     level?: number | null
     name?: string | null
+    nameFa?: string | null
     createdAt?: Date | string
     modifiedAt: Date | string
     products?: ProductCreateNestedManyWithoutCategoryInput
@@ -44233,6 +44329,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     level?: number | null
     name?: string | null
+    nameFa?: string | null
     createdAt?: Date | string
     modifiedAt: Date | string
     products?: ProductUncheckedCreateNestedManyWithoutCategoryInput
@@ -44244,6 +44341,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     level?: NullableIntFieldUpdateOperationsInput | number | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     products?: ProductUpdateManyWithoutCategoryNestedInput
@@ -44255,6 +44353,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     level?: NullableIntFieldUpdateOperationsInput | number | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     products?: ProductUncheckedUpdateManyWithoutCategoryNestedInput
@@ -44266,6 +44365,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     level?: number | null
     name?: string | null
+    nameFa?: string | null
     createdAt?: Date | string
     modifiedAt: Date | string
   }
@@ -44276,6 +44376,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     level?: NullableIntFieldUpdateOperationsInput | number | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -44286,6 +44387,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     level?: NullableIntFieldUpdateOperationsInput | number | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -44849,8 +44951,10 @@ export namespace Prisma {
   export type ProductCreateInput = {
     id: string
     name?: string | null
+    nameFa?: string | null
     deletedAt?: Date | string | null
     desc?: string | null
+    descFa?: string | null
     slug?: string | null
     quantity?: number
     price: Decimal | DecimalJsLike | number | string
@@ -44859,7 +44963,9 @@ export namespace Prisma {
     createdAt?: Date | string
     modifiedAt?: Date | string
     seoTitle?: string | null
+    seoTitleFa?: string | null
     seoDescription?: string | null
+    seoDescriptionFa?: string | null
     seoKeywords?: string | null
     ogImage?: string | null
     canonicalUrl?: string | null
@@ -44877,8 +44983,10 @@ export namespace Prisma {
   export type ProductUncheckedCreateInput = {
     id: string
     name?: string | null
+    nameFa?: string | null
     deletedAt?: Date | string | null
     desc?: string | null
+    descFa?: string | null
     slug?: string | null
     categoryId: string
     quantity?: number
@@ -44888,7 +44996,9 @@ export namespace Prisma {
     createdAt?: Date | string
     modifiedAt?: Date | string
     seoTitle?: string | null
+    seoTitleFa?: string | null
     seoDescription?: string | null
+    seoDescriptionFa?: string | null
     seoKeywords?: string | null
     ogImage?: string | null
     canonicalUrl?: string | null
@@ -44905,8 +45015,10 @@ export namespace Prisma {
   export type ProductUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -44915,7 +45027,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44933,8 +45047,10 @@ export namespace Prisma {
   export type ProductUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     categoryId?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
@@ -44944,7 +45060,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44961,8 +45079,10 @@ export namespace Prisma {
   export type ProductCreateManyInput = {
     id: string
     name?: string | null
+    nameFa?: string | null
     deletedAt?: Date | string | null
     desc?: string | null
+    descFa?: string | null
     slug?: string | null
     categoryId: string
     quantity?: number
@@ -44972,7 +45092,9 @@ export namespace Prisma {
     createdAt?: Date | string
     modifiedAt?: Date | string
     seoTitle?: string | null
+    seoTitleFa?: string | null
     seoDescription?: string | null
+    seoDescriptionFa?: string | null
     seoKeywords?: string | null
     ogImage?: string | null
     canonicalUrl?: string | null
@@ -44981,8 +45103,10 @@ export namespace Prisma {
   export type ProductUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -44991,7 +45115,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -45000,8 +45126,10 @@ export namespace Prisma {
   export type ProductUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     categoryId?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
@@ -45011,7 +45139,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46987,6 +47117,7 @@ export namespace Prisma {
     deletedAt?: SortOrder
     level?: SortOrder
     name?: SortOrder
+    nameFa?: SortOrder
     createdAt?: SortOrder
     modifiedAt?: SortOrder
   }
@@ -47001,6 +47132,7 @@ export namespace Prisma {
     deletedAt?: SortOrder
     level?: SortOrder
     name?: SortOrder
+    nameFa?: SortOrder
     createdAt?: SortOrder
     modifiedAt?: SortOrder
   }
@@ -47011,6 +47143,7 @@ export namespace Prisma {
     deletedAt?: SortOrder
     level?: SortOrder
     name?: SortOrder
+    nameFa?: SortOrder
     createdAt?: SortOrder
     modifiedAt?: SortOrder
   }
@@ -47489,8 +47622,10 @@ export namespace Prisma {
   export type ProductCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
+    nameFa?: SortOrder
     deletedAt?: SortOrder
     desc?: SortOrder
+    descFa?: SortOrder
     slug?: SortOrder
     categoryId?: SortOrder
     quantity?: SortOrder
@@ -47500,7 +47635,9 @@ export namespace Prisma {
     createdAt?: SortOrder
     modifiedAt?: SortOrder
     seoTitle?: SortOrder
+    seoTitleFa?: SortOrder
     seoDescription?: SortOrder
+    seoDescriptionFa?: SortOrder
     seoKeywords?: SortOrder
     ogImage?: SortOrder
     canonicalUrl?: SortOrder
@@ -47516,8 +47653,10 @@ export namespace Prisma {
   export type ProductMaxOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
+    nameFa?: SortOrder
     deletedAt?: SortOrder
     desc?: SortOrder
+    descFa?: SortOrder
     slug?: SortOrder
     categoryId?: SortOrder
     quantity?: SortOrder
@@ -47527,7 +47666,9 @@ export namespace Prisma {
     createdAt?: SortOrder
     modifiedAt?: SortOrder
     seoTitle?: SortOrder
+    seoTitleFa?: SortOrder
     seoDescription?: SortOrder
+    seoDescriptionFa?: SortOrder
     seoKeywords?: SortOrder
     ogImage?: SortOrder
     canonicalUrl?: SortOrder
@@ -47536,8 +47677,10 @@ export namespace Prisma {
   export type ProductMinOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
+    nameFa?: SortOrder
     deletedAt?: SortOrder
     desc?: SortOrder
+    descFa?: SortOrder
     slug?: SortOrder
     categoryId?: SortOrder
     quantity?: SortOrder
@@ -47547,7 +47690,9 @@ export namespace Prisma {
     createdAt?: SortOrder
     modifiedAt?: SortOrder
     seoTitle?: SortOrder
+    seoTitleFa?: SortOrder
     seoDescription?: SortOrder
+    seoDescriptionFa?: SortOrder
     seoKeywords?: SortOrder
     ogImage?: SortOrder
     canonicalUrl?: SortOrder
@@ -51318,8 +51463,10 @@ export namespace Prisma {
   export type ProductCreateWithoutCartItemsInput = {
     id: string
     name?: string | null
+    nameFa?: string | null
     deletedAt?: Date | string | null
     desc?: string | null
+    descFa?: string | null
     slug?: string | null
     quantity?: number
     price: Decimal | DecimalJsLike | number | string
@@ -51328,7 +51475,9 @@ export namespace Prisma {
     createdAt?: Date | string
     modifiedAt?: Date | string
     seoTitle?: string | null
+    seoTitleFa?: string | null
     seoDescription?: string | null
+    seoDescriptionFa?: string | null
     seoKeywords?: string | null
     ogImage?: string | null
     canonicalUrl?: string | null
@@ -51345,8 +51494,10 @@ export namespace Prisma {
   export type ProductUncheckedCreateWithoutCartItemsInput = {
     id: string
     name?: string | null
+    nameFa?: string | null
     deletedAt?: Date | string | null
     desc?: string | null
+    descFa?: string | null
     slug?: string | null
     categoryId: string
     quantity?: number
@@ -51356,7 +51507,9 @@ export namespace Prisma {
     createdAt?: Date | string
     modifiedAt?: Date | string
     seoTitle?: string | null
+    seoTitleFa?: string | null
     seoDescription?: string | null
+    seoDescriptionFa?: string | null
     seoKeywords?: string | null
     ogImage?: string | null
     canonicalUrl?: string | null
@@ -51488,8 +51641,10 @@ export namespace Prisma {
   export type ProductUpdateWithoutCartItemsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -51498,7 +51653,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -51515,8 +51672,10 @@ export namespace Prisma {
   export type ProductUncheckedUpdateWithoutCartItemsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     categoryId?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
@@ -51526,7 +51685,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -51654,8 +51815,10 @@ export namespace Prisma {
   export type ProductCreateWithoutCategoryInput = {
     id: string
     name?: string | null
+    nameFa?: string | null
     deletedAt?: Date | string | null
     desc?: string | null
+    descFa?: string | null
     slug?: string | null
     quantity?: number
     price: Decimal | DecimalJsLike | number | string
@@ -51664,7 +51827,9 @@ export namespace Prisma {
     createdAt?: Date | string
     modifiedAt?: Date | string
     seoTitle?: string | null
+    seoTitleFa?: string | null
     seoDescription?: string | null
+    seoDescriptionFa?: string | null
     seoKeywords?: string | null
     ogImage?: string | null
     canonicalUrl?: string | null
@@ -51681,8 +51846,10 @@ export namespace Prisma {
   export type ProductUncheckedCreateWithoutCategoryInput = {
     id: string
     name?: string | null
+    nameFa?: string | null
     deletedAt?: Date | string | null
     desc?: string | null
+    descFa?: string | null
     slug?: string | null
     quantity?: number
     price: Decimal | DecimalJsLike | number | string
@@ -51691,7 +51858,9 @@ export namespace Prisma {
     createdAt?: Date | string
     modifiedAt?: Date | string
     seoTitle?: string | null
+    seoTitleFa?: string | null
     seoDescription?: string | null
+    seoDescriptionFa?: string | null
     seoKeywords?: string | null
     ogImage?: string | null
     canonicalUrl?: string | null
@@ -51737,8 +51906,10 @@ export namespace Prisma {
     NOT?: ProductScalarWhereInput | ProductScalarWhereInput[]
     id?: StringFilter<"Product"> | string
     name?: StringNullableFilter<"Product"> | string | null
+    nameFa?: StringNullableFilter<"Product"> | string | null
     deletedAt?: DateTimeNullableFilter<"Product"> | Date | string | null
     desc?: StringNullableFilter<"Product"> | string | null
+    descFa?: StringNullableFilter<"Product"> | string | null
     slug?: StringNullableFilter<"Product"> | string | null
     categoryId?: StringFilter<"Product"> | string
     quantity?: IntFilter<"Product"> | number
@@ -51748,7 +51919,9 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Product"> | Date | string
     modifiedAt?: DateTimeFilter<"Product"> | Date | string
     seoTitle?: StringNullableFilter<"Product"> | string | null
+    seoTitleFa?: StringNullableFilter<"Product"> | string | null
     seoDescription?: StringNullableFilter<"Product"> | string | null
+    seoDescriptionFa?: StringNullableFilter<"Product"> | string | null
     seoKeywords?: StringNullableFilter<"Product"> | string | null
     ogImage?: StringNullableFilter<"Product"> | string | null
     canonicalUrl?: StringNullableFilter<"Product"> | string | null
@@ -52341,8 +52514,10 @@ export namespace Prisma {
   export type ProductCreateWithoutOrderItemsInput = {
     id: string
     name?: string | null
+    nameFa?: string | null
     deletedAt?: Date | string | null
     desc?: string | null
+    descFa?: string | null
     slug?: string | null
     quantity?: number
     price: Decimal | DecimalJsLike | number | string
@@ -52351,7 +52526,9 @@ export namespace Prisma {
     createdAt?: Date | string
     modifiedAt?: Date | string
     seoTitle?: string | null
+    seoTitleFa?: string | null
     seoDescription?: string | null
+    seoDescriptionFa?: string | null
     seoKeywords?: string | null
     ogImage?: string | null
     canonicalUrl?: string | null
@@ -52368,8 +52545,10 @@ export namespace Prisma {
   export type ProductUncheckedCreateWithoutOrderItemsInput = {
     id: string
     name?: string | null
+    nameFa?: string | null
     deletedAt?: Date | string | null
     desc?: string | null
+    descFa?: string | null
     slug?: string | null
     categoryId: string
     quantity?: number
@@ -52379,7 +52558,9 @@ export namespace Prisma {
     createdAt?: Date | string
     modifiedAt?: Date | string
     seoTitle?: string | null
+    seoTitleFa?: string | null
     seoDescription?: string | null
+    seoDescriptionFa?: string | null
     seoKeywords?: string | null
     ogImage?: string | null
     canonicalUrl?: string | null
@@ -52452,8 +52633,10 @@ export namespace Prisma {
   export type ProductUpdateWithoutOrderItemsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -52462,7 +52645,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -52479,8 +52664,10 @@ export namespace Prisma {
   export type ProductUncheckedUpdateWithoutOrderItemsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     categoryId?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
@@ -52490,7 +52677,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -52773,6 +52962,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     level?: number | null
     name?: string | null
+    nameFa?: string | null
     createdAt?: Date | string
     modifiedAt: Date | string
   }
@@ -52783,6 +52973,7 @@ export namespace Prisma {
     deletedAt?: Date | string | null
     level?: number | null
     name?: string | null
+    nameFa?: string | null
     createdAt?: Date | string
     modifiedAt: Date | string
   }
@@ -53019,6 +53210,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     level?: NullableIntFieldUpdateOperationsInput | number | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -53029,6 +53221,7 @@ export namespace Prisma {
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     level?: NullableIntFieldUpdateOperationsInput | number | null
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -53271,8 +53464,10 @@ export namespace Prisma {
   export type ProductCreateWithoutProductOptionsInput = {
     id: string
     name?: string | null
+    nameFa?: string | null
     deletedAt?: Date | string | null
     desc?: string | null
+    descFa?: string | null
     slug?: string | null
     quantity?: number
     price: Decimal | DecimalJsLike | number | string
@@ -53281,7 +53476,9 @@ export namespace Prisma {
     createdAt?: Date | string
     modifiedAt?: Date | string
     seoTitle?: string | null
+    seoTitleFa?: string | null
     seoDescription?: string | null
+    seoDescriptionFa?: string | null
     seoKeywords?: string | null
     ogImage?: string | null
     canonicalUrl?: string | null
@@ -53298,8 +53495,10 @@ export namespace Prisma {
   export type ProductUncheckedCreateWithoutProductOptionsInput = {
     id: string
     name?: string | null
+    nameFa?: string | null
     deletedAt?: Date | string | null
     desc?: string | null
+    descFa?: string | null
     slug?: string | null
     categoryId: string
     quantity?: number
@@ -53309,7 +53508,9 @@ export namespace Prisma {
     createdAt?: Date | string
     modifiedAt?: Date | string
     seoTitle?: string | null
+    seoTitleFa?: string | null
     seoDescription?: string | null
+    seoDescriptionFa?: string | null
     seoKeywords?: string | null
     ogImage?: string | null
     canonicalUrl?: string | null
@@ -53399,8 +53600,10 @@ export namespace Prisma {
   export type ProductUpdateWithoutProductOptionsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -53409,7 +53612,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -53426,8 +53631,10 @@ export namespace Prisma {
   export type ProductUncheckedUpdateWithoutProductOptionsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     categoryId?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
@@ -53437,7 +53644,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -53474,8 +53683,10 @@ export namespace Prisma {
   export type ProductCreateWithoutProductPicturesInput = {
     id: string
     name?: string | null
+    nameFa?: string | null
     deletedAt?: Date | string | null
     desc?: string | null
+    descFa?: string | null
     slug?: string | null
     quantity?: number
     price: Decimal | DecimalJsLike | number | string
@@ -53484,7 +53695,9 @@ export namespace Prisma {
     createdAt?: Date | string
     modifiedAt?: Date | string
     seoTitle?: string | null
+    seoTitleFa?: string | null
     seoDescription?: string | null
+    seoDescriptionFa?: string | null
     seoKeywords?: string | null
     ogImage?: string | null
     canonicalUrl?: string | null
@@ -53501,8 +53714,10 @@ export namespace Prisma {
   export type ProductUncheckedCreateWithoutProductPicturesInput = {
     id: string
     name?: string | null
+    nameFa?: string | null
     deletedAt?: Date | string | null
     desc?: string | null
+    descFa?: string | null
     slug?: string | null
     categoryId: string
     quantity?: number
@@ -53512,7 +53727,9 @@ export namespace Prisma {
     createdAt?: Date | string
     modifiedAt?: Date | string
     seoTitle?: string | null
+    seoTitleFa?: string | null
     seoDescription?: string | null
+    seoDescriptionFa?: string | null
     seoKeywords?: string | null
     ogImage?: string | null
     canonicalUrl?: string | null
@@ -53571,8 +53788,10 @@ export namespace Prisma {
   export type ProductUpdateWithoutProductPicturesInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -53581,7 +53800,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -53598,8 +53819,10 @@ export namespace Prisma {
   export type ProductUncheckedUpdateWithoutProductPicturesInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     categoryId?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
@@ -53609,7 +53832,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -53625,8 +53850,10 @@ export namespace Prisma {
   export type ProductCreateWithoutReviewsInput = {
     id: string
     name?: string | null
+    nameFa?: string | null
     deletedAt?: Date | string | null
     desc?: string | null
+    descFa?: string | null
     slug?: string | null
     quantity?: number
     price: Decimal | DecimalJsLike | number | string
@@ -53635,7 +53862,9 @@ export namespace Prisma {
     createdAt?: Date | string
     modifiedAt?: Date | string
     seoTitle?: string | null
+    seoTitleFa?: string | null
     seoDescription?: string | null
+    seoDescriptionFa?: string | null
     seoKeywords?: string | null
     ogImage?: string | null
     canonicalUrl?: string | null
@@ -53652,8 +53881,10 @@ export namespace Prisma {
   export type ProductUncheckedCreateWithoutReviewsInput = {
     id: string
     name?: string | null
+    nameFa?: string | null
     deletedAt?: Date | string | null
     desc?: string | null
+    descFa?: string | null
     slug?: string | null
     categoryId: string
     quantity?: number
@@ -53663,7 +53894,9 @@ export namespace Prisma {
     createdAt?: Date | string
     modifiedAt?: Date | string
     seoTitle?: string | null
+    seoTitleFa?: string | null
     seoDescription?: string | null
+    seoDescriptionFa?: string | null
     seoKeywords?: string | null
     ogImage?: string | null
     canonicalUrl?: string | null
@@ -53762,8 +53995,10 @@ export namespace Prisma {
   export type ProductUpdateWithoutReviewsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -53772,7 +54007,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -53789,8 +54026,10 @@ export namespace Prisma {
   export type ProductUncheckedUpdateWithoutReviewsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     categoryId?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
@@ -53800,7 +54039,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -54915,8 +55156,10 @@ export namespace Prisma {
   export type ProductCreateWithoutWishlistsInput = {
     id: string
     name?: string | null
+    nameFa?: string | null
     deletedAt?: Date | string | null
     desc?: string | null
+    descFa?: string | null
     slug?: string | null
     quantity?: number
     price: Decimal | DecimalJsLike | number | string
@@ -54925,7 +55168,9 @@ export namespace Prisma {
     createdAt?: Date | string
     modifiedAt?: Date | string
     seoTitle?: string | null
+    seoTitleFa?: string | null
     seoDescription?: string | null
+    seoDescriptionFa?: string | null
     seoKeywords?: string | null
     ogImage?: string | null
     canonicalUrl?: string | null
@@ -54942,8 +55187,10 @@ export namespace Prisma {
   export type ProductUncheckedCreateWithoutWishlistsInput = {
     id: string
     name?: string | null
+    nameFa?: string | null
     deletedAt?: Date | string | null
     desc?: string | null
+    descFa?: string | null
     slug?: string | null
     categoryId: string
     quantity?: number
@@ -54953,7 +55200,9 @@ export namespace Prisma {
     createdAt?: Date | string
     modifiedAt?: Date | string
     seoTitle?: string | null
+    seoTitleFa?: string | null
     seoDescription?: string | null
+    seoDescriptionFa?: string | null
     seoKeywords?: string | null
     ogImage?: string | null
     canonicalUrl?: string | null
@@ -55052,8 +55301,10 @@ export namespace Prisma {
   export type ProductUpdateWithoutWishlistsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -55062,7 +55313,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -55079,8 +55332,10 @@ export namespace Prisma {
   export type ProductUncheckedUpdateWithoutWishlistsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     categoryId?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
@@ -55090,7 +55345,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -55179,8 +55436,10 @@ export namespace Prisma {
   export type ProductCreateWithoutRecentlyViewedsInput = {
     id: string
     name?: string | null
+    nameFa?: string | null
     deletedAt?: Date | string | null
     desc?: string | null
+    descFa?: string | null
     slug?: string | null
     quantity?: number
     price: Decimal | DecimalJsLike | number | string
@@ -55189,7 +55448,9 @@ export namespace Prisma {
     createdAt?: Date | string
     modifiedAt?: Date | string
     seoTitle?: string | null
+    seoTitleFa?: string | null
     seoDescription?: string | null
+    seoDescriptionFa?: string | null
     seoKeywords?: string | null
     ogImage?: string | null
     canonicalUrl?: string | null
@@ -55206,8 +55467,10 @@ export namespace Prisma {
   export type ProductUncheckedCreateWithoutRecentlyViewedsInput = {
     id: string
     name?: string | null
+    nameFa?: string | null
     deletedAt?: Date | string | null
     desc?: string | null
+    descFa?: string | null
     slug?: string | null
     categoryId: string
     quantity?: number
@@ -55217,7 +55480,9 @@ export namespace Prisma {
     createdAt?: Date | string
     modifiedAt?: Date | string
     seoTitle?: string | null
+    seoTitleFa?: string | null
     seoDescription?: string | null
+    seoDescriptionFa?: string | null
     seoKeywords?: string | null
     ogImage?: string | null
     canonicalUrl?: string | null
@@ -55349,8 +55614,10 @@ export namespace Prisma {
   export type ProductUpdateWithoutRecentlyViewedsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -55359,7 +55626,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -55376,8 +55645,10 @@ export namespace Prisma {
   export type ProductUncheckedUpdateWithoutRecentlyViewedsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     categoryId?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
@@ -55387,7 +55658,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -56527,8 +56800,10 @@ export namespace Prisma {
   export type ProductCreateWithoutCollectionProductsInput = {
     id: string
     name?: string | null
+    nameFa?: string | null
     deletedAt?: Date | string | null
     desc?: string | null
+    descFa?: string | null
     slug?: string | null
     quantity?: number
     price: Decimal | DecimalJsLike | number | string
@@ -56537,7 +56812,9 @@ export namespace Prisma {
     createdAt?: Date | string
     modifiedAt?: Date | string
     seoTitle?: string | null
+    seoTitleFa?: string | null
     seoDescription?: string | null
+    seoDescriptionFa?: string | null
     seoKeywords?: string | null
     ogImage?: string | null
     canonicalUrl?: string | null
@@ -56554,8 +56831,10 @@ export namespace Prisma {
   export type ProductUncheckedCreateWithoutCollectionProductsInput = {
     id: string
     name?: string | null
+    nameFa?: string | null
     deletedAt?: Date | string | null
     desc?: string | null
+    descFa?: string | null
     slug?: string | null
     categoryId: string
     quantity?: number
@@ -56565,7 +56844,9 @@ export namespace Prisma {
     createdAt?: Date | string
     modifiedAt?: Date | string
     seoTitle?: string | null
+    seoTitleFa?: string | null
     seoDescription?: string | null
+    seoDescriptionFa?: string | null
     seoKeywords?: string | null
     ogImage?: string | null
     canonicalUrl?: string | null
@@ -56644,8 +56925,10 @@ export namespace Prisma {
   export type ProductUpdateWithoutCollectionProductsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -56654,7 +56937,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -56671,8 +56956,10 @@ export namespace Prisma {
   export type ProductUncheckedUpdateWithoutCollectionProductsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     categoryId?: StringFieldUpdateOperationsInput | string
     quantity?: IntFieldUpdateOperationsInput | number
@@ -56682,7 +56969,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -56698,8 +56987,10 @@ export namespace Prisma {
   export type ProductCreateManyCategoryInput = {
     id: string
     name?: string | null
+    nameFa?: string | null
     deletedAt?: Date | string | null
     desc?: string | null
+    descFa?: string | null
     slug?: string | null
     quantity?: number
     price: Decimal | DecimalJsLike | number | string
@@ -56708,7 +56999,9 @@ export namespace Prisma {
     createdAt?: Date | string
     modifiedAt?: Date | string
     seoTitle?: string | null
+    seoTitleFa?: string | null
     seoDescription?: string | null
+    seoDescriptionFa?: string | null
     seoKeywords?: string | null
     ogImage?: string | null
     canonicalUrl?: string | null
@@ -56717,8 +57010,10 @@ export namespace Prisma {
   export type ProductUpdateWithoutCategoryInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -56727,7 +57022,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -56744,8 +57041,10 @@ export namespace Prisma {
   export type ProductUncheckedUpdateWithoutCategoryInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -56754,7 +57053,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null
@@ -56771,8 +57072,10 @@ export namespace Prisma {
   export type ProductUncheckedUpdateManyWithoutCategoryInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
+    nameFa?: NullableStringFieldUpdateOperationsInput | string | null
     deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     desc?: NullableStringFieldUpdateOperationsInput | string | null
+    descFa?: NullableStringFieldUpdateOperationsInput | string | null
     slug?: NullableStringFieldUpdateOperationsInput | string | null
     quantity?: IntFieldUpdateOperationsInput | number
     price?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -56781,7 +57084,9 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     modifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     seoTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    seoTitleFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoDescription?: NullableStringFieldUpdateOperationsInput | string | null
+    seoDescriptionFa?: NullableStringFieldUpdateOperationsInput | string | null
     seoKeywords?: NullableStringFieldUpdateOperationsInput | string | null
     ogImage?: NullableStringFieldUpdateOperationsInput | string | null
     canonicalUrl?: NullableStringFieldUpdateOperationsInput | string | null

@@ -13,6 +13,7 @@ import { HomeNewsletterSection } from "@/components/features/home/home-newslette
 import { HomeProductGrid } from "@/components/features/home/home-product-grid";
 import { getProducts } from "@/lib/actions/products";
 import { getCategories } from "@/lib/actions/categories";
+import { getRequestLocale } from "@/lib/i18n/server";
 
 type ProductListItem = {
   id: string;
@@ -44,6 +45,8 @@ async function fetchHomepageData(): Promise<{
   categories: { id: string; name: string | null; productCount: number }[];
 }> {
   try {
+    const locale = await getRequestLocale();
+
     // Fetch all homepage data in parallel
     const [featuredResult, bestSellersResult, categoriesResult] = await Promise.all([
       getProducts({
@@ -51,14 +54,16 @@ async function fetchHomepageData(): Promise<{
         limit: 8,
         sortBy: "createdAt",
         sortOrder: "desc",
+        locale,
       }),
       getProducts({
         page: 1,
         limit: 8,
         sortBy: "wishlistCount",
         sortOrder: "desc",
+        locale,
       }),
-      getCategories({ limit: 8, sortBy: "name" }),
+      getCategories({ limit: 8, sortBy: "name", locale }),
     ]);
 
     return {

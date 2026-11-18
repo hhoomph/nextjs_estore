@@ -10,7 +10,7 @@ import {
   Search,
   Star,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -299,6 +299,8 @@ export function ProductsPageClient({ initialData }: ProductsPageClientProps) {
 
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
+  const locale = useLocale();
+
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     setError("");
@@ -317,6 +319,7 @@ export function ProductsPageClient({ initialData }: ProductsPageClientProps) {
       if (priceRange[1] < 1000) params.set("maxPrice", priceRange[1].toString());
       if (inStockOnly) params.set("inStock", "true");
 
+      params.set("locale", locale);
       const response = await fetch(`/api/products?${params}`);
       const data: ProductResult = await response.json();
 
@@ -348,7 +351,7 @@ export function ProductsPageClient({ initialData }: ProductsPageClientProps) {
 
     const fetchCategories = async () => {
       try {
-        const response = await fetch("/api/categories", {
+        const response = await fetch(`/api/categories?locale=${locale}`, {
           signal: controller.signal,
         });
         if (!response.ok) return;

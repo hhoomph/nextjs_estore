@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowRight, Clock, Percent, Tag } from "lucide-react";
 import Link from "next/link";
@@ -45,6 +45,7 @@ function toProductCard(product: Product): ProductCardProduct {
 
 export default function DealsPage() {
   const t = useTranslations("Deals");
+  const locale = useLocale();
   const [deals, setDeals] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -57,7 +58,7 @@ export default function DealsPage() {
     setError("");
 
     try {
-      const response = await fetch("/api/products?limit=12&onSale=true", {
+      const response = await fetch(`/api/products?limit=12&onSale=true&locale=${locale}`, {
         signal: controllerRef.current?.signal,
       });
       const data: ProductResult = await response.json();

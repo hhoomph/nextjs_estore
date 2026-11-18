@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useTheme } from "@/components/providers/theme-provider";
 import { useEffect, useState } from "react";
 import { MessageSidebar } from "@/components/features/messages/message-sidebar";
@@ -72,6 +72,7 @@ export function UnifiedNavbar() {
   const { getItemCount: getWishlistCount } = useWishlistStore();
   // Use translations directly from next-intl
   const t = useTranslations("Navigation");
+  const locale = useLocale();
   const tPages = useTranslations("Navigation.pages");
   const tBlog = useTranslations("Navigation.blog");
   const blogLabel = tBlog("grid").split(" ")[0];
@@ -82,7 +83,7 @@ export function UnifiedNavbar() {
     const controller = new AbortController();
     const fetchCategories = async () => {
       try {
-        const res = await fetch("/api/categories", { signal: controller.signal });
+        const res = await fetch(`/api/categories?locale=${locale}`, { signal: controller.signal });
         if (res.ok) {
           const data = await res.json();
           const activeCategories = (data.categories || []).filter((cat: CategoryItem) => cat.productCount > 0);

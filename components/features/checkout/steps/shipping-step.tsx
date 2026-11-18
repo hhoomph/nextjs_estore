@@ -1,5 +1,5 @@
 import { Separator } from "@/components/ui/separator";
-import { Checkbox } from "@/components/ui/checkbox";
+import { useTranslations } from "next-intl";import { Checkbox } from "@/components/ui/checkbox";
 import { MapPin, Truck } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 import type { GuestCheckoutFormData } from "../guest-checkout-flow";
@@ -23,6 +23,7 @@ export function ShippingStep({
   onNext,
   onPrevious,
 }: ShippingStepProps) {
+  const t = useTranslations("Checkout");
   const handleNext = async () => {
     const isShippingValid = await form.trigger([
       "shippingAddress.address_line1",
@@ -58,7 +59,7 @@ export function ShippingStep({
       <CardContent className="space-y-4">
         <form>
           <div>
-            <Label htmlFor="shippingAddress.address_line1">Address Line 1</Label>
+            <Label htmlFor="shippingAddress.address_line1">{t("addressLine1")}</Label>
             <Input data-testid="shipping-address-line1"
               id="shippingAddress.address_line1"
               {...form.register("shippingAddress.address_line1")}
@@ -87,7 +88,7 @@ export function ShippingStep({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="shippingAddress.city">City</Label>
+              <Label htmlFor="shippingAddress.city">{t("city")}</Label>
               <Input data-testid="shipping-city"
                 id="shippingAddress.city"
                 {...form.register("shippingAddress.city")}
@@ -124,7 +125,7 @@ export function ShippingStep({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="shippingAddress.postal_code">Postal Code</Label>
+              <Label htmlFor="shippingAddress.postal_code">{t("postalCode")}</Label>
               <Input data-testid="shipping-postal-code"
                 id="shippingAddress.postal_code"
                 {...form.register("shippingAddress.postal_code")}
@@ -141,7 +142,7 @@ export function ShippingStep({
               )}
             </div>
             <div>
-              <Label htmlFor="shippingAddress.country">Country</Label>
+              <Label htmlFor="shippingAddress.country">{t("country")}</Label>
               <Input data-testid="shipping-country"
                 id="shippingAddress.country"
                 {...form.register("shippingAddress.country")}
@@ -178,7 +179,7 @@ export function ShippingStep({
             <Button type="button" variant="outline" onClick={onPrevious}>
               Back to Contact
             </Button>
-            <Button data-testid="continue-to-payment" type="button" onClick={handleNext}>Continue to Payment</Button>
+            <Button data-testid="continue-to-payment" type="button" onClick={handleNext}>{t("continueToPayment")}</Button>
           </div>
         </form>
       </CardContent>

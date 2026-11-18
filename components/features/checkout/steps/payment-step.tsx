@@ -1,5 +1,5 @@
 import { CreditCard } from "lucide-react";
-import type { UseFormReturn } from "react-hook-form";
+import { useTranslations } from "next-intl";import type { UseFormReturn } from "react-hook-form";
 import type { GuestCheckoutFormData } from "../guest-checkout-flow";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +13,7 @@ interface PaymentStepProps {
 }
 
 export function PaymentStep({ form, onNext, onPrevious }: PaymentStepProps) {
+  const t = useTranslations("Checkout");
   const handleNext = async () => {
     const isValid = await form.trigger([
       "payment.cardNumber",
@@ -44,7 +45,7 @@ export function PaymentStep({ form, onNext, onPrevious }: PaymentStepProps) {
           </div>
 
           <div>
-            <Label htmlFor="payment.cardNumber">Card Number</Label>
+            <Label htmlFor="payment.cardNumber">{t("cardNumber")}</Label>
             <Input data-testid="card-number"
               id="payment.cardNumber"
               placeholder="1234 5678 9012 3456"
@@ -63,7 +64,7 @@ export function PaymentStep({ form, onNext, onPrevious }: PaymentStepProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="payment.expiryDate">Expiry Date</Label>
+              <Label htmlFor="payment.expiryDate">{t("expiryDate")}</Label>
               <Input data-testid="card-expiry"
                 id="payment.expiryDate"
                 placeholder="MM/YY"
@@ -82,7 +83,7 @@ export function PaymentStep({ form, onNext, onPrevious }: PaymentStepProps) {
               )}
             </div>
             <div>
-              <Label htmlFor="payment.cvv">CVV</Label>
+              <Label htmlFor="payment.cvv">{t("cvv")}</Label>
               <Input data-testid="card-cvv"
                 id="payment.cvv"
                 placeholder="123"
@@ -99,7 +100,7 @@ export function PaymentStep({ form, onNext, onPrevious }: PaymentStepProps) {
           </div>
 
           <div>
-            <Label htmlFor="payment.cardName">Cardholder Name</Label>
+            <Label htmlFor="payment.cardName">{t("cardholderName")}</Label>
             <Input data-testid="card-name"
               id="payment.cardName"
               placeholder="Name on card"

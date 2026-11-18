@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Loader2, Search, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductGrid } from "@/components/features/products/product-grid";
@@ -56,6 +56,7 @@ function toProductCard(product: Product): ProductCardProduct {
 }
 
 function SearchBoard() {
+  const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("products") as (key: string) => string;
@@ -90,7 +91,7 @@ function SearchBoard() {
 
       try {
         const response = await fetch(
-          `/api/products?search=${encodeURIComponent(searchQuery)}&limit=20`,
+          `/api/products?search=${encodeURIComponent(searchQuery)}&limit=20&locale=${locale}`,
           { signal: searchAbortRef.current.signal },
         );
         const data = await response.json();

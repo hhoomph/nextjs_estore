@@ -10,6 +10,7 @@ import { hashPassword } from "../node_modules/better-auth/node_modules/@better-a
 import "dotenv/config";
 import { PrismaClient } from "../lib/generated/prisma/client";
 import { catalogCategories, catalogProducts } from "./data/catalog";
+import { catalogCategoriesFa, catalogProductsFa } from "./data/catalog-fa";
 import productImages from "./data/product-images.json";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
@@ -92,10 +93,15 @@ async function seedCategories() {
   for (const [index, category] of catalogCategories.entries()) {
     await prisma.category.upsert({
       where: { id: category.id },
-      update: { name: category.name, modifiedAt: new Date() },
+      update: {
+        name: category.name,
+        nameFa: catalogCategoriesFa[category.id] ?? category.name,
+        modifiedAt: new Date(),
+      },
       create: {
         id: category.id,
         name: category.name,
+        nameFa: catalogCategoriesFa[category.id] ?? category.name,
         level: 1,
         modifiedAt: new Date(),
       },
@@ -140,6 +146,14 @@ async function seedSiteSettings() {
   console.log("⚙️  Site settings ready");
 }
 
+function buildDescriptionFa(product: (typeof catalogProducts)[number]): string {
+  const translated = catalogProductsFa[product.id];
+  if (!translated) return buildDescription(product);
+
+  const highlights = translated.features.map((feature) => `• ${feature}`).join("\n");
+  const specs = translated.specs.map((spec) => `• ${spec.label}: ${spec.value}`).join("\n");
+  return `${translated.description}\n\nویژگی‌ها\n${highlights}\n\nمشخصات\n${specs}`;
+}
 async function seedProducts() {
   const keepIds = new Set(catalogProducts.map((product) => product.id));
 
@@ -171,9 +185,12 @@ async function seedProducts() {
     const primaryImage = images[0] ?? FALLBACK_IMAGE;
     const createdAt = new Date(now - index * 36 * 60 * 60 * 1000);
 
+    const translatedFa = catalogProductsFa[product.id];
     const data = {
       name: product.name,
+      nameFa: translatedFa?.name ?? product.name,
       desc: buildDescription(product),
+      descFa: buildDescriptionFa(product),
       slug: product.slug,
       categoryId: product.categoryId,
       quantity: product.stock,
@@ -181,7 +198,9 @@ async function seedProducts() {
       discountPrice: product.discountPrice !== undefined ? product.discountPrice.toFixed(2) : null,
       ogImage: primaryImage,
       seoTitle: product.seoTitle,
+      seoTitleFa: translatedFa?.seoTitle ?? product.seoTitle,
       seoDescription: product.seoDescription,
+      seoDescriptionFa: translatedFa?.seoDescription ?? product.seoDescription,
       seoKeywords: product.seoKeywords.join(", "),
       status: 1,
       createdAt,

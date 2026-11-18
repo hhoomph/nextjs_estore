@@ -7,6 +7,7 @@ import { ProductGrid } from "@/components/features/products/product-grid";
 import { SectionHeading } from "@/components/features/layout/section-heading";
 import { type ProductCardProduct } from "@/components/features/products/product-card";
 import prisma from "@/lib/prisma";
+import { getRequestLocale } from "@/lib/i18n/server";
 
 interface CategoryDetailPageProps {
   params: Promise<{
@@ -35,7 +36,7 @@ async function getCategoryDescendantIds(categoryId: string) {
   return rows.map((row) => row.id);
 }
 
-async function getCategoryBySlug(slug: string) {
+async function getCategoryBySlug(slug: string, locale: "fa" | "en") {
   const decodedSlug = decodeURIComponent(slug);
   const decodedName = decodedSlug.replaceAll("-", " ");
 
@@ -49,6 +50,7 @@ async function getCategoryBySlug(slug: string) {
     select: {
       id: true,
       name: true,
+      nameFa: true,
       level: true,
     },
   });
@@ -69,6 +71,7 @@ async function getCategoryBySlug(slug: string) {
       category: {
         select: {
           name: true,
+          nameFa: true,
         },
       },
       productPictures: {
@@ -86,6 +89,8 @@ async function getCategoryBySlug(slug: string) {
 
   return {
     ...category,
+    name:
+      locale === "fa" ? (category as { nameFa?: string | null }).nameFa || category.name : category.name,
     products: products.map((product) => {
       const images = product.productPictures.length > 0
         ? product.productPictures.map((picture) => picture.picture.url)
@@ -95,7 +100,10 @@ async function getCategoryBySlug(slug: string) {
 
       return {
         id: product.id,
-        name: product.name,
+        name:
+          locale === "fa"
+            ? (product as { nameFa?: string | null }).nameFa || product.name
+            : product.name,
         slug: product.slug,
         price: Number(product.price),
         discount_price: product.discountPrice ? Number(product.discountPrice) : null,
@@ -117,7 +125,8 @@ function HeroPlaceholder() {
 
 export default async function CategoryDetailPage({ params }: CategoryDetailPageProps) {
   const { slug } = await params;
-  const category = await getCategoryBySlug(slug);
+  const locale = await getRequestLocale();
+  const category = await getCategoryBySlug(slug, locale);
 
   if (!category) {
     notFound();
