@@ -6,6 +6,7 @@
  * @since 2025-01-01
  */
 "use client";
+import { useTranslations } from "next-intl";
 
 import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
@@ -19,6 +20,7 @@ interface UserDashboardProps {
 }
 
 export function UserDashboard({ session }: UserDashboardProps) {
+  const tCommon = useTranslations("Common");
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -87,7 +89,7 @@ export function UserDashboard({ session }: UserDashboardProps) {
       <header className="bg-card shadow-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <h1 className="text-2xl font-bold text-foreground">My Account</h1>
+            <h1 className="text-2xl font-bold text-foreground">{tCommon("myAccount")}</h1>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                   <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-medium">
@@ -142,7 +144,7 @@ export function UserDashboard({ session }: UserDashboardProps) {
                       : "text-muted-foreground hover:bg-accent"
                   }`}
                 >
-                  Addresses
+                  {tCommon("addresses")}
                 </button>
               </nav>
             </div>
@@ -172,6 +174,7 @@ function ProfileTab({
   user: User | null;
   onUpdate: (data: Partial<User>) => void;
 }) {
+  const tCommon = useTranslations("Common");
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || "",
@@ -371,13 +374,14 @@ function ProfileTab({
 
 // Orders Tab Component
 function OrdersTab() {
+  const tCommon = useTranslations("Common");
   return (
     <div>
       <h2 className="text-xl font-semibold text-foreground mb-6">
         Order History
       </h2>
       <div className="text-center py-12">
-        <p className="text-muted-foreground">Order history feature coming soon...</p>
+        <p className="text-muted-foreground">{tCommon("orderHistorySoon")}</p>
       </div>
     </div>
   );
@@ -385,10 +389,11 @@ function OrdersTab() {
 
 // Addresses Tab Component
 function AddressesTab({ user }: { user: User | null }) {
+  const tCommon = useTranslations("Common");
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-foreground">Addresses</h2>
+        <h2 className="text-xl font-semibold text-foreground">{tCommon("addresses")}</h2>
         <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
           Add Address
         </button>
@@ -430,7 +435,7 @@ function AddressesTab({ user }: { user: User | null }) {
         </div>
       ) : (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">No addresses saved yet.</p>
+          <p className="text-muted-foreground">{tCommon("noAddressesSaved")}</p>
           <p className="text-sm text-muted-foreground mt-1">
             Add your first address to get started.
           </p>

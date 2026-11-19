@@ -59,6 +59,7 @@ function hashTestId(value: string, seed: number): string {
 }
 
 export default function CartPage() {
+  const tCommon = useTranslations("Common");
   // ALL hooks must be called at the top level, BEFORE any conditional returns
   // This is critical for React's Rules of Hooks
 
@@ -354,7 +355,7 @@ export default function CartPage() {
                       data-testid="cart-shipping"
                     >
                       <span>{tCart("cartShipping")}</span>
-                      <span className="text-success">Free</span>
+                      <span className="text-success">{tCommon("free")}</span>
                     </div>
 
                     <Separator />

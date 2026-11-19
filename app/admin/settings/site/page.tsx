@@ -25,7 +25,7 @@ import { Globe, Loader2, Save } from "lucide-react";
 const siteSettingsSchema = z.object({
   siteName: z.string().min(1, "Site name is required"),
   siteDescription: z.string().min(1, "Site description is required"),
-  contactEmail: z.string().email("Invalid email address"),
+  contactEmail: z.string().email("Invalid email address").or(z.literal("")),
   maintenanceMode: z.boolean(),
   allowRegistration: z.boolean(),
   defaultCurrency: z.string().min(1, "Currency is required"),
@@ -38,6 +38,8 @@ const siteSettingsSchema = z.object({
 type SiteSettingsFormData = z.infer<typeof siteSettingsSchema>;
 
 const CURRENCIES = [
+  { value: "TOMAN", label: "Iranian Toman (تومان)" },
+  { value: "IRR", label: "Iranian Rial (ریال)" },
   { value: "USD", label: "US Dollar ($)" },
   { value: "EUR", label: "Euro (€)" },
   { value: "GBP", label: "British Pound (£)" },
@@ -57,7 +59,7 @@ export default function AdminSiteSettingsPage() {
       contactEmail: "",
       maintenanceMode: false,
       allowRegistration: true,
-      defaultCurrency: "USD",
+      defaultCurrency: "TOMAN",
       lowStockThreshold: 10,
       siteTitleFa: "",
       phoneFa: "",

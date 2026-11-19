@@ -140,7 +140,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   href={`/categories`}
                   className="text-sm text-muted-foreground hover:text-primary"
                 >
-                  {product.category.name}
+                  {product.category?.name}
                 </Link>
                 <h1 className="text-3xl font-bold mt-1">{product.name}</h1>
                 
@@ -160,7 +160,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                       ))}
                     </div>
                     <span className="text-sm text-muted-foreground">
-                      ({product.reviews.length} reviews)
+                      ({product.reviews.length} {t("reviews")})
                     </span>
                   </div>
                 )}
@@ -185,6 +185,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <StockBadge
                 inStock={product.quantity > 0}
                 quantity={product.quantity}
+                inStockLabel={t("inStock")}
+                outOfStockLabel={t("outOfStock")}
+                availableLabel={t("available")}
               />
 
               <Separator />
@@ -207,7 +210,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   className="inline-flex items-center text-sm text-muted-foreground hover:text-primary"
                 >
                   <ChevronLeft className="h-4 w-4 mr-1" />
-                  Back to Products
+                  {t("backToProducts")}
                 </Link>
               </div>
               </div>

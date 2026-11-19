@@ -14,6 +14,7 @@ import { ProductActionButton } from "@/components/ui/product-action-button";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
 import { useCartActions } from "@/lib/hooks/use-simplified-cart-sync";
+import { useTranslations } from "next-intl";
 
 interface AddToCartSectionProps {
   productId: string;
@@ -35,6 +36,7 @@ export function AddToCartSection({
   isOutOfStock,
 }: AddToCartSectionProps) {
   const { addToCart } = useCartActions();
+  const t = useTranslations("ProductDetail");
 
   const handleAddToCart = async () => {
     if (isOutOfStock) return;
@@ -59,7 +61,7 @@ export function AddToCartSection({
   const handleAddToWishlist = () => {
     // Wishlist is handled by the wishlist store - just scroll to top as a simple action
     // The actual wishlist integration would go here
-    alert("Added to wishlist!");
+    alert(t("addedToWishlist"));
   };
 
   return (
@@ -67,11 +69,13 @@ export function AddToCartSection({
       <ProductActionButton
         className="flex-1"
         inStock={!isOutOfStock}
+        label={t("addToCart")}
+        outOfStockLabel={t("outOfStock")}
         onClick={handleAddToCart}
       />
       <Button variant="outline" size="lg" onClick={handleAddToWishlist}>
         <Heart className="mr-2 h-5 w-5" />
-        Wishlist
+        {t("wishlist")}
       </Button>
     </div>
   );

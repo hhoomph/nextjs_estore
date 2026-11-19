@@ -1,4 +1,5 @@
 "use client";
+import { useTranslations } from "next-intl";
 
 /**
  * Product Comparison Page
@@ -40,6 +41,7 @@ import {
 import { useWishlistStore } from "@/lib/stores/wishlist-store";
 
 export default function ComparePage() {
+  const tCommon = useTranslations("Common");
   const { items: comparisonItems, removeItem, clearAll } = useComparisonStore();
   const { addToCart } = useCartActions();
   const {
@@ -114,7 +116,7 @@ export default function ComparePage() {
         className="object-cover"
       />
       <div className="absolute top-2 left-2 flex gap-1">
-        {product.discount_price && <Badge className="bg-success text-success-foreground">Sale</Badge>}
+        {product.discount_price && <Badge className="bg-success text-success-foreground">{tCommon("sale")}</Badge>}
         <Badge variant="secondary">#{index + 1}</Badge>
       </div>
     </div>

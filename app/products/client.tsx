@@ -41,6 +41,7 @@ import { ProductGrid } from "@/components/features/products/product-grid";
 import { SectionHeading } from "@/components/features/layout/section-heading";
 import { useCartActions } from "@/lib/hooks/use-simplified-cart-sync";
 import { useDebounce } from "@/lib/hooks/use-debounce";
+import { formatAmount } from "@/lib/utils/currency";
 
 interface Product {
   id: string;
@@ -84,6 +85,14 @@ const sortOptions = [
   { value: "price-high", labelKey: "sortOptions.priceHighLow" as const },
   { value: "name", labelKey: "sortOptions.name" as const },
 ];
+
+function niceCeil(value: number): number {
+  if (!Number.isFinite(value) || value <= 0) return 1000;
+  const magnitude = Math.pow(10, Math.floor(Math.log10(value)));
+  const normalized = value / magnitude;
+  const nice = normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 5 ? 5 : 10;
+  return nice * magnitude;
+}
 
 function ProductSkeleton() {
   return (
@@ -134,6 +143,8 @@ function FilterContent({
   setSelectedCategory,
   priceRange,
   setPriceRange,
+  priceCeiling,
+  priceStep,
   inStockOnly,
   setInStockOnly,
   categoryOptions,
@@ -144,11 +155,15 @@ function FilterContent({
   setSelectedCategory: (value: string) => void;
   priceRange: number[];
   setPriceRange: (value: number[]) => void;
+  priceCeiling: number;
+  priceStep: number;
   inStockOnly: boolean;
   setInStockOnly: (value: boolean) => void;
   categoryOptions: Array<{ key: string; label: string }>;
 }) {
   const t = useTranslations("products") as (key: string) => string;
+  const locale = useLocale();
+  const currency = locale === "fa" ? "IRR" : "USD";
 
   return (
     <div className="space-y-7">
@@ -198,13 +213,13 @@ function FilterContent({
           <Slider
             value={priceRange}
             onValueChange={setPriceRange}
-            max={1000}
-            step={10}
+            max={priceCeiling}
+            step={priceStep}
             className="w-full"
           />
           <div className="flex items-center justify-between text-sm font-bold text-muted-foreground">
-            <span>${priceRange[0]}</span>
-            <span>${priceRange[1]}</span>
+            <span>{formatAmount(priceRange[0], currency)}</span>
+            <span>{formatAmount(priceRange[1], currency)}</span>
           </div>
         </div>
       </div>
@@ -276,8 +291,12 @@ export function ProductsPageClient({ initialData }: ProductsPageClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("createdAt");
-  const [sortOrder] = useState("desc");
-  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const sortOrder = sortBy === "price" || sortBy === "name" ? "asc" : "desc";
+  const [priceCeiling] = useState(() =>
+    niceCeil(Math.max(1000, ...initialData.data.map((product) => product.price))),
+  );
+  const [priceRange, setPriceRange] = useState<number[]>(() => [0, priceCeiling]);
+  const priceStep = Math.max(1, Math.round(priceCeiling / 100));
   const [inStockOnly, setInStockOnly] = useState(false);
   const [currentPage, setCurrentPage] = useState(initialData.pagination.page);
   const [totalPages, setTotalPages] = useState(initialData.pagination.pages);
@@ -316,7 +335,7 @@ export function ProductsPageClient({ initialData }: ProductsPageClientProps) {
       if (selectedCategory !== "all") params.set("category", selectedCategory);
       if (debouncedSearchQuery) params.set("search", debouncedSearchQuery);
       if (priceRange[0] > 0) params.set("minPrice", priceRange[0].toString());
-      if (priceRange[1] < 1000) params.set("maxPrice", priceRange[1].toString());
+      if (priceRange[1] < priceCeiling) params.set("maxPrice", priceRange[1].toString());
       if (inStockOnly) params.set("inStock", "true");
 
       params.set("locale", locale);
@@ -339,6 +358,8 @@ export function ProductsPageClient({ initialData }: ProductsPageClientProps) {
     currentPage,
     debouncedSearchQuery,
     inStockOnly,
+    locale,
+    priceCeiling,
     priceRange,
     selectedCategory,
     sortBy,
@@ -406,7 +427,7 @@ export function ProductsPageClient({ initialData }: ProductsPageClientProps) {
   const gridClass =
     viewMode === "grid"
       ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-      : "grid-cols-1";
+      : "grid-cols-1 sm:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1";
 
   return (
     <div className="container px-4 py-8 sm:px-6 lg:px-8">
@@ -423,7 +444,7 @@ export function ProductsPageClient({ initialData }: ProductsPageClientProps) {
               selectedCategory={selectedCategory}
               setSelectedCategory={setSelectedCategory}
               priceRange={priceRange}
-              setPriceRange={setPriceRange}
+              setPriceRange={setPriceRange} priceCeiling={priceCeiling} priceStep={priceStep}
               inStockOnly={inStockOnly}
               setInStockOnly={setInStockOnly}
               categoryOptions={categoryOptions}
@@ -526,7 +547,7 @@ export function ProductsPageClient({ initialData }: ProductsPageClientProps) {
                           selectedCategory={selectedCategory}
                           setSelectedCategory={setSelectedCategory}
                           priceRange={priceRange}
-                          setPriceRange={setPriceRange}
+                          setPriceRange={setPriceRange} priceCeiling={priceCeiling} priceStep={priceStep}
                           inStockOnly={inStockOnly}
                           setInStockOnly={setInStockOnly}
                           categoryOptions={categoryOptions}
@@ -545,6 +566,7 @@ export function ProductsPageClient({ initialData }: ProductsPageClientProps) {
               ) : (
                 <ProductGrid
                   products={products.map(toProductCard)}
+                  className={gridClass}
                   onAddToCart={handleAddToCart}
                   unknownProductLabel={t("unknownProduct")}
                   outOfStockLabel={t("outOfStock")}

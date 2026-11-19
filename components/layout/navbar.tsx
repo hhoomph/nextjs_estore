@@ -58,6 +58,7 @@ import { useWishlistStore } from "@/lib/stores/wishlist-store";
 
 export function Navbar() {
   const t = useTranslations("Navigation");
+  const tCommon = useTranslations("Common");
   const { data: sessionData } = useSession();
   const [searchQuery, setSearchQuery] = useState("");
   const [mounted, setMounted] = useState(false); // Track hydration state
@@ -197,7 +198,7 @@ export function Navbar() {
             {/* Persian Search Bar */}
             <form onSubmit={handlePersianSearchSubmit} className="hidden md:flex flex-1 max-w-sm mx-4">
               <PersianSearchInput
-                placeholder="Search products..."
+                placeholder={tCommon("searchProductsPlaceholder")}
                 onSearch={handlePersianSearch}
                 className="w-full"
               />
@@ -296,7 +297,7 @@ export function Navbar() {
                           className="flex items-center px-2 py-2 hover:bg-accent/80 transition-colors duration-200 rounded-md cursor-pointer focus:bg-accent focus:text-accent-foreground"
                         >
                           <Package className="mr-3 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                          <span className="font-medium">Orders</span>
+                          <span className="font-medium">{t("orders")}</span>
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild={true}>
@@ -364,7 +365,7 @@ export function Navbar() {
                 <SheetTrigger asChild={true}>
                   <Button variant="ghost" size="icon" className="md:hidden">
                     <Menu className="h-4 w-4" />
-                    <span className="sr-only">Menu</span>
+                    <span className="sr-only">{tCommon("menu")}</span>
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-75 sm:w-100">

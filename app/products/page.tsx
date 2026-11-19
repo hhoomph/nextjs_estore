@@ -8,12 +8,16 @@
 import { Suspense } from "react";
 import { LoadingPage } from "@/components/ui/loading";
 import { getProducts } from "@/lib/actions/products";
+import { getRequestLocale } from "@/lib/i18n/server";
+import { getTranslations } from "next-intl/server";
 import { ProductsBreadcrumb } from "./breadcrumb";
 import { ProductsPageClient } from "./client";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export default async function ProductsPage() {
+  const locale = await getRequestLocale();
+  const t = (await getTranslations("products")) as (key: string) => string;
   // Server component - fetch initial data
   let initialData;
   try {
@@ -22,6 +26,7 @@ export default async function ProductsPage() {
       limit: 12,
       sortBy: "createdAt",
       sortOrder: "desc",
+      locale,
     });
   } catch (error) {
     console.warn(
@@ -50,7 +55,7 @@ export default async function ProductsPage() {
         </div>
       </div>
 
-      <Suspense fallback={<LoadingPage text="Loading products..." />}>
+      <Suspense fallback={<LoadingPage text={t("loading")} />}>
         <ProductsPageClient initialData={initialData} />
       </Suspense>
     </div>

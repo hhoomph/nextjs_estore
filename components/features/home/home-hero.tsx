@@ -1,5 +1,5 @@
 import { ArrowRight, Package, Sparkles, Star } from "lucide-react";
-import Image from "next/image";
+import { useTranslations } from "next-intl";import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -37,9 +37,10 @@ export function HomeHero({
   browseCategories,
   heroProduct,
 }: HomeHeroProps) {
+  const t = useTranslations("Common");
   const heroImage = heroProduct?.images?.[0];
-  const productName = heroProduct?.name || "Featured Product";
-  const categoryName = heroProduct?.category?.name || "Curated collection";
+  const productName = heroProduct?.name || t("featuredProduct");
+  const categoryName = heroProduct?.category?.name || t("curatedCollection");
 
   return (
     <section data-testid="hero-section" className="relative overflow-hidden bg-background">
@@ -72,15 +73,15 @@ export function HomeHero({
             <div className="mt-10 grid max-w-xl grid-cols-3 gap-3">
               <div className="rounded-2xl border border-border bg-background/70 p-4 text-center backdrop-blur">
                 <p className="text-2xl font-black text-primary">30%</p>
-                <p className="text-xs font-bold text-muted-foreground">Top deals</p>
+                <p className="text-xs font-bold text-muted-foreground">{t("topDeals")}</p>
               </div>
               <div className="rounded-2xl border border-border bg-background/70 p-4 text-center backdrop-blur">
                 <p className="text-2xl font-black text-primary">$80</p>
-                <p className="text-xs font-bold text-muted-foreground">Free ship</p>
+                <p className="text-xs font-bold text-muted-foreground">{t("freeShip")}</p>
               </div>
               <div className="rounded-2xl border border-border bg-background/70 p-4 text-center backdrop-blur">
                 <p className="text-2xl font-black text-primary">24/7</p>
-                <p className="text-xs font-bold text-muted-foreground">Support</p>
+                <p className="text-xs font-bold text-muted-foreground">{t("support")}</p>
               </div>
             </div>
           </div>
@@ -105,7 +106,7 @@ export function HomeHero({
               </div>
               <div className="absolute left-6 top-6">
                 <Badge className="rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground shadow-lg">
-                  {heroProduct?.discount_price ? "Limited Offer" : "Featured"}
+                  {heroProduct?.discount_price ? t("limitedOffer") : t("featured")}
                 </Badge>
               </div>
               <div className="absolute bottom-6 left-6 right-6 rounded-3xl border border-border bg-background/90 p-5 shadow-xl backdrop-blur">

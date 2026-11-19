@@ -42,6 +42,7 @@ import { useSession } from "@/lib/auth-client";
 export default function AddressesPage() {
   const { data: session, isPending } = useSession();
   const t = useTranslations("Addresses");
+  const tCommon = useTranslations("Common");
   const [activeTab, setActiveTab] = useState("list");
   const [isClient, setIsClient] = useState(false);
 
@@ -105,7 +106,7 @@ export default function AddressesPage() {
               Settings
             </Link>
             <span>/</span>
-            <span className="text-foreground">Addresses</span>
+            <span className="text-foreground">{tCommon("addresses")}</span>
           </nav>
         </div>
       </div>
@@ -123,7 +124,7 @@ export default function AddressesPage() {
                   </Button>
                 </Link>
               </div>
-              <h1 className="text-3xl font-bold">Address Book</h1>
+              <h1 className="text-3xl font-bold">{tCommon("addressBook")}</h1>
               <p className="text-muted-foreground">
                 Manage your delivery addresses for faster checkout
               </p>

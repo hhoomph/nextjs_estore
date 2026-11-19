@@ -8,6 +8,7 @@
  * @since 2025-01-01
  */
 "use client";
+import { useTranslations } from "next-intl";
 
 import {
 
@@ -89,6 +90,7 @@ export function MessageSidebar({
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
 } = {}) {
+  const t = useTranslations("Common");
 
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = open !== undefined;
@@ -200,7 +202,7 @@ export function MessageSidebar({
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search messages..."
+              placeholder={t("searchMessages")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-8"
@@ -383,7 +385,7 @@ export function MessageSidebar({
               <div className="shrink-0 p-4 border-t border-border">
                 <div className="flex gap-2">
                   <Input
-                    placeholder="Type a message..."
+                    placeholder={t("typeMessage")}
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}

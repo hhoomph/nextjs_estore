@@ -1,7 +1,9 @@
 import { Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 export function HomeNewsletterSection() {
+  const t = useTranslations("Common");
   return (
     <section className="bg-background py-16 sm:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -10,30 +12,29 @@ export function HomeNewsletterSection() {
             <div className="relative">
               <div className="absolute -left-8 -top-8 h-24 w-24 rounded-full bg-primary-foreground/15 blur-2xl" />
               <p className="mb-4 inline-flex rounded-full border border-primary-foreground/30 bg-primary-foreground/15 px-4 py-2 text-sm font-bold">
-                Don't Miss Out
+                {t("newsletterBadge")}
               </p>
               <h2 className="max-w-3xl text-balance text-3xl font-black tracking-tight sm:text-5xl">
-                Latest Trends & Offers
+                {t("newsletterTitle")}
               </h2>
               <p className="mt-4 max-w-xl text-lg text-primary-foreground/80">
-                Register to receive news about the latest offers, discount codes,
-                and product drops.
+                {t("newsletterDescription")}
               </p>
             </div>
             <form className="flex flex-col gap-3 sm:flex-row">
               <label className="sr-only" htmlFor="newsletter-email">
-                Email address
+                {t("emailAddress")}
               </label>
               <input
                 id="newsletter-email"
-                aria-label="Email address"
+                aria-label={t("emailAddress")}
                 className="min-h-12 w-full rounded-full border-0 px-5 text-foreground outline-none ring-1 ring-primary-foreground/30 focus:ring-4 focus:ring-primary-foreground/40"
-                placeholder="Email address"
+                placeholder={t("emailAddress")}
                 type="email"
               />
               <Button type="submit" size="lg" className="rounded-full bg-primary-foreground text-primary hover:bg-primary-foreground/90">
                 <Mail className="mr-2 h-4 w-4" />
-                Subscribe
+                {t("subscribe")}
               </Button>
             </form>
           </div>

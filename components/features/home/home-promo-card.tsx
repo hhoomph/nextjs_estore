@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import type { HomeHeroProduct } from "@/components/features/home/home-hero";
 import { PLACEHOLDER_IMAGE } from "@/lib/utils/image-utils";
+import { useTranslations } from "next-intl";
 
 interface HomePromoCardProps {
   product: HomeHeroProduct;
@@ -24,6 +25,7 @@ export function HomePromoCard({
   description,
   index,
 }: HomePromoCardProps) {
+  const t = useTranslations("Common");
   return (
     <article className="group overflow-hidden rounded-[2rem] border border-border/60 bg-card/80 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl">
       <div className={`relative overflow-hidden bg-muted ${index === 0 ? "aspect-[4/3]" : "aspect-square"}`}>
@@ -52,12 +54,12 @@ export function HomePromoCard({
       <div className="space-y-4 p-6">
         <div>
           <p className="text-sm font-black uppercase tracking-[0.25em] text-primary">{title}</p>
-          <h3 className="mt-2 text-2xl font-black text-foreground">{product.name || "Featured Product"}</h3>
+          <h3 className="mt-2 text-2xl font-black text-foreground">{product.name || t("featuredProduct")}</h3>
           <p className="mt-3 text-sm leading-7 text-muted-foreground">{description}</p>
         </div>
         <Button asChild={true} className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
           <Link href={createProductHref(product)}>
-            Purchase Now
+            {t("purchaseNow")}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </Button>

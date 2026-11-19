@@ -6,6 +6,7 @@ interface StockBadgeProps {
   quantity?: number;
   inStockLabel?: string;
   outOfStockLabel?: string;
+  availableLabel?: string;
   showQuantity?: boolean;
   className?: string;
 }
@@ -15,12 +16,13 @@ export function StockBadge({
   quantity,
   inStockLabel = "In Stock",
   outOfStockLabel = "Out of Stock",
+  availableLabel = "available",
   showQuantity = true,
   className,
 }: StockBadgeProps) {
   const label = inStock
     ? showQuantity && typeof quantity === "number"
-      ? `${inStockLabel} (${quantity} available)`
+      ? `${inStockLabel} (${quantity} ${availableLabel})`
       : inStockLabel
     : outOfStockLabel;
 

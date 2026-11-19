@@ -87,6 +87,11 @@ export async function updateSiteSettings(data: SiteSettingsData) {
       defaultCurrency: validatedData.default_currency,
       lowStockThreshold: validatedData.low_stock_threshold,
       defaultOgImage: validatedData.default_og_image,
+      phoneEn: validatedData.phone_en,
+      phoneFa: validatedData.phone_fa,
+      defaultSeoTitle: validatedData.default_seo_title,
+      defaultSeoDescription: validatedData.default_seo_description,
+      googleAnalyticsId: validatedData.google_analytics_id,
     };
 
     // Update or create settings (ensure only one record exists)

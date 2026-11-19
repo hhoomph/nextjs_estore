@@ -31,6 +31,7 @@ interface PaginationInfo {
 }
 
 export function UserManagement() {
+  const tCommon = useTranslations("Common");
   const t = useTranslations("Admin Users");
   const [users, setUsers] = useState<UserWithCounts[]>([]);
   const [pagination, setPagination] = useState<PaginationInfo>({
@@ -182,7 +183,7 @@ export function UserManagement() {
           <div className="grid gap-4 md:grid-cols-[1fr_14rem]">
             <Input
               type="text"
-              placeholder="Search users..."
+              placeholder={tCommon("searchUsersPlaceholder")}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               className="rounded-xl"
@@ -192,9 +193,9 @@ export function UserManagement() {
               onChange={(event) => setRoleFilter(event.target.value)}
               className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
             >
-              <option value="">All Roles</option>
-              <option value="USER">User</option>
-              <option value="ADMIN">Admin</option>
+              <option value="">{tCommon("allRoles")}</option>
+              <option value="USER">{tCommon("userRole")}</option>
+              <option value="ADMIN">{tCommon("adminRole")}</option>
             </select>
           </div>
         </CardContent>
@@ -385,6 +386,7 @@ interface UserModalProps {
 }
 
 function UserModal({ onClose, onSubmit, title, initialData }: UserModalProps) {
+  const tCommon = useTranslations("Common");
   const [formData, setFormData] = useState({
     name: initialData?.name || "",
     email: initialData?.email || "",
@@ -482,8 +484,8 @@ function UserModal({ onClose, onSubmit, title, initialData }: UserModalProps) {
               onChange={handleChange}
               className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
             >
-              <option value="USER">User</option>
-              <option value="ADMIN">Admin</option>
+              <option value="USER">{tCommon("user")}</option>
+              <option value="ADMIN">{tCommon("admin")}</option>
             </select>
           </FormField>
 

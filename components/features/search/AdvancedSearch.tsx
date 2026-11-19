@@ -1,4 +1,6 @@
+  const t = useTranslations("Common");
 "use client";
+import { useTranslations } from "next-intl";
 
 /**
  * Module for AdvancedSearch
@@ -547,10 +549,10 @@ export function AdvancedSearch({
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Any rating" />
+                  <SelectValue placeholder={t("anyRating")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Any rating</SelectItem>
+                  <SelectItem value="">{t("anyRating")}</SelectItem>
                   <SelectItem value="4">4+ stars</SelectItem>
                   <SelectItem value="3">3+ stars</SelectItem>
                   <SelectItem value="2">2+ stars</SelectItem>
@@ -563,7 +565,7 @@ export function AdvancedSearch({
 
             {/* Additional Filters */}
             <div className="space-y-3">
-              <Label>Additional Filters</Label>
+              <Label>{t("additionalFilters")}</Label>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <Checkbox
@@ -610,7 +612,7 @@ export function AdvancedSearch({
 
             {/* Sort Options */}
             <div className="space-y-3">
-              <Label>Sort By</Label>
+              <Label>{t("sortBy")}</Label>
               <Select
                 value={filters.sortBy || "relevance"}
                 onValueChange={(value) => updateFilter("sortBy", value)}

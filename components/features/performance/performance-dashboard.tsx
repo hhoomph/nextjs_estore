@@ -10,6 +10,7 @@
  */
 
 "use client";
+import { useTranslations } from "next-intl";
 
 import {
   Activity,
@@ -51,6 +52,7 @@ export function PerformanceDashboard({
   isVisible = false,
   onToggle,
 }: PerformanceDashboardProps) {
+  const t = useTranslations("Common");
   const [metrics, setMetrics] = useState<PerformanceMetric[]>([]);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -197,7 +199,7 @@ export function PerformanceDashboard({
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Monitor className="h-5 w-5 text-primary" />
-              <CardTitle className="text-lg">Performance Monitor</CardTitle>
+              <CardTitle className="text-lg">{t("performanceMonitor")}</CardTitle>
             </div>
             <div className="flex items-center space-x-2">
               <Button
@@ -272,7 +274,7 @@ export function PerformanceDashboard({
           {metrics.length === 0 && (
             <div className="text-center py-4 text-muted-foreground">
               <Activity className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p className="text-sm">Collecting performance metrics...</p>
+              <p className="text-sm">{t("collectingMetrics")}</p>
             </div>
           )}
         </CardContent>

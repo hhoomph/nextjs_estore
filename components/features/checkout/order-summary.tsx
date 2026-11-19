@@ -1,5 +1,5 @@
 import Image from "next/image";
-import type { ReactNode } from "react";
+import { useTranslations } from "next-intl";import type { ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ProductPrice } from "@/components/ui/product-price";
@@ -35,6 +35,7 @@ export function OrderSummary({
   className,
   footer,
 }: OrderSummaryProps) {
+  const t = useTranslations("Common");
   const { currency } = useCurrencyStore();
   const tax = subtotal * taxRate;
   const total = subtotal + shippingCost + tax;
@@ -83,11 +84,11 @@ export function OrderSummary({
 
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span>Subtotal</span>
+            <span>{t("subtotal")}</span>
             <span>{formatAmount(subtotal, currency)}</span>
           </div>
           <div className="flex justify-between">
-            <span>Shipping</span>
+            <span>{t("shipping")}</span>
             <span>{formatAmount(shippingCost, currency)}</span>
           </div>
           {taxRate > 0 && (
@@ -98,7 +99,7 @@ export function OrderSummary({
           )}
           <Separator />
           <div className="flex justify-between text-base font-semibold">
-            <span>Total</span>
+            <span>{t("total")}</span>
             <span>{formatAmount(total, currency)}</span>
           </div>
         </div>

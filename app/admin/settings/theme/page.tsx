@@ -28,8 +28,13 @@ import {
   hexToHslString,
   type ColorPreset,
 } from "@/lib/utils/admin-color-presets";
-
-const THEME_STORAGE_KEY = "admin-theme-settings";
+import {
+  ADMIN_THEME_STORAGE_KEY,
+  ADMIN_THEME_UPDATED_EVENT,
+  DEFAULT_ADMIN_THEME,
+  applyAdminTheme,
+  loadStoredAdminTheme,
+} from "@/lib/theme/admin-theme";
 
 const themeSettingsSchema = z.object({
   mode: z.enum(["light", "dark", "system"]),
@@ -48,15 +53,6 @@ const themeSettingsSchema = z.object({
 
 type ThemeSettingsFormData = z.infer<typeof themeSettingsSchema>;
 
-const DEFAULT_THEME: ThemeSettingsFormData = {
-  mode: "system",
-  primaryColor: "#2563eb",
-  secondaryColor: "#64748b",
-  backgroundColor: "#f8fafc",
-  foregroundColor: "#0f172a",
-  borderColor: "#e2e8f0",
-};
-
 export default function AdminThemeSettingsPage() {
   const t = useTranslations("Admin Theme Settings");
   const { theme, setTheme } = useTheme();
@@ -64,7 +60,7 @@ export default function AdminThemeSettingsPage() {
 
   const form = useForm<ThemeSettingsFormData>({
     resolver: zodResolver(themeSettingsSchema),
-    defaultValues: DEFAULT_THEME,
+    defaultValues: DEFAULT_ADMIN_THEME,
   });
 
   const primaryColor = useWatch({ control: form.control, name: "primaryColor" });
@@ -93,21 +89,10 @@ export default function AdminThemeSettingsPage() {
   );
 
   useEffect(() => {
-    const savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
-
-    if (!savedTheme) return;
-
-    try {
-      const parsed = JSON.parse(savedTheme) as ThemeSettingsFormData;
-      const result = themeSettingsSchema.safeParse(parsed);
-
-      if (result.success) {
-        form.reset(result.data);
-        applyThemeSettings(result.data);
-      }
-    } catch {
-      window.localStorage.removeItem(THEME_STORAGE_KEY);
-    }
+    const saved = loadStoredAdminTheme();
+    if (!saved) return;
+    form.reset(saved);
+    applyAdminTheme(saved);
   }, [form]);
 
   const onSubmit = (data: ThemeSettingsFormData) => {
@@ -115,8 +100,9 @@ export default function AdminThemeSettingsPage() {
 
     try {
       setTheme(data.mode);
-      applyThemeSettings(data);
-      window.localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(data));
+      applyAdminTheme(data);
+      window.localStorage.setItem(ADMIN_THEME_STORAGE_KEY, JSON.stringify(data));
+      window.dispatchEvent(new Event(ADMIN_THEME_UPDATED_EVENT));
       toast.success(t("themeSettingsSaved"));
     } catch {
       toast.error("Failed to save theme settings");
@@ -126,10 +112,11 @@ export default function AdminThemeSettingsPage() {
   };
 
   const resetTheme = () => {
-    form.reset(DEFAULT_THEME);
+    form.reset(DEFAULT_ADMIN_THEME);
     setTheme("system");
-    window.localStorage.removeItem(THEME_STORAGE_KEY);
-    applyThemeSettings(DEFAULT_THEME);
+    window.localStorage.removeItem(ADMIN_THEME_STORAGE_KEY);
+    applyAdminTheme(DEFAULT_ADMIN_THEME);
+    window.dispatchEvent(new Event(ADMIN_THEME_UPDATED_EVENT));
     toast.success(t("themeSettingsReset"));
   };
 
@@ -357,53 +344,4 @@ function ColorField({
       )}
     </div>
   );
-}
-
-function darkenHex(hex: string, amount: number): string {
-  const normalized = hex.replace("#", "");
-  const r = Math.max(0, parseInt(normalized.slice(0, 2), 16) - amount);
-  const g = Math.max(0, parseInt(normalized.slice(2, 4), 16) - amount);
-  const b = Math.max(0, parseInt(normalized.slice(4, 6), 16) - amount);
-
-  return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
-}
-
-function applyThemeSettings(data: ThemeSettingsFormData) {
-  const root = document.documentElement;
-
-  root.style.setProperty("--primary", hexToHslString(data.primaryColor));
-  root.style.setProperty("--secondary", hexToHslString(data.secondaryColor));
-  root.style.setProperty("--background", hexToHslString(data.backgroundColor));
-  root.style.setProperty("--foreground", hexToHslString(data.foregroundColor));
-  root.style.setProperty("--border", hexToHslString(data.borderColor));
-
-  root.style.setProperty("--primary-hover", hexToHslString(darkenHex(data.primaryColor, 20)));
-  root.style.setProperty("--primary-active", hexToHslString(darkenHex(data.primaryColor, 35)));
-  root.style.setProperty("--primary-foreground", "#ffffff");
-  root.style.setProperty("--secondary-hover", hexToHslString(data.backgroundColor));
-  root.style.setProperty("--muted-hover", hexToHslString(data.borderColor));
-  root.style.setProperty("--accent-hover", hexToHslString(data.backgroundColor));
-  root.style.setProperty("--border-hover", hexToHslString(data.borderColor));
-  root.style.setProperty("--input-hover", hexToHslString(data.backgroundColor));
-  root.style.setProperty("--ring-offset", hexToHslString(data.backgroundColor));
-  root.style.setProperty("--secondary-active", hexToHslString(data.borderColor));
-  root.style.setProperty("--muted-active", hexToHslString(data.borderColor));
-  root.style.setProperty("--accent-active", hexToHslString(data.borderColor));
-
-  root.style.setProperty("--apex-primary", hexToHslString(data.primaryColor));
-  root.style.setProperty("--apex-secondary", hexToHslString(data.secondaryColor));
-  root.style.setProperty("--apex-bg", hexToHslString(data.backgroundColor));
-  root.style.setProperty("--apex-foreground", hexToHslString(data.foregroundColor));
-  root.style.setProperty("--apex-border", hexToHslString(data.borderColor));
-  root.style.setProperty("--apex-border-soft", hexToHslString(data.borderColor));
-  root.style.setProperty(
-    "--apex-primary-soft",
-    `color-mix(in srgb, ${data.primaryColor} 10%, white)`
-  );
-  root.style.setProperty(
-    "--apex-gradient-primary",
-    `linear-gradient(135deg, ${data.primaryColor} 0%, ${data.secondaryColor} 100%)`
-  );
-  root.style.setProperty("--apex-sidebar-active", data.primaryColor);
-  root.style.setProperty("--chart-1", hexToHslString(data.primaryColor));
 }

@@ -6,6 +6,7 @@
  * @since 2025-01-01
  */
 "use client";
+import { useTranslations } from "next-intl";
 
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 import * as React from "react";
@@ -25,6 +26,7 @@ export function Pagination({
   onPageChange,
   className,
 }: PaginationProps) {
+  const t = useTranslations("Common");
   const getVisiblePages = () => {
     const delta = 2;
     const range = [];
@@ -70,7 +72,7 @@ export function Pagination({
         aria-label="Previous page"
       >
         <ChevronLeft className="h-4 w-4" />
-        <span className="sr-only">Previous</span>
+        <span className="sr-only">{t("previous")}</span>
       </Button>
 
       {getVisiblePages().map((page, index) => {
@@ -81,7 +83,7 @@ export function Pagination({
               className="flex h-9 w-9 items-center justify-center"
             >
               <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">More pages</span>
+              <span className="sr-only">{t("page")}</span>
             </span>
           );
         }
@@ -108,7 +110,7 @@ export function Pagination({
         aria-label="Next page"
       >
         <ChevronRight className="h-4 w-4" />
-        <span className="sr-only">Next</span>
+        <span className="sr-only">{t("next")}</span>
       </Button>
     </nav>
   );

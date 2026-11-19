@@ -8,6 +8,7 @@ import { SectionHeading } from "@/components/features/layout/section-heading";
 import { type ProductCardProduct } from "@/components/features/products/product-card";
 import prisma from "@/lib/prisma";
 import { getRequestLocale } from "@/lib/i18n/server";
+import { getTranslations } from "next-intl/server";
 
 interface CategoryDetailPageProps {
   params: Promise<{
@@ -126,6 +127,7 @@ function HeroPlaceholder() {
 export default async function CategoryDetailPage({ params }: CategoryDetailPageProps) {
   const { slug } = await params;
   const locale = await getRequestLocale();
+  const t = await getTranslations("categories.detail");
   const category = await getCategoryBySlug(slug, locale);
 
   if (!category) {
@@ -149,11 +151,11 @@ export default async function CategoryDetailPage({ params }: CategoryDetailPageP
         <div className="container px-4 py-3">
           <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
             <Link href="/" className="font-semibold text-foreground">
-              Home
+              {t("home")}
             </Link>
             <span>/</span>
             <Link href="/categories" className="font-semibold text-foreground">
-              Categories
+              {t("categories")}
             </Link>
             <span>/</span>
             <span className="font-bold text-foreground">{category.name}</span>
@@ -166,11 +168,11 @@ export default async function CategoryDetailPage({ params }: CategoryDetailPageP
           <div>
             <Badge className="mb-4 rounded-full bg-primary/10 text-primary shadow-sm">
               <Grid3X3 className="mr-2 h-4 w-4" />
-              {products.length} products
+              {products.length} {t("products")}
             </Badge>
             <SectionHeading
-              title={category.name || "Category"}
-              description="Explore every product in this collection with a consistent shopping experience."
+              title={category.name || t("categories")}
+              description={t("collection")}
               align="left"
               className="max-w-none"
             />
@@ -178,7 +180,7 @@ export default async function CategoryDetailPage({ params }: CategoryDetailPageP
               <Button asChild={true} variant="outline" className="rounded-full">
                 <Link href="/categories">
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Categories
+                  {t("backToCategories")}
                 </Link>
               </Button>
             </div>
@@ -192,20 +194,20 @@ export default async function CategoryDetailPage({ params }: CategoryDetailPageP
           <div className="rounded-[2rem] border border-border/60 bg-card p-10 text-center shadow-xl shadow-primary/10">
             <Package className="mx-auto mb-4 h-14 w-14 text-muted-foreground" />
             <h2 className="text-2xl font-black text-foreground">
-              No products yet
+              {t("noProductsTitle")}
             </h2>
             <p className="mt-2 text-muted-foreground">
-              This category does not have active products right now.
+              {t("noProductsMessage")}
             </p>
           </div>
         ) : (
           <ProductGrid
             products={products}
-            unknownProductLabel="Unknown Product"
-            outOfStockLabel="Out of Stock"
-            saleLabel="Sale"
-            addToCartLabel="Add to Cart"
-            uncategorizedLabel={category.name || "Uncategorized"}
+            unknownProductLabel={t("unknownProduct")}
+            outOfStockLabel={t("outOfStock")}
+            saleLabel={t("sale")}
+            addToCartLabel={t("addToCart")}
+            uncategorizedLabel={t("uncategorized")}
             showAddToCart={false}
           />
         )}

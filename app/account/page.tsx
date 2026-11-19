@@ -41,6 +41,7 @@ import { useTranslations } from "next-intl";
 
 export default function AccountPage() {
   const t = useTranslations("Account");
+  const tCommon = useTranslations("Common");
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [editingAddress, setEditingAddress] = useState<any>(null);
   const { data: session, isPending, refetch } = useSession();
@@ -326,7 +327,7 @@ export default function AccountPage() {
                             2 days ago
                           </p>
                         </div>
-                        <Badge>Shipped</Badge>
+                        <Badge>{tCommon("orderShipped")}</Badge>
                       </div>
                       <Separator />
                       <div className="flex items-center justify-between">
@@ -336,7 +337,7 @@ export default function AccountPage() {
                             1 week ago
                           </p>
                         </div>
-                        <Badge variant="outline">Delivered</Badge>
+                        <Badge variant="outline">{tCommon("orderDelivered")}</Badge>
                       </div>
                     </div>
                     <Button

@@ -6,6 +6,7 @@
  * @since 2025-01-01
  */
 "use client";
+import { useTranslations } from "next-intl";
 
 import Image from "next/image";
 import * as React from "react";
@@ -47,6 +48,7 @@ export const OptimizedImage = React.forwardRef<
     },
     ref,
   ) => {
+  const t = useTranslations("Common");
     const [isLoaded, setIsLoaded] = React.useState(false);
     const [hasError, setHasError] = React.useState(false);
     const [optimizedSrc, setOptimizedSrc] = React.useState(src);
@@ -125,8 +127,8 @@ export const OptimizedImage = React.forwardRef<
           style={{ width, height }}
         >
           <div className="text-center">
-            <div className="text-xs mb-1">Failed to load</div>
-            <div className="text-xs opacity-70">Click to retry</div>
+            <div className="text-xs mb-1">{t("failedToLoad")}</div>
+            <div className="text-xs opacity-70">{t("clickToRetry")}</div>
           </div>
         </div>
       );
@@ -208,6 +210,7 @@ export function ImageGallery({
   itemClassName,
   columns = 3,
 }: ImageGalleryProps) {
+  const t = useTranslations("Common");
   const gridCols = {
     1: "grid-cols-1",
     2: "grid-cols-1 md:grid-cols-2",

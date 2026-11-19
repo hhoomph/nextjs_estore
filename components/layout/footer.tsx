@@ -156,7 +156,6 @@ export function Footer() {
               <Link href="/privacy-policy" className="transition hover:text-primary">{t("privacyPolicy")}</Link>
               <Link href="/terms-condition" className="transition hover:text-primary">{t("termsOfService")}</Link>
               <Link href="/contact" className="transition hover:text-primary">{t("contactUs")}</Link>
-              <Link href="/credits" className="transition hover:text-primary">Image credits</Link>
             </div>
           </div>
         </div>

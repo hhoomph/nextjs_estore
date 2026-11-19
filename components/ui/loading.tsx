@@ -10,6 +10,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { Heart, Loader2, Package, ShoppingBag } from "lucide-react";
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -108,6 +109,7 @@ export function LoadingSpinner({
 }
 
 export function LoadingPage({ text = "Loading..." }: { text?: string }) {
+  const t = useTranslations("Common");
   return (
     <div className="flex min-h-screen items-center justify-center bg-linear-to-br from-background via-background to-muted/20">
       <div className="text-center space-y-4">
@@ -241,6 +243,7 @@ export function SkeletonCard({ className }: { className?: string }) {
 
 // Page transition loading
 export function PageTransition({ isLoading }: { isLoading: boolean }) {
+  const t = useTranslations("Common");
   if (!isLoading) return null;
 
   return (
@@ -254,7 +257,7 @@ export function PageTransition({ isLoading }: { isLoading: boolean }) {
             className="absolute -inset-2 border-2 rounded-full animate-ping border-primary/20"
           />
         </div>
-        <p className="text-muted-foreground">Loading page...</p>
+        <p className="text-muted-foreground">{t("loadingPage")}</p>
       </div>
     </div>
   );
@@ -262,26 +265,28 @@ export function PageTransition({ isLoading }: { isLoading: boolean }) {
 
 // E-commerce specific loading states
 export function LoadingCart() {
+  const t = useTranslations("Common");
   return (
     <div className="flex items-center justify-center p-8">
       <div className="text-center space-y-4">
         <ShoppingBag
           className="w-12 h-12 animate-pulse mx-auto text-primary"
         />
-        <p className="text-muted-foreground">Loading cart...</p>
+        <p className="text-muted-foreground">{t("loadingCart")}</p>
       </div>
     </div>
   );
 }
 
 export function LoadingWishlist() {
+  const t = useTranslations("Common");
   return (
     <div className="flex items-center justify-center p-8">
       <div className="text-center space-y-4">
         <Heart
           className="w-12 h-12 animate-pulse mx-auto text-destructive"
         />
-        <p className="text-muted-foreground">Loading wishlist...</p>
+        <p className="text-muted-foreground">{t("loadingWishlist")}</p>
       </div>
     </div>
   );

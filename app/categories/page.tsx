@@ -69,6 +69,7 @@ function CategoryCard({ category }: { category: Category }) {
 }
 
 export default function CategoriesPage() {
+  const tCommon = useTranslations("Common");
   const t = useTranslations("categories");
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -206,7 +207,7 @@ export default function CategoriesPage() {
                 className="absolute right-2 top-1/2 h-9 w-9 -translate-y-1/2 rounded-full"
                 onClick={() => setSearchQuery("")}
               >
-                <span className="sr-only">Clear search</span>×
+                <span className="sr-only">{tCommon("clearSearch")}</span>×
               </Button>
             )}
           </div>

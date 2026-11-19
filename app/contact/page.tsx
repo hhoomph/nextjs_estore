@@ -6,6 +6,7 @@
  * @since 2025-01-01
  */
 "use client";
+import { useTranslations } from "next-intl";
 
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -28,6 +29,7 @@ const contactSchema = z.object({
 type ContactForm = z.infer<typeof contactSchema>;
 
 export default function ContactPage() {
+  const t = useTranslations("Contact");
   const [contactInfo, setContactInfo] = useState({ phone: "", email: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -108,7 +110,7 @@ export default function ContactPage() {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       {/* Header */}
       <div className="text-center mb-12">
-        <h1 className="text-3xl font-bold mb-2">Contact Us</h1>
+        <h1 className="text-3xl font-bold mb-2">{t("title")}</h1>
         <p className="text-muted-foreground">
           Have a question or need help? We'd love to hear from you.
         </p>
@@ -119,14 +121,14 @@ export default function ContactPage() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Get in Touch</CardTitle>
+              <CardTitle>{t("info.title")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {contactInfo.email && (
                 <div className="flex items-center gap-3">
                   <Mail className="h-5 w-5 text-primary" />
                   <div>
-                    <p className="font-medium">Email</p>
+                    <p className="font-medium">{t("info.email")}</p>
                     <a
                       href={`mailto:${contactInfo.email}`}
                       className="text-sm text-muted-foreground hover:text-primary"
@@ -140,7 +142,7 @@ export default function ContactPage() {
                 <div className="flex items-center gap-3">
                   <Phone className="h-5 w-5 text-primary" />
                   <div>
-                    <p className="font-medium">Phone</p>
+                    <p className="font-medium">{t("info.phone")}</p>
                     <a
                       href={`tel:${contactInfo.phone}`}
                       className="text-sm text-muted-foreground hover:text-primary"
@@ -160,20 +162,20 @@ export default function ContactPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Business Hours</CardTitle>
+              <CardTitle>{t("info.hours")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Monday - Friday</span>
-                <span>9:00 AM - 6:00 PM</span>
+                <span className="text-muted-foreground">{t("info.mondayFriday")}</span>
+                <span>{t("info.mondayFridayTime")}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Saturday</span>
-                <span>10:00 AM - 4:00 PM</span>
+                <span className="text-muted-foreground">{t("info.saturday")}</span>
+                <span>{t("info.saturdayTime")}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Sunday</span>
-                <span>Closed</span>
+                <span className="text-muted-foreground">{t("info.sunday")}</span>
+                <span>{t("info.sundayTime")}</span>
               </div>
             </CardContent>
           </Card>
@@ -182,7 +184,7 @@ export default function ContactPage() {
         {/* Contact Form */}
         <Card>
           <CardHeader>
-            <CardTitle>Send a Message</CardTitle>
+            <CardTitle>{t("form.title")}</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
@@ -194,10 +196,10 @@ export default function ContactPage() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="name">{t("form.name")}</Label>
                  <Input data-testid="contact-name"
                   id="name"
-                  placeholder="Your name"
+                  placeholder={t("form.namePlaceholder")}
                   {...form.register("name")}
                 />
                 {form.formState.errors.name && (
@@ -208,11 +210,11 @@ export default function ContactPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t("form.email")}</Label>
                  <Input data-testid="contact-email"
                   id="email"
                   type="email"
-                  placeholder="your@email.com"
+                  placeholder={t("form.emailPlaceholder")}
                   {...form.register("email")}
                 />
                 {form.formState.errors.email && (
@@ -223,11 +225,11 @@ export default function ContactPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="subject">Subject</Label>
+                <Label htmlFor="subject">{t("form.subject")}</Label>
                 <Input
                   id="subject"
                   data-testid="contact-subject"
-                  placeholder="How can we help?"
+                  placeholder={t("form.subjectPlaceholder")}
                   {...form.register("subject")}
                 />
                 {form.formState.errors.subject && (
@@ -238,9 +240,9 @@ export default function ContactPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="message">Message</Label>
+                <Label htmlFor="message">{t("form.message")}</Label>
                  <Textarea data-testid="contact-message"
-                  placeholder="Tell us more about your inquiry..."
+                  placeholder={t("form.messagePlaceholder")}
                   rows={5}
                   {...form.register("message")}
                 />

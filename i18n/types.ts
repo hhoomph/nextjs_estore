@@ -106,7 +106,57 @@ export interface SettingsMessages {
   language: string;
   selectLanguage: string;
   currency: string;
-  displayCurrency: string;
+  displayCurrency: string;
+  signIn: string;
+  signUp: string;
+  signInRequiredDescription: string;
+  account: string;
+  backToAccount: string;
+  signOut: string;
+  settingsSubtitle: string;
+  profile: string;
+  security: string;
+  notifications: string;
+  preferences: string;
+  profilePicture: string;
+  personalInformation: string;
+  fullName: string;
+  emailAddress: string;
+  bio: string;
+  fullNamePlaceholder: string;
+  emailPlaceholder: string;
+  bioPlaceholder: string;
+  verified: string;
+  administrator: string;
+  customer: string;
+  changePassword: string;
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+  currentPasswordPlaceholder: string;
+  newPasswordPlaceholder: string;
+  confirmPasswordPlaceholder: string;
+  twoFactorAuth: string;
+  enable2fa: string;
+  enable: string;
+  twoFactorDescription: string;
+  emailNotifications: string;
+  orderUpdates: string;
+  orderUpdatesDesc: string;
+  promotionalEmails: string;
+  promotionalEmailsDesc: string;
+  newsletter: string;
+  newsletterDesc: string;
+  pushNotifications: string;
+  pushOrderUpdatesDesc: string;
+  promotions: string;
+  pushPromotionsDesc: string;
+  saveNotificationSettings: string;
+  savePreferences: string;
+  saveChanges: string;
+  saving: string;
+  pleaseSignIn: string;
+  settings: string;
 }
 
 export interface StatusMessages {
@@ -181,13 +231,29 @@ export interface HomeMessages {
     browseCategories: string;
   };
   featuredProducts: {
+    eyebrow: string;
     title: string;
     subtitle: string;
     viewAll: string;
   };
+  promo: {
+    hero: { eyebrow: string; title: string; description: string };
+    fitness: { eyebrow: string; title: string; description: string };
+    wearable: { eyebrow: string; title: string; description: string };
+  };
   product: {
     sale: string;
     viewDetails: string;
+    addToCart: string;
+    uncategorized: string;
+    unknownProduct: string;
+    outOfStock: string;
+  };
+  bestSellers: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    viewAll: string;
   };
   features: {
     title: string;
@@ -233,7 +299,9 @@ export interface HomeMessages {
     subtitle: string;
     createAccount: string;
     browseProducts: string;
-  };
+  };
+  addToCart: string;
+  uncategorized: string;
 }
 
 export interface ProductRelatedMessages {
@@ -1214,7 +1282,19 @@ export interface OrdersMessages {
   signInRequired: string;
   noOrdersYet: string;
   ordersDescription: string;
-  browseProducts: string;
+  browseProducts: string;
+  ordersSubtitle: string;
+  unableToLoad: string;
+  orderNumber: string;
+  date: string;
+  status: string;
+  total: string;
+  items: string;
+  viewDetails: string;
+  emptyTitle: string;
+  emptyDescription: string;
+  home: string;
+  account: string;
 }
 
 export interface AddressesMessages {
@@ -1261,6 +1341,10 @@ export interface AddressesMessages {
   addAddress: string;
   emptyAddressesHint: string;
   addAnotherHint: string;
+  loadingMap: string;
+  mapTitle: string;
+  howToUse: string;
+  openStreetMap: string;
 }
 // Complete messages structure type
 interface ProductDetailMessages {
@@ -1272,9 +1356,18 @@ interface ProductDetailMessages {
   noDescription: string;
   customerReviews: string;
   anonymous: string;
+  reviews: string;
+  backToProducts: string;
+  addToCart: string;
+  wishlist: string;
+  outOfStock: string;
+  inStock: string;
+  available: string;
+  addedToWishlist: string;
 }
 export interface AppMessages {
   loading: string;
+  Common: Record<string, string>;
   Navigation: NavigationMessages;
   Authentication: AuthenticationMessages;
   "Admin Panel": AdminPanelMessages;

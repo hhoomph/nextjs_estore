@@ -167,7 +167,7 @@ async function FeaturedProductsSection({ products }: { products: ProductListItem
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-10 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
           <SectionHeading
-            eyebrow="New Arrivals"
+            eyebrow={tHome("featuredProducts.eyebrow")}
             title={tHome("featuredProducts.title")}
             description={tHome("featuredProducts.subtitle")}
             align="left"
@@ -180,11 +180,11 @@ async function FeaturedProductsSection({ products }: { products: ProductListItem
 
         <HomeProductGrid
           products={products.map(toHomeProduct)}
-          unknownProductLabel="Unknown Product"
-          outOfStockLabel="Out of Stock"
+          unknownProductLabel={tHome("product.unknownProduct")}
+          outOfStockLabel={tHome("product.outOfStock")}
           saleLabel={tHome("product.sale")}
-          addToCartLabel="Add to Cart"
-          uncategorizedLabel="Uncategorized"
+          addToCartLabel={tHome("product.addToCart")}
+          uncategorizedLabel={tHome("product.uncategorized")}
         />
       </div>
     </section>
@@ -203,24 +203,24 @@ async function BestSellersSection({ products }: { products: ProductListItem[] })
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-10 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
           <SectionHeading
-            eyebrow="Best Selling Products"
-            title="These top picks are flying off the shelves"
-            description="Find out what everyone is loving right now."
+            eyebrow={tHome("bestSellers.eyebrow")}
+            title={tHome("bestSellers.title")}
+            description={tHome("bestSellers.description")}
             align="left"
             className="max-w-none"
           />
           <Button asChild={true} variant="outline" className="w-fit rounded-full">
-            <Link href="/popular">View all best sellers</Link>
+            <Link href="/popular">{tHome("bestSellers.viewAll")}</Link>
           </Button>
         </div>
 
         <HomeProductGrid
           products={products.map(toHomeProduct)}
-          unknownProductLabel="Unknown Product"
-          outOfStockLabel="Out of Stock"
+          unknownProductLabel={tHome("product.unknownProduct")}
+          outOfStockLabel={tHome("product.outOfStock")}
           saleLabel={tHome("product.sale")}
-          addToCartLabel="Add to Cart"
-          uncategorizedLabel="Uncategorized"
+          addToCartLabel={tHome("product.addToCart")}
+          uncategorizedLabel={tHome("product.uncategorized")}
         />
       </div>
     </section>

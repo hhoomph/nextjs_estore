@@ -111,25 +111,25 @@ export default function OrdersPage() {
       <div className="border-b">
         <div className="container px-4 py-3">
           <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
-            <Link href="/" className="hover:text-foreground">Home</Link>
+            <Link href="/" className="hover:text-foreground">{t("home")}</Link>
             <span>/</span>
-            <Link href="/account" className="hover:text-foreground">Account</Link>
+            <Link href="/account" className="hover:text-foreground">{t("account")}</Link>
             <span>/</span>
-            <span className="text-foreground">Orders</span>
+            <span className="text-foreground">{t("orders")}</span>
           </nav>
         </div>
       </div>
 
       <div className="container px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Orders</h1>
-          <p className="text-muted-foreground">Review your recent order history.</p>
+          <h1 className="text-3xl font-bold mb-2">{t("orders")}</h1>
+          <p className="text-muted-foreground">{t("ordersSubtitle")}</p>
         </div>
 
         {error && (
           <Card className="mb-6 border-destructive/40">
             <CardHeader>
-              <CardTitle className="text-destructive">Unable to load orders</CardTitle>
+              <CardTitle className="text-destructive">{t("unableToLoad")}</CardTitle>
               <CardDescription>{error}</CardDescription>
             </CardHeader>
           </Card>

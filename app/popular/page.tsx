@@ -11,10 +11,12 @@ import { getProducts } from "@/lib/actions/products";
 import { PopularBreadcrumb } from "./breadcrumb";
 import { ProductsPageClient } from "./client";
 import { getRequestLocale } from "@/lib/i18n/server";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function PopularProductsPage() {
+  const t = (await getTranslations("products")) as (key: string) => string;
   // Server component - fetch initial data sorted by wishlist count (popularity)
   let initialData;
   try {
@@ -52,7 +54,7 @@ export default async function PopularProductsPage() {
         </div>
       </div>
 
-      <Suspense fallback={<LoadingPage text="Loading popular products..." />}>
+      <Suspense fallback={<LoadingPage text={t("loading")} />}>
         <ProductsPageClient initialData={initialData} />
       </Suspense>
     </div>

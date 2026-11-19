@@ -44,6 +44,7 @@ function toProductCard(product: Product): ProductCardProduct {
 }
 
 export default function DealsPage() {
+  const tCommon = useTranslations("Common");
   const t = useTranslations("Deals");
   const locale = useLocale();
   const [deals, setDeals] = useState<Product[]>([]);
@@ -128,7 +129,7 @@ export default function DealsPage() {
               Home
             </Link>
             <span>/</span>
-            <span className="font-bold text-foreground">Deals</span>
+            <span className="font-bold text-foreground">{tCommon("deals")}</span>
           </nav>
         </div>
       </div>

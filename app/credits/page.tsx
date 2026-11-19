@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import credits from "../../scripts/data/image-credits.json";
 
 export const metadata: Metadata = {
@@ -19,10 +20,11 @@ const licenses = entries.reduce<Record<string, number>>((accumulator, [, credit]
 }, {});
 
 export default function CreditsPage() {
+  const t = useTranslations("Common");
   return (
     <div className="bg-background min-h-screen">
       <div className="container px-4 py-12">
-        <h1 className="text-3xl font-bold tracking-tight">Image credits</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t("imageCredits")}</h1>
         <p className="mt-3 max-w-3xl text-muted-foreground">
           Product photography is sourced from Wikimedia Commons. Each file below lists its
           author and licence; where a licence requires attribution or share-alike, the credit
@@ -30,7 +32,7 @@ export default function CreditsPage() {
         </p>
 
         <section className="mt-8">
-          <h2 className="text-lg font-semibold">Licences in use</h2>
+          <h2 className="text-lg font-semibold">{t("licencesInUse")}</h2>
           <ul className="mt-3 flex flex-wrap gap-2">
             {Object.entries(licenses)
               .sort(([, a], [, b]) => b - a)
@@ -46,15 +48,15 @@ export default function CreditsPage() {
         </section>
 
         <section className="mt-10">
-          <h2 className="text-lg font-semibold">Per-image attribution</h2>
+          <h2 className="text-lg font-semibold">{t("perImageAttribution")}</h2>
           <div className="mt-4 overflow-x-auto rounded-2xl border border-border">
             <table className="w-full text-left text-sm">
               <thead className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
                 <tr>
-                  <th className="px-4 py-3">Image</th>
-                  <th className="px-4 py-3">Author</th>
-                  <th className="px-4 py-3">Licence</th>
-                  <th className="px-4 py-3">Source</th>
+                  <th className="px-4 py-3">{t("image")}</th>
+                  <th className="px-4 py-3">{t("author")}</th>
+                  <th className="px-4 py-3">{t("licence")}</th>
+                  <th className="px-4 py-3">{t("source")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -85,7 +87,7 @@ export default function CreditsPage() {
         </section>
 
         <Link href="/" className="mt-10 inline-block text-sm font-semibold text-primary hover:underline">
-          Back to store
+          {t("backToStore")}
         </Link>
       </div>
     </div>

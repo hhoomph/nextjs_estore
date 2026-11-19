@@ -433,7 +433,7 @@ export function AddressForm({
             name="telephone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Telephone</FormLabel>
+                <FormLabel>{t("telephone")}</FormLabel>
                 <FormControl>
                   <PersianPhoneInput placeholder="۰۲۱ ۱۲۳۴۵۶۷۸" {...field} />
                 </FormControl>
@@ -463,7 +463,7 @@ export function AddressForm({
           name="location"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Map Location (Optional)</FormLabel>
+              <FormLabel>{t("mapLocation")}</FormLabel>
               <FormControl>
                 <div className="space-y-2">
                   <Input

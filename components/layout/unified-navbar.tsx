@@ -55,6 +55,7 @@ interface CategoryItem {
   productCount: number;
 }
 export function UnifiedNavbar() {
+  const tCommon = useTranslations("Common");
   // ALL HOOKS MUST BE CALLED IN EXACT SAME ORDER EVERY TIME
   // Core hooks - must be called first, always
   const router = useRouter();
@@ -147,7 +148,7 @@ export function UnifiedNavbar() {
         >
           <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
           <Moon className="absolute inset-0 h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only cursor-pointer">Toggle theme</span>
+          <span className="sr-only cursor-pointer">{tCommon("toggleTheme")}</span>
         </Button>
       );
     }
@@ -447,7 +448,7 @@ export function UnifiedNavbar() {
             <SheetTrigger asChild={true}>
               <Button variant="ghost" size="icon">
                 <Menu className="h-5 w-5" />
-                <span className="sr-only">Menu</span>
+                <span className="sr-only">{tCommon("menu")}</span>
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[min(88vw,22rem)] overflow-y-auto">

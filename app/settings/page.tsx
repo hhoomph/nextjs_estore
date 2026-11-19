@@ -230,16 +230,16 @@ export default function SettingsPage() {
       <div className="container px-4 py-16 text-center">
         <div className="max-w-md mx-auto">
           <User className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-          <h1 className="text-2xl font-bold mb-4">Please Sign In</h1>
+          <h1 className="text-2xl font-bold mb-4">{t("pleaseSignIn")}</h1>
           <p className="text-muted-foreground mb-6">
-            You need to be signed in to access your settings.
+            {t("signInRequiredDescription")}
           </p>
           <div className="space-x-4">
             <Button asChild={true}>
-              <Link href="/auth/signin?redirect=/settings">Sign In</Link>
+              <Link href="/auth/signin?redirect=/settings">{t("signIn")}</Link>
             </Button>
             <Button variant="outline" asChild={true}>
-              <Link href="/auth/signup?redirect=/settings">Sign Up</Link>
+              <Link href="/auth/signup?redirect=/settings">{t("signUp")}</Link>
             </Button>
           </div>
         </div>
@@ -371,10 +371,10 @@ export default function SettingsPage() {
             </Link>
             <span>/</span>
             <Link href="/account" className="hover:text-foreground">
-              Account
+              {tNav("account")}
             </Link>
             <span>/</span>
-            <span className="text-foreground">Settings</span>
+            <span className="text-foreground">{t("settings")}</span>
           </nav>
         </div>
       </div>
@@ -386,17 +386,17 @@ export default function SettingsPage() {
             <Button variant="outline" size="sm" asChild={true}>
               <Link href="/account">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Account
+                {t("backToAccount")}
               </Link>
             </Button>
             <Button variant="outline" size="sm" onClick={() => handleSignOut()}>
               <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
+              {t("signOut")}
             </Button>
             <div>
-              <h1 className="text-3xl font-bold">Settings</h1>
+              <h1 className="text-3xl font-bold">{t("settings")}</h1>
               <p className="text-muted-foreground">
-                Manage your account preferences
+                {t("settingsSubtitle")}
               </p>
             </div>
           </div>
@@ -408,10 +408,10 @@ export default function SettingsPage() {
             className="w-full"
           >
             <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
-              <TabsTrigger value="profile">Profile</TabsTrigger>
-              <TabsTrigger value="security">Security</TabsTrigger>
-              <TabsTrigger value="notifications">Notifications</TabsTrigger>
-              <TabsTrigger value="preferences">Preferences</TabsTrigger>
+              <TabsTrigger value="profile">{t("profile")}</TabsTrigger>
+              <TabsTrigger value="security">{t("security")}</TabsTrigger>
+              <TabsTrigger value="notifications">{t("notifications")}</TabsTrigger>
+              <TabsTrigger value="preferences">{t("preferences")}</TabsTrigger>
             </TabsList>
 
             {/* Profile Tab */}
@@ -419,7 +419,7 @@ export default function SettingsPage() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <Card className="lg:col-span-1">
                   <CardHeader>
-                    <CardTitle>Profile Picture</CardTitle>
+                    <CardTitle>{t("profilePicture")}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex flex-col items-center">
@@ -444,7 +444,7 @@ export default function SettingsPage() {
 
                 <Card className="lg:col-span-2">
                   <CardHeader>
-                    <CardTitle>Personal Information</CardTitle>
+                    <CardTitle>{t("personalInformation")}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <form
@@ -453,11 +453,11 @@ export default function SettingsPage() {
                     >
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="name">Full Name</Label>
+                          <Label htmlFor="name">{t("fullName")}</Label>
                           <Input
                             id="name"
                             {...profileForm.register("name")}
-                            placeholder="Enter your full name"
+                            placeholder={t("fullNamePlaceholder")}
                           />
                           {profileForm.formState.errors.name && (
                             <p className="text-sm text-destructive">
@@ -467,12 +467,12 @@ export default function SettingsPage() {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="email">Email Address</Label>
+                          <Label htmlFor="email">{t("emailAddress")}</Label>
                           <Input
                             id="email"
                             type="email"
                             {...profileForm.register("email")}
-                            placeholder="Enter your email"
+                            placeholder={t("emailPlaceholder")}
                           />
                           {profileForm.formState.errors.email && (
                             <p className="text-sm text-destructive">
@@ -483,11 +483,11 @@ export default function SettingsPage() {
                       </div>
 
                        <div className="space-y-2">
-                         <Label htmlFor="bio">Bio</Label>
+                         <Label htmlFor="bio">{t("bio")}</Label>
                          <textarea
                            id="bio"
                            {...profileForm.register("bio")}
-                           placeholder="Tell us about yourself"
+                           placeholder={t("bioPlaceholder")}
                            className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                          />
                          {profileForm.formState.errors.bio && (
@@ -500,10 +500,10 @@ export default function SettingsPage() {
                       <div className="flex items-center gap-2 pt-4">
                         <Badge variant="secondary">
                           {effectiveSession.user.role === "ADMIN"
-                            ? "Administrator"
-                            : "Customer"}
+                            ? t("administrator")
+                            : t("customer")}
                         </Badge>
-                        <Badge variant="outline">Verified</Badge>
+                        <Badge variant="outline">{t("verified")}</Badge>
                       </div>
 
                       <Button
@@ -524,7 +524,7 @@ export default function SettingsPage() {
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Change Password</CardTitle>
+                    <CardTitle>{t("changePassword")}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <form
@@ -540,7 +540,7 @@ export default function SettingsPage() {
                             id="currentPassword"
                             type={showCurrentPassword ? "text" : "password"}
                             {...passwordForm.register("currentPassword")}
-                            placeholder="Enter your current password"
+                            placeholder={t("currentPasswordPlaceholder")}
                           />
                           <Button
                             type="button"
@@ -570,13 +570,13 @@ export default function SettingsPage() {
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="newPassword">New Password</Label>
+                          <Label htmlFor="newPassword">{t("newPassword")}</Label>
                           <div className="relative">
                             <Input
                               id="newPassword"
                               type={showNewPassword ? "text" : "password"}
                               {...passwordForm.register("newPassword")}
-                              placeholder="Enter new password"
+                              placeholder={t("newPasswordPlaceholder")}
                             />
                             <Button
                               type="button"
@@ -606,14 +606,14 @@ export default function SettingsPage() {
 
                         <div className="space-y-2">
                           <Label htmlFor="confirmPassword">
-                            Confirm New Password
+                            {t("confirmNewPassword")}
                           </Label>
                           <div className="relative">
                             <Input
                               id="confirmPassword"
                               type={showConfirmPassword ? "text" : "password"}
                               {...passwordForm.register("confirmPassword")}
-                              placeholder="Confirm new password"
+                              placeholder={t("confirmPasswordPlaceholder")}
                             />
                             <Button
                               type="button"
@@ -655,17 +655,17 @@ export default function SettingsPage() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Two-Factor Authentication</CardTitle>
+                    <CardTitle>{t("twoFactorAuth")}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-medium">Enable 2FA</p>
+                        <p className="font-medium">{t("enable2fa")}</p>
                         <p className="text-sm text-muted-foreground">
-                          Add an extra layer of security to your account
+                          {t("twoFactorDescription")}
                         </p>
                       </div>
-                      <Button variant="outline">Enable</Button>
+                      <Button variant="outline">{t("enable")}</Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -676,14 +676,14 @@ export default function SettingsPage() {
             <TabsContent value="notifications" className="mt-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Email Notifications</CardTitle>
+                  <CardTitle>{t("emailNotifications")}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium">Order Updates</p>
+                      <p className="font-medium">{t("orderUpdates")}</p>
                       <p className="text-sm text-muted-foreground">
-                        Receive emails about your order status
+                        {t("orderUpdatesDesc")}
                       </p>
                     </div>
                     <Switch
@@ -701,9 +701,9 @@ export default function SettingsPage() {
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium">Promotional Emails</p>
+                      <p className="font-medium">{t("promotionalEmails")}</p>
                       <p className="text-sm text-muted-foreground">
-                        Get notified about sales and special offers
+                        {t("promotionalEmailsDesc")}
                       </p>
                     </div>
                     <Switch
@@ -721,9 +721,9 @@ export default function SettingsPage() {
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium">Newsletter</p>
+                      <p className="font-medium">{t("newsletter")}</p>
                       <p className="text-sm text-muted-foreground">
-                        Weekly newsletter with product updates
+                        {t("newsletterDesc")}
                       </p>
                     </div>
                     <Switch
@@ -741,14 +741,14 @@ export default function SettingsPage() {
 
               <Card className="mt-6">
                 <CardHeader>
-                  <CardTitle>Push Notifications</CardTitle>
+                  <CardTitle>{t("pushNotifications")}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium">Order Updates</p>
+                      <p className="font-medium">{t("orderUpdates")}</p>
                       <p className="text-sm text-muted-foreground">
-                        Browser notifications for order updates
+                        {t("pushOrderUpdatesDesc")}
                       </p>
                     </div>
                     <Switch
@@ -766,9 +766,9 @@ export default function SettingsPage() {
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium">Promotions</p>
+                      <p className="font-medium">{t("promotions")}</p>
                       <p className="text-sm text-muted-foreground">
-                        Notifications about flash sales and deals
+                        {t("pushPromotionsDesc")}
                       </p>
                     </div>
                     <Switch
@@ -788,7 +788,7 @@ export default function SettingsPage() {
               <div className="flex justify-end pt-4">
                 <Button onClick={saveNotifications}>
                   <Save className="h-4 w-4 mr-2" />
-                  Save Notification Settings
+                  {t("saveNotificationSettings")}
                 </Button>
               </div>
             {/* Preferences Tab */}
@@ -866,7 +866,7 @@ export default function SettingsPage() {
               <div className="flex justify-end pt-4">
                 <Button onClick={savePreferences}>
                   <Save className="h-4 w-4 mr-2" />
-                  Save Preferences
+                  {t("savePreferences")}
                 </Button>
               </div>
           </Tabs>

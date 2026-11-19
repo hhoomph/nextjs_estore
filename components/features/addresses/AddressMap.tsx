@@ -6,6 +6,7 @@
  * @since 2025-01-01
  */
 "use client";
+import { useTranslations } from "next-intl";
 
 import type { Map as LeafletMap, LeafletMouseEvent } from "leaflet";
 import { Loader2, MapPin, Navigation, RefreshCw } from "lucide-react";
@@ -73,6 +74,7 @@ interface AddressMapProps {
 }
 
 export function AddressMap({}: AddressMapProps) {
+  const t = useTranslations("Addresses");
   const { data: session } = useSession();
   const { toast } = useToast();
   const [addresses, setAddresses] = useState<MapAddress[]>([]);
@@ -163,7 +165,7 @@ export function AddressMap({}: AddressMapProps) {
     return (
       <div className="flex justify-center items-center py-12">
         <Loader2 className="h-8 w-8 animate-spin" />
-        <span className="ml-2">Loading map...</span>
+        <span className="ml-2">{t("loadingMap")}</span>
       </div>
     );
   }
@@ -173,7 +175,7 @@ export function AddressMap({}: AddressMapProps) {
       {/* Map Controls */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold">Your Addresses on Map</h3>
+          <h3 className="text-lg font-semibold">{t("mapTitle")}</h3>
           <p className="text-sm text-muted-foreground">
             Click on the map to copy coordinates for new addresses
           </p>
@@ -221,7 +223,7 @@ export function AddressMap({}: AddressMapProps) {
             >
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">{t("openStreetMap")}</a> contributors'
               />
 
               <MapEvents onMapClick={handleMapClick} />
@@ -237,7 +239,7 @@ export function AddressMap({}: AddressMapProps) {
                       <div className="space-y-2 min-w-48">
                         <div className="flex items-center gap-2">
                           <MapPin className="h-4 w-4" />
-                          <span className="font-medium">Delivery Address</span>
+                          <span className="font-medium">{t("deliveryAddress")}</span>
                           {address.isDefault && (
                             <Badge variant="default" className="text-xs">
                               Default
@@ -288,7 +290,7 @@ export function AddressMap({}: AddressMapProps) {
           <div className="flex items-start gap-3">
             <MapPin className="h-5 w-5 text-primary mt-0.5" />
             <div>
-              <h4 className="font-medium text-foreground">How to use the map</h4>
+              <h4 className="font-medium text-foreground">{t("howToUse")}</h4>
               <ul className="text-sm text-muted-foreground mt-1 space-y-1">
                 <li>
                   • Click anywhere on the map to copy coordinates to your

@@ -226,7 +226,7 @@ export const deleteCategory = async (id: string): Promise<void> => {
  * Get category by slug
  */
 export const getCategoryBySlug = cache(
-  async (slug: string): Promise<CategoryWithCount | null> => {
+  async (slug: string, locale: "fa" | "en" = "fa"): Promise<CategoryWithCount | null> => {
     try {
       const category = await prisma.category.findFirst({
         where: {
@@ -248,7 +248,7 @@ export const getCategoryBySlug = cache(
         id: category.id,
         parentId: category.parentId,
         level: category.level,
-        name: category.name,
+        name: locale === "fa" ? (category as { nameFa?: string | null }).nameFa || category.name : category.name,
         productCount: category._count.products,
         createdAt: category.createdAt,
         modifiedAt: category.modifiedAt,

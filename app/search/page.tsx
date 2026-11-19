@@ -60,6 +60,7 @@ function SearchBoard() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("products") as (key: string) => string;
+  const tCommon = useTranslations("Common");
   const initialQuery = searchParams.get("q") || "";
   const searchAbortRef = useRef<AbortController | null>(null);
 
@@ -215,7 +216,7 @@ function SearchBoard() {
               Home
             </Link>
             <span>/</span>
-            <span className="font-semibold text-foreground">Search</span>
+            <span className="font-semibold text-foreground">{tCommon("search")}</span>
           </nav>
         </div>
       </div>
@@ -249,7 +250,7 @@ function SearchBoard() {
                   className="absolute right-3 top-1/2 h-9 w-9 -translate-y-1/2 rounded-full"
                 >
                   <X className="h-4 w-4" />
-                  <span className="sr-only">Clear search</span>
+                  <span className="sr-only">{tCommon("clearSearch")}</span>
                 </Button>
               )}
             </div>
@@ -265,7 +266,7 @@ function SearchBoard() {
         {loading && (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="mr-3 h-8 w-8 animate-spin text-primary" />
-            <span className="font-semibold text-muted-foreground">Searching...</span>
+            <span className="font-semibold text-muted-foreground">{tCommon("searching")}</span>
           </div>
         )}
 
@@ -335,7 +336,7 @@ function SearchBoard() {
                     Clear Search
                   </Button>
                   <Button variant="outline" asChild={true} className="rounded-full">
-                    <Link href="/products">Browse All Products</Link>
+                    <Link href="/products">{tCommon("browseAllProducts")}</Link>
                   </Button>
                 </div>
               </div>
@@ -358,8 +359,9 @@ function SearchBoard() {
 }
 
 export default function SearchPage() {
+  const tCommon = useTranslations("Common");
   return (
-    <Suspense fallback={<div className="flex items-center justify-center py-12"><Loader2 className="mr-3 h-8 w-8 animate-spin text-primary" /><span className="font-semibold text-muted-foreground">Loading search...</span></div>}>
+    <Suspense fallback={<div className="flex items-center justify-center py-12"><Loader2 className="mr-3 h-8 w-8 animate-spin text-primary" /><span className="font-semibold text-muted-foreground">{tCommon("loadingSearch")}</span></div>}>
       <SearchBoard />
     </Suspense>
   );

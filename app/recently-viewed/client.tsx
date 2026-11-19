@@ -35,6 +35,7 @@ interface RecentlyViewedProduct {
 
 export function RecentlyViewedClient() {
   const t = useTranslations("Recently Viewed");
+  const tCommon = useTranslations("Common");
   const [products, setProducts] = useState<RecentlyViewedProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -76,7 +77,7 @@ export function RecentlyViewedClient() {
     return (
       <div className="text-center py-12">
         <p className="text-destructive mb-4">{error}</p>
-        <Button onClick={() => fetchRecentlyViewed()}>Try Again</Button>
+        <Button onClick={() => fetchRecentlyViewed()}>{tCommon("tryAgain")}</Button>
       </div>
     );
   }
@@ -112,7 +113,7 @@ export function RecentlyViewedClient() {
           You haven't viewed any products recently.
         </p>
         <Link href="/products">
-          <Button>Browse Products</Button>
+          <Button>{tCommon("browseProducts")}</Button>
         </Link>
       </div>
     );

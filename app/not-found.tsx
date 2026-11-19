@@ -6,17 +6,19 @@
  * @since 2025-01-01
  */
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 // Force dynamic rendering to avoid prerendering issues
 export const dynamic = "force-dynamic";
 
-export default function NotFound() {
+export default async function NotFound() {
+  const t = await getTranslations("Common");
   return (
     <div style={{ padding: "2rem", textAlign: "center" }}>
       <h1 style={{ fontSize: "2rem", marginBottom: "1rem" }}>
-        404 - Page Not Found
+        404 - {t("notFoundHeading")}
       </h1>
-      <p>The page you are looking for does not exist.</p>
+      <p>{t("notFoundDescription")}</p>
       <Link
         href="/"
         style={{
@@ -29,7 +31,7 @@ export default function NotFound() {
           borderRadius: "0.375rem",
         }}
       >
-        Go Home
+        {t("goHome")}
       </Link>
     </div>
   );

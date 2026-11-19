@@ -25,6 +25,7 @@ import { LocaleProvider } from "@/components/providers/locale-provider";
 import { OverlayProvider } from "@/components/providers/overlay-provider";
 import { PerformanceProvider } from "@/components/providers/performance-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { AdminThemeBootstrap } from "@/components/providers/admin-theme-bootstrap";
 import type { CookieLocale } from "@/lib/i18n/cookie-locale";
 import { generateSEOMetadata } from "@/lib/seo/metadata";
 
@@ -68,6 +69,7 @@ export default async function RootLayout({
             <CurrencyProvider initialLocale={locale as CookieLocale}>
               {/* Client-side fallback that updates attributes after hydration */}
               <HTMLAttributesProvider />
+              <AdminThemeBootstrap />
 
               <EnhancedErrorBoundary>
                 <PerformanceProvider>

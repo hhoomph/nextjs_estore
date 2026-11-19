@@ -1,4 +1,5 @@
 "use client";
+import { useTranslations } from "next-intl";
 
 /**
  * Forgot password page
@@ -26,6 +27,7 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordForm = z.infer<typeof forgotPasswordSchema>;
 
 export default function ForgotPasswordPage() {
+  const tCommon = useTranslations("Common");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -75,7 +77,7 @@ export default function ForgotPasswordPage() {
             <div className="flex justify-center mb-4">
               <CheckCircle2 className="h-16 w-16 text-success" />
             </div>
-            <h2 className="text-2xl font-bold mb-2">Check your email</h2>
+            <h2 className="text-2xl font-bold mb-2">{tCommon("checkYourEmail")}</h2>
             <p className="text-muted-foreground mb-4">
               If an account exists for {submittedEmail}, we&apos;ve sent a password reset link.
             </p>
@@ -125,7 +127,7 @@ export default function ForgotPasswordPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder={tCommon("emailPlaceholder")}
                 {...form.register("email")}
                 className="focus:ring-primary"
               />

@@ -117,7 +117,7 @@ function CheckoutSuccessContent() {
     return (
       <div className="container px-4 py-20">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Order Not Found</h1>
+          <h1 className="text-2xl font-bold mb-4">{t("orderNotFound")}</h1>
           <p className="text-muted-foreground mb-8">{error}</p>
           <Link href="/">
             <Button>
@@ -144,7 +144,7 @@ function CheckoutSuccessContent() {
               Checkout
             </Link>
             <span>/</span>
-            <span className="text-foreground">Success</span>
+            <span className="text-foreground">{t("orderConfirmed")}</span>
           </nav>
         </div>
       </div>
@@ -175,11 +175,11 @@ function CheckoutSuccessContent() {
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h3 className="font-semibold mb-2">Order Number</h3>
+                    <h3 className="font-semibold mb-2">{t("orderNumber")}</h3>
                     <p data-testid="order-number" className="text-lg font-mono">{order.orderNumber}</p>
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-2">Order Date</h3>
+                    <h3 className="font-semibold mb-2">{t("orderDate")}</h3>
                     <p className="text-muted-foreground">
                       {new Date(order.createdAt).toLocaleDateString("en-US", {
                         year: "numeric",
@@ -191,7 +191,7 @@ function CheckoutSuccessContent() {
                     </p>
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-2">Order Status</h3>
+                    <h3 className="font-semibold mb-2">{t("orderStatus")}</h3>
                     <Badge
                       variant="default"
                       className="bg-success/10 text-success"
@@ -200,7 +200,7 @@ function CheckoutSuccessContent() {
                     </Badge>
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-2">Transaction ID</h3>
+                    <h3 className="font-semibold mb-2">{t("transactionId")}</h3>
                     <p className="text-sm font-mono text-muted-foreground">
                       {order.transactionCode}
                     </p>
@@ -211,14 +211,14 @@ function CheckoutSuccessContent() {
 
                 {/* Order Summary */}
                 <div>
-                  <h3 className="font-semibold mb-4">Order Summary</h3>
+                  <h3 className="font-semibold mb-4">{t("orderSummary")}</h3>
                   <div className="bg-muted/50 rounded-lg p-4 space-y-3">
                     <div className="flex justify-between">
-                      <span>Subtotal</span>
+                      <span>{t("subtotal")}</span>
                       <span>${(order.total * 0.88).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Shipping</span>
+                      <span>{t("shipping")}</span>
                       <span>$5.00</span>
                     </div>
                     <div className="flex justify-between">
@@ -227,14 +227,14 @@ function CheckoutSuccessContent() {
                     </div>
                     <Separator />
                     <div className="flex justify-between font-semibold">
-                      <span>Total</span>
+                      <span>{t("total")}</span>
                       <span>${order.total.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="font-semibold mb-4">Purchased Items</h3>
+                  <h3 className="font-semibold mb-4">{t("purchasedItems")}</h3>
                   <div className="space-y-3">
                     {order.items.map((item) => (
                       <div
@@ -283,7 +283,7 @@ function CheckoutSuccessContent() {
                         </span>
                       </div>
                       <div>
-                        <h4 className="font-medium">Order Processing</h4>
+                        <h4 className="font-medium">{t("orderProcessing")}</h4>
                         <p className="text-sm text-muted-foreground">
                           We're preparing your order for shipment. This usually
                           takes 1-2 business days.
@@ -297,7 +297,7 @@ function CheckoutSuccessContent() {
                         </span>
                       </div>
                       <div>
-                        <h4 className="font-medium">Shipping</h4>
+                        <h4 className="font-medium">{t("shippingInformation")}</h4>
                         <p className="text-sm text-muted-foreground">
                           Once shipped, you'll receive a tracking number via
                           email.
@@ -311,7 +311,7 @@ function CheckoutSuccessContent() {
                         </span>
                       </div>
                       <div>
-                        <h4 className="font-medium">Delivery</h4>
+                        <h4 className="font-medium">{t("delivery")}</h4>
                         <p className="text-sm text-muted-foreground">
                           Standard delivery takes 3-5 business days. Express
                           delivery is 1-2 days.
@@ -329,7 +329,7 @@ function CheckoutSuccessContent() {
             {/* Quick Actions */}
             <Card>
               <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
+                <CardTitle>{t("quickActions")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Link href="/orders" className="w-full">
@@ -423,7 +423,7 @@ function CheckoutSuccessContent() {
               next purchase.
             </p>
             <Link href="/products">
-              <Button size="lg">Continue Shopping</Button>
+              <Button size="lg">{t("continueShopping")}</Button>
             </Link>
           </div>
         </div>

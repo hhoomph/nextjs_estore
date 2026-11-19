@@ -1,4 +1,5 @@
 "use client";
+import { useTranslations } from "next-intl";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -17,6 +18,7 @@ interface Testimonial {
 }
 
 export function HomeTestimonialsSection() {
+  const t = useTranslations("Common");
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -116,7 +118,7 @@ export function HomeTestimonialsSection() {
                   )}
                   <div>
                     <h3 className="font-black text-foreground">{testimonial.user.name}</h3>
-                    <p className="text-xs font-bold text-muted-foreground">Verified Customer</p>
+                    <p className="text-xs font-bold text-muted-foreground">{t("verifiedCustomer")}</p>
                   </div>
                 </div>
               </article>
@@ -126,7 +128,7 @@ export function HomeTestimonialsSection() {
 
         <div className="mt-10 flex justify-center">
           <Button asChild={true} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
-            <Link href="/products">Shop best sellers</Link>
+            <Link href="/products">{t("shopBestSellers")}</Link>
           </Button>
         </div>
       </div>
